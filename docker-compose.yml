@@ -3,12 +3,15 @@ version: '3'
 services:
   postgres:
     image: postgres:12
+    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=paca_db
     ports:
       - "5432:5432"
+    networks:
+      - default
 
   app:
     build: .
@@ -20,3 +23,9 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paca_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
