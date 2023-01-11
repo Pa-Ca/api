@@ -1,13 +1,15 @@
 version: '3'
+
 services:
   postgres:
     image: postgres:12
     environment:
-      - POSTGRES_USER=postgress
-      - POSTGRES_PASSWORD=postgress
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=paca_db
     ports:
       - "5432:5432"
+
   app:
     build: .
     ports:
@@ -16,5 +18,5 @@ services:
       - postgres
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paca_db
-      - SPRING_DATASOURCE_USERNAME=postgress
-      - SPRING_DATASOURCE_PASSWORD=postgress
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
