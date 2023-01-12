@@ -2,6 +2,9 @@ package com.paca.paca.user;
 
 import org.springframework.stereotype.Service;
 
+import com.paca.paca.exception.NotFoundException;
+
+import java.net.http.HttpResponse;
 import java.util.List;
 
 @Service
@@ -14,9 +17,15 @@ public class UserService {
     }
 
     public List<User> getAll() {
-        //return List.of(new User());
-
         return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(
+            () -> new NotFoundException(
+                "User with id: ${id} does not exists"
+            )
+        );
     }
 
 }
