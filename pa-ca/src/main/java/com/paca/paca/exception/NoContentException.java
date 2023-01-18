@@ -10,4 +10,8 @@ public class NoContentException extends RuntimeException {
         super(msg);
         System.out.print(msg);
     }
+
+    public NoContentException(String msg, Throwable cause) {
+        super (msg, cause);
+    }
 }

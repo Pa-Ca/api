@@ -43,6 +43,15 @@ public class User {
         this.roleId = role;
     }
 
+    public User (Long id, String email, String password, Boolean verified, Boolean loggedIn, Role role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.verified = verified;
+        this.loggedIn = loggedIn;
+        this.roleId = role;
+    }
+
     // Getters
     public Long getId () { return this.id; }
     public String getEmail () { return this.email; }

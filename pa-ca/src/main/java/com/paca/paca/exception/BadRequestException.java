@@ -10,4 +10,8 @@ public class BadRequestException extends RuntimeException {
         super(msg);
         System.out.print(msg);
     }
+
+    public BadRequestException(String msg, Throwable cause) {
+        super (msg, cause);
+    }
 }

@@ -1,6 +1,6 @@
 CREATE SEQUENCE IF NOT EXISTS user_seq MINVALUE 1 START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE IF NOT EXISTS role_seq MINVALUE 1 START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS role_seq MINVALUE 0 START WITH 0 INCREMENT BY 1;
 
-INSERT INTO role (id, name) VALUES (1, 'admin');
-INSERT INTO role (id, name) VALUES (2, 'client');
-INSERT INTO role (id, name) VALUES (3, 'business');
+INSERT INTO role (id, name) VALUES (0, 'admin');
+INSERT INTO role (id, name) VALUES (1, 'client');
+INSERT INTO role (id, name) VALUES (2, 'business');

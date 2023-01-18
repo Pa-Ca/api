@@ -44,30 +44,22 @@ public class UserService {
         boolean userExists = userRepository.existsByEmail(dto.email);
         if (userExists) throw new BadRequestException("User already exists");
 
-        if (dto.role.isEmpty()) throw new BadRequestException("The role attribute not found");
-        try {
-            UserRole role = UserRole.valueOf(dto.role);
-        } catch (Exception e) {
-            throw new BadRequestException("The role given is not valid");
-        }
+        if (dto.password.isEmpty()) throw new BadRequestException("Password not found");
 
-        Optional<Role> userRole = roleRepository.findByName(UserRole.valueOf(dto.role));
-        if (userRole.isEmpty()) throw new BadRequestException("The role given does not exists");
-
-        userRepository.save(new User(dto.email, dto.password, userRole.get()));
+        userRepository.save(dto.toUser());
     }
 
-    public void update(User user) {
-        Optional<User> current = userRepository.findById(user.getId());
+    public void update(UserDTO dto) {
+        Optional<User> current = userRepository.findById(dto.id);
         if (current.isEmpty()) throw new BadRequestException("User does not exists");
 
-        String email = user.getEmail();
+        String email = dto.email;
         if (!current.get().getEmail().equals(email)) {
-            boolean emailExists = userRepository.existsById(user.getId());
+            boolean emailExists = userRepository.existsByEmail(dto.email);
             if (emailExists) throw new BadRequestException("This email is already taken");
         }
 
-        userRepository.save(user);
+        userRepository.save(dto.toUser());
     }
 
     public void delete(Long id) {

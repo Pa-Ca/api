@@ -1,6 +1,7 @@
 package com.paca.paca.user;
 
 import com.paca.paca.role.Role;
+import com.paca.paca.statics.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class UserRepositoryTest {
             1L,
             "user@example.com",
             "pass-example",
-            new Role("admin")
+                new Role((long) UserRole.admin.ordinal(), UserRole.admin)
         );
         underTest.save(user);
 
