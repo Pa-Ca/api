@@ -3,10 +3,10 @@ package com.paca.paca.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NO_CONTENT)
-public class NoContentException extends RuntimeException {
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class BadRequestException extends RuntimeException {
 
-    public NoContentException(String msg) {
+    public BadRequestException(String msg) {
         super(msg);
         System.out.print(msg);
     }
