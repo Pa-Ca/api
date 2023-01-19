@@ -63,7 +63,10 @@ public class UserService {
     }
 
     public void delete(Long id) {
+        Optional<User> current = userRepository.findById(id);
+        if (current.isEmpty()) throw new BadRequestException("User does not exists");
         userRepository.deleteById(id);
+
     }
 
 }
