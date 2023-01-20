@@ -1,6 +1,5 @@
 package com.paca.paca.user;
 
-import com.paca.paca.exception.BadRequestException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -8,8 +7,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
-    
+
     private final UserService userService;
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -30,11 +30,17 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public void save(@RequestBody UserDTO user) { userService.save(user); }
+    public void save(@RequestBody UserDTO user) {
+        userService.save(user);
+    }
 
     @PutMapping("/")
-    public void update(@RequestBody UserDTO user) { userService.update(user); }
+    public void update(@RequestBody UserDTO user) {
+        userService.update(user);
+    }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) { userService.delete(id); }
+    public void delete(@PathVariable("id") Long id) {
+        userService.delete(id);
+    }
 }

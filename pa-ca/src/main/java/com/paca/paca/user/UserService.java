@@ -1,10 +1,10 @@
 package com.paca.paca.user;
 
-import com.paca.paca.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.paca.paca.exception.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.NoContentException;
 
 import java.util.List;
 import java.util.Optional;
