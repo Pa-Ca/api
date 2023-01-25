@@ -1,5 +1,6 @@
 package com.paca.paca.user;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public List<User> getAll() {
+    public ResponseEntity<List<UserDTO>> getAll() {
         return userService.getAll();
     }
 

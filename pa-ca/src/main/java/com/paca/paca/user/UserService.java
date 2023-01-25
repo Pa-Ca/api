@@ -1,11 +1,13 @@
 package com.paca.paca.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +21,22 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public ResponseEntity<List<UserDTO>> getAll() {
+        List<UserDTO> response = new ArrayList<>();
+        userRepository.findAll().forEach(user -> {
+            response.add (
+                    UserDTO.builder()
+                            .id(user.getId())
+                            .email(user.getEmail())
+                            .password(user.getPassword())
+                            .verified(user.isVerified())
+                            .loggedIn(user.isLoggedIn())
+                            .role(user.getRoleId().getName().name())
+                            .build()
+            );
+        });
+
+        return ResponseEntity.ok(response);
     }
 
     public User getById(Long id) {

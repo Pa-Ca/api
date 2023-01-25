@@ -3,7 +3,15 @@ package com.paca.paca.user;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.role.Role;
 import com.paca.paca.statics.UserRole;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
 
     public Long id;
