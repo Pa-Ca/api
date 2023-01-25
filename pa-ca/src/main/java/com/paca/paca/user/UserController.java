@@ -1,12 +1,16 @@
 package com.paca.paca.user;
 
+import com.paca.paca.user.dto.UserDTO;
+import com.paca.paca.user.dto.UserListDTO;
+import com.paca.paca.user.statics.UserStatics;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping(UserStatics.Endpoint.USER_PATH)
 public class UserController {
 
     private final UserService userService;
@@ -15,15 +19,11 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<UserDTO>> getAll() {
-        return userService.getAll();
-    }
+    @GetMapping
+    public ResponseEntity<UserListDTO> getAll() { return userService.getAll(); }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable("id") Long id) {
-        return userService.getById(id);
-    }
+    public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id) { return userService.getById(id); }
 
     @GetMapping("/email/{email}")
     public User getByEmail(@PathVariable("email") String email) {

@@ -1,5 +1,7 @@
 package com.paca.paca.user;
 
+import com.paca.paca.user.dto.UserDTO;
+import com.paca.paca.user.dto.UserListDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<List<UserDTO>> getAll() {
+    public ResponseEntity<UserListDTO> getAll() {
         List<UserDTO> response = new ArrayList<>();
         userRepository.findAll().forEach(user -> {
             response.add (
@@ -36,12 +38,22 @@ public class UserService {
             );
         });
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(UserListDTO.builder().users(response).build());
     }
 
-    public User getById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NoContentException("User with id: " + id + " does not exists"));
+    public ResponseEntity<UserDTO> getById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new NoContentException("User does not exists", 8)
+        );
+        UserDTO response = UserDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .verified(user.isVerified())
+                .loggedIn(user.isLoggedIn())
+                .role(user.getRoleId().getName().name())
+                .build();
+         return ResponseEntity.ok(response);
     }
 
     public User getByEmail(String email) {

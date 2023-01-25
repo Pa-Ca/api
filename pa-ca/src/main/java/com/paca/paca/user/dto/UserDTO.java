@@ -1,8 +1,9 @@
-package com.paca.paca.user;
+package com.paca.paca.user.dto;
 
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.role.Role;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
