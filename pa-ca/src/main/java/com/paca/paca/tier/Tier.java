@@ -15,13 +15,19 @@ public class Tier {
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
     private BusinessTier name;
-
-    // private int reservation_limit
-    // private int tier_cost
+    @Column(name = "reservation_limit")
+    private int reservation_limit;
+    @Column(name = "tier_cost")
+    private float tier_cost;
 
     public Tier() {}
-    public Tier(BusinessTier name) { this.name = name; }
-    public Tier(Long id, BusinessTier name) { this.id = id; this.name = name; }
+    public Tier(BusinessTier name, int reservation_limit, float tier_cost) { 
+        this.name = name;
+        this.reservation_limit = reservation_limit;
+        this.tier_cost = tier_cost;
+    }
+
+    public Tier(Long id, BusinessTier name, int reservation_limit, float tier_cost) { this.id = id; this.name = name; }
 
     public Tier(String name) { this.name = BusinessTier.valueOf(name); }
     public Tier(Long id, String name) { this.id = id; this.name = BusinessTier.valueOf(name); }
@@ -29,7 +35,11 @@ public class Tier {
     //Getters
     public Long getId() { return id; }
     public BusinessTier getName() { return name; }
+    public int getReservationLimit() { return reservation_limit; }
+    public float getTierCost() { return tier_cost; }
 
     // Setters
     public void setName(BusinessTier name) { this.name = name; }
+    public void setReservationLimit(int reservation_limit) { this.reservation_limit = reservation_limit; }
+    public void setTierCost(float tier_cost) { this.tier_cost = tier_cost; }
 }
