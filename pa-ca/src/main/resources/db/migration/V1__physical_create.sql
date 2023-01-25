@@ -47,7 +47,7 @@ CREATE TABLE client (
     name varchar(50)  NOT NULL,
     surname varchar(50)  NOT NULL,
     stripe_customer_id varchar(100)  NOT NULL,
-    phone_number int  NOT NULL,
+    phone_number varchar(20)  NOT NULL,
     address varchar(1024)  NOT NULL,
     date_of_birth date  NOT NULL,
     CONSTRAINT client_pk PRIMARY KEY (id)
