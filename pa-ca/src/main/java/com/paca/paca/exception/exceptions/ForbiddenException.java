@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.FORBIDDEN)
 public class ForbiddenException extends RuntimeException {
 
-    private Integer code = 400;
+    private Integer code = 403;
 
     public ForbiddenException(String msg) {
         super(msg);
