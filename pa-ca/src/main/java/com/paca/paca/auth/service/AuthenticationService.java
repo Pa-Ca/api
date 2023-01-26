@@ -21,9 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import com.paca.paca.role.Role;
-import com.paca.paca.user.User;
-import com.paca.paca.user.UserRepository;
+import com.paca.paca.user.model.Role;
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.auth.config.JwtService;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
