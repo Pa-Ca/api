@@ -1,18 +1,21 @@
-package com.paca.paca.user;
+package com.paca.paca.user.model;
 
 import java.util.Collection;
 import java.util.List;
 
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.paca.paca.role.Role;
 import jakarta.persistence.*;
-import lombok.Builder;
 
 @Builder
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "\"user\"")
 public class User implements UserDetails {
     @Id
@@ -32,9 +35,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role roleId;
 
-    public User() {
-    }
-
     public User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
@@ -49,62 +49,6 @@ public class User implements UserDetails {
         this.password = password;
         this.verified = false;
         this.loggedIn = false;
-        this.roleId = role;
-    }
-
-    public User(Long id, String email, String password, Boolean verified, Boolean loggedIn, Role role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.verified = verified;
-        this.loggedIn = loggedIn;
-        this.roleId = role;
-    }
-
-    // Getters
-    public Long getId() {
-        return this.id;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    public Boolean isVerified() {
-        return this.verified;
-    }
-
-    public Boolean isLoggedIn() {
-        return this.loggedIn;
-    }
-
-    public Role getRoleId() {
-        return this.roleId;
-    }
-
-    // Setters
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setVerification(Boolean verification) {
-        this.verified = verification;
-    }
-
-    public void setLogin(Boolean login) {
-        this.loggedIn = login;
-    }
-
-    public void setRoleId(Role role) {
         this.roleId = role;
     }
 

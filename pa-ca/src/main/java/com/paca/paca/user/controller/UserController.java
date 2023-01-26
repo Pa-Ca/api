@@ -1,12 +1,12 @@
-package com.paca.paca.user;
+package com.paca.paca.user.controller;
 
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.dto.UserListDTO;
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.statics.UserStatics;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin
 @RestController

@@ -1,8 +1,11 @@
-package com.paca.paca.user;
+package com.paca.paca.user.service;
 
+import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.dto.UserDTO;
+import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.user.dto.UserListDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.utils.UserMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,43 +20,46 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
+    private void validateRole(UserDTO dto) {
+        if (dto.role.isEmpty()) throw new BadRequestException("The role attribute not found");
+        UserRole role;
+        try {
+            role = UserRole.valueOf(dto.role);
+        } catch (Exception e) {
+            throw new BadRequestException("The role given is not valid");
+        }
+
+        userRepository.save(userMapper.toEntity(dto, role));
+    }
+
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public ResponseEntity<UserListDTO> getAll() {
         List<UserDTO> response = new ArrayList<>();
-        userRepository.findAll().forEach(user -> {
-            response.add (
-                    UserDTO.builder()
-                            .id(user.getId())
-                            .email(user.getEmail())
-                            .password(user.getPassword())
-                            .verified(user.isVerified())
-                            .loggedIn(user.isLoggedIn())
-                            .role(user.getRoleId().getName().name())
-                            .build()
-            );
-        });
+        userRepository.findAll().forEach(user -> response.add (
+            UserDTO
+                .builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .verified(user.getVerified())
+                .loggedIn(user.getLoggedIn())
+                .role(user.getRoleId().getName().name())
+                .build()
+        ));
 
         return ResponseEntity.ok(UserListDTO.builder().users(response).build());
     }
 
-    public ResponseEntity<UserDTO> getById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new NoContentException("User does not exists", 8)
-        );
-        UserDTO response = UserDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .verified(user.isVerified())
-                .loggedIn(user.isLoggedIn())
-                .role(user.getRoleId().getName().name())
-                .build();
-         return ResponseEntity.ok(response);
+    public ResponseEntity<UserDTO> getById(Long id) throws NoContentException {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) throw new NoContentException("User with id " + id + " does not exists", 8);
+        else return ResponseEntity.ok(userMapper.toDTO(user.get()));
     }
 
     public User getByEmail(String email) {
@@ -69,7 +75,7 @@ public class UserService {
         if (dto.password.isEmpty())
             throw new BadRequestException("Password not found");
 
-        userRepository.save(dto.toUser());
+        validateRole(dto);
     }
 
     public void update(UserDTO dto) {
@@ -84,7 +90,7 @@ public class UserService {
                 throw new BadRequestException("This email is already taken");
         }
 
-        userRepository.save(dto.toUser());
+        validateRole(dto);
     }
 
     public void delete(Long id) {
