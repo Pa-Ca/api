@@ -62,9 +62,10 @@ public class UserService {
         else return ResponseEntity.ok(userMapper.toDTO(user.get()));
     }
 
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoContentException("User with email: " + email + " does not exists"));
+    public ResponseEntity<UserDTO> getByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) throw new NoContentException("User with email: " + email + " does not exists");
+        else return ResponseEntity.ok(userMapper.toDTO(user.get()));
     }
 
     public void save(UserDTO dto) {
