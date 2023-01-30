@@ -40,20 +40,17 @@ public class ClientService {
         return new ResponseEntity<Map<String, List<Client>>>(body, HttpStatus.OK);
     }
 
-    public ResponseEntity<Map<String, Client>> getById(Long id) throws NoContentException {
+    public ResponseEntity<Client> getById(Long id) throws NoContentException {
         // Get client
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
                         "Client with id: " + id + " does not exists",
                         11));
 
-        // Create response
-        Map<String, Client> body = new HashMap<>();
-        body.put("client", client);
-        return new ResponseEntity<Map<String, Client>>(body, HttpStatus.OK);
+        return new ResponseEntity<Client>(client, HttpStatus.OK);
     }
 
-    public ResponseEntity<Map<String, Client>> getByUserEmail(String email) throws NoContentException {
+    public ResponseEntity<Client> getByUserEmail(String email) throws NoContentException {
         // Get client
         Client client = clientRepository.findByUserEmail(email)
                 .orElseThrow(() -> new NoContentException(
@@ -61,9 +58,7 @@ public class ClientService {
                         11));
 
         // Create response
-        Map<String, Client> body = new HashMap<>();
-        body.put("client", client);
-        return new ResponseEntity<Map<String, Client>>(body, HttpStatus.OK);
+        return new ResponseEntity<Client>(client, HttpStatus.OK);
     }
 
     public ResponseEntity<Map<String, Long>> save(ClientDTO dto) throws NoContentException, ConflictException {
