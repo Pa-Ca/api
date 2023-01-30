@@ -74,8 +74,8 @@ CREATE TABLE favorite_branch (
 CREATE TABLE friend (
     id int  NOT NULL,
     client_requester_id int  NOT NULL,
-    client_addressee_id int  NOT NULL,
-    accepted boolean  NOT NULL,
+    client_addresser_id int  NOT NULL,
+    accepted boolean  NOT NULL DEFAULT FALSE,
     CONSTRAINT friend_pk PRIMARY KEY (id)
 );
 
