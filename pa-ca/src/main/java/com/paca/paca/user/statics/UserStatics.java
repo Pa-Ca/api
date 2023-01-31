@@ -1,9 +1,5 @@
 package com.paca.paca.user.statics;
 
-import java.util.Map;
-
-import static java.util.Map.entry;
-
 public interface UserStatics {
 
     interface Endpoint {

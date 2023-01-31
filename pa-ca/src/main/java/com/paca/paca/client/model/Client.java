@@ -2,7 +2,7 @@ package com.paca.paca.client.model;
 
 import java.util.Date;
 
-import com.paca.paca.user.User;
+import com.paca.paca.user.model.User;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

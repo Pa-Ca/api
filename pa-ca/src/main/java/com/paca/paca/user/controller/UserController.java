@@ -2,7 +2,6 @@ package com.paca.paca.user.controller;
 
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.dto.UserListDTO;
