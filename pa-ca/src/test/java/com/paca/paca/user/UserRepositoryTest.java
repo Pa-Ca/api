@@ -1,7 +1,9 @@
 package com.paca.paca.user;
 
-import com.paca.paca.role.Role;
+import com.paca.paca.user.model.Role;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
