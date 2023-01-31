@@ -47,7 +47,7 @@ CREATE TABLE client (
     name varchar(50)  NOT NULL,
     surname varchar(50)  NOT NULL,
     stripe_customer_id varchar(100)  NOT NULL,
-    phone_number int  NOT NULL,
+    phone_number varchar(20)  NOT NULL,
     address varchar(1024)  NOT NULL,
     date_of_birth date  NOT NULL,
     CONSTRAINT client_pk PRIMARY KEY (id)
@@ -74,8 +74,8 @@ CREATE TABLE favorite_branch (
 CREATE TABLE friend (
     id int  NOT NULL,
     client_requester_id int  NOT NULL,
-    client_addressee_id int  NOT NULL,
-    accepted boolean  NOT NULL,
+    client_addresser_id int  NOT NULL,
+    accepted boolean  NOT NULL DEFAULT FALSE,
     CONSTRAINT friend_pk PRIMARY KEY (id)
 );
 

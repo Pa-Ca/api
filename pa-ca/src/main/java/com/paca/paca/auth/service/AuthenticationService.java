@@ -72,7 +72,7 @@ public class AuthenticationService {
             throw new BadRequestException("Password not found");
         }
         if (!repository.existsByEmail(email)) {
-            throw new NoContentException("User don't exists", 8);
+            throw new NoContentException("User does not exists", 8);
         }
 
         var user = repository.findByEmail(request.getEmail()).orElseThrow();
