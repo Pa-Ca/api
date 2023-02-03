@@ -6,6 +6,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.repository.BusinessRepository;
+
 @DataJpaTest
 class BusinessRepositoryTest {
 

@@ -1,8 +1,9 @@
-package com.paca.paca.business;
+package com.paca.paca.business.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 

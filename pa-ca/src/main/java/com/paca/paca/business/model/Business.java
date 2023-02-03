@@ -1,5 +1,6 @@
-package com.paca.paca.business;
-import com.paca.paca.tier.Tier;
+package com.paca.paca.business.model;
+import com.paca.paca.business.tier.Tier;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,36 +13,36 @@ public class Business {
     private Long id;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id")
-    private Long user_id;
+    private Long userId;
     @Column(name = "name")
     private String name;
     @Column(name = "verified")
     private Boolean verified;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "business_tier")
-    private Tier tier_id;
+    private Tier tierId;
 
 
     public Business () {}
 
-    public Business (Long id, Long user_id, String name, Boolean verified, Tier tier_id) {
+    public Business (Long id, Long userId, String name, Boolean verified, Tier tierId) {
         this.id = id;
-        this.user_id = user_id;
+        this.userId = userId;
         this.name = name;
         this.verified = verified;
-        this.tier_id = tier_id;
+        this.tierId = tierId;
     }
 
     // Getters
     public Long getId () { return this.id; }
-    public Long user_id () { return this.user_id; }
+    public Long getUserId () { return this.userId; }
     public String getName () { return this.name; }
     public Boolean getVerified () { return this.verified; }
-    public Tier getTierId () { return this.tier_id; }
+    public Tier getTierId () { return this.tierId; }
 
     // Setters
-    public void setUserId(Long user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setName(String name) {
@@ -53,6 +54,6 @@ public class Business {
     }
 
     public void setTierId(Tier tier) {
-        this.tier_id = tier;
+        this.tierId = tier;
     }
 }

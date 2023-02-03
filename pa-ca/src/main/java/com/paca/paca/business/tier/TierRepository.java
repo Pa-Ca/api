@@ -1,4 +1,4 @@
-package com.paca.paca.tier;
+package com.paca.paca.business.tier;
 
 import com.paca.paca.statics.BusinessTier;
 import org.springframework.data.jpa.repository.JpaRepository;
