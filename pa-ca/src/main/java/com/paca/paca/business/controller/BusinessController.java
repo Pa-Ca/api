@@ -1,9 +1,5 @@
 package com.paca.paca.business.controller;
 
-import com.paca.paca.business.dto.BusinessListDTO;
-import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.exception.exceptions.NoContentException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,14 +21,12 @@ public class BusinessController {
     }
 
     @GetMapping
-    public ResponseEntity<BusinessListDTO> getAll() {
-        return ResponseEntity.ok(businessService.getAll());
+    public List<Business> getAll() {
+        return businessService.getAll();
     }
-
 
     @GetMapping("/{id}")
-    public ResponseEntity<BusinessDTO> getById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(businessService.getById(id));
+    public Business getUserById(@PathVariable("id") Long id) {
+        return businessService.getById(id);
     }
-
 }

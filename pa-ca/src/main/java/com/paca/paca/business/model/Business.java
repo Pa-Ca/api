@@ -1,18 +1,13 @@
 package com.paca.paca.business.model;
+import com.paca.paca.business.tier.Tier;
 
 import com.paca.paca.user.model.User;
 import jakarta.persistence.*;
-import lombok.*;
-
-import com.paca.paca.business.tier.Tier;
+import lombok.Builder;
 
 @Builder
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "business")
+@Table(name="`business`")
 public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "business_seq")

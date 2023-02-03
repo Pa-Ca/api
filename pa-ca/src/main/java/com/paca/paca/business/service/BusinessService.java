@@ -1,17 +1,13 @@
 package com.paca.paca.business.service;
 
-import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.business.model.Business;
-import com.paca.paca.business.utils.BusinessMapper;
-import com.paca.paca.business.dto.BusinessListDTO;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.paca.paca.business.model.Business;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,34 +15,23 @@ import java.util.Optional;
 public class BusinessService {
     
     private final BusinessRepository businessRepository;
-    private final BusinessMapper businessMapper;
 
+    // @Autowired
+    // public UserService(UserRepository userRepository) {
+    //     this.userRepository = userRepository;
+    // }
 
-    public BusinessService(BusinessRepository userRepository, BusinessMapper businessMapper) {
+    public BusinessService(BusinessRepository userRepository) {
         this.businessRepository = userRepository;
-        this.businessMapper = businessMapper;
     }
 
-    public BusinessListDTO getAll() {
-        List<BusinessDTO> response = new ArrayList<>();
-        businessRepository.findAll().forEach(business -> {
-            BusinessDTO dto = businessMapper.toDTO(business);
-            dto.setUserId(business.getUser().getId());
-            response.add(dto);
-        });
-
-        return BusinessListDTO.builder().business(response).build();
+    public List<Business> getAll() {
+        return businessRepository.findAll();
     }
 
-    public BusinessDTO getById(Long id) throws NoContentException {
-        Business business = businessRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
-                        "Client with id: " + id + " does not exists",
-                        28));
-
-        BusinessDTO dto = businessMapper.toDTO(business);
-        dto.setUserId(business.getUser().getId());
-        return dto;
+    public Business getById(Long id) {
+        return businessRepository.findById(id)
+                .orElseThrow(() -> new NoContentException("Business with id: " + id + " does not exists"));
     }
 
 }
