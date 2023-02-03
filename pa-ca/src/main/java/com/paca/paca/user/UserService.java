@@ -61,7 +61,7 @@ public class UserService {
         if (!current.get().getEmail().equals(email)) {
             boolean emailExists = userRepository.existsByEmail(dto.email);
             if (emailExists) {
-                throw new ConflictException("This email is already taken", 10);
+                throw new ConflictException("Email is already taken", 10);
             }
         }
 
