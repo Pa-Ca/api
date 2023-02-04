@@ -1,5 +1,7 @@
 package com.paca.paca.user;
 
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new UserService(userRepository);
+        //underTest = new UserService(userRepository);
     }
 
     @Test

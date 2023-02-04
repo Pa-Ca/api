@@ -1,5 +1,6 @@
 package com.paca.paca.auth.config;
 
+import com.paca.paca.user.statics.UserStatics;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
