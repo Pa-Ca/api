@@ -3,8 +3,8 @@ package com.paca.paca.branch.statics;
 public interface AmenityStatics {
 
     interface Endpoint {
-        String AMENITY_PATH = "/api/v1/branch/amenity";
-
-        String AMENITY_SEARCH_PATH = "/search/{term}";
+        String AMENITY_PATH = "/amenity";
+        String AMENITY_SEARCH_PATH = "/amenity/search/{word}";
+        String AMENITY_FROM_BRANCH_ID_PATH = "/{id}/amenity";
     }
 }
