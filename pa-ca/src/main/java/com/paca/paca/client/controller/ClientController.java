@@ -4,58 +4,48 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.paca.paca.client.model.Client;
 import com.paca.paca.client.dto.ClientDTO;
-import com.paca.paca.client.dto.FriendRequestDTO;
+import com.paca.paca.client.dto.ClientListDTO;
+import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.service.ClientService;
-import com.paca.paca.client.service.FriendService;
+import com.paca.paca.client.statics.ClientStatics;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
-import java.util.Map;
 import java.util.Date;
-import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1/client")
+@RequestMapping(ClientStatics.Endpoint.PATH)
 public class ClientController {
 
     private final ClientService clientService;
 
-    private final FriendService friendService;
-
-    public ClientController(ClientService clientService, FriendService friendService) {
+    public ClientController(ClientService clientService) {
         this.clientService = clientService;
-        this.friendService = friendService;
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<Client>>> getAll() {
+    public ResponseEntity<ClientListDTO> getAll() {
         return clientService.getAll();
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Long>> save(@RequestBody ClientDTO client)
+    public ResponseEntity<ClientDTO> save(@RequestBody ClientDTO client)
             throws NoContentException, ConflictException {
         return clientService.save(client);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return clientService.getById(id);
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<Client> getByEmail(@PathVariable("email") String email)
-            throws NoContentException {
-        return clientService.getByUserEmail(email);
-    }
-
     @PutMapping("/{id}")
-    public void update(@PathVariable("id") Long id, @RequestBody ClientDTO client) throws NoContentException {
-        clientService.update(id, client);
+    public ResponseEntity<ClientDTO> update(@PathVariable("id") Long id, @RequestBody ClientDTO client)
+            throws NoContentException {
+        return clientService.update(id, client);
     }
 
     @DeleteMapping("/{id}")
@@ -64,43 +54,45 @@ public class ClientController {
     }
 
     @PostMapping("/{id}/friend")
-    public ResponseEntity<Map<String, Long>> sendRequest(
+    public ResponseEntity<FriendDTO> friendRequest(
             @PathVariable("id") Long id,
-            @RequestBody FriendRequestDTO request) throws NoContentException, ConflictException {
-        return friendService.save(request.getRequesterId(), id);
+            @RequestBody FriendDTO request) throws NoContentException, ConflictException {
+        return clientService.friendRequest(request.getRequesterId(), id);
     }
 
     @GetMapping("/{id}/friend/accepted")
-    public ResponseEntity<Map<String, List<Client>>> getAccepted(@PathVariable("id") Long id) {
-        return friendService.getAccepted(id);
+    public ResponseEntity<ClientListDTO> getAcceptedFriends(@PathVariable("id") Long id) {
+        return clientService.getAcceptedFriends(id);
     }
 
     @GetMapping("/{id}/friend/rejected")
-    public ResponseEntity<Map<String, List<Client>>> getRejected(@PathVariable("id") Long id) {
-        return friendService.getRejected(id);
+    public ResponseEntity<ClientListDTO> getRejectedFriends(@PathVariable("id") Long id) {
+        return clientService.getRejectedFriends(id);
     }
 
     @GetMapping("/{id}/friend/pending")
-    public ResponseEntity<Map<String, List<Client>>> getPendings(@PathVariable("id") Long id) {
-        return friendService.getPendings(id);
+    public ResponseEntity<ClientListDTO> getPendingFriends(@PathVariable("id") Long id) {
+        return clientService.getPendingFriends(id);
     }
 
     @DeleteMapping("/{id}/friend/pending/{requesterId}")
-    public void delete(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
+    public void deleteFriendRequest(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
             throws NoContentException {
-        friendService.delete(requesterId, id);
+        clientService.deleteFriendRequest(requesterId, id);
     }
 
     @PutMapping("/{id}/friend/pending/{requesterId}/accept")
-    public void accept(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
+    public ResponseEntity<FriendDTO> acceptFriendRequest(@PathVariable("id") Long id,
+            @PathVariable("requesterId") Long requesterId)
             throws NoContentException, ConflictException {
-        friendService.accept(requesterId, id);
+        return clientService.acceptFriendRequest(requesterId, id);
     }
 
     @PutMapping("/{id}/friend/pending/{requesterId}/reject")
-    public void reject(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
+    public ResponseEntity<FriendDTO> rejectFriendRequest(@PathVariable("id") Long id,
+            @PathVariable("requesterId") Long requesterId)
             throws NoContentException, ConflictException {
-        friendService.reject(requesterId, id);
+        return clientService.rejectFriendRequest(requesterId, id);
     }
 
     @GetMapping("/{id}/reservation")
