@@ -4,8 +4,9 @@ import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
-import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,5 +57,12 @@ public class BranchController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         branchService.delete(id);
+    }
+
+    @GetMapping("/{branchId}/product-category/{productCategoryId}/product-sub-category")
+    public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
+            Long branchId,
+            Long productCategoryId) throws NoContentException {
+        return branchService.getProductSubCategories(branchId, productCategoryId);
     }
 }
