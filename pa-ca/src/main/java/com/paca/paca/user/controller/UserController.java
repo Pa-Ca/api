@@ -8,22 +8,24 @@ import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.statics.UserStatics;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(UserStatics.Endpoint.USER_PATH)
 public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
     @GetMapping
-    public ResponseEntity<UserListDTO> getAll() { return userService.getAll(); }
+    public ResponseEntity<UserListDTO> getAll() {
+        return userService.getAll();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id) throws BadRequestException {

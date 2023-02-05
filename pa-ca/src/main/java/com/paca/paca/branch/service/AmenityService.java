@@ -1,15 +1,18 @@
 package com.paca.paca.branch.service;
 
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
-import com.paca.paca.branch.model.Amenity;
-import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.BranchAmenity;
-import com.paca.paca.branch.repository.AmenityRepository;
-import com.paca.paca.branch.repository.BranchAmenityRepository;
-import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.utils.AmenityMapper;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.branch.repository.BranchAmenityRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AmenityService {
     private final BranchRepository branchRepository;
     private final BranchAmenityRepository branchAmenityRepository;
@@ -34,17 +38,6 @@ public class AmenityService {
                         .build()));
 
         return ResponseEntity.ok(AmenityListDTO.builder().amenities(response).build());
-    }
-
-    public AmenityService(
-            BranchRepository branchRepository,
-            BranchAmenityRepository branchAmenityRepository,
-            AmenityRepository amenityRepository,
-            AmenityMapper amenityMapper) {
-        this.branchRepository = branchRepository;
-        this.branchAmenityRepository = branchAmenityRepository;
-        this.amenityRepository = amenityRepository;
-        this.amenityMapper = amenityMapper;
     }
 
     public ResponseEntity<AmenityListDTO> getAll() {

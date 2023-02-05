@@ -10,6 +10,9 @@ import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.statics.ClientStatics;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -17,14 +20,11 @@ import java.util.Date;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ClientStatics.Endpoint.PATH)
 public class ClientController {
 
     private final ClientService clientService;
-
-    public ClientController(ClientService clientService) {
-        this.clientService = clientService;
-    }
 
     @GetMapping
     public ResponseEntity<ClientListDTO> getAll() {

@@ -5,17 +5,22 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.dto.ProductListDTO;
-import com.paca.paca.product.model.Product;
-import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.product.utils.ProductMapper;
+import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductMapper productMapper;
@@ -23,15 +28,6 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
-
-    public ProductService(
-            ProductMapper productMapper,
-            ProductRepository productRepository,
-            ProductSubCategoryRepository productSubCategoryRepository) {
-        this.productMapper = productMapper;
-        this.productRepository = productRepository;
-        this.productSubCategoryRepository = productSubCategoryRepository;
-    }
 
     public ResponseEntity<ProductListDTO> getAll() {
         List<ProductDTO> response = new ArrayList<>();

@@ -7,14 +7,17 @@ import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 
 import java.util.Date;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,14 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(BranchStatics.Endpoint.PATH)
 public class BranchController {
 
     private final BranchService branchService;
-
-    public BranchController(BranchService branchService) {
-        this.branchService = branchService;
-    }
 
     @GetMapping
     public ResponseEntity<BranchListDTO> getAll() {

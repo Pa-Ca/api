@@ -13,6 +13,9 @@ import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.client.utils.FriendMapper;
 import com.paca.paca.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
@@ -28,6 +31,7 @@ import java.util.Optional;
 import java.util.ArrayList;
 
 @Service
+@RequiredArgsConstructor
 public class ClientService {
 
     private final ClientMapper clientMapper;
@@ -43,23 +47,6 @@ public class ClientService {
     private final FriendRepository friendRepository;
 
     private final ClientGroupRepository clientGroupRepository;
-
-    public ClientService(
-            ClientMapper clientMapper,
-            FriendMapper friendMapper,
-            ReservationMapper reservationMapper,
-            UserRepository userRepository,
-            ClientRepository clientRepository,
-            FriendRepository friendRepository,
-            ClientGroupRepository clientGroupRepository) {
-        this.clientMapper = clientMapper;
-        this.friendMapper = friendMapper;
-        this.reservationMapper = reservationMapper;
-        this.userRepository = userRepository;
-        this.clientRepository = clientRepository;
-        this.friendRepository = friendRepository;
-        this.clientGroupRepository = clientGroupRepository;
-    }
 
     public ResponseEntity<ClientListDTO> getAll() {
         List<ClientDTO> response = new ArrayList<>();

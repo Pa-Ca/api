@@ -15,18 +15,18 @@ import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.exception.exceptions.NoContentException;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ProductStatics.Endpoint.PATH)
 public class ProductController {
 
     private final ProductService productService;
-
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 
     @GetMapping
     public ResponseEntity<ProductListDTO> getAll() {

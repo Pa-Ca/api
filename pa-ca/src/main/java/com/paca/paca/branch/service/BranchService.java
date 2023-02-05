@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 
 import com.paca.paca.branch.model.Branch;
@@ -23,6 +24,9 @@ import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -36,6 +40,8 @@ import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
+@Service
+@RequiredArgsConstructor
 public class BranchService {
 
     private final BranchMapper branchMapper;
@@ -61,33 +67,6 @@ public class BranchService {
     private final ProductCategoryRepository productCategoryRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
-
-    public BranchService(
-            BranchMapper branchMapper,
-            ProductMapper productMapper,
-            PromotionMapper promotionMapper,
-            ReservationMapper reservationMapper,
-            ProductSubCategoryMapper productSubCategoryMapper,
-            BranchRepository branchRepository,
-            ProductRepository productRepository,
-            BusinessRepository businessRepository,
-            PromotionRepository promotionRepository,
-            ReservationRepository reservationRepository,
-            ProductCategoryRepository productCategoryRepository,
-            ProductSubCategoryRepository productSubCategoryRepository) {
-        this.branchMapper = branchMapper;
-        this.productMapper = productMapper;
-        this.promotionMapper = promotionMapper;
-        this.reservationMapper = reservationMapper;
-        this.productSubCategoryMapper = productSubCategoryMapper;
-        this.branchRepository = branchRepository;
-        this.productRepository = productRepository;
-        this.businessRepository = businessRepository;
-        this.promotionRepository = promotionRepository;
-        this.reservationRepository = reservationRepository;
-        this.productCategoryRepository = productCategoryRepository;
-        this.productSubCategoryRepository = productSubCategoryRepository;
-    }
 
     public ResponseEntity<BranchListDTO> getAll() {
         List<BranchDTO> response = new ArrayList<>();

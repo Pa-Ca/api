@@ -15,18 +15,18 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.exception.exceptions.NoContentException;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ReservationStatics.Endpoint.PATH)
 public class ReservationController {
 
     private final ReservationService reservationService;
-
-    public ReservationController(ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
 
     @GetMapping
     public ResponseEntity<ReservationListDTO> getAll() {

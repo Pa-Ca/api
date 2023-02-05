@@ -15,18 +15,18 @@ import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.promotion.service.PromotionService;
 import com.paca.paca.promotion.statics.PromotionStatics;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.exception.exceptions.NoContentException;
 
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(PromotionStatics.Endpoint.PATH)
 public class PromotionController {
 
     private final PromotionService promotionService;
-
-    public PromotionController(PromotionService promotionService) {
-        this.promotionService = promotionService;
-    }
 
     @GetMapping
     public ResponseEntity<PromotionListDTO> getAll() {

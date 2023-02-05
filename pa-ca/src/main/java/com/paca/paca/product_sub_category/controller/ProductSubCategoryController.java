@@ -11,24 +11,23 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.product.dto.ProductListDTO;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 import com.paca.paca.product_sub_category.service.ProductSubCategoryService;
 import com.paca.paca.product_sub_category.statics.ProductSubCategoryStatics;
 
+import lombok.RequiredArgsConstructor;
+
 @CrossOrigin
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ProductSubCategoryStatics.Endpoint.PATH)
 public class ProductSubCategoryController {
 
     private final ProductSubCategoryService productSubCategoryService;
-
-    public ProductSubCategoryController(ProductSubCategoryService productSubCategoryService) {
-        this.productSubCategoryService = productSubCategoryService;
-    }
 
     @GetMapping
     public ResponseEntity<ProductSubCategoryListDTO> getAll() {

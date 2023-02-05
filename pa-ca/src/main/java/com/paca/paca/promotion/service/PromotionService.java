@@ -2,11 +2,14 @@ package com.paca.paca.promotion.service;
 
 import com.paca.paca.promotion.utils.PromotionMapper;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 
 import com.paca.paca.branch.model.Branch;
@@ -17,6 +20,8 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 
+@Service
+@RequiredArgsConstructor
 public class PromotionService {
 
     private final PromotionMapper promotionMapper;
@@ -24,15 +29,6 @@ public class PromotionService {
     private final PromotionRepository promotionRepository;
 
     private final BranchRepository branchRepository;
-
-    public PromotionService(
-            PromotionMapper promotionMapper,
-            PromotionRepository promotionRepository,
-            BranchRepository branchRepository) {
-        this.promotionMapper = promotionMapper;
-        this.promotionRepository = promotionRepository;
-        this.branchRepository = branchRepository;
-    }
 
     public ResponseEntity<PromotionListDTO> getAll() {
         List<PromotionDTO> response = new ArrayList<>();

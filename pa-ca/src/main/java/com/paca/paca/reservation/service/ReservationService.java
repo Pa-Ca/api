@@ -1,21 +1,27 @@
 package com.paca.paca.reservation.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 
+import com.paca.paca.branch.model.Branch;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.ReservationDTO;
-import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.reservation.utils.ReservationMapper;
+
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
+@Service
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationMapper reservationMapper;
@@ -23,15 +29,6 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     private final BranchRepository branchRepository;
-
-    public ReservationService(
-            ReservationMapper reservationMapper,
-            ReservationRepository reservationRepository,
-            BranchRepository branchRepository) {
-        this.reservationMapper = reservationMapper;
-        this.reservationRepository = reservationRepository;
-        this.branchRepository = branchRepository;
-    }
 
     public ResponseEntity<ReservationListDTO> getAll() {
         List<ReservationDTO> response = new ArrayList<>();

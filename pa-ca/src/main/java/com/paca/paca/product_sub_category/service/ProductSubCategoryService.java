@@ -1,28 +1,33 @@
 package com.paca.paca.product_sub_category.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.dto.ProductListDTO;
-import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
+import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
+import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
+import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
+import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
-import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class ProductSubCategoryService {
 
     private final ProductSubCategoryMapper productSubCategoryMapper;
@@ -36,21 +41,6 @@ public class ProductSubCategoryService {
     private final BranchRepository branchRepository;
 
     private final ProductRepository productRepository;
-
-    public ProductSubCategoryService(
-            ProductSubCategoryMapper productSubCategoryMapper,
-            ProductMapper productMapper,
-            ProductSubCategoryRepository productSubCategoryRepository,
-            ProductCategoryRepository productCategoryRepository,
-            BranchRepository branchRepository,
-            ProductRepository productRepository) {
-        this.productSubCategoryMapper = productSubCategoryMapper;
-        this.productMapper = productMapper;
-        this.productSubCategoryRepository = productSubCategoryRepository;
-        this.productCategoryRepository = productCategoryRepository;
-        this.branchRepository = branchRepository;
-        this.productRepository = productRepository;
-    }
 
     public ResponseEntity<ProductSubCategoryListDTO> getAll() {
         List<ProductSubCategoryDTO> response = new ArrayList<>();
