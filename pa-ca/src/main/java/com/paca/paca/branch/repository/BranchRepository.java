@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
 
-    Optional<Branch> findById(Long branchId);
+    Optional<Branch> findById(Long id);
 }

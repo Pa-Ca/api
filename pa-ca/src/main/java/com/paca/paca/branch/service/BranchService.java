@@ -14,12 +14,16 @@ import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.product.dto.ProductListDTO;
+import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.product.utils.ProductMapper;
+import com.paca.paca.promotion.dto.PromotionListDTO;
+import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
@@ -33,6 +37,8 @@ public class BranchService {
 
     private final ProductMapper productMapper;
 
+    private final PromotionMapper promotionMapper;
+
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
     private final BranchRepository branchRepository;
@@ -41,6 +47,8 @@ public class BranchService {
 
     private final BusinessRepository businessRepository;
 
+    private final PromotionRepository promotionRepository;
+
     private final ProductCategoryRepository productCategoryRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
@@ -48,18 +56,22 @@ public class BranchService {
     public BranchService(
             BranchMapper branchMapper,
             ProductMapper productMapper,
+            PromotionMapper promotionMapper,
             ProductSubCategoryMapper productSubCategoryMapper,
             BranchRepository branchRepository,
             ProductRepository productRepository,
             BusinessRepository businessRepository,
+            PromotionRepository promotionRepository,
             ProductCategoryRepository productCategoryRepository,
             ProductSubCategoryRepository productSubCategoryRepository) {
         this.branchMapper = branchMapper;
         this.productMapper = productMapper;
+        this.promotionMapper = promotionMapper;
         this.productSubCategoryMapper = productSubCategoryMapper;
         this.branchRepository = branchRepository;
         this.productRepository = productRepository;
         this.businessRepository = businessRepository;
+        this.promotionRepository = promotionRepository;
         this.productCategoryRepository = productCategoryRepository;
         this.productSubCategoryRepository = productSubCategoryRepository;
     }
@@ -187,5 +199,23 @@ public class BranchService {
                 });
 
         return ResponseEntity.ok(ProductListDTO.builder().products(response).build());
+    }
+
+    public ResponseEntity<PromotionListDTO> getPromotions(Long id) throws NoContentException {
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id: " + id + " does not exists",
+                    20);
+        }
+
+        List<PromotionDTO> response = new ArrayList<>();
+        promotionRepository.findAllByBranchId(id).forEach(promotion -> {
+            PromotionDTO dto = promotionMapper.toDTO(promotion);
+            dto.setBranchId(promotion.getBranch().getId());
+            response.add(dto);
+        });
+
+        return ResponseEntity.ok(PromotionListDTO.builder().promotions(response).build());
     }
 }

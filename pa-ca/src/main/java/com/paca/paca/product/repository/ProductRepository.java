@@ -11,9 +11,9 @@ import com.paca.paca.product.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Optional<Product> findById(Long branchId);
+    Optional<Product> findById(Long id);
 
     List<Product> findAllBySubCategoryId(Long id);
 
-    List<Product> findAllBySubCategory_Branch_Id(Long branchId);
+    List<Product> findAllBySubCategory_Branch_Id(Long id);
 }
