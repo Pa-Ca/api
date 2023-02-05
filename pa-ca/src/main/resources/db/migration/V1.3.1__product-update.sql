@@ -1,0 +1,10 @@
+-- Date: 2023-02-04
+
+ALTER TABLE product DROP COLUMN branch_id;
+
+ALTER TABLE product ADD product_sub_category_id INT NOT NULL;
+ALTER TABLE product ADD name VARCHAR(100) NOT NULL;
+ALTER TABLE product ADD price INT NOT NULL;
+ALTER TABLE product ADD description VARCHAR(256) INT NULL;
+
+CREATE SEQUENCE IF NOT EXISTS product_seq MINVALUE 0 START WITH 0 INCREMENT BY 1;

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
@@ -58,5 +59,10 @@ public class ProductSubCategoryController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         productSubCategoryService.delete(id);
+    }
+
+    @GetMapping("/{id}/product")
+    public ResponseEntity<ProductListDTO> getAllProducts(@PathVariable("id") Long id) throws NoContentException {
+        return productSubCategoryService.getAllProducts(id);
     }
 }

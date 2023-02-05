@@ -61,8 +61,8 @@ public class BranchController {
 
     @GetMapping("/{branchId}/product-category/{productCategoryId}/product-sub-category")
     public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
-            Long branchId,
-            Long productCategoryId) throws NoContentException {
+            @PathVariable("branchId") Long branchId,
+            @PathVariable("productCategoryId") Long productCategoryId) throws NoContentException {
         return branchService.getProductSubCategories(branchId, productCategoryId);
     }
 }
