@@ -6,10 +6,14 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.promotion.dto.PromotionListDTO;
+import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 
+import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -69,12 +73,25 @@ public class BranchController {
     }
 
     @GetMapping("/{id}/product")
-    public ResponseEntity<ProductListDTO> getProducts(Long id) throws NoContentException {
+    public ResponseEntity<ProductListDTO> getProducts(@PathVariable("id") Long id) throws NoContentException {
         return branchService.getProducts(id);
     }
 
     @GetMapping("/{id}/promotion")
-    public ResponseEntity<PromotionListDTO> getPromotions(Long id) throws NoContentException {
+    public ResponseEntity<PromotionListDTO> getPromotions(@PathVariable("id") Long id) throws NoContentException {
         return branchService.getPromotions(id);
+    }
+
+    @GetMapping("/{id}/reservation")
+    public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id) throws NoContentException {
+        return branchService.getReservations(id);
+    }
+
+    @GetMapping("/{id}/reservation/{date}")
+    public ResponseEntity<ReservationListDTO> getReservationsByDate(
+            @PathVariable("id") Long id,
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date)
+            throws NoContentException {
+        return branchService.getReservationsByDate(id, date);
     }
 }

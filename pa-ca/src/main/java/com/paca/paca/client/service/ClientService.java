@@ -1,33 +1,48 @@
 package com.paca.paca.client.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
 
 import com.paca.paca.user.model.User;
-import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.dto.ClientDTO;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.client.repository.ClientRepository;
+import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.reservation.repository.ClientGroupRepository;
 
 import java.util.Map;
 import java.util.List;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class ClientService {
 
-    private final ClientRepository clientRepository;
+    private final ReservationMapper reservationMapper;
+
     private final UserRepository userRepository;
 
-    @Autowired
-    public ClientService(ClientRepository clientRepository, UserRepository userRepository) {
-        this.clientRepository = clientRepository;
+    private final ClientRepository clientRepository;
+
+    private final ClientGroupRepository clientGroupRepository;
+
+    public ClientService(
+            ReservationMapper reservationMapper,
+            UserRepository userRepository,
+            ClientRepository clientRepository,
+            ClientGroupRepository clientGroupRepository) {
+        this.reservationMapper = reservationMapper;
         this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
+        this.clientGroupRepository = clientGroupRepository;
     }
 
     public ResponseEntity<Map<String, List<Client>>> getAll() {
@@ -124,4 +139,41 @@ public class ClientService {
 
     }
 
+    public ResponseEntity<ReservationListDTO> getReservations(Long id) throws NoContentException {
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isEmpty()) {
+            throw new NoContentException(
+                    "Client with id: " + id + " does not exists",
+                    28);
+        }
+
+        List<ReservationDTO> response = new ArrayList<>();
+        clientGroupRepository.findAllByClientId(id).forEach(group -> {
+            ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
+            dto.setBranchId(group.getReservation().getBranch().getId());
+            response.add(dto);
+        });
+
+        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+    }
+
+    public ResponseEntity<ReservationListDTO> getReservationsByDate(Long id, Date reservationDate)
+            throws NoContentException {
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isEmpty()) {
+            throw new NoContentException(
+                    "Client with id: " + id + " does not exists",
+                    28);
+        }
+
+        List<ReservationDTO> response = new ArrayList<>();
+        clientGroupRepository.findAllByClientIdAndReservationReservationDateGreaterThanEqual(id, reservationDate)
+                .forEach(group -> {
+                    ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
+                    dto.setBranchId(group.getReservation().getBranch().getId());
+                    response.add(dto);
+                });
+
+        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+    }
 }

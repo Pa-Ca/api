@@ -1,6 +1,7 @@
 package com.paca.paca.branch.service;
 
 import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
 
@@ -17,14 +18,18 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.promotion.dto.PromotionListDTO;
+import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
+import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
@@ -39,6 +44,8 @@ public class BranchService {
 
     private final PromotionMapper promotionMapper;
 
+    private final ReservationMapper reservationMapper;
+
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
     private final BranchRepository branchRepository;
@@ -49,6 +56,8 @@ public class BranchService {
 
     private final PromotionRepository promotionRepository;
 
+    private final ReservationRepository reservationRepository;
+
     private final ProductCategoryRepository productCategoryRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
@@ -57,21 +66,25 @@ public class BranchService {
             BranchMapper branchMapper,
             ProductMapper productMapper,
             PromotionMapper promotionMapper,
+            ReservationMapper reservationMapper,
             ProductSubCategoryMapper productSubCategoryMapper,
             BranchRepository branchRepository,
             ProductRepository productRepository,
             BusinessRepository businessRepository,
             PromotionRepository promotionRepository,
+            ReservationRepository reservationRepository,
             ProductCategoryRepository productCategoryRepository,
             ProductSubCategoryRepository productSubCategoryRepository) {
         this.branchMapper = branchMapper;
         this.productMapper = productMapper;
         this.promotionMapper = promotionMapper;
+        this.reservationMapper = reservationMapper;
         this.productSubCategoryMapper = productSubCategoryMapper;
         this.branchRepository = branchRepository;
         this.productRepository = productRepository;
         this.businessRepository = businessRepository;
         this.promotionRepository = promotionRepository;
+        this.reservationRepository = reservationRepository;
         this.productCategoryRepository = productCategoryRepository;
         this.productSubCategoryRepository = productSubCategoryRepository;
     }
@@ -217,5 +230,43 @@ public class BranchService {
         });
 
         return ResponseEntity.ok(PromotionListDTO.builder().promotions(response).build());
+    }
+
+    public ResponseEntity<ReservationListDTO> getReservations(Long id) throws NoContentException {
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id: " + id + " does not exists",
+                    20);
+        }
+
+        List<ReservationDTO> response = new ArrayList<>();
+        reservationRepository.findAllByBranchId(id).forEach(reservation -> {
+            ReservationDTO dto = reservationMapper.toDTO(reservation);
+            dto.setBranchId(reservation.getBranch().getId());
+            response.add(dto);
+        });
+
+        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+    }
+
+    public ResponseEntity<ReservationListDTO> getReservationsByDate(Long id, Date reservationDate)
+            throws NoContentException {
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id: " + id + " does not exists",
+                    20);
+        }
+
+        List<ReservationDTO> response = new ArrayList<>();
+        reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate)
+                .forEach(reservation -> {
+                    ReservationDTO dto = reservationMapper.toDTO(reservation);
+                    dto.setBranchId(reservation.getBranch().getId());
+                    response.add(dto);
+                });
+
+        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
     }
 }

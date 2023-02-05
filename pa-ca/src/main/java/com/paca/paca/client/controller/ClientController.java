@@ -2,16 +2,19 @@ package com.paca.paca.client.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendRequestDTO;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.service.FriendService;
+import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 import java.util.Map;
+import java.util.Date;
 import java.util.List;
 
 @CrossOrigin
@@ -98,5 +101,18 @@ public class ClientController {
     public void reject(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
             throws NoContentException, ConflictException {
         friendService.reject(requesterId, id);
+    }
+
+    @GetMapping("/{id}/reservation")
+    public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id) throws NoContentException {
+        return clientService.getReservations(id);
+    }
+
+    @GetMapping("/{id}/reservation/{date}")
+    public ResponseEntity<ReservationListDTO> getReservationsByDate(
+            @PathVariable("id") Long id,
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date)
+            throws NoContentException {
+        return clientService.getReservationsByDate(id, date);
     }
 }

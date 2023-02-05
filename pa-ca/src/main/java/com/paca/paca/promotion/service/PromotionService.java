@@ -95,7 +95,7 @@ public class PromotionService {
         if (current.isEmpty()) {
             throw new NoContentException(
                     "Promotion with id: " + id + " does not exists",
-                    25);
+                    26);
         }
         promotionRepository.deleteById(id);
     }
