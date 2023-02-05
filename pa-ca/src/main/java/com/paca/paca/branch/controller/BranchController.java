@@ -2,6 +2,7 @@ package com.paca.paca.branch.controller;
 
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -64,5 +65,10 @@ public class BranchController {
             @PathVariable("branchId") Long branchId,
             @PathVariable("productCategoryId") Long productCategoryId) throws NoContentException {
         return branchService.getProductSubCategories(branchId, productCategoryId);
+    }
+
+    @GetMapping("/{id}/product")
+    public ResponseEntity<ProductListDTO> getProducts(Long id) throws NoContentException {
+        return branchService.getProducts(id);
     }
 }
