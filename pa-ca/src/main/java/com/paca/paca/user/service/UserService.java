@@ -40,10 +40,21 @@ public class UserService {
         }
     }
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
+    public ResponseEntity<UserListDTO> getAll() {
+        List<UserDTO> response = new ArrayList<>();
+        userRepository.findAll().forEach(user -> response.add (
+            UserDTO
+                .builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .verified(user.getVerified())
+                .loggedIn(user.getLoggedIn())
+                .role(user.getRole().getName().name())
+                .build()
+        ));
+
+        return ResponseEntity.ok(UserListDTO.builder().users(response).build());
     }
 
     public UserListDTO getAll() {
