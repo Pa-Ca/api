@@ -54,7 +54,7 @@ public class UserService {
                 .password(user.getPassword())
                 .verified(user.getVerified())
                 .loggedIn(user.getLoggedIn())
-                .role(user.getRoleId().getName().name())
+                .role(user.getRole().getName().name())
                 .build()
         ));
 
@@ -102,7 +102,7 @@ public class UserService {
 
         System.out.println("NP_________________________________________________________________________________");
         User user = userMapper.updateEntity(dto, current.get(), UserRole.valueOf(
-                (dto.role != null) ? dto.role : current.get().getRoleId().getName().name()
+                (dto.role != null) ? dto.role : current.get().getRole().getName().name()
         ));
         userRepository.save(user);
         return ResponseEntity.ok(userMapper.toDTO(user));

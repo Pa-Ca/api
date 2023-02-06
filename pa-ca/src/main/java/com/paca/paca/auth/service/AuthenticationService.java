@@ -46,7 +46,7 @@ public class AuthenticationService {
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roleId(new Role(1L, "client"))
+                .role(new Role(1L, "client"))
                 .verified(false)
                 .loggedIn(false)
                 .build();
