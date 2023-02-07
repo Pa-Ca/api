@@ -65,11 +65,11 @@ public class BranchController {
         branchService.delete(id);
     }
 
-    @GetMapping("/{branchId}/product-category/{productCategoryId}/product-sub-category")
+    @GetMapping("/{id}/product-category/{productCategoryId}/")
     public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
-            @PathVariable("branchId") Long branchId,
+            @PathVariable("id") Long id,
             @PathVariable("productCategoryId") Long productCategoryId) throws NoContentException {
-        return branchService.getProductSubCategories(branchId, productCategoryId);
+        return branchService.getProductSubCategories(id, productCategoryId);
     }
 
     @GetMapping("/{id}/product")

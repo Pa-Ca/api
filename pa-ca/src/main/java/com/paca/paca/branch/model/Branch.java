@@ -42,7 +42,7 @@ public class Branch {
     private Integer capacity;
 
     @Column(name = "reservation_price")
-    private Long reservationPrice;
+    private Float reservationPrice;
 
     @Column(name = "reserve_off")
     private Boolean reserveOff;

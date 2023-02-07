@@ -19,5 +19,5 @@ public class ReservationDTO {
     private String payment;
     private Integer status;
     private Date payDate;
-    private Long price;
+    private Float price;
 }

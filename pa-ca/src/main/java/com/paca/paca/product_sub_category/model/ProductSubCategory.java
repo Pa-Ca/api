@@ -27,7 +27,6 @@ public class ProductSubCategory {
     @JoinColumn(name = "product_category_id")
     private ProductCategory productCategory;
 
-    @ManyToOne
-    @JoinColumn(name = "name")
+    @Column(name = "name")
     private String name;
 }

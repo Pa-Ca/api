@@ -17,6 +17,6 @@ public class BranchDTO {
     private String overview;
     private Float score;
     private Integer capacity;
-    private Long reservationPrice;
+    private Float reservationPrice;
     private Boolean reserveOff;
 }

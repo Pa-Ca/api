@@ -13,6 +13,6 @@ public class ProductDTO {
     private Long productSubCategoryId;
     private Boolean disabled;
     private String name;
-    private Long price;
+    private Float price;
     private String description;
 }

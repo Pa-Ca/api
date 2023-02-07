@@ -33,7 +33,7 @@ public class Product {
     private String name;
 
     @Column(name = "price")
-    private Long price;
+    private Float price;
 
     @Column(name = "description")
     private String description;

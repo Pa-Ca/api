@@ -53,13 +53,6 @@ public class ClientController {
         clientService.delete(id);
     }
 
-    @PostMapping("/{id}/friend")
-    public ResponseEntity<FriendDTO> friendRequest(
-            @PathVariable("id") Long id,
-            @RequestBody FriendDTO request) throws NoContentException, ConflictException {
-        return clientService.friendRequest(request.getRequesterId(), id);
-    }
-
     @GetMapping("/{id}/friend/accepted")
     public ResponseEntity<ClientListDTO> getAcceptedFriends(@PathVariable("id") Long id) {
         return clientService.getAcceptedFriends(id);
@@ -73,6 +66,13 @@ public class ClientController {
     @GetMapping("/{id}/friend/pending")
     public ResponseEntity<ClientListDTO> getPendingFriends(@PathVariable("id") Long id) {
         return clientService.getPendingFriends(id);
+    }
+
+    @PostMapping("/{id}/friend/pending/{requesterId}")
+    public ResponseEntity<FriendDTO> friendRequest(
+            @PathVariable("id") Long id,
+            @PathVariable("requesterId") Long requesterId) throws NoContentException, ConflictException {
+        return clientService.friendRequest(requesterId, id);
     }
 
     @DeleteMapping("/{id}/friend/pending/{requesterId}")

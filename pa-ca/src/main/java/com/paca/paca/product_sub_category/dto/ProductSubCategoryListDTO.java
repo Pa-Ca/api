@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductSubCategoryListDTO {
-    List<ProductSubCategoryDTO> categories;
+    List<ProductSubCategoryDTO> productSubCategories;
 }

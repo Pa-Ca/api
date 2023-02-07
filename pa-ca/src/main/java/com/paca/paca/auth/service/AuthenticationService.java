@@ -103,21 +103,23 @@ public class AuthenticationService {
             throw new BadRequestException("Password not found");
         }
         if (!userRepository.existsByEmail(email)) {
-            throw new NoContentException("User does not exists", 8);
-        }
-
-        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
-        if (password.equals(user.getPassword())) {
             throw new ForbiddenException("Authentication failed", 9);
         }
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()));
-        var jwtToken = jwtService.generateToken(user);
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()));
+        } catch (Exception e) {
+            throw new ForbiddenException("Authentication failed", 9);
+        }
+        String jwtToken = jwtService.generateToken(user);
         return ResponseEntity.ok(LoginResponseDTO.builder()
                 .token(jwtToken)
+                .id(user.getId())
                 .build());
     }
 }

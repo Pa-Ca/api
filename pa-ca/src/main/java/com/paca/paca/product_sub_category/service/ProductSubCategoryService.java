@@ -51,7 +51,7 @@ public class ProductSubCategoryService {
             response.add(dto);
         });
 
-        return ResponseEntity.ok(ProductSubCategoryListDTO.builder().categories(response).build());
+        return ResponseEntity.ok(ProductSubCategoryListDTO.builder().productSubCategories(response).build());
     }
 
     public ResponseEntity<ProductSubCategoryDTO> getById(Long id) throws NoContentException {

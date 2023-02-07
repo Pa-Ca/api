@@ -17,7 +17,6 @@ public class ProductCategory {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "name")
+    @Column(name = "name")
     private String name;
 }

@@ -171,7 +171,7 @@ public class BranchService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ProductSubCategoryListDTO.builder().categories(response).build());
+        return ResponseEntity.ok(ProductSubCategoryListDTO.builder().productSubCategories(response).build());
     }
 
     public ResponseEntity<ProductListDTO> getProducts(Long id) throws NoContentException {

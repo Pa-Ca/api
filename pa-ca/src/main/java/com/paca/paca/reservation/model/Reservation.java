@@ -47,5 +47,5 @@ public class Reservation {
     private Date payDate;
 
     @Column(name = "price")
-    private Long price;
+    private Float price;
 }

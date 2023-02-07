@@ -16,7 +16,6 @@ import com.paca.paca.auth.service.AuthenticationService;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
@@ -37,7 +36,7 @@ public class AuthenticationController {
 
     @PostMapping(AuthenticationStatics.Endpoint.LOGIN)
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request)
-            throws BadRequestException, NoContentException, ForbiddenException {
+            throws ForbiddenException {
         return service.login(request);
     }
 
