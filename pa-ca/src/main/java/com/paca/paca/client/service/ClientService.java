@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.paca.paca.user.User;
-import com.paca.paca.user.UserRepository;
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.repository.ClientRepository;
