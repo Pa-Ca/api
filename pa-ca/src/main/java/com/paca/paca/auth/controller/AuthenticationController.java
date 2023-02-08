@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.auth.dto.RefreshRequestDTO;
+import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.auth.service.AuthenticationService;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -38,6 +40,12 @@ public class AuthenticationController {
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request)
             throws ForbiddenException {
         return service.login(request);
+    }
+
+    @PostMapping(AuthenticationStatics.Endpoint.REFRESH)
+    public ResponseEntity<RefreshResponseDTO> refresh(@RequestBody RefreshRequestDTO request)
+            throws ForbiddenException {
+        return service.refresh(request);
     }
 
 }

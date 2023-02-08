@@ -30,19 +30,25 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(UserDetails userDetails, Boolean isRefresh) {
+        return generateToken(new HashMap<>(), userDetails, isRefresh);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails) {
+            UserDetails userDetails,
+            Boolean isRefresh) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + AuthenticationStatics.Jwt.JWT_EXPIRATION))
+                .setExpiration(new Date(
+                        System.currentTimeMillis() + (
+                            isRefresh ? AuthenticationStatics.Jwt.REFRESH_EXPIRATION :
+                                        AuthenticationStatics.Jwt.TOKEN_EXPIRATION
+                            )
+                    ))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

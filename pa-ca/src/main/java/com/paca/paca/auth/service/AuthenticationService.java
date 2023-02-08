@@ -1,14 +1,16 @@
 package com.paca.paca.auth.service;
 
-import com.paca.paca.auth.utils.EmailValidator;
-import com.paca.paca.auth.utils.PassValidator;
 import lombok.RequiredArgsConstructor;
+import com.paca.paca.auth.utils.PassValidator;
 import org.springframework.stereotype.Service;
+import com.paca.paca.auth.utils.EmailValidator;
 
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -19,12 +21,15 @@ import com.paca.paca.auth.config.JwtService;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.auth.dto.RefreshRequestDTO;
+import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.exception.exceptions.BadRequestException;
+
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
 @Service
@@ -38,6 +43,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    private final UserDetailsService userDetailsService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -84,8 +91,10 @@ public class AuthenticationService {
 
         // Generate JWT token and Response
         LoginResponseDTO response = LoginResponseDTO.builder()
-                .token(jwtService.generateToken(user))
+                .token(jwtService.generateToken(user, false))
+                .refresh(jwtService.generateToken(user, true))
                 .id(user.getId())
+                .role(user.getRoleId().getName().name())
                 .build();
 
         return ResponseEntity.ok(response);
@@ -116,10 +125,38 @@ public class AuthenticationService {
         } catch (Exception e) {
             throw new ForbiddenException("Authentication failed", 9);
         }
-        String jwtToken = jwtService.generateToken(user);
-        return ResponseEntity.ok(LoginResponseDTO.builder()
-                .token(jwtToken)
+
+        LoginResponseDTO response = LoginResponseDTO.builder()
+                .token(jwtService.generateToken(user, false))
+                .refresh(jwtService.generateToken(user, true))
                 .id(user.getId())
-                .build());
+                .role(user.getRoleId().getName().name())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<RefreshResponseDTO> refresh(RefreshRequestDTO request) throws ForbiddenException {
+        String jwt = request.getRefresh();
+        String userEmail;
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (Exception e) {
+            throw new ForbiddenException("Authentication failed1", 9);
+        }
+        if (userEmail != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+            if (! jwtService.isTokenValid(jwt, userDetails)) {
+                throw new ForbiddenException("Authentication failed", 9);
+            }
+        }
+        else {
+            throw new ForbiddenException("Authentication failed", 9);
+        }
+
+        User user = userRepository.findByEmail(userEmail).orElseThrow();
+        RefreshResponseDTO response = RefreshResponseDTO.builder()
+                .token(jwtService.generateToken(user, false))
+                .build();
+        return ResponseEntity.ok(response);
     }
 }

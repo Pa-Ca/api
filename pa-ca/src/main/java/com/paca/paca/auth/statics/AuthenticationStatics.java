@@ -6,7 +6,8 @@ import static java.util.Map.entry;
 public interface AuthenticationStatics {
 
   interface Jwt {
-    Integer JWT_EXPIRATION = 36000000;
+    Integer TOKEN_EXPIRATION = 300000;
+    Integer REFRESH_EXPIRATION = 86400000;
     String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
   }
 
@@ -27,5 +28,6 @@ public interface AuthenticationStatics {
     String AUTH_PATH = "/api/v1/auth";
     String SIGNUP = "/signup";
     String LOGIN = "/login";
+    String REFRESH = "/refresh";
   }
 }
