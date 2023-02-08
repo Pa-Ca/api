@@ -15,18 +15,18 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Boolean existsByRequesterIdAndAddresserId(Long requesterId, Long addresserId);
 
     // Solicitudes aceptadas
-    List<Friend> findByRequesterIdAndAcceptedTrue(Long userId);
+    List<Friend> findAllByRequesterIdAndAcceptedTrue(Long userId);
 
-    List<Friend> findByAddresserIdAndAcceptedTrue(Long userId);
+    List<Friend> findAllByAddresserIdAndAcceptedTrue(Long userId);
 
     // Solicitudes rechazadas
-    List<Friend> findByRequesterIdAndRejectedTrue(Long userId);
+    List<Friend> findAllByRequesterIdAndRejectedTrue(Long userId);
 
-    List<Friend> findByAddresserIdAndRejectedTrue(Long userId);
+    List<Friend> findAllByAddresserIdAndRejectedTrue(Long userId);
 
     // Solicitudes pendientes
-    List<Friend> findByRequesterIdAndAcceptedFalseAndRejectedFalse(Long userId);
+    List<Friend> findAllByRequesterIdAndAcceptedFalseAndRejectedFalse(Long userId);
 
-    List<Friend> findByAddresserIdAndAcceptedFalseAndRejectedFalse(Long userId);
+    List<Friend> findAllByAddresserIdAndAcceptedFalseAndRejectedFalse(Long userId);
 
 }

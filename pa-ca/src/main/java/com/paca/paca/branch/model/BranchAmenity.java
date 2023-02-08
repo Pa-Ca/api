@@ -16,9 +16,11 @@ public class BranchAmenity {
     @SequenceGenerator(name = "branch_amenity_seq", sequenceName = "branch_amenity_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "branch_id")
     private Branch branch;
+
     @ManyToOne
     @JoinColumn(name = "amenity_id")
     private Amenity amenity;
