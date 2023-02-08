@@ -26,9 +26,6 @@ public class Product {
     @Column(name = "disabled")
     private Boolean disabled;
 
-    @Column(name = "coordinates")
-    private String coordinates;
-
     @Column(name = "name")
     private String name;
 
