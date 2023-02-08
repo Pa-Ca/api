@@ -17,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.auth.config.JwtService;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
@@ -145,7 +144,7 @@ public class AuthenticationService {
         }
         if (userEmail != null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            if (! jwtService.isTokenValid(jwt, userDetails)) {
+            if (! jwtService.isTokenValid(jwt, userDetails) || ! jwtService.isTokenRefresh(jwt)) {
                 throw new ForbiddenException("Authentication failed", 9);
             }
         }

@@ -29,5 +29,6 @@ public interface AuthenticationStatics {
     String SIGNUP = "/signup";
     String LOGIN = "/login";
     String REFRESH = "/refresh";
+    String LOGOUT = "/logout";
   }
 }
