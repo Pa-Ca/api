@@ -124,6 +124,17 @@ public class ClientService {
 
     }
 
+    public ResponseEntity<ClientDTO> getByUserId(Long id) throws NoContentException {
+        Client client = clientRepository.findByUserId(id)
+                .orElseThrow(() -> new NoContentException(
+                        "User with id: " + id + " does not exists",
+                        12));
+
+        ClientDTO dto = clientMapper.toDTO(client);
+        dto.setUserId(client.getUser().getId());
+        return new ResponseEntity<ClientDTO>(dto, HttpStatus.OK);
+    }
+
     public ResponseEntity<ClientListDTO> getPendingFriends(Long id) {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {

@@ -53,6 +53,11 @@ public class ClientController {
         clientService.delete(id);
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<ClientDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
+        return clientService.getByUserId(id);
+    }
+
     @GetMapping("/{id}/friend/accepted")
     public ResponseEntity<ClientListDTO> getAcceptedFriends(@PathVariable("id") Long id) {
         return clientService.getAcceptedFriends(id);
