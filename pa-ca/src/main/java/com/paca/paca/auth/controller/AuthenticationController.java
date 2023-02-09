@@ -20,6 +20,7 @@ import com.paca.paca.auth.service.AuthenticationService;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
@@ -36,7 +37,7 @@ public class AuthenticationController {
     @PostMapping(AuthenticationStatics.Endpoint.SIGNUP)
     public ResponseEntity<LoginResponseDTO> signup(
             @RequestBody SignupRequestDTO request)
-            throws BadRequestException, UnprocessableException, ConflictException {
+            throws BadRequestException, NoContentException,UnprocessableException, ConflictException {
         return service.signup(request);
     }
 
