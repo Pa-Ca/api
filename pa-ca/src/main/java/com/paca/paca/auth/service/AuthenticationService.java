@@ -75,6 +75,7 @@ public class AuthenticationService {
         validateRole(request.getRole());
         Optional<Role> role = roleRepository.findByName(UserRole.valueOf(request.getRole()));
         if (role.isEmpty()) {
+            System.out.println("ROLEEEEEEEEE: " + request.getRole());
             throw new NoContentException("Role " + request.getRole() + " does not exists");
         }
 

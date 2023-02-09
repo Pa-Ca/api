@@ -9,7 +9,10 @@ INSERT INTO amenity (id, name)
         (4, 'music live'),
         (5, 'wifi'),
         (6, 'parking'),
-        (7, 'outdoor');
+        (7, 'outdoor'),
+        (8, 'hotel'),
+        (9, 'internet'),
+        (10, 'delivery');
 
 INSERT INTO branch_amenity (id, branch_id, amenity_id) 
     VALUES
