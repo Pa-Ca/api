@@ -1,12 +1,10 @@
 package com.paca.paca.user.utils;
 
-import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import org.mapstruct.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

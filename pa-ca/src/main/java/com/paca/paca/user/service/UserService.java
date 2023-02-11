@@ -44,7 +44,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity<UserListDTO> getAll() {
+    public UserListDTO getAll() {
         List<UserDTO> response = new ArrayList<>();
         userRepository.findAll().forEach(user -> response.add (
             UserDTO
@@ -58,28 +58,19 @@ public class UserService {
                 .build()
         ));
 
-        return ResponseEntity.ok(UserListDTO.builder().users(response).build());
+        return UserListDTO.builder().users(response).build();
     }
 
-    public ResponseEntity<UserDTO> getById(Long id) throws BadRequestException {
+    public UserDTO getById(Long id) throws BadRequestException {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) throw new BadRequestException("User does not exists");
-        else return ResponseEntity.ok(userMapper.toDTO(user.get()));
+        else {
+            UserDTO response = userMapper.toDTO(user.get());
+            return response;
+        }
     }
 
-    public ResponseEntity<User> getById2(Long id) throws BadRequestException {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) throw new BadRequestException("User does not exists");
-        else return ResponseEntity.ok(user.get());
-    }
-
-    public ResponseEntity<UserDTO> getByEmail(String email) throws NoContentException {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) throw new NoContentException("User with email: " + email + " does not exists");
-        else return ResponseEntity.ok(userMapper.toDTO(user.get()));
-    }
-
-    public ResponseEntity<UserDTO> update(Long id, UserDTO dto)
+    public UserDTO update(Long id, UserDTO dto)
             throws BadRequestException, UnprocessableException, ConflictException {
         Optional<User> current = userRepository.findById(id);
         if (current.isEmpty()) throw new BadRequestException("User does not exists");
@@ -100,12 +91,11 @@ public class UserService {
         // Role validation
         if (dto.getRole() != null) validateRole(dto.getRole());
 
-        System.out.println("NP_________________________________________________________________________________");
         User user = userMapper.updateEntity(dto, current.get(), UserRole.valueOf(
                 (dto.role != null) ? dto.role : current.get().getRole().getName().name()
         ));
         userRepository.save(user);
-        return ResponseEntity.ok(userMapper.toDTO(user));
+        return userMapper.toDTO(user);
     }
 
     public void delete(Long id) throws BadRequestException {
