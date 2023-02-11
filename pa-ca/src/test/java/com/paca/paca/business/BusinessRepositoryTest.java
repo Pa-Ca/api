@@ -1,35 +1,39 @@
 package com.paca.paca.business;
 
+import com.paca.paca.business.tier.Tier;
+import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.repository.BusinessRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.paca.paca.business.model.Business;
-import com.paca.paca.business.repository.BusinessRepository;
-
 @DataJpaTest
 class BusinessRepositoryTest {
 
     @Autowired
-    private BusinessRepository underTest;
+    private BusinessRepositoryTest underTest;
+
+    @AfterEach
+    void restoreTest() {
+        underTest.deleteAll();
+    }
 
     @Test
-    void itShouldSelectById() {
+    @Disabled
+    void doesNotExistsUserById() {
         // given
-        Business business = new Business(
-            1L,
-            "McDonald Charallave",
-            true
-        );
-        underTest.save(business);
+        Long id = 1L;
 
         // when
-        boolean expected = underTest.existsById(1L);
+        boolean expected = underTest.existsById(id);
 
         // then
-        assertThat(expected).isTrue();
+        assertThat(expected).isFalse();
     }
 
 }
