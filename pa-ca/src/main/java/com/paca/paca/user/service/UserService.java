@@ -10,6 +10,9 @@ import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.utils.UserMapper;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,12 +27,15 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private void validateRole(String role) throws BadRequestException {
-        if (role.isEmpty()) throw new BadRequestException("The role attribute not found");
+        if (role.isEmpty())
+            throw new BadRequestException("The role attribute not found");
 
         try {
             UserRole.valueOf(role);
@@ -58,6 +64,7 @@ public class UserService {
                 .build()
         ));
 
+
         return UserListDTO.builder().users(response).build();
     }
 
@@ -71,9 +78,11 @@ public class UserService {
     }
 
     public UserDTO update(Long id, UserDTO dto)
+
             throws BadRequestException, UnprocessableException, ConflictException {
         Optional<User> current = userRepository.findById(id);
-        if (current.isEmpty()) throw new BadRequestException("User does not exists");
+        if (current.isEmpty())
+            throw new BadRequestException("User does not exists");
 
         // Email Validation
         if (dto.getEmail() != null) {
@@ -89,18 +98,21 @@ public class UserService {
         }
 
         // Role validation
-        if (dto.getRole() != null) validateRole(dto.getRole());
+        if (dto.getRole() != null)
+            validateRole(dto.getRole());
 
         User user = userMapper.updateEntity(dto, current.get(), UserRole.valueOf(
                 (dto.role != null) ? dto.role : current.get().getRole().getName().name()
         ));
+
         userRepository.save(user);
         return userMapper.toDTO(user);
     }
 
     public void delete(Long id) throws BadRequestException {
         Optional<User> current = userRepository.findById(id);
-        if (current.isEmpty()) throw new BadRequestException("User does not exists");
+        if (current.isEmpty())
+            throw new BadRequestException("User does not exists");
         userRepository.deleteById(id);
     }
 

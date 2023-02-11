@@ -121,7 +121,6 @@ public class UserServiceTest {
     }
 
     @Test
-    @Disabled
     void shouldGetBadRequestFromUpdateUserByIdBecauseEmailIsTaken() {
         Role admin = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
         User user = User.builder()

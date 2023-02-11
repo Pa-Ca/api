@@ -1,0 +1,33 @@
+-- Promotion
+
+INSERT INTO promotion (id, branch_id, text, disabled)
+    VALUES
+        (1, 1, '20% de descuento en platos principales', FALSE),
+        (3, 1, 'Menú del día a solo $10', FALSE),
+        (4, 2, 'Ven con tus amigos y disfruta de una noche inolvidable', FALSE),
+        (7, 3, 'Disfruta de nuestro menú de brunch los fines de semana', FALSE),
+        (8, 3, 'Especial de martes: cualquier plato con una cerveza por solo $15', FALSE),
+        (9, 4, '20% de descuento en todas nuestras opciones vegetarianas', FALSE),
+        (10, 4, 'Martes de tacos: 3 tacos por solo $10', FALSE),
+        (11, 5, 'Compra un plato principal y lleva un postre gratis', FALSE),
+        (12, 5, 'Jueves de vino: vino por solo $5 el vaso', FALSE),
+        (13, 6, 'Sábados de cerveza: cerveza por solo $3 la botella', FALSE),
+        (100, 7, '20% de descuento en la cena', FALSE),
+        (101, 7, 'Comida gratis con una bebida', FALSE),
+        (102, 7, '2 por 1 en postres', FALSE),
+        (103, 8, 'Comida gratis con una bebida', FALSE),
+        (104, 8, '10% de descuento en el almuerzo', FALSE),
+        (105, 8, '2 por 1 en postres', FALSE),
+        (107, 9, 'Comida gratis con una bebida', FALSE),
+        (108, 9, '2 por 1 en postres', FALSE),
+        (109, 10, 'Comida gratis con una bebida', FALSE),
+        (110, 10, '10% de descuento en el almuerzo', FALSE),
+        (111, 10, '2 por 1 en postres', FALSE),
+        (112, 11, '20% de descuento en la cena', FALSE),
+        (115, 12, 'Comida gratis con una bebida', FALSE),
+        (117, 12, '2 por 1 en postres', FALSE),
+        (118, 13, '20% de descuento en la cena', FALSE),
+        (121, 14, 'Comida gratis con una bebida', FALSE),
+        (123, 14, '2 por 1 en postres', FALSE),
+        (124, 15, '20% de descuento en la cena', FALSE),
+        (125, 15, 'Comida gratis con una bebida', FALSE);

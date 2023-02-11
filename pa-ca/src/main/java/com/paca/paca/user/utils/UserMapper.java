@@ -24,7 +24,7 @@ public interface UserMapper {
     @Mapping(target = "loggedIn", ignore = true)
     User updateEntity(UserDTO dto, @MappingTarget User user, UserRole role);
 
-    default Role stringToRole (UserRole role) { return new Role(role); }
+    default Role stringToRole(UserRole role) {
+        return new Role(role);
+    }
 }
-
-
