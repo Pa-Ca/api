@@ -1,5 +1,5 @@
 package com.paca.paca.user.model;
-import com.paca.paca.exception.exceptions.BadRequestException;
+
 import com.paca.paca.statics.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,6 +15,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
     private UserRole name;
@@ -23,6 +24,14 @@ public class Role {
         this.id = (long) name.ordinal();
         this.name = name;
     }
-    public Role(Long id, UserRole name) { this.id = id; this.name = name; }
-    public Role(Long id, String name) { this.id = id; this.name = UserRole.valueOf(name); }
+
+    public Role(Long id, UserRole name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Role(Long id, String name) {
+        this.id = id;
+        this.name = UserRole.valueOf(name);
+    }
 }
