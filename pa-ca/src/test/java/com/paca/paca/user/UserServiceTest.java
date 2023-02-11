@@ -1,5 +1,6 @@
 package com.paca.paca.user;
 
+import com.paca.paca.PacaTest;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.dto.UserDTO;
@@ -23,6 +24,7 @@ import com.paca.paca.utils.TestUtils;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
