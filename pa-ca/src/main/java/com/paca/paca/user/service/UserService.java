@@ -11,14 +11,10 @@ import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.utils.UserMapper;
 
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.NoContentException;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -44,7 +44,7 @@ public class ExceptionHandler {
                 e.getMessage(),
                 status,
                 ZonedDateTime.now(),
-                e.getcode());
+                e.getCode());
         return new ResponseEntity<>(response, status);
     }
 
