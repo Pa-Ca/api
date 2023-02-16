@@ -23,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -75,8 +74,8 @@ public class UserServiceTest {
             userService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals(e.getMessage(), "User does not exists");
+            Assertions.assertTrue(e instanceof BadRequestException);
+            Assertions.assertEquals(e.getMessage(), "User does not exists");
         }
     }
 
@@ -113,10 +112,9 @@ public class UserServiceTest {
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
         try {
             userService.update(1L, UserDTO.builder().build());
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-            Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals(e.getMessage(), "User does not exists");
+        } catch (BadRequestException e){
+            assertThat(e.getMessage()).isEqualTo("User does not exists");
+            assertThat(e.getCode()).isEqualTo(400);
         }
     }
 
@@ -128,14 +126,12 @@ public class UserServiceTest {
                 .build();
 
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(user));
-        //when(userRepository.existsByEmail(any(String.class))).thenReturn(false);
+        when(userRepository.existsByEmail(any(String.class))).thenReturn(true);
         try {
-            userService.update(1L, UserDTO.builder().build());
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-
-            Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals(e.getMessage(), "This email is already taken");
+            userService.update(1L, UserDTO.builder().email("test@test.com").build());
+        } catch (BadRequestException e){
+            assertThat(e.getMessage()).isEqualTo("This email is already taken");
+            assertThat(e.getCode()).isEqualTo(400);
         }
     }
 }

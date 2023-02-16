@@ -12,9 +12,8 @@ import java.util.Properties;
 public class PassValidator {
 
     public static void validate(String password) {
-        if (password == null) {
-            throw new BadRequestException("Password not found");
-        }
+        if (password == null) throw new BadRequestException("Password not found");
+
         Properties props = new Properties();
         for (Map.Entry<String, String> entry : AuthenticationStatics.Auth.PASSWORD_ERRORS_PROPS
                 .entrySet()) {
