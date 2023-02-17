@@ -35,6 +35,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable("id") Long id, @RequestBody UserDTO user)
             throws BadRequestException, UnprocessableException, ConflictException {
+        System.out.println(user);
         return new ResponseEntity<>(userService.update(id, user), HttpStatus.OK);
     }
 

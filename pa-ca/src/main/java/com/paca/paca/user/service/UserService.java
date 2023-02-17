@@ -74,7 +74,6 @@ public class UserService {
     }
 
     public UserDTO update(Long id, UserDTO dto)
-
             throws BadRequestException, UnprocessableException, ConflictException {
         Optional<User> current = userRepository.findById(id);
         if (current.isEmpty())
