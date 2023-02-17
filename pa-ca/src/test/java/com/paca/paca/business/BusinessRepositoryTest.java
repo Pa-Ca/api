@@ -16,24 +16,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class BusinessRepositoryTest {
 
     @Autowired
-    private BusinessRepositoryTest underTest;
-
-    @AfterEach
-    void restoreTest() {
-        underTest.deleteAll();
-    }
-
-    @Test
-    @Disabled
-    void doesNotExistsUserById() {
-        // given
-        Long id = 1L;
-
-        // when
-        boolean expected = underTest.existsById(id);
-
-        // then
-        assertThat(expected).isFalse();
-    }
+    private BusinessRepository underTest;
 
 }
