@@ -1,8 +1,6 @@
 package com.paca.paca.client.service;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.http.ResponseEntity;
 
 import com.paca.paca.user.model.User;
 import com.paca.paca.client.model.Client;
@@ -48,7 +46,7 @@ public class ClientService {
 
     private final ClientGroupRepository clientGroupRepository;
 
-    public ResponseEntity<ClientListDTO> getAll() {
+    public ClientListDTO getAll() {
         List<ClientDTO> response = new ArrayList<>();
         clientRepository.findAll().forEach(client -> {
             ClientDTO dto = clientMapper.toDTO(client);
@@ -56,21 +54,21 @@ public class ClientService {
             response.add(dto);
         });
 
-        return ResponseEntity.ok(ClientListDTO.builder().clients(response).build());
+        return ClientListDTO.builder().clients(response).build();
     }
 
-    public ResponseEntity<ClientDTO> getById(Long id) throws NoContentException {
+    public ClientDTO getById(Long id) throws NoContentException {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
-                        "Client with id: " + id + " does not exists",
+                        "Client with id " + id + " does not exists",
                         28));
 
         ClientDTO dto = clientMapper.toDTO(client);
         dto.setUserId(client.getUser().getId());
-        return new ResponseEntity<ClientDTO>(dto, HttpStatus.OK);
+        return dto;
     }
 
-    public ResponseEntity<ClientDTO> save(ClientDTO dto) throws NoContentException, ConflictException {
+    public ClientDTO save(ClientDTO dto) throws NoContentException, ConflictException {
         String email = dto.getEmail();
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
@@ -80,7 +78,7 @@ public class ClientService {
                     30);
         }
 
-        boolean clientExists = this.clientRepository.existsByUserEmail(email);
+        boolean clientExists = clientRepository.existsByUserEmail(email);
         if (clientExists) {
             throw new ConflictException(
                     "Client with email " + dto.getEmail() + " already exists",
@@ -94,14 +92,14 @@ public class ClientService {
         ClientDTO newDto = clientMapper.toDTO(newClient);
         newDto.setUserId(newClient.getUser().getId());
 
-        return new ResponseEntity<ClientDTO>(newDto, HttpStatus.OK);
+        return newDto;
     }
 
-    public ResponseEntity<ClientDTO> update(Long id, ClientDTO dto) throws NoContentException {
+    public ClientDTO update(Long id, ClientDTO dto) throws NoContentException {
         Optional<Client> current = clientRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -110,36 +108,37 @@ public class ClientService {
         ClientDTO newDto = clientMapper.toDTO(newClient);
         newDto.setUserId(newClient.getUser().getId());
 
-        return new ResponseEntity<ClientDTO>(newDto, HttpStatus.OK);
+        return newDto;
     }
 
     public void delete(Long id) throws NoContentException {
         Optional<Client> current = clientRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
         clientRepository.deleteById(id);
 
     }
 
-    public ResponseEntity<ClientDTO> getByUserId(Long id) throws NoContentException {
+    public ClientDTO getByUserId(Long id) throws NoContentException {
         Client client = clientRepository.findByUserId(id)
                 .orElseThrow(() -> new NoContentException(
-                        "User with id: " + id + " does not exists",
+                        "User with id " + id + " does not exists",
                         12));
 
         ClientDTO dto = clientMapper.toDTO(client);
         dto.setUserId(client.getUser().getId());
-        return new ResponseEntity<ClientDTO>(dto, HttpStatus.OK);
+
+        return dto;
     }
 
-    public ResponseEntity<ClientListDTO> getPendingFriends(Long id) {
+    public ClientListDTO getPendingFriends(Long id) {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -151,14 +150,14 @@ public class ClientService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ClientListDTO.builder().clients(response).build());
+        return ClientListDTO.builder().clients(response).build();
     }
 
-    public ResponseEntity<ClientListDTO> getAcceptedFriends(Long id) {
+    public ClientListDTO getAcceptedFriends(Long id) {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -176,14 +175,14 @@ public class ClientService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ClientListDTO.builder().clients(response).build());
+        return ClientListDTO.builder().clients(response).build();
     }
 
-    public ResponseEntity<ClientListDTO> getRejectedFriends(Long id) {
+    public ClientListDTO getRejectedFriends(Long id) {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -195,13 +194,13 @@ public class ClientService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ClientListDTO.builder().clients(response).build());
+        return ClientListDTO.builder().clients(response).build();
     }
 
-    public ResponseEntity<FriendDTO> friendRequest(Long requesterId, Long addresserId)
+    public FriendDTO friendRequest(Long requesterId, Long addresserId)
             throws NoContentException, ConflictException {
         if (requesterId == addresserId) {
-            throw new ConflictException("Requester and addresser can not be the same", 19);
+            throw new ConflictException("Requester and addresser can not be the same", 28);
         }
 
         Optional<Client> requester = clientRepository.findById(requesterId);
@@ -235,10 +234,10 @@ public class ClientService {
         newDto.setRequesterId(request.getRequester().getId());
         newDto.setAddresserId(request.getAddresser().getId());
 
-        return new ResponseEntity<FriendDTO>(newDto, HttpStatus.OK);
+        return newDto;
     }
 
-    public ResponseEntity<FriendDTO> acceptFriendRequest(Long requesterId, Long addresserId)
+    public FriendDTO acceptFriendRequest(Long requesterId, Long addresserId)
             throws NoContentException, ConflictException {
         Optional<Friend> request = friendRepository.findByRequesterIdAndAddresserId(requesterId, addresserId);
         if (request.isEmpty()) {
@@ -263,10 +262,10 @@ public class ClientService {
         newDto.setRequesterId(newRequest.getRequester().getId());
         newDto.setAddresserId(newRequest.getAddresser().getId());
 
-        return new ResponseEntity<FriendDTO>(newDto, HttpStatus.OK);
+        return newDto;
     }
 
-    public ResponseEntity<FriendDTO> rejectFriendRequest(Long requesterId, Long addresserId)
+    public FriendDTO rejectFriendRequest(Long requesterId, Long addresserId)
             throws NoContentException, ConflictException {
         Optional<Friend> request = friendRepository.findByRequesterIdAndAddresserId(requesterId, addresserId);
         if (request.isEmpty()) {
@@ -291,7 +290,7 @@ public class ClientService {
         newDto.setRequesterId(newRequest.getRequester().getId());
         newDto.setAddresserId(newRequest.getAddresser().getId());
 
-        return new ResponseEntity<FriendDTO>(newDto, HttpStatus.OK);
+        return newDto;
     }
 
     public void deleteFriendRequest(Long requesterId, Long addresserId)
@@ -305,7 +304,7 @@ public class ClientService {
         friendRepository.deleteById(request.get().getId());
     }
 
-    public ResponseEntity<ReservationListDTO> getReservations(Long id) throws NoContentException {
+    public ReservationListDTO getReservations(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
@@ -320,10 +319,10 @@ public class ClientService {
             response.add(dto);
         });
 
-        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+        return ReservationListDTO.builder().reservations(response).build();
     }
 
-    public ResponseEntity<ReservationListDTO> getReservationsByDate(Long id, Date reservationDate)
+    public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
             throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
@@ -340,6 +339,6 @@ public class ClientService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+        return ReservationListDTO.builder().reservations(response).build();
     }
 }

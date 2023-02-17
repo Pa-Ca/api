@@ -16,8 +16,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.UserDetails;
 
+import com.paca.paca.user.model.User;
 import com.paca.paca.auth.model.JwtBlackList;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
@@ -29,7 +29,7 @@ public class JwtService {
 
     private final JwtBlackListRepository jwtBlackListRepository;
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -38,18 +38,18 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails, Boolean isRefresh) {
-        return generateToken(new HashMap<>(), userDetails, isRefresh);
+    public String generateToken(User user, Boolean isRefresh) {
+        return generateToken(new HashMap<>(), user, isRefresh);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails,
+            User user,
             Boolean isRefresh) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(
                         System.currentTimeMillis() + (
@@ -62,9 +62,9 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) &&
+    public boolean isTokenValid(String token, User user) {
+        final String email = extractEmail(token);
+        return (email.equals(user.getEmail())) &&
                 !isTokenExpired(token) && 
                 !jwtBlackListRepository.findByToken(token).isPresent();
     }

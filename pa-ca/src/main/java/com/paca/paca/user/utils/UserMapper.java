@@ -9,16 +9,16 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(source = "roleId.name", target = "role")
+    @Mapping(source = "role.name", target = "role")
     UserDTO toDTO(User user);
 
-    @Mapping(source = "role", target = "roleId")
+    @Mapping(source = "role", target = "role")
     @Mapping(target = "verified", defaultExpression = "java(false)")
     @Mapping(target = "loggedIn", defaultExpression = "java(false)")
     User toEntity(UserDTO dto, UserRole role);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "role", target = "roleId")
+    @Mapping(source = "role", target = "role")
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "verified", ignore = true)
     @Mapping(target = "loggedIn", ignore = true)
