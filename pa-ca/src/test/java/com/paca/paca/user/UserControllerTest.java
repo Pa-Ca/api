@@ -135,7 +135,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Disabled
     public void shouldThrowUnprocessableExceptionInUpdateUserById() throws Exception {
         when(userService.update(anyLong(), any(UserDTO.class))).thenThrow(new UnprocessableException("message", 0));
 
@@ -151,7 +150,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Disabled
     public void shouldThrowConflictExceptionInUpdateUserById() throws Exception {
         when(userService.update(anyLong(), any(UserDTO.class))).thenThrow(new ConflictException("message", 0));
 
