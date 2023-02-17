@@ -8,22 +8,46 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.branch.dto.BranchDTO;
+import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.AmenityRepository;
 
 import java.util.ArrayList;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+@Setter
+@Getter
+@Builder
 public class TestUtils {
+
+    RoleRepository roleRepository;
+
+    UserRepository userRepository;
+
+    ClientRepository clientRepository;
+
+    FriendRepository friendRepository;
+
+    BranchRepository branchRepository;
+
+    AmenityRepository amenityRepository;
+
     public static <T> List<T> castList(Class<? extends T> clazz, List<?> rawCollection) {
         List<T> result = new ArrayList<>(rawCollection.size());
 
@@ -34,7 +58,7 @@ public class TestUtils {
         return result;
     }
 
-    public static User createUser(RoleRepository roleRepository, UserRepository userRepository) {
+    public User createUser() {
         Role role = Role.builder()
                 .id((long) UserRole.client.ordinal())
                 .name(UserRole.client)
@@ -58,9 +82,9 @@ public class TestUtils {
         return user;
     }
 
-    public static Client createClient(User user, ClientRepository clientRepository) throws ParseException {
+    public Client createClient(User user) throws ParseException {
         if (user == null) {
-            user = createUser(null, null);
+            user = createUser();
         }
         Client client = Client.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
@@ -78,9 +102,9 @@ public class TestUtils {
         return client;
     }
 
-    public static ClientDTO createClientDTO(Client client) throws ParseException {
+    public ClientDTO createClientDTO(Client client) throws ParseException {
         if (client == null) {
-            client = createClient(null, null);
+            client = createClient(null);
         }
         ClientDTO dto = ClientDTO.builder()
                 .id(client.getId())
@@ -97,18 +121,16 @@ public class TestUtils {
         return dto;
     }
 
-    public static Friend createFriendRequest(
+    public Friend createFriendRequest(
             Client requester,
             Client addresser,
             boolean accepted,
-            boolean rejected,
-            FriendRepository friendRepository) throws ParseException {
+            boolean rejected) throws ParseException {
         if (requester == null) {
-            requester = createClient(null, null);
+            requester = createClient(null);
         }
         if (addresser == null) {
-            addresser = createClient(null, null);
-            addresser.setId(requester.getId() + 1);
+            addresser = createClient(null);
         }
 
         Friend request = Friend.builder()
@@ -126,9 +148,9 @@ public class TestUtils {
         return request;
     }
 
-    public static FriendDTO createFriendRequestDTO(Friend request) throws ParseException {
+    public FriendDTO createFriendRequestDTO(Friend request) throws ParseException {
         if (request == null) {
-            request = createFriendRequest(null, null, false, false, null);
+            request = createFriendRequest(null, null, false, false);
         }
         FriendDTO dto = FriendDTO.builder()
                 .requesterId(request.getRequester().getId())
@@ -140,7 +162,7 @@ public class TestUtils {
         return dto;
     }
 
-    public static Business createBusiness() {
+    public Business createBusiness() {
         Business business = Business.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .build();
@@ -148,7 +170,7 @@ public class TestUtils {
         return business;
     }
 
-    public static Branch createBranch(Business business, BranchRepository branchRepository) {
+    public Branch createBranch(Business business) {
         if (business == null) {
             business = createBusiness();
         }
@@ -173,9 +195,9 @@ public class TestUtils {
         return branch;
     }
 
-    public static BranchDTO createBranchDTO(Branch branch) throws ParseException {
+    public BranchDTO createBranchDTO(Branch branch) throws ParseException {
         if (branch == null) {
-            branch = createBranch(null, null);
+            branch = createBranch(null);
         }
         BranchDTO dto = BranchDTO.builder()
                 .id(branch.getId())
@@ -193,4 +215,28 @@ public class TestUtils {
         return dto;
     }
 
+    public Amenity createAmenity() {
+        Amenity amenity = Amenity.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .name("test")
+                .build();
+
+        if (amenityRepository != null) {
+            amenity = amenityRepository.save(amenity);
+        }
+
+        return amenity;
+    }
+
+    public AmenityDTO createAmenityDTO(Amenity amenity) {
+        if (amenity == null) {
+            amenity = createAmenity();
+        }
+        AmenityDTO dto = AmenityDTO.builder()
+                .id(amenity.getId())
+                .name(amenity.getName())
+                .build();
+
+        return dto;
+    }
 }

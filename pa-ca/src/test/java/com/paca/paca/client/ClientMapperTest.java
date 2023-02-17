@@ -29,9 +29,11 @@ public class ClientMapperTest {
     @InjectMocks
     private FriendMapperImpl friendMapper;
 
+    private TestUtils utils = TestUtils.builder().build();
+
     @Test
     void shouldMapClientEntityToClientDTO() throws ParseException {
-        Client client = TestUtils.createClient(null, null);
+        Client client = utils.createClient(null);
 
         ClientDTO response = clientMapper.toDTO(client);
         response.setUserId(client.getUser().getId());
@@ -49,8 +51,8 @@ public class ClientMapperTest {
 
     @Test 
     void shouldMapClientDTOtoClientEntity() throws ParseException {
-        User user = TestUtils.createUser(null, null);
-        ClientDTO dto = TestUtils.createClientDTO(TestUtils.createClient(user, null));
+        User user = utils.createUser();
+        ClientDTO dto = utils.createClientDTO(utils.createClient(user));
 
         Client client = clientMapper.toEntity(dto);
         client.setUser(user);
@@ -68,7 +70,7 @@ public class ClientMapperTest {
     
     @Test
     void shouldPartiallyMapClientDTOtoClientEntity() throws ParseException {
-        Client client = TestUtils.createClient(null, null);
+        Client client = utils.createClient(null);
 
         // Not changing ID
         ClientDTO dto = ClientDTO.builder()
@@ -137,7 +139,7 @@ public class ClientMapperTest {
 
     @Test 
     void shouldMapFriendEntityToFriendDTO() throws ParseException {
-        Friend friend = TestUtils.createFriendRequest(null, null, false, false, null);
+        Friend friend = utils.createFriendRequest(null, null, false, false);
 
         FriendDTO response = friendMapper.toDTO(friend);
         response.setRequesterId(friend.getRequester().getId());
@@ -153,8 +155,8 @@ public class ClientMapperTest {
     
     @Test 
     void shouldMapFriendDTOtoFriendEntity() throws ParseException {
-        Friend request = TestUtils.createFriendRequest(null, null, false, false, null);
-        FriendDTO dto = TestUtils.createFriendRequestDTO(request);
+        Friend request = utils.createFriendRequest(null, null, false, false);
+        FriendDTO dto = utils.createFriendRequestDTO(request);
 
         Friend requestMapped = friendMapper.toEntity(dto);
         requestMapped.setRequester(request.getRequester());
@@ -170,7 +172,7 @@ public class ClientMapperTest {
 
     @Test 
     void shouldPartiallyMapFriendDTOtoFriendEntity() throws ParseException {
-        Friend friend = TestUtils.createFriendRequest(null, null, false, false, null);
+        Friend friend = utils.createFriendRequest(null, null, false, false);
 
         // Not changing ID
         FriendDTO dto = FriendDTO.builder()

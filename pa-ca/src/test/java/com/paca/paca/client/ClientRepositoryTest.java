@@ -2,7 +2,9 @@ package com.paca.paca.client;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 
 import com.paca.paca.PacaTest;
 import com.paca.paca.user.model.User;
@@ -30,6 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DataJpaTest
 @Testcontainers
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ClientRepositoryTest extends PacaTest {
     
@@ -45,6 +48,18 @@ public class ClientRepositoryTest extends PacaTest {
     @Autowired
     private RoleRepository roleRepository;
 
+    private TestUtils utils;
+
+    @BeforeAll
+    void initUtils() {
+        utils = TestUtils.builder()
+                .roleRepository(roleRepository)
+                .userRepository(userRepository)
+                .clientRepository(clientRepository)
+                .friendRepository(friendRepository)
+                .build();
+    }
+
     @BeforeEach
     void restoreClientDB() {
         clientRepository.deleteAll();
@@ -59,7 +74,7 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldCreateClient() throws ParseException {
-        User user = TestUtils.createUser(roleRepository, userRepository);
+        User user = utils.createUser();
         Client client = Client.builder()
                 .id(1L)
                 .user(user)
@@ -88,9 +103,7 @@ public class ClientRepositoryTest extends PacaTest {
         int nUsers = 10;
 
         for (int i = 0; i < nUsers; i++) {
-            TestUtils.createClient(
-                    TestUtils.createUser(roleRepository, userRepository),
-                    clientRepository);
+            utils.createClient(null);
         }
 
         List<Client> clients = clientRepository.findAll();
@@ -100,9 +113,7 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldCheckThatClientExistsById() throws ParseException {
-        Client client = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
+        Client client = utils.createClient(null);
 
         boolean expected = clientRepository.existsById(client.getId());
         Optional<Client> expectedClient = clientRepository.findById(client.getId());
@@ -129,8 +140,8 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldCheckThatClientExistsByUserId() throws ParseException {
-        User user = TestUtils.createUser(roleRepository, userRepository);
-        Client client = TestUtils.createClient(user, clientRepository);
+        User user = utils.createUser();
+        Client client = utils.createClient(user);
 
         boolean expected = clientRepository.existsByUserId(user.getId());
         Optional<Client> expectedClient = clientRepository.findByUserId(user.getId());
@@ -148,8 +159,8 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldCheckThatClientDoesNotExistsByUserId() throws ParseException {
-        User user = TestUtils.createUser(roleRepository, userRepository);
-        TestUtils.createClient(user, clientRepository);
+        User user = utils.createUser();
+        utils.createClient(user);
 
         boolean expected = clientRepository.existsByUserId(user.getId() + 1);
         Optional<Client> expectedClient = clientRepository.findByUserId(user.getId() + 1);
@@ -160,8 +171,8 @@ public class ClientRepositoryTest extends PacaTest {
     
     @Test
     void shouldCheckThatClientExistsByUserEmail() throws ParseException {
-        User user = TestUtils.createUser(roleRepository, userRepository);
-        Client client = TestUtils.createClient(user, clientRepository);
+        User user = utils.createUser();
+        Client client = utils.createClient(user);
 
         boolean expected = clientRepository.existsByUserEmail(user.getEmail());
         Optional<Client> expectedClient = clientRepository.findByUserEmail(user.getEmail());
@@ -179,8 +190,8 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldCheckThatClientDoesNotExistsByUserEmail() throws ParseException {
-        User user = TestUtils.createUser(roleRepository, userRepository);
-        TestUtils.createClient(user, clientRepository);
+        User user = utils.createUser();
+        utils.createClient(user);
 
         boolean expected = clientRepository.existsByUserEmail(user.getEmail() + "a");
         Optional<Client> expectedClient = clientRepository.findByUserEmail(user.getEmail() + "a");
@@ -192,9 +203,7 @@ public class ClientRepositoryTest extends PacaTest {
     @Test
     void shouldDeleteClient() throws ParseException {
         clientRepository.deleteAll();
-        Client client = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
+        Client client = utils.createClient(null);
         
         clientRepository.delete(client);
 
@@ -204,16 +213,7 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldCheckThatFriendRequestExistsById() throws ParseException {
-        Friend request = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                    TestUtils.createUser(roleRepository, userRepository),
-                    clientRepository),
-                TestUtils.createClient(
-                    TestUtils.createUser(roleRepository, userRepository),
-                    clientRepository),
-                false,
-                false,
-                friendRepository);
+        Friend request = utils.createFriendRequest(null, null, false, false);
 
         boolean expected = friendRepository.existsById(request.getId());
         Optional<Friend> expectedRequest = friendRepository.findById(request.getId());
@@ -229,17 +229,8 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldCheckThatFriendRequestDoesNotExistsById() throws ParseException {
-        Friend request = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                    TestUtils.createUser(roleRepository, userRepository),
-                    clientRepository),
-                TestUtils.createClient(
-                    TestUtils.createUser(roleRepository, userRepository),
-                    clientRepository),
-                false,
-                false,
-                friendRepository);
-
+        Friend request = utils.createFriendRequest(null, null, false, false);
+        
         boolean expected = friendRepository.existsById(request.getId() + 1);
         Optional<Friend> expectedRequest = friendRepository.findById(request.getId() + 1);
 
@@ -249,25 +240,14 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldCheckThatFriendRequestExistsByRequesterIdAndAddresserId() throws ParseException {
-        Client requester = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Client addresser = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request = TestUtils.createFriendRequest(
-                requester,
-                addresser,
-                false,
-                false,
-                friendRepository);
+        Friend request = utils.createFriendRequest(null, null, false, false);
 
         boolean expected = friendRepository.existsByRequesterIdAndAddresserId(
-                requester.getId(),
-                addresser.getId());
+                request.getRequester().getId(),
+                request.getAddresser().getId());
         Optional<Friend> expectedRequest = friendRepository.findByRequesterIdAndAddresserId(
-                requester.getId(),
-                addresser.getId());
+                request.getRequester().getId(),
+                request.getAddresser().getId());
 
         assertThat(expected).isTrue();
         assertThat(expectedRequest.isPresent()).isTrue();
@@ -280,18 +260,9 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldCheckThatFriendRequestDoesNotExistsByRequesterIdAndAddresserId() throws ParseException {
-        Client requester = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Client addresser = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester,
-                addresser,
-                false,
-                false,
-                friendRepository);
+        Client requester = utils.createClient(null);
+        Client addresser = utils.createClient(null);
+        utils.createFriendRequest(requester, addresser, false, false);
 
         boolean expected = friendRepository.existsByRequesterIdAndAddresserId(
                 requester.getId() + 1,
@@ -326,55 +297,15 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedTrue() throws ParseException {
-        Client requester1 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request1 = TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                true,
-                false,
-                friendRepository);
-        Friend request2 = TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                true,
-                false,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
-        Client requester4 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester4,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                true,
-                false,
-                friendRepository);
-        Client requester5 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester5,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
+        Client requester1 = utils.createClient(null);
+        Friend request1 = utils.createFriendRequest(requester1, null, true, false);
+        Friend request2 = utils.createFriendRequest(requester1, null, true, false);
+
+        utils.createFriendRequest(requester1, null, false, false);
+        Client requester4 = utils.createClient(null);
+        utils.createFriendRequest(requester4, null, true, false);
+        Client requester5 = utils.createClient(null);
+        utils.createFriendRequest(requester5, null, false, false);
 
         List<Friend> requests = friendRepository.findAllByRequesterIdAndAcceptedTrue(requester1.getId());
 
@@ -385,55 +316,15 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedTrue() throws ParseException {
-        Client addresser1 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request1 = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                true,
-                false,
-                friendRepository);
-        Friend request2 = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                true,
-                false,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                false,
-                friendRepository);
-        Client addresser4 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser4,
-                true,
-                false,
-                friendRepository);
-        Client addresser5 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser5,
-                false,
-                false,
-                friendRepository);
+        Client addresser1 = utils.createClient(null);
+        Friend request1 = utils.createFriendRequest(null, addresser1, true, false);
+        Friend request2 = utils.createFriendRequest(null, addresser1, true, false);
+
+        utils.createFriendRequest(null, addresser1, false, false);
+        Client addresser4 = utils.createClient(null);
+        utils.createFriendRequest(null, addresser4, true, false);
+        Client addresser5 = utils.createClient(null);
+        utils.createFriendRequest(null, addresser5, false, false);
 
         List<Friend> requests = friendRepository.findAllByAddresserIdAndAcceptedTrue(addresser1.getId());
 
@@ -444,55 +335,15 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldGetAllFriendRequestsExistsByRequesterIdAndRejectedTrue() throws ParseException {
-        Client requester1 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request1 = TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                true,
-                friendRepository);
-        Friend request2 = TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                true,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
-        Client requester4 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester4,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                true,
-                friendRepository);
-        Client requester5 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester5,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
+        Client requester1 = utils.createClient(null);
+        Friend request1 = utils.createFriendRequest(requester1, null, false, true);
+        Friend request2 = utils.createFriendRequest(requester1, null, false, true);
+
+        utils.createFriendRequest(requester1, null, false, false);
+        Client requester4 = utils.createClient(null);
+        utils.createFriendRequest(requester4, null, false, true);
+        Client requester5 = utils.createClient(null);
+        utils.createFriendRequest(requester5, null, false, false);
 
         List<Friend> requests = friendRepository.findAllByRequesterIdAndRejectedTrue(requester1.getId());
 
@@ -503,55 +354,15 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldGetAllFriendRequestsExistsByAddresserIdAndRejectedTrue() throws ParseException {
-        Client addresser1 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request1 = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                true,
-                friendRepository);
-        Friend request2 = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                true,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                false,
-                friendRepository);
-        Client addresser4 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser4,
-                false,
-                true,
-                friendRepository);
-        Client addresser5 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser5,
-                false,
-                false,
-                friendRepository);
+        Client addresser1 = utils.createClient(null);
+        Friend request1 = utils.createFriendRequest(null, addresser1, false, true);
+        Friend request2 = utils.createFriendRequest(null, addresser1, false, true);
+
+        utils.createFriendRequest(null, addresser1, false, false);
+        Client addresser4 = utils.createClient(null);
+        utils.createFriendRequest(null, addresser4, false, true);
+        Client addresser5 = utils.createClient(null);
+        utils.createFriendRequest(null, addresser5, false, false);
 
         List<Friend> requests = friendRepository.findAllByAddresserIdAndRejectedTrue(addresser1.getId());
 
@@ -562,63 +373,16 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test 
     void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedFalseAndRejectedFalse() throws ParseException {
-        Client requester1 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request1 = TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
-        Friend request2 = TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                true,
-                false,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                requester1,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                true,
-                friendRepository);
-        Client requester4 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester4,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                false,
-                false,
-                friendRepository);
-        Client requester5 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                requester5,
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                true,
-                false,
-                friendRepository);
+        Client requester1 = utils.createClient(null);
+        Friend request1 = utils.createFriendRequest(requester1, null, false, false);
+        Friend request2 = utils.createFriendRequest(requester1, null, false, false);
+
+        utils.createFriendRequest(requester1, null, true, false);
+        utils.createFriendRequest(requester1, null, false, true);
+        Client requester4 = utils.createClient(null);
+        utils.createFriendRequest(requester4, null, false, false);
+        Client requester5 = utils.createClient(null);
+        utils.createFriendRequest(requester5, null, true, false);
 
         List<Friend> requests = friendRepository
                 .findAllByRequesterIdAndAcceptedFalseAndRejectedFalse(requester1.getId());
@@ -630,63 +394,16 @@ public class ClientRepositoryTest extends PacaTest {
     
     @Test 
     void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedFalseAndRejectedFalse() throws ParseException {
-        Client addresser1 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        Friend request1 = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                false,
-                friendRepository);
-        Friend request2 = TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                false,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                true,
-                false,
-                friendRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser1,
-                false,
-                true,
-                friendRepository);
-        Client addresser4 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser4,
-                false,
-                false,
-                friendRepository);
-        Client addresser5 = TestUtils.createClient(
-                TestUtils.createUser(roleRepository, userRepository),
-                clientRepository);
-        TestUtils.createFriendRequest(
-                TestUtils.createClient(
-                        TestUtils.createUser(roleRepository, userRepository),
-                        clientRepository),
-                addresser5,
-                true,
-                false,
-                friendRepository);
+        Client addresser1 = utils.createClient(null);
+        Friend request1 = utils.createFriendRequest(null, addresser1, false, false);
+        Friend request2 = utils.createFriendRequest(null, addresser1, false, false);
+
+        utils.createFriendRequest(null, addresser1, true, false);
+        utils.createFriendRequest(null, addresser1, false, true);
+        Client addresser4 = utils.createClient(null);
+        utils.createFriendRequest(null, addresser4, false, false);
+        Client addresser5 = utils.createClient(null);
+        utils.createFriendRequest(null, addresser5, true, false);
 
         List<Friend> requests = friendRepository
                 .findAllByAddresserIdAndAcceptedFalseAndRejectedFalse(addresser1.getId());
