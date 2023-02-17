@@ -8,24 +8,23 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
-import com.paca.paca.branch.dto.AmenityDTO;
+import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
-import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.text.ParseException;
