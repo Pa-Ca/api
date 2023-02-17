@@ -7,6 +7,8 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.business.model.Business;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.user.repository.RoleRepository;
@@ -29,7 +31,7 @@ public class TestUtils {
         return result;
     }
 
-    public static User createUser() {
+    public static User createUser(RoleRepository roleRepository, UserRepository userRepository) {
         Role role = Role.builder()
                 .id((long) UserRole.client.ordinal())
                 .name(UserRole.client)
@@ -43,19 +45,20 @@ public class TestUtils {
                 .role(role)
                 .build();
 
-        return user;
-    }
-
-    public static User createUser(RoleRepository roleRepository, UserRepository userRepository) {
-        User user = createUser();
-
-        roleRepository.save(user.getRole());
-        user = userRepository.save(user);
+        if (roleRepository != null) {
+            roleRepository.save(user.getRole());
+        }
+        if (userRepository != null) {
+            user = userRepository.save(user);
+        }
 
         return user;
     }
 
-    public static Client createClient(User user) throws ParseException {
+    public static Client createClient(User user, ClientRepository clientRepository) throws ParseException {
+        if (user == null) {
+            user = createUser(null, null);
+        }
         Client client = Client.builder()
                 .id(1L)
                 .user(user)
@@ -66,17 +69,16 @@ public class TestUtils {
                 .address("Test address")
                 .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"))
                 .build();
-
+        if (clientRepository != null) {
+            client = clientRepository.save(client);
+        }
         return client;
     }
 
-    public static Client createClient(User user, ClientRepository clientRepository) throws ParseException {
-        Client client = createClient(user);
-        client = clientRepository.save(client);
-        return client;
-    }
-
-    public static ClientDTO createClientDTO(Client client) {
+    public static ClientDTO createClientDTO(Client client) throws ParseException {
+        if (client == null) {
+            client = createClient(null, null);
+        }
         ClientDTO dto = ClientDTO.builder()
                 .id(client.getId())
                 .userId(client.getUser().getId())
@@ -96,7 +98,16 @@ public class TestUtils {
             Client requester,
             Client addresser,
             boolean accepted,
-            boolean rejected) {
+            boolean rejected,
+            FriendRepository friendRepository) throws ParseException {
+        if (requester == null) {
+            requester = createClient(null, null);
+        }
+        if (addresser == null) {
+            addresser = createClient(null, null);
+            addresser.setId(requester.getId() + 1);
+        }
+
         Friend request = Friend.builder()
                 .requester(requester)
                 .addresser(addresser)
@@ -104,21 +115,18 @@ public class TestUtils {
                 .rejected(rejected)
                 .build();
 
+        if (friendRepository != null) {
+            request = friendRepository.save(request);
+        }
+
         return request;
     }
 
-    public static Friend createFriendRequest(
-            Client requester,
-            Client addresser,
-            boolean accepted,
-            boolean rejected,
-            FriendRepository friendRepository) {
-        Friend request = createFriendRequest(requester, addresser, accepted, rejected);
-        request = friendRepository.save(request);
-        return request;
-    }
 
-    public static FriendDTO createFriendRequestDTO(Friend request) {
+    public static FriendDTO createFriendRequestDTO(Friend request) throws ParseException {
+        if (request == null) {
+            request = createFriendRequest(null, null, false, false, null);
+        }
         FriendDTO dto = FriendDTO.builder()
                 .requesterId(request.getRequester().getId())
                 .addresserId(request.getAddresser().getId())
@@ -128,4 +136,13 @@ public class TestUtils {
 
         return dto;
     }
+
+    public static Business createBussiness() {
+        Business business = Business.builder()
+                .id(1L)
+                .build();
+
+        return business;
+    }
+
 }

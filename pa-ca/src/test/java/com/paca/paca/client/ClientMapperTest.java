@@ -3,6 +3,7 @@ package com.paca.paca.client;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import com.paca.paca.user.model.User;
+import com.paca.paca.utils.TestUtils;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.dto.ClientDTO;
@@ -30,26 +31,14 @@ public class ClientMapperTest {
 
     @Test
     void shouldMapClientEntityToClientDTO() throws ParseException {
-        User user = User.builder()
-                .id(1L)
-                .build();
-        Client client = Client.builder()
-                .id(1L)
-                .user(user)
-                .name("test")
-                .surname("Test")
-                .stripeCustomerId("stripe_id_test")
-                .phoneNumber("+580000000")
-                .address("Test address")
-                .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"))
-                .build();
+        Client client = TestUtils.createClient(null, null);
 
         ClientDTO response = clientMapper.toDTO(client);
-        response.setUserId(user.getId());
+        response.setUserId(client.getUser().getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(client.getId());
-        assertThat(response.getUserId()).isEqualTo(user.getId());
+        assertThat(response.getUserId()).isEqualTo(client.getUser().getId());
         assertThat(response.getName()).isEqualTo(client.getName());
         assertThat(response.getSurname()).isEqualTo(client.getSurname());
         assertThat(response.getStripeCustomerId()).isEqualTo(client.getStripeCustomerId());
@@ -60,20 +49,8 @@ public class ClientMapperTest {
 
     @Test 
     void shouldMapClientDTOtoClientEntity() throws ParseException {
-        User user = User.builder()
-                .id(1L)
-                .build();
-        ClientDTO dto = ClientDTO.builder()
-                .id(1L)
-                .userId(user.getId())
-                .email(user.getEmail())
-                .name("test")
-                .surname("Test")
-                .stripeCustomerId("stripe_id_test")
-                .phoneNumber("+580000000")
-                .address("Test address")
-                .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"))
-                .build();
+        User user = TestUtils.createUser(null, null);
+        ClientDTO dto = TestUtils.createClientDTO(TestUtils.createClient(user, null));
 
         Client client = clientMapper.toEntity(dto);
         client.setUser(user);
@@ -91,19 +68,7 @@ public class ClientMapperTest {
     
     @Test
     void shouldPartiallyMapUserDTOtoUserEntity() throws ParseException {
-        User user = User.builder()
-                .id(1L)
-                .build();
-        Client client = Client.builder()
-                .id(1L)
-                .user(user)
-                .name("test")
-                .surname("Test")
-                .stripeCustomerId("stripe_id_test")
-                .phoneNumber("+580000000")
-                .address("Test address")
-                .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"))
-                .build();
+        Client client = TestUtils.createClient(null, null);
 
         // Not changing ID
         ClientDTO dto = ClientDTO.builder()
@@ -115,7 +80,7 @@ public class ClientMapperTest {
 
         // Not changing User ID
         dto = ClientDTO.builder()
-                .userId(user.getId() + 1)
+                .userId(client.getUser().getId() + 1)
                 .build();
         updatedClient = clientMapper.updateModel(client, dto);
         assertThat(updatedClient).isNotNull();
@@ -171,76 +136,41 @@ public class ClientMapperTest {
     }
 
     @Test 
-    void shouldMapFriendEntityToFriendDTO() {
-        Client requester = Client.builder()
-                .id(1L)
-                .build();
-        Client addresser = Client.builder()
-                .id(2L)
-                .build();
-        Friend friend = Friend.builder()
-                .id(1L)
-                .requester(requester)
-                .addresser(addresser)
-                .accepted(false)
-                .rejected(false)
-                .build();
+    void shouldMapFriendEntityToFriendDTO() throws ParseException {
+        Friend friend = TestUtils.createFriendRequest(null, null, false, false, null);
 
         FriendDTO response = friendMapper.toDTO(friend);
-        response.setRequesterId(requester.getId());
-        response.setAddresserId(addresser.getId());
+        response.setRequesterId(friend.getRequester().getId());
+        response.setAddresserId(friend.getAddresser().getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(friend.getId());
-        assertThat(response.getRequesterId()).isEqualTo(requester.getId());
-        assertThat(response.getAddresserId()).isEqualTo(addresser.getId());
+        assertThat(response.getRequesterId()).isEqualTo(friend.getRequester().getId());
+        assertThat(response.getAddresserId()).isEqualTo(friend.getAddresser().getId());
         assertThat(response.getAccepted()).isEqualTo(false);
         assertThat(response.getRejected()).isEqualTo(false);
     }
     
     @Test 
-    void shouldMapFriendDTOtoFriendEntity() {
-        Client requester = Client.builder()
-                .id(1L)
-                .build();
-        Client addresser = Client.builder()
-                .id(2L)
-                .build();
-        FriendDTO dto = FriendDTO.builder()
-                .id(1L)
-                .requesterId(requester.getId())
-                .addresserId(addresser.getId())
-                .accepted(false)
-                .rejected(false)
-                .build();
+    void shouldMapFriendDTOtoFriendEntity() throws ParseException {
+        Friend request = TestUtils.createFriendRequest(null, null, false, false, null);
+        FriendDTO dto = TestUtils.createFriendRequestDTO(request);
 
-        Friend friend = friendMapper.toEntity(dto);
-        friend.setRequester(requester);
-        friend.setAddresser(addresser);
+        Friend requestMapped = friendMapper.toEntity(dto);
+        requestMapped.setRequester(request.getRequester());
+        requestMapped.setAddresser(request.getAddresser());
 
-        assertThat(friend).isNotNull();
-        assertThat(friend.getId()).isEqualTo(dto.getId());
-        assertThat(friend.getRequester().getId()).isEqualTo(requester.getId());
-        assertThat(friend.getAddresser().getId()).isEqualTo(addresser.getId());
-        assertThat(friend.getAccepted()).isEqualTo(dto.getAccepted());
-        assertThat(friend.getRejected()).isEqualTo(dto.getRejected());
+        assertThat(requestMapped).isNotNull();
+        assertThat(requestMapped.getId()).isEqualTo(dto.getId());
+        assertThat(requestMapped.getRequester().getId()).isEqualTo(request.getRequester().getId());
+        assertThat(requestMapped.getAddresser().getId()).isEqualTo(request.getAddresser().getId());
+        assertThat(requestMapped.getAccepted()).isEqualTo(dto.getAccepted());
+        assertThat(requestMapped.getRejected()).isEqualTo(dto.getRejected());
     }
 
     @Test 
-    void shouldPartiallyMapFriendDTOtoFriendEntity() {
-        Client requester = Client.builder()
-                .id(1L)
-                .build();
-        Client addresser = Client.builder()
-                .id(2L)
-                .build();
-        Friend friend = Friend.builder()
-                .id(1L)
-                .requester(requester)
-                .addresser(addresser)
-                .accepted(false)
-                .rejected(false)
-                .build();
+    void shouldPartiallyMapFriendDTOtoFriendEntity() throws ParseException {
+        Friend friend = TestUtils.createFriendRequest(null, null, false, false, null);
 
         // Not changing ID
         FriendDTO dto = FriendDTO.builder()
@@ -252,19 +182,19 @@ public class ClientMapperTest {
 
         // Not changing Requester ID
         dto = FriendDTO.builder()
-                .requesterId(requester.getId() + 1)
+                .requesterId(friend.getRequester().getId() + 1)
                 .build();
         updateFriend = friendMapper.updateModel(friend, dto);
         assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getRequester().getId()).isEqualTo(requester.getId());
+        assertThat(updateFriend.getRequester().getId()).isEqualTo(friend.getRequester().getId());
 
         // Not changing Addreser ID
         dto = FriendDTO.builder()
-                .addresserId(addresser.getId() + 1)
+                .addresserId(friend.getAddresser().getId() + 1)
                 .build();
         updateFriend = friendMapper.updateModel(friend, dto);
         assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getAddresser().getId()).isEqualTo(addresser.getId());
+        assertThat(updateFriend.getAddresser().getId()).isEqualTo(friend.getAddresser().getId());
 
         // Changing accepted
         dto = FriendDTO.builder()

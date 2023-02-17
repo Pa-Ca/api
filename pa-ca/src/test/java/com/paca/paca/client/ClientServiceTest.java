@@ -86,8 +86,8 @@ public class ClientServiceTest {
 
     @Test 
     void shouldGetClientById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
-        ClientDTO dto = TestUtils.createClientDTO(client);
+        Client client = TestUtils.createClient(null, null);
+        ClientDTO dto = TestUtils.createClientDTO(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
@@ -101,8 +101,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingUserInSave() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
-        ClientDTO dto = TestUtils.createClientDTO(client);
+        ClientDTO dto = TestUtils.createClientDTO(null);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
 
@@ -118,7 +117,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetClientDueToExistingClientInSave() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         ClientDTO dto = TestUtils.createClientDTO(client);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(client.getUser()));
@@ -136,7 +135,7 @@ public class ClientServiceTest {
     
     @Test
     void shouldSave() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         ClientDTO dto = TestUtils.createClientDTO(client);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(client.getUser()));
@@ -155,7 +154,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingClientInUpdate() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         ClientDTO dto = TestUtils.createClientDTO(client);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -172,7 +171,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldUpdate() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         ClientDTO dto = TestUtils.createClientDTO(client);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
@@ -189,7 +188,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingClientInDelete() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -205,7 +204,7 @@ public class ClientServiceTest {
 
     @Test 
     void shouldGetNoContentDueToMissingClientInGetClientByUserId() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.empty());
 
@@ -221,7 +220,7 @@ public class ClientServiceTest {
 
     @Test 
     void shouldGetClientByUserId() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         ClientDTO dto = TestUtils.createClientDTO(client);
 
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.ofNullable(client));
@@ -236,7 +235,7 @@ public class ClientServiceTest {
 
     @Test 
     void shouldGetNoContentDueToMissingClientInGetPendingRequestById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -252,7 +251,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetPendingRequestById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         List<Friend> requests = TestUtils.castList(
                 Friend.class,
                 Mockito.mock(List.class));
@@ -269,7 +268,7 @@ public class ClientServiceTest {
 
     @Test 
     void shouldGetNoContentDueToMissingClientInGetAcceptedRequestById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -285,7 +284,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetAcceptedRequestById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         List<Friend> requests = TestUtils.castList(
                 Friend.class,
                 Mockito.mock(List.class));
@@ -304,7 +303,7 @@ public class ClientServiceTest {
 
     @Test 
     void shouldGetNoContentDueToMissingClientInGetRejectedRequestById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -320,7 +319,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetRejectedRequestById() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         List<Friend> requests = TestUtils.castList(
                 Friend.class,
                 Mockito.mock(List.class));
@@ -337,7 +336,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetConflictDueToRequesterIdEqualToAddresserIdInCreateFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         try {
             clientService.friendRequest(client.getId(), client.getId());
@@ -351,7 +350,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingRequestInCreateFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
@@ -366,7 +365,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetConflictDueToFriendRequestAlreadyExistsInCreateFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(client));
@@ -386,16 +385,16 @@ public class ClientServiceTest {
 
     @Test
     void shouldCreateFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 false,
-                false);
+                false,
+                null);
         FriendDTO dto = TestUtils.createFriendRequestDTO(request);
 
         when(clientRepository.findById(any(Long.class)))
-                .thenReturn(Optional.ofNullable(client));
+                .thenReturn(Optional.ofNullable(request.getRequester()));
         when(friendRepository.existsByRequesterIdAndAddresserId(
                 any(Long.class),
                 any(Long.class))).thenReturn(false);
@@ -404,14 +403,16 @@ public class ClientServiceTest {
         when(friendMapper.toDTO(any(Friend.class)))
                 .thenReturn(dto);
 
-        FriendDTO responseDTO = clientService.friendRequest(client.getId(), client.getId() + 1);
+        FriendDTO responseDTO = clientService.friendRequest(
+                request.getRequester().getId(),
+                request.getAddresser().getId());
 
         assertThat(responseDTO).isNotNull();
     }
 
     @Test
     void shouldGetNoContentDueToMissingFriendRequestInAcceptFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
                 any(Long.class), 
@@ -429,19 +430,21 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetConflictDueToFriendRequestAlreadyAcceptedInAcceptFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 true,
-                false);
+                false,
+                null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
                 any(Long.class),
                 any(Long.class))).thenReturn(Optional.ofNullable(request));
 
         try {
-            clientService.acceptFriendRequest(client.getId(), client.getId());
+            clientService.acceptFriendRequest(
+                    request.getRequester().getId(),
+                    request.getAddresser().getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ConflictException);
@@ -452,19 +455,21 @@ public class ClientServiceTest {
     
     @Test
     void shouldGetConflictDueToFriendRequestAlreadyRejectedInAcceptFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 false,
-                true);
+                true,
+                null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
-                any(Long.class), 
+                any(Long.class),
                 any(Long.class))).thenReturn(Optional.ofNullable(request));
 
         try {
-            clientService.acceptFriendRequest(client.getId(), client.getId());
+            clientService.acceptFriendRequest(
+                    request.getRequester().getId(),
+                    request.getAddresser().getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ConflictException);
@@ -475,12 +480,12 @@ public class ClientServiceTest {
 
     @Test
     void shouldAcceptFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 false,
-                false);
+                false,
+                null);
         FriendDTO dto = TestUtils.createFriendRequestDTO(request);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -489,14 +494,16 @@ public class ClientServiceTest {
         when(friendRepository.save(any(Friend.class))).thenReturn(request);
         when(friendMapper.toDTO(any(Friend.class))).thenReturn(dto);
 
-        FriendDTO responseDTO = clientService.acceptFriendRequest(client.getId(), client.getId());
+        FriendDTO responseDTO = clientService.acceptFriendRequest(
+                request.getRequester().getId(),
+                request.getAddresser().getId());
 
         assertThat(responseDTO).isNotNull();
     }
-    
+
     @Test
     void shouldGetNoContentDueToMissingFriendRequestInRejectFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
                 any(Long.class), 
@@ -514,19 +521,21 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetConflictDueToFriendRequestAlreadyAcceptedInRejectFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 true,
-                false);
+                false,
+                null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
                 any(Long.class),
                 any(Long.class))).thenReturn(Optional.ofNullable(request));
 
         try {
-            clientService.rejectFriendRequest(client.getId(), client.getId());
+            clientService.rejectFriendRequest(
+                    request.getRequester().getId(),
+                    request.getAddresser().getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ConflictException);
@@ -534,22 +543,24 @@ public class ClientServiceTest {
             Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 17);
         }
     }
-    
+
     @Test
     void shouldGetConflictDueToFriendRequestAlreadyRejectedInRejectFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 false,
-                true);
+                true,
+                null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
-                any(Long.class), 
+                any(Long.class),
                 any(Long.class))).thenReturn(Optional.ofNullable(request));
 
         try {
-            clientService.acceptFriendRequest(client.getId(), client.getId());
+            clientService.acceptFriendRequest(
+                    request.getRequester().getId(),
+                    request.getAddresser().getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ConflictException);
@@ -560,12 +571,12 @@ public class ClientServiceTest {
 
     @Test
     void shouldRejectFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
         Friend request = TestUtils.createFriendRequest(
-                client,
-                client,
+                null,
+                null,
                 false,
-                false);
+                false,
+                null);
         FriendDTO dto = TestUtils.createFriendRequestDTO(request);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -574,14 +585,16 @@ public class ClientServiceTest {
         when(friendRepository.save(any(Friend.class))).thenReturn(request);
         when(friendMapper.toDTO(any(Friend.class))).thenReturn(dto);
 
-        FriendDTO responseDTO = clientService.rejectFriendRequest(client.getId(), client.getId());
+        FriendDTO responseDTO = clientService.rejectFriendRequest(
+                request.getRequester().getId(),
+                request.getAddresser().getId());
 
         assertThat(responseDTO).isNotNull();
     }
-    
+
     @Test
     void shouldGetNoContentDueToMissingFriendRequestInDeleteFriendRequest() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
                 any(Long.class),
@@ -599,7 +612,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingClientInGetAllReservations() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class)))
                 .thenReturn(Optional.empty());
@@ -616,7 +629,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetAllReservations() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         List<ClientGroup> clientGroups = TestUtils.castList(
                 ClientGroup.class,
                 Mockito.mock(List.class));
@@ -633,7 +646,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingClientInGetAllReservationsByDate() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
 
         when(clientRepository.findById(any(Long.class)))
                 .thenReturn(Optional.empty());
@@ -650,7 +663,7 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetAllReservationsByDate() throws ParseException {
-        Client client = TestUtils.createClient(TestUtils.createUser());
+        Client client = TestUtils.createClient(null, null);
         List<ClientGroup> clientGroups = TestUtils.castList(
                 ClientGroup.class,
                 Mockito.mock(List.class));
