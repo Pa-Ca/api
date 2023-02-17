@@ -21,7 +21,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AuthRepositoryTest extends PacaTest {
-    @Autowired private JwtBlackListRepository jwtBlackListRepository;
+
+    @Autowired
+    private JwtBlackListRepository jwtBlackListRepository;
 
     @AfterEach
     void restoreTest() {
