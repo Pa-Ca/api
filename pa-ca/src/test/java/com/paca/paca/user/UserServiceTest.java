@@ -1,6 +1,5 @@
 package com.paca.paca.user;
 
-import com.paca.paca.PacaTest;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.dto.UserDTO;
@@ -19,6 +18,7 @@ import org.mockito.Mockito;
 import junit.framework.TestCase;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.paca.paca.utils.TestUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +38,7 @@ public class UserServiceTest {
 
     @Test
     void shouldGetAllUsers() {
-        List<User> user = Mockito.mock(List.class);
+        List<User> user = TestUtils.castList(User.class, Mockito.mock(List.class));
 
         when(userRepository.findAll()).thenReturn(user);
         UserListDTO responseDTO = userService.getAll();

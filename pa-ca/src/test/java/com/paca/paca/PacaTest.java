@@ -5,9 +5,10 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public abstract class PacaTest {
-    public static final PostgreSQLContainer POSTGRES_SQL_CONTAINER;
+    public static final PostgreSQLContainer<?> POSTGRES_SQL_CONTAINER;
+
     static {
-       POSTGRES_SQL_CONTAINER = new  PostgreSQLContainer("postgres:15.1");
+       POSTGRES_SQL_CONTAINER = new PostgreSQLContainer<>("postgres:15.1");
        POSTGRES_SQL_CONTAINER.start();
     }
 
