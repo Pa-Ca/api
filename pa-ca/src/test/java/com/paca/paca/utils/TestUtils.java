@@ -1,20 +1,23 @@
 package com.paca.paca.utils;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.business.model.Business;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.business.model.Business;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
+import com.paca.paca.branch.repository.BranchRepository;
 
 import java.util.ArrayList;
 import java.text.ParseException;
@@ -37,7 +40,7 @@ public class TestUtils {
                 .name(UserRole.client)
                 .build();
         User user = User.builder()
-                .id(1L)
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .email("test@test.com")
                 .password("123456789aA#")
                 .verified(false)
@@ -60,7 +63,7 @@ public class TestUtils {
             user = createUser(null, null);
         }
         Client client = Client.builder()
-                .id(1L)
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .user(user)
                 .name("test")
                 .surname("Test")
@@ -109,6 +112,7 @@ public class TestUtils {
         }
 
         Friend request = Friend.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .requester(requester)
                 .addresser(addresser)
                 .accepted(accepted)
@@ -121,7 +125,6 @@ public class TestUtils {
 
         return request;
     }
-
 
     public static FriendDTO createFriendRequestDTO(Friend request) throws ParseException {
         if (request == null) {
@@ -137,12 +140,57 @@ public class TestUtils {
         return dto;
     }
 
-    public static Business createBussiness() {
+    public static Business createBusiness() {
         Business business = Business.builder()
-                .id(1L)
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .build();
 
         return business;
+    }
+
+    public static Branch createBranch(Business business, BranchRepository branchRepository) {
+        if (business == null) {
+            business = createBusiness();
+        }
+
+        Branch branch = Branch.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .business(business)
+                .address("address test")
+                .coordinates("coordinates test")
+                .name("name test")
+                .overview("overview test")
+                .score(4.0F)
+                .capacity(42)
+                .reservationPrice(37.0F)
+                .reserveOff(false)
+                .build();
+
+        if (branchRepository != null) {
+            branch = branchRepository.save(branch);
+        }
+
+        return branch;
+    }
+
+    public static BranchDTO createBranchDTO(Branch branch) throws ParseException {
+        if (branch == null) {
+            branch = createBranch(null, null);
+        }
+        BranchDTO dto = BranchDTO.builder()
+                .id(branch.getId())
+                .businessId(branch.getBusiness().getId())
+                .address(branch.getAddress())
+                .coordinates(branch.getCoordinates())
+                .name(branch.getName())
+                .overview(branch.getOverview())
+                .score(branch.getScore())
+                .capacity(branch.getCapacity())
+                .reservationPrice(branch.getReservationPrice())
+                .reserveOff(branch.getReserveOff())
+                .build();
+
+        return dto;
     }
 
 }

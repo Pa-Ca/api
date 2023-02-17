@@ -87,7 +87,7 @@ public class ClientServiceTest {
     @Test 
     void shouldGetClientById() throws ParseException {
         Client client = TestUtils.createClient(null, null);
-        ClientDTO dto = TestUtils.createClientDTO(null);
+        ClientDTO dto = TestUtils.createClientDTO(client);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);

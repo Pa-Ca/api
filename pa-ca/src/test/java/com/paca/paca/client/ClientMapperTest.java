@@ -67,12 +67,12 @@ public class ClientMapperTest {
     }
     
     @Test
-    void shouldPartiallyMapUserDTOtoUserEntity() throws ParseException {
+    void shouldPartiallyMapClientDTOtoClientEntity() throws ParseException {
         Client client = TestUtils.createClient(null, null);
 
         // Not changing ID
         ClientDTO dto = ClientDTO.builder()
-                .id(1L)
+                .id(client.getId() + 1)
                 .build();
         Client updatedClient = clientMapper.updateModel(client, dto);
         assertThat(updatedClient).isNotNull();
@@ -174,7 +174,7 @@ public class ClientMapperTest {
 
         // Not changing ID
         FriendDTO dto = FriendDTO.builder()
-                .id(1L)
+                .id(friend.getId() + 1)
                 .build();
         Friend updateFriend = friendMapper.updateModel(friend, dto);
         assertThat(updateFriend).isNotNull();
