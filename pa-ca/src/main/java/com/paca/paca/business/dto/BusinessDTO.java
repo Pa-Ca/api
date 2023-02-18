@@ -10,5 +10,5 @@ public class BusinessDTO {
     private Long userId;
     private String name;
     private Boolean verified;
-    private String tier_id;
+    private String tier;
 }

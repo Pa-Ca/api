@@ -4,8 +4,6 @@ import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.business.dto.BusinessListDTO;
-import com.paca.paca.client.dto.ClientDTO;
-import com.paca.paca.client.model.Client;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

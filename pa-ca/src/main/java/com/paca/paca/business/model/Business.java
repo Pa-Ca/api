@@ -28,7 +28,7 @@ public class Business {
     @Column(name = "verified")
     private Boolean verified;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "business_tier")
-    private Tier tierId;
+    @JoinColumn(name = "tier_id")
+    private Tier tier;
 
 }
