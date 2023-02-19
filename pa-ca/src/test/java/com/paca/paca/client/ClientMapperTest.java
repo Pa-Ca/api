@@ -36,7 +36,6 @@ public class ClientMapperTest {
         Client client = utils.createClient(null);
 
         ClientDTO response = clientMapper.toDTO(client);
-        response.setUserId(client.getUser().getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(client.getId());
@@ -76,7 +75,7 @@ public class ClientMapperTest {
         ClientDTO dto = ClientDTO.builder()
                 .id(client.getId() + 1)
                 .build();
-        Client updatedClient = clientMapper.updateModel(client, dto);
+        Client updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getId()).isEqualTo(client.getId());
 
@@ -84,7 +83,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .userId(client.getUser().getId() + 1)
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getUser().getId()).isEqualTo(client.getUser().getId());
 
@@ -92,7 +91,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .name("m_test")
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getName()).isEqualTo(dto.getName());
 
@@ -100,7 +99,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .surname("m_Test")
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getSurname()).isEqualTo(dto.getSurname());
 
@@ -108,7 +107,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .stripeCustomerId("m_stripe_id_test")
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getStripeCustomerId()).isEqualTo(dto.getStripeCustomerId());
 
@@ -116,7 +115,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .phoneNumber("+580000001")
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
 
@@ -124,7 +123,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .address("m_Test address")
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getAddress()).isEqualTo(dto.getAddress());
 
@@ -132,7 +131,7 @@ public class ClientMapperTest {
         dto = ClientDTO.builder()
                 .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-02"))
                 .build();
-        updatedClient = clientMapper.updateModel(client, dto);
+        updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
         assertThat(updatedClient.getDateOfBirth()).isEqualTo(dto.getDateOfBirth());
     }
@@ -142,8 +141,6 @@ public class ClientMapperTest {
         Friend friend = utils.createFriendRequest(null, null, false, false);
 
         FriendDTO response = friendMapper.toDTO(friend);
-        response.setRequesterId(friend.getRequester().getId());
-        response.setAddresserId(friend.getAddresser().getId());
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(friend.getId());
@@ -178,7 +175,7 @@ public class ClientMapperTest {
         FriendDTO dto = FriendDTO.builder()
                 .id(friend.getId() + 1)
                 .build();
-        Friend updateFriend = friendMapper.updateModel(friend, dto);
+        Friend updateFriend = friendMapper.updateModel(dto, friend);
         assertThat(updateFriend).isNotNull();
         assertThat(updateFriend.getId()).isEqualTo(friend.getId());
 
@@ -186,7 +183,7 @@ public class ClientMapperTest {
         dto = FriendDTO.builder()
                 .requesterId(friend.getRequester().getId() + 1)
                 .build();
-        updateFriend = friendMapper.updateModel(friend, dto);
+        updateFriend = friendMapper.updateModel(dto, friend);
         assertThat(updateFriend).isNotNull();
         assertThat(updateFriend.getRequester().getId()).isEqualTo(friend.getRequester().getId());
 
@@ -194,7 +191,7 @@ public class ClientMapperTest {
         dto = FriendDTO.builder()
                 .addresserId(friend.getAddresser().getId() + 1)
                 .build();
-        updateFriend = friendMapper.updateModel(friend, dto);
+        updateFriend = friendMapper.updateModel(dto, friend);
         assertThat(updateFriend).isNotNull();
         assertThat(updateFriend.getAddresser().getId()).isEqualTo(friend.getAddresser().getId());
 
@@ -202,7 +199,7 @@ public class ClientMapperTest {
         dto = FriendDTO.builder()
                 .accepted(true)
                 .build();
-        updateFriend = friendMapper.updateModel(friend, dto);
+        updateFriend = friendMapper.updateModel(dto, friend);
         assertThat(updateFriend).isNotNull();
         assertThat(updateFriend.getAccepted()).isEqualTo(dto.getAccepted());
 
@@ -210,7 +207,7 @@ public class ClientMapperTest {
         dto = FriendDTO.builder()
                 .rejected(true)
                 .build();
-        updateFriend = friendMapper.updateModel(friend, dto);
+        updateFriend = friendMapper.updateModel(dto, friend);
         assertThat(updateFriend).isNotNull();
         assertThat(updateFriend.getRejected()).isEqualTo(dto.getRejected());
     }

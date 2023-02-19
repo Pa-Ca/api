@@ -33,7 +33,6 @@ public class ProductService {
         List<ProductDTO> response = new ArrayList<>();
         productRepository.findAll().forEach(product -> {
             ProductDTO dto = productMapper.toDTO(product);
-            dto.setProductSubCategoryId(product.getSubCategory().getId());
             response.add(dto);
         });
 
@@ -47,16 +46,15 @@ public class ProductService {
                         25));
 
         ProductDTO dto = productMapper.toDTO(product);
-        dto.setProductSubCategoryId(product.getSubCategory().getId());
         return new ResponseEntity<ProductDTO>(dto, HttpStatus.OK);
     }
 
     public ResponseEntity<ProductDTO> save(ProductDTO productDto) throws NoContentException {
         Optional<ProductSubCategory> subCategory = productSubCategoryRepository
-                .findById(productDto.getProductSubCategoryId());
+                .findById(productDto.getSubCategoryId());
         if (subCategory.isEmpty()) {
             throw new NoContentException(
-                    "Product sub-category with id " + productDto.getProductSubCategoryId() + " does not exists",
+                    "Product sub-category with id " + productDto.getSubCategoryId() + " does not exists",
                     23);
         }
 
@@ -65,7 +63,6 @@ public class ProductService {
         newProduct = productRepository.save(newProduct);
 
         ProductDTO newDto = productMapper.toDTO(newProduct);
-        newDto.setProductSubCategoryId(newProduct.getSubCategory().getId());
 
         return new ResponseEntity<ProductDTO>(newDto, HttpStatus.OK);
     }
@@ -78,10 +75,9 @@ public class ProductService {
                     25);
         }
 
-        Product newProduct = productMapper.updateModel(current.get(), productDto);
+        Product newProduct = productMapper.updateModel(productDto, current.get());
         newProduct = productRepository.save(newProduct);
         ProductDTO newDto = productMapper.toDTO(newProduct);
-        newDto.setProductSubCategoryId(newProduct.getSubCategory().getId());
 
         return new ResponseEntity<ProductDTO>(newDto, HttpStatus.OK);
     }

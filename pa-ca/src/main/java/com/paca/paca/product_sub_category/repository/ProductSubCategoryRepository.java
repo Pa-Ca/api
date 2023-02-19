@@ -12,7 +12,7 @@ import com.paca.paca.product_sub_category.model.ProductSubCategory;
 public interface ProductSubCategoryRepository extends JpaRepository<ProductSubCategory, Long> {
     Optional<ProductSubCategory> findById(Long productSubCategoryId);
 
-    List<ProductSubCategory> findAllByBranchIdAndProductCategoryId(
+    List<ProductSubCategory> findAllByBranchIdAndCategoryId(
             Long branchId,
-            Long productCategoryId);
+            Long categoryId);
 }

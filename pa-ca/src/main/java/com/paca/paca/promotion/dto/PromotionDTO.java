@@ -10,7 +10,7 @@ import lombok.Setter;
 public class PromotionDTO {
 
     private Long id;
-    private Long BranchId;
+    private Long branchId;
     private Boolean disabled;
     private String text;
 }

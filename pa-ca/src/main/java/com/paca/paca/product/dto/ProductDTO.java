@@ -10,7 +10,7 @@ import lombok.Setter;
 public class ProductDTO {
 
     private Long id;
-    private Long productSubCategoryId;
+    private Long subCategoryId;
     private Boolean disabled;
     private String name;
     private Float price;

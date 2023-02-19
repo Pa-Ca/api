@@ -6,18 +6,16 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface FriendMapper {
+
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "addresser.id", target = "addresserId")
     FriendDTO toDTO(Friend friend);
 
     Friend toEntity(FriendDTO dto);
 
-    default Friend updateModel(Friend friend, FriendDTO dto) {
-        if (dto.getAccepted() != null) {
-            friend.setAccepted(dto.getAccepted());
-        }
-        if (dto.getRejected() != null) {
-            friend.setRejected(dto.getRejected());
-        }
-
-        return friend;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "requester", ignore = true)
+    @Mapping(target = "addresser", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Friend updateModel(FriendDTO dto, @MappingTarget Friend friend);
 }

@@ -72,7 +72,6 @@ public class BranchService {
         List<BranchDTO> response = new ArrayList<>();
         branchRepository.findAll().forEach(branch -> {
             BranchDTO dto = branchMapper.toDTO(branch);
-            dto.setBusinessId(branch.getBusiness().getId());
             response.add(dto);
         });
 
@@ -86,7 +85,6 @@ public class BranchService {
                         20));
 
         BranchDTO dto = branchMapper.toDTO(branch);
-        dto.setBusinessId(branch.getBusiness().getId());
         return new ResponseEntity<BranchDTO>(dto, HttpStatus.OK);
     }
 
@@ -108,7 +106,6 @@ public class BranchService {
         newBranch = branchRepository.save(newBranch);
 
         BranchDTO newDto = branchMapper.toDTO(newBranch);
-        newDto.setBusinessId(newBranch.getBusiness().getId());
 
         return new ResponseEntity<BranchDTO>(newDto, HttpStatus.OK);
     }
@@ -128,10 +125,9 @@ public class BranchService {
                     21);
         }
 
-        Branch newBranch = branchMapper.updateModel(current.get(), branchDto);
+        Branch newBranch = branchMapper.updateModel(branchDto, current.get());
         newBranch = branchRepository.save(newBranch);
         BranchDTO newDto = branchMapper.toDTO(newBranch);
-        newDto.setBusinessId(newBranch.getBusiness().getId());
 
         return new ResponseEntity<BranchDTO>(newDto, HttpStatus.OK);
     }
@@ -163,11 +159,9 @@ public class BranchService {
         }
 
         List<ProductSubCategoryDTO> response = new ArrayList<>();
-        productSubCategoryRepository.findAllByBranchIdAndProductCategoryId(branchId, productCategoryId)
+        productSubCategoryRepository.findAllByBranchIdAndCategoryId(branchId, productCategoryId)
                 .forEach(subCategory -> {
                     ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(subCategory);
-                    dto.setBranchId(branchId);
-                    dto.setProductCategoryId(productCategoryId);
                     response.add(dto);
                 });
 
@@ -186,7 +180,6 @@ public class BranchService {
         productRepository.findAllBySubCategory_Branch_Id(id)
                 .forEach(product -> {
                     ProductDTO dto = productMapper.toDTO(product);
-                    dto.setProductSubCategoryId(product.getSubCategory().getId());
                     response.add(dto);
                 });
 
@@ -204,7 +197,6 @@ public class BranchService {
         List<PromotionDTO> response = new ArrayList<>();
         promotionRepository.findAllByBranchId(id).forEach(promotion -> {
             PromotionDTO dto = promotionMapper.toDTO(promotion);
-            dto.setBranchId(promotion.getBranch().getId());
             response.add(dto);
         });
 
@@ -222,7 +214,6 @@ public class BranchService {
         List<ReservationDTO> response = new ArrayList<>();
         reservationRepository.findAllByBranchId(id).forEach(reservation -> {
             ReservationDTO dto = reservationMapper.toDTO(reservation);
-            dto.setBranchId(reservation.getBranch().getId());
             response.add(dto);
         });
 
@@ -242,7 +233,6 @@ public class BranchService {
         reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate)
                 .forEach(reservation -> {
                     ReservationDTO dto = reservationMapper.toDTO(reservation);
-                    dto.setBranchId(reservation.getBranch().getId());
                     response.add(dto);
                 });
 

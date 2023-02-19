@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ReservationDTO {
 
     private Long id;
-    private Long BranchId;
+    private Long branchId;
     private Date requestDate;
     private Date reservationDate;
     private Integer clientNumber;

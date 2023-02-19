@@ -50,7 +50,6 @@ public class ClientService {
         List<ClientDTO> response = new ArrayList<>();
         clientRepository.findAll().forEach(client -> {
             ClientDTO dto = clientMapper.toDTO(client);
-            dto.setUserId(client.getUser().getId());
             response.add(dto);
         });
 
@@ -64,7 +63,6 @@ public class ClientService {
                         28));
 
         ClientDTO dto = clientMapper.toDTO(client);
-        dto.setUserId(client.getUser().getId());
         return dto;
     }
 
@@ -90,7 +88,6 @@ public class ClientService {
         newClient = clientRepository.save(newClient);
 
         ClientDTO newDto = clientMapper.toDTO(newClient);
-        newDto.setUserId(newClient.getUser().getId());
 
         return newDto;
     }
@@ -103,10 +100,9 @@ public class ClientService {
                     28);
         }
 
-        Client newClient = clientMapper.updateModel(current.get(), dto);
+        Client newClient = clientMapper.updateModel(dto, current.get());
         newClient = clientRepository.save(newClient);
         ClientDTO newDto = clientMapper.toDTO(newClient);
-        newDto.setUserId(newClient.getUser().getId());
 
         return newDto;
     }
@@ -129,7 +125,6 @@ public class ClientService {
                         12));
 
         ClientDTO dto = clientMapper.toDTO(client);
-        dto.setUserId(client.getUser().getId());
 
         return dto;
     }
@@ -146,7 +141,6 @@ public class ClientService {
         friendRepository.findAllByAddresserIdAndAcceptedFalseAndRejectedFalse(id).forEach(
                 request -> {
                     ClientDTO dto = clientMapper.toDTO(request.getRequester());
-                    dto.setUserId(request.getRequester().getUser().getId());
                     response.add(dto);
                 });
 
@@ -165,13 +159,11 @@ public class ClientService {
         friendRepository.findAllByAddresserIdAndAcceptedTrue(id).forEach(
                 request -> {
                     ClientDTO dto = clientMapper.toDTO(request.getRequester());
-                    dto.setUserId(request.getRequester().getUser().getId());
                     response.add(dto);
                 });
         friendRepository.findAllByRequesterIdAndAcceptedTrue(id).forEach(
                 request -> {
                     ClientDTO dto = clientMapper.toDTO(request.getAddresser());
-                    dto.setUserId(request.getAddresser().getUser().getId());
                     response.add(dto);
                 });
 
@@ -190,7 +182,6 @@ public class ClientService {
         friendRepository.findAllByAddresserIdAndRejectedTrue(id).forEach(
                 request -> {
                     ClientDTO dto = clientMapper.toDTO(request.getRequester());
-                    dto.setUserId(request.getRequester().getUser().getId());
                     response.add(dto);
                 });
 
@@ -231,8 +222,6 @@ public class ClientService {
         request = friendRepository.save(request);
 
         FriendDTO newDto = friendMapper.toDTO(request);
-        newDto.setRequesterId(request.getRequester().getId());
-        newDto.setAddresserId(request.getAddresser().getId());
 
         return newDto;
     }
@@ -259,8 +248,6 @@ public class ClientService {
         newRequest = friendRepository.save(newRequest);
 
         FriendDTO newDto = friendMapper.toDTO(newRequest);
-        newDto.setRequesterId(newRequest.getRequester().getId());
-        newDto.setAddresserId(newRequest.getAddresser().getId());
 
         return newDto;
     }
@@ -287,8 +274,6 @@ public class ClientService {
         newRequest = friendRepository.save(newRequest);
 
         FriendDTO newDto = friendMapper.toDTO(newRequest);
-        newDto.setRequesterId(newRequest.getRequester().getId());
-        newDto.setAddresserId(newRequest.getAddresser().getId());
 
         return newDto;
     }
@@ -315,7 +300,6 @@ public class ClientService {
         List<ReservationDTO> response = new ArrayList<>();
         clientGroupRepository.findAllByClientId(id).forEach(group -> {
             ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
-            dto.setBranchId(group.getReservation().getBranch().getId());
             response.add(dto);
         });
 
@@ -335,7 +319,6 @@ public class ClientService {
         clientGroupRepository.findAllByClientIdAndReservationReservationDateGreaterThanEqual(id, reservationDate)
                 .forEach(group -> {
                     ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
-                    dto.setBranchId(group.getReservation().getBranch().getId());
                     response.add(dto);
                 });
 

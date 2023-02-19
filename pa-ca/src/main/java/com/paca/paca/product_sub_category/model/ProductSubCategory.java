@@ -25,7 +25,7 @@ public class ProductSubCategory {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "product_category_id")
-    private ProductCategory productCategory;
+    private ProductCategory category;
 
     @Column(name = "name")
     private String name;
