@@ -34,7 +34,6 @@ public class PromotionService {
         List<PromotionDTO> response = new ArrayList<>();
         promotionRepository.findAll().forEach(promotion -> {
             PromotionDTO dto = promotionMapper.toDTO(promotion);
-            dto.setBranchId(promotion.getBranch().getId());
             response.add(dto);
         });
 
@@ -48,7 +47,6 @@ public class PromotionService {
                         26));
 
         PromotionDTO dto = promotionMapper.toDTO(promotion);
-        dto.setBranchId(promotion.getBranch().getId());
         return new ResponseEntity<PromotionDTO>(dto, HttpStatus.OK);
     }
 
@@ -65,7 +63,6 @@ public class PromotionService {
         newPromotion = promotionRepository.save(newPromotion);
 
         PromotionDTO newDto = promotionMapper.toDTO(newPromotion);
-        newDto.setBranchId(newPromotion.getBranch().getId());
 
         return new ResponseEntity<PromotionDTO>(newDto, HttpStatus.OK);
     }
@@ -78,10 +75,9 @@ public class PromotionService {
                     26);
         }
 
-        Promotion newPromotion = promotionMapper.updateModel(current.get(), dto);
+        Promotion newPromotion = promotionMapper.updateModel(dto, current.get());
         newPromotion = promotionRepository.save(newPromotion);
         PromotionDTO newDto = promotionMapper.toDTO(newPromotion);
-        newDto.setBranchId(newPromotion.getBranch().getId());
 
         return new ResponseEntity<PromotionDTO>(newDto, HttpStatus.OK);
     }

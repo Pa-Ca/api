@@ -6,18 +6,14 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface PromotionMapper {
+
+    @Mapping(source = "branch.id", target = "branchId")
     PromotionDTO toDTO(Promotion promotion);
 
     Promotion toEntity(PromotionDTO dto);
 
-    default Promotion updateModel(Promotion promotion, PromotionDTO dto) {
-        if (dto.getDisabled() != null) {
-            promotion.setDisabled(dto.getDisabled());
-        }
-        if (dto.getText() != null) {
-            promotion.setText(dto.getText());
-        }
-
-        return promotion;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "branch", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Promotion updateModel(PromotionDTO dto, @MappingTarget Promotion promotion);
 }

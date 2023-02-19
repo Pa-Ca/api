@@ -11,6 +11,6 @@ public class ProductSubCategoryDTO {
 
     private Long id;
     private Long branchId;
-    private Long productCategoryId;
+    private Long categoryId;
     private String name;
 }

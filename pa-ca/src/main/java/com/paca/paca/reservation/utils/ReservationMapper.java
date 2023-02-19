@@ -6,33 +6,14 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface ReservationMapper {
+
+    @Mapping(source = "branch.id", target = "branchId")
     ReservationDTO toDTO(Reservation reservation);
 
     Reservation toEntity(ReservationDTO dto);
 
-    default Reservation updateModel(Reservation reservation, ReservationDTO dto) {
-        if (dto.getRequestDate() != null) {
-            reservation.setRequestDate(dto.getRequestDate());
-        }
-        if (dto.getReservationDate() != null) {
-            reservation.setReservationDate(dto.getReservationDate());
-        }
-        if (dto.getClientNumber() != null) {
-            reservation.setClientNumber(dto.getClientNumber());
-        }
-        if (dto.getPayment() != null) {
-            reservation.setPayment(dto.getPayment());
-        }
-        if (dto.getStatus() != null) {
-            reservation.setStatus(dto.getStatus());
-        }
-        if (dto.getPayDate() != null) {
-            reservation.setPayDate(dto.getPayDate());
-        }
-        if (dto.getPrice() != null) {
-            reservation.setPrice(dto.getPrice());
-        }
-
-        return reservation;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "branch", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Reservation updateModel(ReservationDTO dto, @MappingTarget Reservation reservation);
 }

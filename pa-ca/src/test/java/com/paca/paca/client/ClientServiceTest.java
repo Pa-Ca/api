@@ -178,7 +178,7 @@ public class ClientServiceTest {
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientRepository.save(any(Client.class))).thenReturn(client);
-        when(clientMapper.updateModel(any(Client.class), any(ClientDTO.class))).thenReturn(client);
+        when(clientMapper.updateModel(any(ClientDTO.class), any(Client.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
         ClientDTO expectedDto = clientService.update(client.getId(), dto);

@@ -7,17 +7,16 @@ import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 
 @Mapper(componentModel = "spring")
 public interface ProductSubCategoryMapper {
+
+    @Mapping(source = "branch.id", target = "branchId")
+    @Mapping(source = "category.id", target = "categoryId")
     ProductSubCategoryDTO toDTO(ProductSubCategory productCategory);
 
     ProductSubCategory toEntity(ProductSubCategoryDTO dto);
 
-    default ProductSubCategory updateModel(
-            ProductSubCategory subCategory,
-            ProductSubCategoryDTO dto) {
-        if (dto.getName() != null) {
-            subCategory.setName(dto.getName());
-        }
-
-        return subCategory;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "branch", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    ProductSubCategory updateModel(ProductSubCategoryDTO dto, @MappingTarget ProductSubCategory subCategory);
 }
