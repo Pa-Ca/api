@@ -202,7 +202,6 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Test
     void shouldDeleteClient() throws ParseException {
-        clientRepository.deleteAll();
         Client client = utils.createClient(null);
         
         clientRepository.delete(client);

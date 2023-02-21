@@ -4,9 +4,13 @@ import com.paca.paca.business.tier.Tier;
 import com.paca.paca.user.model.User;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Entity
+@Setter
+@Getter
 @Table(name="`business`")
 public class Business {
     @Id

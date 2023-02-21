@@ -5,7 +5,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
+import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.business.tier.Tier;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.branch.model.Branch;
@@ -15,6 +17,7 @@ import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.repository.ClientRepository;
@@ -46,6 +49,8 @@ public class TestUtils {
     BranchRepository branchRepository;
 
     AmenityRepository amenityRepository;
+
+    BusinessRepository businessRepository;
 
     public static <T> List<T> castList(Class<? extends T> clazz, List<?> rawCollection) {
         List<T> result = new ArrayList<>(rawCollection.size());
@@ -161,17 +166,31 @@ public class TestUtils {
         return dto;
     }
 
-    public Business createBusiness() {
+    public Business createBusiness(User user) {
+        if (user == null) {
+            user = createUser();
+        }
+        Tier tier = Tier.builder()
+                .id((long) BusinessTier.basic.ordinal())
+                .name(BusinessTier.basic)
+                .build();
         Business business = Business.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
+                .user(user)
+                .name("Test")
+                .verified(false)
+                .tier(tier)
                 .build();
 
+        if (businessRepository != null) {
+            business = businessRepository.save(business);
+        }
         return business;
     }
 
     public Branch createBranch(Business business) {
         if (business == null) {
-            business = createBusiness();
+            business = createBusiness(null);
         }
 
         Branch branch = Branch.builder()
