@@ -1,37 +1,37 @@
 package com.paca.paca.utils;
 
 import java.util.List;
+import java.util.Date;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
-import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.business.tier.Tier;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.business.model.Business;
-import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.branch.repository.BranchAmenityRepository;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 @Setter
 @Getter
@@ -49,6 +49,8 @@ public class TestUtils {
     BranchRepository branchRepository;
 
     AmenityRepository amenityRepository;
+
+    BranchAmenityRepository branchAmenityRepository;
 
     BusinessRepository businessRepository;
 
@@ -86,7 +88,7 @@ public class TestUtils {
         return user;
     }
 
-    public Client createClient(User user) throws ParseException {
+    public Client createClient(User user) {
         if (user == null) {
             user = createUser();
         }
@@ -98,7 +100,7 @@ public class TestUtils {
                 .stripeCustomerId("stripe_id_test")
                 .phoneNumber("+580000000")
                 .address("Test address")
-                .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"))
+                .dateOfBirth(new Date(System.currentTimeMillis()))
                 .build();
         if (clientRepository != null) {
             client = clientRepository.save(client);
@@ -106,7 +108,7 @@ public class TestUtils {
         return client;
     }
 
-    public ClientDTO createClientDTO(Client client) throws ParseException {
+    public ClientDTO createClientDTO(Client client) {
         if (client == null) {
             client = createClient(null);
         }
@@ -129,7 +131,7 @@ public class TestUtils {
             Client requester,
             Client addresser,
             boolean accepted,
-            boolean rejected) throws ParseException {
+            boolean rejected) {
         if (requester == null) {
             requester = createClient(null);
         }
@@ -152,7 +154,7 @@ public class TestUtils {
         return request;
     }
 
-    public FriendDTO createFriendRequestDTO(Friend request) throws ParseException {
+    public FriendDTO createFriendRequestDTO(Friend request) {
         if (request == null) {
             request = createFriendRequest(null, null, false, false);
         }
@@ -213,7 +215,7 @@ public class TestUtils {
         return branch;
     }
 
-    public BranchDTO createBranchDTO(Branch branch) throws ParseException {
+    public BranchDTO createBranchDTO(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
         }
@@ -256,5 +258,26 @@ public class TestUtils {
                 .build();
 
         return dto;
+    }
+
+    public BranchAmenity createBranchAmenity(Branch branch, Amenity amenity) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+        if (amenity == null) {
+            amenity = createAmenity();
+        }
+
+        BranchAmenity branchAmenity = BranchAmenity.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .amenity(amenity)
+                .build();
+
+        if (branchAmenityRepository != null) {
+            branchAmenity = branchAmenityRepository.save(branchAmenity);
+        }
+
+        return branchAmenity;
     }
 }

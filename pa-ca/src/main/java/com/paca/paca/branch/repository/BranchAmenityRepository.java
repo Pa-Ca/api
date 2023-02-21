@@ -9,7 +9,12 @@ import java.util.Optional;
 
 @Repository
 public interface BranchAmenityRepository extends JpaRepository<BranchAmenity, Long> {
+
     List<BranchAmenity> findAllByBranchId(Long id);
+
+    List<BranchAmenity> findAllByAmenityId(Long id);
+
+    boolean existsByBranchIdAndAmenityId(Long branchId, Long amenityId);
 
     Optional<BranchAmenity> findByBranchIdAndAmenityId(Long branchId, Long amenityId);
 }

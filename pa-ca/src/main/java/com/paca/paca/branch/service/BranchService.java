@@ -43,6 +43,9 @@ import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
+
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class BranchService {

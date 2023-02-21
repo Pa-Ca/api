@@ -31,7 +31,6 @@ import com.paca.paca.reservation.repository.ClientGroupRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.text.ParseException;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -74,7 +73,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingClientInGetClientById() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetClientById() {
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
@@ -88,7 +87,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetClientById() throws ParseException {
+    void shouldGetClientById() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -103,7 +102,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingUserInSave() throws ParseException {
+    void shouldGetNoContentDueToMissingUserInSave() {
         ClientDTO dto = utils.createClientDTO(null);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
@@ -119,7 +118,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetClientDueToExistingClientInSave() throws ParseException {
+    void shouldGetClientDueToExistingClientInSave() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -137,7 +136,7 @@ public class ClientServiceTest {
     }
     
     @Test
-    void shouldSave() throws ParseException {
+    void shouldSave() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -156,7 +155,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInUpdate() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInUpdate() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -173,7 +172,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldUpdate() throws ParseException {
+    void shouldUpdate() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -190,7 +189,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInDelete() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInDelete() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -206,7 +205,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingClientInGetClientByUserId() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetClientByUserId() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.empty());
@@ -222,7 +221,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetClientByUserId() throws ParseException {
+    void shouldGetClientByUserId() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -237,7 +236,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingClientInGetPendingRequestById() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetPendingRequestById() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -253,7 +252,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetPendingRequestById() throws ParseException {
+    void shouldGetPendingRequestById() {
         Client client = utils.createClient(null);
         List<Friend> requests = TestUtils.castList(
                 Friend.class,
@@ -270,7 +269,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingClientInGetAcceptedRequestById() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetAcceptedRequestById() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -286,7 +285,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetAcceptedRequestById() throws ParseException {
+    void shouldGetAcceptedRequestById() {
         Client client = utils.createClient(null);
         List<Friend> requests = TestUtils.castList(
                 Friend.class,
@@ -305,7 +304,7 @@ public class ClientServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingClientInGetRejectedRequestById() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetRejectedRequestById() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -321,7 +320,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetRejectedRequestById() throws ParseException {
+    void shouldGetRejectedRequestById() {
         Client client = utils.createClient(null);
         List<Friend> requests = TestUtils.castList(
                 Friend.class,
@@ -338,7 +337,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetConflictDueToRequesterIdEqualToAddresserIdInCreateFriendRequest() throws ParseException {
+    void shouldGetConflictDueToRequesterIdEqualToAddresserIdInCreateFriendRequest() {
         Client client = utils.createClient(null);
 
         try {
@@ -352,7 +351,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingRequestInCreateFriendRequest() throws ParseException {
+    void shouldGetNoContentDueToMissingRequestInCreateFriendRequest() {
         Client client = utils.createClient(null);
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -367,7 +366,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetConflictDueToFriendRequestAlreadyExistsInCreateFriendRequest() throws ParseException {
+    void shouldGetConflictDueToFriendRequestAlreadyExistsInCreateFriendRequest() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class)))
@@ -387,7 +386,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldCreateFriendRequest() throws ParseException {
+    void shouldCreateFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, false, false);
         FriendDTO dto = utils.createFriendRequestDTO(request);
 
@@ -409,7 +408,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFriendRequestInAcceptFriendRequest() throws ParseException {
+    void shouldGetNoContentDueToMissingFriendRequestInAcceptFriendRequest() {
         Client client = utils.createClient(null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -427,7 +426,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetConflictDueToFriendRequestAlreadyAcceptedInAcceptFriendRequest() throws ParseException {
+    void shouldGetConflictDueToFriendRequestAlreadyAcceptedInAcceptFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, true, false);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -447,7 +446,7 @@ public class ClientServiceTest {
     }
     
     @Test
-    void shouldGetConflictDueToFriendRequestAlreadyRejectedInAcceptFriendRequest() throws ParseException {
+    void shouldGetConflictDueToFriendRequestAlreadyRejectedInAcceptFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, false, true);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -467,7 +466,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldAcceptFriendRequest() throws ParseException {
+    void shouldAcceptFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, false, false);
         FriendDTO dto = utils.createFriendRequestDTO(request);
 
@@ -485,7 +484,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFriendRequestInRejectFriendRequest() throws ParseException {
+    void shouldGetNoContentDueToMissingFriendRequestInRejectFriendRequest() {
         Client client = utils.createClient(null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -503,7 +502,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetConflictDueToFriendRequestAlreadyAcceptedInRejectFriendRequest() throws ParseException {
+    void shouldGetConflictDueToFriendRequestAlreadyAcceptedInRejectFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, true, false);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -523,7 +522,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetConflictDueToFriendRequestAlreadyRejectedInRejectFriendRequest() throws ParseException {
+    void shouldGetConflictDueToFriendRequestAlreadyRejectedInRejectFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, false, true);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -543,7 +542,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldRejectFriendRequest() throws ParseException {
+    void shouldRejectFriendRequest() {
         Friend request = utils.createFriendRequest(null, null, false, false);
         FriendDTO dto = utils.createFriendRequestDTO(request);
 
@@ -561,7 +560,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFriendRequestInDeleteFriendRequest() throws ParseException {
+    void shouldGetNoContentDueToMissingFriendRequestInDeleteFriendRequest() {
         Client client = utils.createClient(null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -579,7 +578,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetAllReservations() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetAllReservations() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class)))
@@ -596,7 +595,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetAllReservations() throws ParseException {
+    void shouldGetAllReservations() {
         Client client = utils.createClient(null);
         List<ClientGroup> clientGroups = TestUtils.castList(
                 ClientGroup.class,
@@ -613,7 +612,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetAllReservationsByDate() throws ParseException {
+    void shouldGetNoContentDueToMissingClientInGetAllReservationsByDate() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class)))
@@ -630,7 +629,7 @@ public class ClientServiceTest {
     }
 
     @Test
-    void shouldGetAllReservationsByDate() throws ParseException {
+    void shouldGetAllReservationsByDate() {
         Client client = utils.createClient(null);
         List<ClientGroup> clientGroups = TestUtils.castList(
                 ClientGroup.class,

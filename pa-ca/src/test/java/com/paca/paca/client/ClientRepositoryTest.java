@@ -23,9 +23,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.List;
+import java.util.Date;
 import java.util.Optional;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -73,7 +72,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCreateClient() throws ParseException {
+    void shouldCreateClient() {
         User user = utils.createUser();
         Client client = Client.builder()
                 .id(1L)
@@ -83,7 +82,7 @@ public class ClientRepositoryTest extends PacaTest {
                 .stripeCustomerId("stripe_id_test")
                 .phoneNumber("+580000000")
                 .address("Test address")
-                .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-01"))
+                .dateOfBirth(new Date(System.currentTimeMillis()))
                 .build();
 
         Client savedClient = clientRepository.save(client);
@@ -99,7 +98,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldGetAllClients() throws ParseException {
+    void shouldGetAllClients() {
         int nUsers = 10;
 
         for (int i = 0; i < nUsers; i++) {
@@ -112,7 +111,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCheckThatClientExistsById() throws ParseException {
+    void shouldCheckThatClientExistsById() {
         Client client = utils.createClient(null);
 
         boolean expected = clientRepository.existsById(client.getId());
@@ -139,7 +138,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCheckThatClientExistsByUserId() throws ParseException {
+    void shouldCheckThatClientExistsByUserId() {
         User user = utils.createUser();
         Client client = utils.createClient(user);
 
@@ -158,7 +157,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCheckThatClientDoesNotExistsByUserId() throws ParseException {
+    void shouldCheckThatClientDoesNotExistsByUserId() {
         User user = utils.createUser();
         utils.createClient(user);
 
@@ -170,7 +169,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
     
     @Test
-    void shouldCheckThatClientExistsByUserEmail() throws ParseException {
+    void shouldCheckThatClientExistsByUserEmail() {
         User user = utils.createUser();
         Client client = utils.createClient(user);
 
@@ -189,7 +188,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCheckThatClientDoesNotExistsByUserEmail() throws ParseException {
+    void shouldCheckThatClientDoesNotExistsByUserEmail() {
         User user = utils.createUser();
         utils.createClient(user);
 
@@ -201,7 +200,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldDeleteClient() throws ParseException {
+    void shouldDeleteClient() {
         Client client = utils.createClient(null);
         
         clientRepository.delete(client);
@@ -211,7 +210,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldCheckThatFriendRequestExistsById() throws ParseException {
+    void shouldCheckThatFriendRequestExistsById() {
         Friend request = utils.createFriendRequest(null, null, false, false);
 
         boolean expected = friendRepository.existsById(request.getId());
@@ -227,7 +226,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCheckThatFriendRequestDoesNotExistsById() throws ParseException {
+    void shouldCheckThatFriendRequestDoesNotExistsById() {
         Friend request = utils.createFriendRequest(null, null, false, false);
         
         boolean expected = friendRepository.existsById(request.getId() + 1);
@@ -238,7 +237,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldCheckThatFriendRequestExistsByRequesterIdAndAddresserId() throws ParseException {
+    void shouldCheckThatFriendRequestExistsByRequesterIdAndAddresserId() {
         Friend request = utils.createFriendRequest(null, null, false, false);
 
         boolean expected = friendRepository.existsByRequesterIdAndAddresserId(
@@ -258,7 +257,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldCheckThatFriendRequestDoesNotExistsByRequesterIdAndAddresserId() throws ParseException {
+    void shouldCheckThatFriendRequestDoesNotExistsByRequesterIdAndAddresserId() {
         Client requester = utils.createClient(null);
         Client addresser = utils.createClient(null);
         utils.createFriendRequest(requester, addresser, false, false);
@@ -295,7 +294,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedTrue() throws ParseException {
+    void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedTrue() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, true, false);
         Friend request2 = utils.createFriendRequest(requester1, null, true, false);
@@ -314,7 +313,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedTrue() throws ParseException {
+    void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedTrue() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, true, false);
         Friend request2 = utils.createFriendRequest(null, addresser1, true, false);
@@ -333,7 +332,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByRequesterIdAndRejectedTrue() throws ParseException {
+    void shouldGetAllFriendRequestsExistsByRequesterIdAndRejectedTrue() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, false, true);
         Friend request2 = utils.createFriendRequest(requester1, null, false, true);
@@ -352,7 +351,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByAddresserIdAndRejectedTrue() throws ParseException {
+    void shouldGetAllFriendRequestsExistsByAddresserIdAndRejectedTrue() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, false, true);
         Friend request2 = utils.createFriendRequest(null, addresser1, false, true);
@@ -371,7 +370,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedFalseAndRejectedFalse() throws ParseException {
+    void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedFalseAndRejectedFalse() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, false, false);
         Friend request2 = utils.createFriendRequest(requester1, null, false, false);
@@ -392,7 +391,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
     
     @Test 
-    void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedFalseAndRejectedFalse() throws ParseException {
+    void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedFalseAndRejectedFalse() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, false, false);
         Friend request2 = utils.createFriendRequest(null, addresser1, false, false);
