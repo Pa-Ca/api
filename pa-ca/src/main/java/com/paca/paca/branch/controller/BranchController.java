@@ -43,9 +43,9 @@ public class BranchController {
     }
 
     @PostMapping
-    public ResponseEntity<BranchDTO> save(@RequestBody BranchDTO branchDto)
+    public ResponseEntity<BranchDTO> save(@RequestBody BranchDTO dto)
             throws NoContentException, BadRequestException {
-        return branchService.save(branchDto);
+        return branchService.save(dto);
     }
 
     @GetMapping("/{id}")
@@ -56,9 +56,9 @@ public class BranchController {
     @PutMapping("/{id}")
     public ResponseEntity<BranchDTO> update(
             @PathVariable("id") Long id,
-            @RequestBody BranchDTO branchDto)
+            @RequestBody BranchDTO dto)
             throws NoContentException, BadRequestException {
-        return branchService.update(id, branchDto);
+        return branchService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")

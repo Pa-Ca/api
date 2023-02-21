@@ -53,8 +53,7 @@ public class ClientMapperTest {
         User user = utils.createUser();
         ClientDTO dto = utils.createClientDTO(utils.createClient(user));
 
-        Client client = clientMapper.toEntity(dto);
-        client.setUser(user);
+        Client client = clientMapper.toEntity(dto, user);
 
         assertThat(client).isNotNull();
         assertThat(client.getId()).isEqualTo(dto.getId());
@@ -155,9 +154,7 @@ public class ClientMapperTest {
         Friend request = utils.createFriendRequest(null, null, false, false);
         FriendDTO dto = utils.createFriendRequestDTO(request);
 
-        Friend requestMapped = friendMapper.toEntity(dto);
-        requestMapped.setRequester(request.getRequester());
-        requestMapped.setAddresser(request.getAddresser());
+        Friend requestMapped = friendMapper.toEntity(dto, request.getRequester(), request.getAddresser());
 
         assertThat(requestMapped).isNotNull();
         assertThat(requestMapped.getId()).isEqualTo(dto.getId());

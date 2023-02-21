@@ -95,29 +95,28 @@ public class BranchService {
         return new ResponseEntity<BranchDTO>(dto, HttpStatus.OK);
     }
 
-    public ResponseEntity<BranchDTO> save(BranchDTO branchDto) throws NoContentException, BadRequestException {
-        Optional<Business> business = businessRepository.findById(branchDto.getBusinessId());
+    public ResponseEntity<BranchDTO> save(BranchDTO dto) throws NoContentException, BadRequestException {
+        Optional<Business> business = businessRepository.findById(dto.getBusinessId());
         if (business.isEmpty()) {
             throw new NoContentException(
-                    "Business with id " + branchDto.getBusinessId() + " does not exists",
+                    "Business with id " + dto.getBusinessId() + " does not exists",
                     21);
         }
-        if (branchDto.getCapacity() < 1) {
+        if (dto.getCapacity() < 1) {
             throw new BadRequestException(
                     "Branch capacity must be greater than 0",
                     22);
         }
 
-        Branch newBranch = branchMapper.toEntity(branchDto);
-        newBranch.setBusiness(business.get());
+        Branch newBranch = branchMapper.toEntity(dto, business.get());
         newBranch = branchRepository.save(newBranch);
 
-        BranchDTO newDto = branchMapper.toDTO(newBranch);
+        BranchDTO dtoResponse = branchMapper.toDTO(newBranch);
 
-        return new ResponseEntity<BranchDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<BranchDTO>(dtoResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<BranchDTO> update(Long id, BranchDTO branchDto)
+    public ResponseEntity<BranchDTO> update(Long id, BranchDTO dto)
             throws NoContentException, BadRequestException {
         Optional<Branch> current = branchRepository.findById(id);
         if (current.isEmpty()) {
@@ -126,17 +125,17 @@ public class BranchService {
                     20);
         }
 
-        if (branchDto.getCapacity() < 1) {
+        if (dto.getCapacity() < 1) {
             throw new BadRequestException(
                     "Branch capacity must be greater than 0",
                     21);
         }
 
-        Branch newBranch = branchMapper.updateModel(branchDto, current.get());
+        Branch newBranch = branchMapper.updateModel(dto, current.get());
         newBranch = branchRepository.save(newBranch);
-        BranchDTO newDto = branchMapper.toDTO(newBranch);
+        BranchDTO dtoResponse = branchMapper.toDTO(newBranch);
 
-        return new ResponseEntity<BranchDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<BranchDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {

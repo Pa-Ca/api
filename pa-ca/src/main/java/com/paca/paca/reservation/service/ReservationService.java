@@ -62,9 +62,9 @@ public class ReservationService {
         newReservation.setBranch(branch.get());
         newReservation = reservationRepository.save(newReservation);
 
-        ReservationDTO newDto = reservationMapper.toDTO(newReservation);
+        ReservationDTO dtoResponse = reservationMapper.toDTO(newReservation);
 
-        return new ResponseEntity<ReservationDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ReservationDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<ReservationDTO> update(Long id, ReservationDTO dto) throws NoContentException {
@@ -77,9 +77,9 @@ public class ReservationService {
 
         Reservation newReservation = reservationMapper.updateModel(dto, current.get());
         newReservation = reservationRepository.save(newReservation);
-        ReservationDTO newDto = reservationMapper.toDTO(newReservation);
+        ReservationDTO dtoResponse = reservationMapper.toDTO(newReservation);
 
-        return new ResponseEntity<ReservationDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ReservationDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {

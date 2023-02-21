@@ -58,13 +58,12 @@ public class PromotionService {
                     20);
         }
 
-        Promotion newPromotion = promotionMapper.toEntity(dto);
-        newPromotion.setBranch(branch.get());
+        Promotion newPromotion = promotionMapper.toEntity(dto, branch.get());
         newPromotion = promotionRepository.save(newPromotion);
 
-        PromotionDTO newDto = promotionMapper.toDTO(newPromotion);
+        PromotionDTO dtoResponse = promotionMapper.toDTO(newPromotion);
 
-        return new ResponseEntity<PromotionDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<PromotionDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<PromotionDTO> update(Long id, PromotionDTO dto) throws NoContentException {
@@ -77,9 +76,9 @@ public class PromotionService {
 
         Promotion newPromotion = promotionMapper.updateModel(dto, current.get());
         newPromotion = promotionRepository.save(newPromotion);
-        PromotionDTO newDto = promotionMapper.toDTO(newPromotion);
+        PromotionDTO dtoResponse = promotionMapper.toDTO(newPromotion);
 
-        return new ResponseEntity<PromotionDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<PromotionDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {
