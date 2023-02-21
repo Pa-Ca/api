@@ -1,19 +1,16 @@
 package com.paca.paca.business.service;
 
-import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.model.Business;
-import com.paca.paca.business.utils.BusinessMapper;
-import com.paca.paca.business.dto.BusinessListDTO;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.business.dto.BusinessListDTO;
+import com.paca.paca.business.utils.BusinessMapper;
 
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class BusinessService {
