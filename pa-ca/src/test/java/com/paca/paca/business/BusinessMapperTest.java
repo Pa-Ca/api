@@ -11,8 +11,6 @@ import com.paca.paca.business.utils.BusinessMapperImpl;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.text.ParseException;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -24,7 +22,7 @@ public class BusinessMapperTest {
     private TestUtils utils = TestUtils.builder().build();
     
     @Test
-    void shouldMapBusinessEntityToBusinessDTO() throws ParseException {
+    void shouldMapBusinessEntityToBusinessDTO() {
         Business business = utils.createBusiness(null);
 
         BusinessDTO response = businessMapper.toDTO(business);

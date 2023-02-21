@@ -1,9 +1,12 @@
 package com.paca.paca.branch.service;
 
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.branch.dto.AmenityDTO;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
+import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.branch.utils.AmenityMapper;
 import com.paca.paca.branch.repository.BranchRepository;
@@ -23,10 +26,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AmenityService {
-    private final BranchRepository branchRepository;
-    private final BranchAmenityRepository branchAmenityRepository;
-    private final AmenityRepository amenityRepository;
+
+    private final BranchMapper branchMapper;
+
     private final AmenityMapper amenityMapper;
+
+    private final BranchRepository branchRepository;
+
+    private final AmenityRepository amenityRepository;
+
+    private final BranchAmenityRepository branchAmenityRepository;
 
     private ResponseEntity<AmenityListDTO> getAmenityListDTOByBranch(Optional<Branch> branch) {
         List<AmenityDTO> response = new ArrayList<>();
@@ -115,5 +124,18 @@ public class AmenityService {
         });
 
         return getAmenityListDTOByBranch(branch);
+    }
+
+    public BranchListDTO getAllBranches(Long id) throws NoContentException {
+        if (!amenityRepository.existsById(id))
+            throw new NoContentException("Amenity with id " + id + " does not exists", 34);
+
+        List<BranchDTO> response = new ArrayList<>();
+        branchAmenityRepository.findAllByAmenityId(id).forEach(branchAmenity -> {
+            BranchDTO dto = branchMapper.toDTO(branchAmenity.getBranch());
+            response.add(dto);
+        });
+
+        return BranchListDTO.builder().branches(response).build();
     }
 }

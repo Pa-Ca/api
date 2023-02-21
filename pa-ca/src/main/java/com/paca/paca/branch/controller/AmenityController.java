@@ -1,9 +1,10 @@
 package com.paca.paca.branch.controller;
 
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
+import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.branch.statics.AmenityStatics;
-import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,10 @@ public class AmenityController {
             @PathVariable("id") Long id,
             @RequestBody AmenityListDTO dto) throws NoContentException {
         return amenityService.deleteAllByBranchId(id, dto);
+    }
+
+    @GetMapping(AmenityStatics.Endpoint.AMENITY_BRANCHES)
+    public ResponseEntity<BranchListDTO> getAllBranches(@PathVariable("id") Long id) throws NoContentException {
+        return ResponseEntity.ok(amenityService.getAllBranches(id));
     }
 }

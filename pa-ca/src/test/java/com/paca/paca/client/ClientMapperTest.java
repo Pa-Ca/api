@@ -8,15 +8,13 @@ import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
-
-import org.junit.jupiter.api.extension.ExtendWith;
 import com.paca.paca.client.utils.ClientMapperImpl;
 import com.paca.paca.client.utils.FriendMapperImpl;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -32,7 +30,7 @@ public class ClientMapperTest {
     private TestUtils utils = TestUtils.builder().build();
 
     @Test
-    void shouldMapClientEntityToClientDTO() throws ParseException {
+    void shouldMapClientEntityToClientDTO() {
         Client client = utils.createClient(null);
 
         ClientDTO response = clientMapper.toDTO(client);
@@ -49,7 +47,7 @@ public class ClientMapperTest {
     }
 
     @Test 
-    void shouldMapClientDTOtoClientEntity() throws ParseException {
+    void shouldMapClientDTOtoClientEntity() {
         User user = utils.createUser();
         ClientDTO dto = utils.createClientDTO(utils.createClient(user));
 
@@ -67,7 +65,7 @@ public class ClientMapperTest {
     }
     
     @Test
-    void shouldPartiallyMapClientDTOtoClientEntity() throws ParseException {
+    void shouldPartiallyMapClientDTOtoClientEntity() {
         Client client = utils.createClient(null);
 
         // Not changing ID
@@ -128,7 +126,7 @@ public class ClientMapperTest {
 
         // Change date of birth
         dto = ClientDTO.builder()
-                .dateOfBirth(new SimpleDateFormat("yyyy-MM-dd").parse("2000-01-02"))
+                .dateOfBirth(new Date(System.currentTimeMillis()))
                 .build();
         updatedClient = clientMapper.updateModel(dto, client);
         assertThat(updatedClient).isNotNull();
@@ -136,7 +134,7 @@ public class ClientMapperTest {
     }
 
     @Test 
-    void shouldMapFriendEntityToFriendDTO() throws ParseException {
+    void shouldMapFriendEntityToFriendDTO() {
         Friend friend = utils.createFriendRequest(null, null, false, false);
 
         FriendDTO response = friendMapper.toDTO(friend);
@@ -150,7 +148,7 @@ public class ClientMapperTest {
     }
     
     @Test 
-    void shouldMapFriendDTOtoFriendEntity() throws ParseException {
+    void shouldMapFriendDTOtoFriendEntity() {
         Friend request = utils.createFriendRequest(null, null, false, false);
         FriendDTO dto = utils.createFriendRequestDTO(request);
 
@@ -165,7 +163,7 @@ public class ClientMapperTest {
     }
 
     @Test 
-    void shouldPartiallyMapFriendDTOtoFriendEntity() throws ParseException {
+    void shouldPartiallyMapFriendDTOtoFriendEntity() {
         Friend friend = utils.createFriendRequest(null, null, false, false);
 
         // Not changing ID
