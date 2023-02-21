@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.paca.paca.utils.TestUtils;
+import com.paca.paca.user.model.User;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.dto.ClientDTO;
@@ -94,11 +95,11 @@ public class ClientServiceTest {
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO expectedDto = clientService.getById(client.getId());
+        ClientDTO dtoResponse = clientService.getById(client.getId());
 
-        assertThat(expectedDto).isNotNull();
-        assertThat(expectedDto.getId()).isEqualTo(client.getId());
-        assertThat(expectedDto.getUserId()).isEqualTo(client.getUser().getId());
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(client.getId());
+        assertThat(dtoResponse.getUserId()).isEqualTo(client.getUser().getId());
     }
 
     @Test
@@ -143,15 +144,15 @@ public class ClientServiceTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(client.getUser()));
         when(clientRepository.existsByUserEmail(any(String.class))).thenReturn(false);
         when(clientRepository.save(any(Client.class))).thenReturn(client);
-        when(clientMapper.toEntity(any(ClientDTO.class))).thenReturn(client);
+        when(clientMapper.toEntity(any(ClientDTO.class), any(User.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO expectedDto = clientService.save(dto);
+        ClientDTO dtoResponse = clientService.save(dto);
 
-        assertThat(expectedDto).isNotNull();
-        assertThat(expectedDto.getId()).isEqualTo(client.getId());
-        assertThat(expectedDto.getUserId()).isEqualTo(client.getUser().getId());
-        assertThat(expectedDto.getEmail()).isEqualTo(client.getUser().getEmail());
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(client.getId());
+        assertThat(dtoResponse.getUserId()).isEqualTo(client.getUser().getId());
+        assertThat(dtoResponse.getEmail()).isEqualTo(client.getUser().getEmail());
     }
 
     @Test
@@ -181,11 +182,11 @@ public class ClientServiceTest {
         when(clientMapper.updateModel(any(ClientDTO.class), any(Client.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO expectedDto = clientService.update(client.getId(), dto);
+        ClientDTO dtoResponse = clientService.update(client.getId(), dto);
 
-        assertThat(expectedDto).isNotNull();
-        assertThat(expectedDto.getId()).isEqualTo(client.getId());
-        assertThat(expectedDto.getUserId()).isEqualTo(client.getUser().getId());
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(client.getId());
+        assertThat(dtoResponse.getUserId()).isEqualTo(client.getUser().getId());
     }
 
     @Test
@@ -228,11 +229,11 @@ public class ClientServiceTest {
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO expectedDto = clientService.getByUserId(client.getUser().getId());
+        ClientDTO dtoResponse = clientService.getByUserId(client.getUser().getId());
 
-        assertThat(expectedDto).isNotNull();
-        assertThat(expectedDto.getId()).isEqualTo(client.getId());
-        assertThat(expectedDto.getUserId()).isEqualTo(client.getUser().getId());
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(client.getId());
+        assertThat(dtoResponse.getUserId()).isEqualTo(client.getUser().getId());
     }
 
     @Test 

@@ -83,13 +83,12 @@ public class ClientService {
                     12);
         }
 
-        Client newClient = clientMapper.toEntity(dto);
-        newClient.setUser(user.get());
+        Client newClient = clientMapper.toEntity(dto, user.get());
         newClient = clientRepository.save(newClient);
 
-        ClientDTO newDto = clientMapper.toDTO(newClient);
+        ClientDTO dtoResponse = clientMapper.toDTO(newClient);
 
-        return newDto;
+        return dtoResponse;
     }
 
     public ClientDTO update(Long id, ClientDTO dto) throws NoContentException {
@@ -102,9 +101,9 @@ public class ClientService {
 
         Client newClient = clientMapper.updateModel(dto, current.get());
         newClient = clientRepository.save(newClient);
-        ClientDTO newDto = clientMapper.toDTO(newClient);
+        ClientDTO dtoResponse = clientMapper.toDTO(newClient);
 
-        return newDto;
+        return dtoResponse;
     }
 
     public void delete(Long id) throws NoContentException {
@@ -221,9 +220,9 @@ public class ClientService {
                 .build();
         request = friendRepository.save(request);
 
-        FriendDTO newDto = friendMapper.toDTO(request);
+        FriendDTO dtoResponse = friendMapper.toDTO(request);
 
-        return newDto;
+        return dtoResponse;
     }
 
     public FriendDTO acceptFriendRequest(Long requesterId, Long addresserId)
@@ -247,9 +246,9 @@ public class ClientService {
         newRequest.setAccepted(true);
         newRequest = friendRepository.save(newRequest);
 
-        FriendDTO newDto = friendMapper.toDTO(newRequest);
+        FriendDTO dtoResponse = friendMapper.toDTO(newRequest);
 
-        return newDto;
+        return dtoResponse;
     }
 
     public FriendDTO rejectFriendRequest(Long requesterId, Long addresserId)
@@ -273,9 +272,9 @@ public class ClientService {
         newRequest.setRejected(true);
         newRequest = friendRepository.save(newRequest);
 
-        FriendDTO newDto = friendMapper.toDTO(newRequest);
+        FriendDTO dtoResponse = friendMapper.toDTO(newRequest);
 
-        return newDto;
+        return dtoResponse;
     }
 
     public void deleteFriendRequest(Long requesterId, Long addresserId)

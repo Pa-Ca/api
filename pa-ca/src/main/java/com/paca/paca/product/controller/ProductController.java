@@ -34,8 +34,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO productDto) throws NoContentException {
-        return productService.save(productDto);
+    public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto) throws NoContentException {
+        return productService.save(dto);
     }
 
     @GetMapping("/{id}")
@@ -46,9 +46,9 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
-            @RequestBody ProductDTO productDto)
+            @RequestBody ProductDTO dto)
             throws NoContentException {
-        return productService.update(id, productDto);
+        return productService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
