@@ -1,6 +1,14 @@
 package com.paca.paca.reservation.controller;
 
+import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
+import com.paca.paca.statics.UserRole;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,6 +49,25 @@ public class ReservationController {
     @GetMapping("/{id}")
     public ResponseEntity<ReservationDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return reservationService.getById(id);
+    }
+
+    @PostMapping("/reject/{id}")
+    public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        System.out.println("-------------------------------------------------------------------------------------z");
+        System.out.println(auth);
+
+        if (auth != null && auth.getAuthorities().stream()
+                .anyMatch( a -> a.getAuthority().equals(UserRole.business.name() )
+        ))
+        {
+
+            reservationService.reject(id);
+        } else {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
     }
 
     @PutMapping("/{id}")
