@@ -8,9 +8,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Builder
-@Entity
 @Setter
 @Getter
+@Entity
 @Table(name="`business`")
 public class Business {
     @Id

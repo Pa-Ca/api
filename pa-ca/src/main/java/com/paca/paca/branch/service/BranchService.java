@@ -41,9 +41,6 @@ import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
-
-import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class BranchService {
@@ -74,13 +71,9 @@ public class BranchService {
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
 
-<<<<<<< HEAD
     private final FavoriteBranchRepository favoriteBranchRepository;
 
-    public ResponseEntity<BranchListDTO> getAll() {
-=======
     public BranchListDTO getAll() {
->>>>>>> Create Branch Service Tests
         List<BranchDTO> response = new ArrayList<>();
         branchRepository.findAll().forEach(branch -> {
             BranchDTO dto = branchMapper.toDTO(branch);
