@@ -37,10 +37,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
 @Setter
 @Getter
 @Builder

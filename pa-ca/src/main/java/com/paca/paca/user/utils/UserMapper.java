@@ -22,6 +22,7 @@ public interface UserMapper {
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "verified", ignore = true)
     @Mapping(target = "loggedIn", ignore = true)
+    @Mapping(target = "authorities", ignore = true)
     User updateEntity(UserDTO dto, @MappingTarget User user, UserRole role);
 
     default Role stringToRole(UserRole role) {

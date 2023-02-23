@@ -6,7 +6,6 @@ import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.utils.BusinessMapper;
 
-import com.paca.paca.business.model.Business;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 

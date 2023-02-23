@@ -1,16 +1,22 @@
 package com.paca.paca.business.model;
-import com.paca.paca.business.tier.Tier;
 
 import com.paca.paca.user.model.User;
-import jakarta.persistence.*;
+import com.paca.paca.business.tier.Tier;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+import jakarta.persistence.*;
 
 @Builder
 @Setter
 @Getter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="`business`")
 public class Business {
     @Id

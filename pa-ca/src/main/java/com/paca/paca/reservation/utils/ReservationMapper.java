@@ -1,6 +1,7 @@
 package com.paca.paca.reservation.utils;
 
 import org.mapstruct.*;
+
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.ReservationDTO;
@@ -25,3 +26,4 @@ public interface ReservationMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Reservation updateModel(ReservationDTO dto, @MappingTarget Reservation reservation);
 }
+

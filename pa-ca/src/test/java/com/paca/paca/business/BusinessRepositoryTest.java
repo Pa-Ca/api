@@ -23,13 +23,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-<<<<<<< HEAD
-import com.paca.paca.business.model.Business;
-import com.paca.paca.business.repository.BusinessRepository;
-=======
 import java.util.List;
 import java.util.Optional;
->>>>>>> Create initial Business tests
 
 @DataJpaTest
 @Testcontainers
