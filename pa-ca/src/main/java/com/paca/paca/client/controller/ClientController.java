@@ -4,9 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ClientDTO;
-import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.statics.ClientStatics;
 import com.paca.paca.reservation.dto.ReservationListDTO;
@@ -112,4 +114,27 @@ public class ClientController {
             throws NoContentException {
         return clientService.getReservationsByDate(id, date);
     }
+
+    @GetMapping("/{id}/favorite-branchs")
+    public ResponseEntity<BranchListDTO> getFavoriteBranchs(@PathVariable("id") Long id)
+            throws NoContentException {
+        return ResponseEntity.ok(clientService.getFavoriteBranchs(id));
+    }
+    
+    @PostMapping("/{id}/favorite-branchs/{branchId}")
+    public ResponseEntity<BranchDTO> getFavoriteBranchs(
+            @PathVariable("id") Long id,
+            @PathVariable("branchId") Long branchId)
+            throws NoContentException {
+        return ResponseEntity.ok(clientService.addFavoriteBranch(id, branchId));
+    }
+
+    @DeleteMapping("/{id}/favorite-branchs/{branchId}")
+    public void deleteFavoriteBranchs(
+            @PathVariable("id") Long id,
+            @PathVariable("branchId") Long branchId)
+            throws NoContentException {
+        clientService.deleteFavoriteBranch(id, branchId);
+    }
 }
+

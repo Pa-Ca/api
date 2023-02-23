@@ -2,6 +2,7 @@ package com.paca.paca.branch.controller;
 
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
@@ -93,5 +94,11 @@ public class BranchController {
             @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date)
             throws NoContentException {
         return branchService.getReservationsByDate(id, date);
+    }
+
+    @GetMapping("/{id}/favorite-clients")
+    public ResponseEntity<ClientListDTO> getFavoriteClients(@PathVariable("id") Long id)
+            throws NoContentException {
+        return ResponseEntity.ok(branchService.getFavoriteClients(id));
     }
 }
