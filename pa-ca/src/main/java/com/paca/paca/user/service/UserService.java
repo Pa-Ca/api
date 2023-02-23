@@ -74,17 +74,15 @@ public class UserService {
     }
 
     public UserDTO update(Long id, UserDTO dto)
-
             throws BadRequestException, UnprocessableException, ConflictException {
         Optional<User> current = userRepository.findById(id);
         if (current.isEmpty())
             throw new BadRequestException("User does not exists");
 
         // Email Validation
-        if (dto.getEmail() != null) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             EmailValidator.validate(dto.email);
-            if (userRepository.existsByEmail(dto.getEmail()))
-                throw new BadRequestException("This email is already taken");
+            if (dto.getEmail() != null) throw new BadRequestException("This email is already taken");
         }
 
         // Password validation
