@@ -20,17 +20,20 @@ import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.business.repository.BusinessRepository;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
+import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.product_sub_category.model.ProductSubCategory;
+import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
+import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
 
 import java.util.Date;
 import java.util.ArrayList;
@@ -52,9 +55,13 @@ public class TestUtils {
 
     AmenityRepository amenityRepository;
 
+    BusinessRepository businessRepository;
+
     BranchAmenityRepository branchAmenityRepository;
 
-    BusinessRepository businessRepository;
+    ProductCategoryRepository productCategoryRepository;
+
+    ProductSubCategoryRepository productSubCategoryRepository;
 
     public static <T> List<T> castList(Class<? extends T> clazz, List<?> rawCollection) {
         List<T> result = new ArrayList<>(rawCollection.size());
@@ -281,5 +288,40 @@ public class TestUtils {
         }
 
         return branchAmenity;
+    }
+
+    public ProductCategory createProductCategory() {
+        ProductCategory category = ProductCategory.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .name("test")
+                .build();
+
+        if (productCategoryRepository != null) {
+            category = productCategoryRepository.save(category);
+        }
+
+        return category;
+    }
+
+    public ProductSubCategory createProductSubCategory(Branch branch, ProductCategory category) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+        if (category == null) {
+            category = createProductCategory();
+        }
+
+        ProductSubCategory subCategory = ProductSubCategory.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .category(category)
+                .name("test")
+                .build();
+
+        if (productSubCategoryRepository != null) {
+            subCategory = productSubCategoryRepository.save(subCategory);
+        }
+
+        return subCategory;
     }
 }
