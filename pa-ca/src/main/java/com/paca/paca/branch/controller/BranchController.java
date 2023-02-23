@@ -39,18 +39,18 @@ public class BranchController {
 
     @GetMapping
     public ResponseEntity<BranchListDTO> getAll() {
-        return branchService.getAll();
+        return ResponseEntity.ok(branchService.getAll());
     }
 
     @PostMapping
     public ResponseEntity<BranchDTO> save(@RequestBody BranchDTO dto)
             throws NoContentException, BadRequestException {
-        return branchService.save(dto);
+        return ResponseEntity.ok(branchService.save(dto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BranchDTO> getById(@PathVariable("id") Long id) throws NoContentException {
-        return branchService.getById(id);
+        return ResponseEntity.ok(branchService.getById(id));
     }
 
     @PutMapping("/{id}")
@@ -58,7 +58,7 @@ public class BranchController {
             @PathVariable("id") Long id,
             @RequestBody BranchDTO dto)
             throws NoContentException, BadRequestException {
-        return branchService.update(id, dto);
+        return ResponseEntity.ok(branchService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
@@ -70,22 +70,22 @@ public class BranchController {
     public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
             @PathVariable("id") Long id,
             @PathVariable("productCategoryId") Long productCategoryId) throws NoContentException {
-        return branchService.getProductSubCategories(id, productCategoryId);
+        return ResponseEntity.ok(branchService.getProductSubCategories(id, productCategoryId));
     }
 
     @GetMapping("/{id}/product")
     public ResponseEntity<ProductListDTO> getProducts(@PathVariable("id") Long id) throws NoContentException {
-        return branchService.getProducts(id);
+        return ResponseEntity.ok(branchService.getProducts(id));
     }
 
     @GetMapping("/{id}/promotion")
     public ResponseEntity<PromotionListDTO> getPromotions(@PathVariable("id") Long id) throws NoContentException {
-        return branchService.getPromotions(id);
+        return ResponseEntity.ok(branchService.getPromotions(id));
     }
 
     @GetMapping("/{id}/reservation")
     public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id) throws NoContentException {
-        return branchService.getReservations(id);
+        return ResponseEntity.ok(branchService.getReservations(id));
     }
 
     @GetMapping("/{id}/reservation/{date}")
@@ -93,7 +93,7 @@ public class BranchController {
             @PathVariable("id") Long id,
             @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date)
             throws NoContentException {
-        return branchService.getReservationsByDate(id, date);
+        return ResponseEntity.ok(branchService.getReservationsByDate(id, date));
     }
 
     @GetMapping("/{id}/favorite-clients")

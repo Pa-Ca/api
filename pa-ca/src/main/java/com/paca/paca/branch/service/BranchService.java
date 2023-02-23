@@ -5,9 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.http.ResponseEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -76,29 +74,33 @@ public class BranchService {
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
 
+<<<<<<< HEAD
     private final FavoriteBranchRepository favoriteBranchRepository;
 
     public ResponseEntity<BranchListDTO> getAll() {
+=======
+    public BranchListDTO getAll() {
+>>>>>>> Create Branch Service Tests
         List<BranchDTO> response = new ArrayList<>();
         branchRepository.findAll().forEach(branch -> {
             BranchDTO dto = branchMapper.toDTO(branch);
             response.add(dto);
         });
 
-        return ResponseEntity.ok(BranchListDTO.builder().branches(response).build());
+        return BranchListDTO.builder().branches(response).build();
     }
 
-    public ResponseEntity<BranchDTO> getById(Long id) throws NoContentException {
+    public BranchDTO getById(Long id) throws NoContentException {
         Branch branch = branchRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
                         "Branch with id " + id + " does not exists",
                         20));
 
         BranchDTO dto = branchMapper.toDTO(branch);
-        return new ResponseEntity<BranchDTO>(dto, HttpStatus.OK);
+        return dto;
     }
 
-    public ResponseEntity<BranchDTO> save(BranchDTO dto) throws NoContentException, BadRequestException {
+    public BranchDTO save(BranchDTO dto) throws NoContentException, BadRequestException {
         Optional<Business> business = businessRepository.findById(dto.getBusinessId());
         if (business.isEmpty()) {
             throw new NoContentException(
@@ -116,15 +118,15 @@ public class BranchService {
 
         BranchDTO dtoResponse = branchMapper.toDTO(newBranch);
 
-        return new ResponseEntity<BranchDTO>(dtoResponse, HttpStatus.OK);
+        return dtoResponse;
     }
 
-    public ResponseEntity<BranchDTO> update(Long id, BranchDTO dto)
+    public BranchDTO update(Long id, BranchDTO dto)
             throws NoContentException, BadRequestException {
         Optional<Branch> current = branchRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
 
@@ -138,32 +140,32 @@ public class BranchService {
         newBranch = branchRepository.save(newBranch);
         BranchDTO dtoResponse = branchMapper.toDTO(newBranch);
 
-        return new ResponseEntity<BranchDTO>(dtoResponse, HttpStatus.OK);
+        return dtoResponse;
     }
 
     public void delete(Long id) throws NoContentException {
         Optional<Branch> current = branchRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
         branchRepository.deleteById(id);
     }
 
-    public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
+    public ProductSubCategoryListDTO getProductSubCategories(
             Long branchId,
             Long productCategoryId) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + branchId + " does not exists",
+                    "Branch with id " + branchId + " does not exists",
                     20);
         }
         Optional<ProductCategory> category = productCategoryRepository.findById(productCategoryId);
         if (category.isEmpty()) {
             throw new NoContentException(
-                    "Product category with id: " + productCategoryId + " does not exists",
+                    "Product category with id " + productCategoryId + " does not exists",
                     24);
         }
 
@@ -174,14 +176,14 @@ public class BranchService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ProductSubCategoryListDTO.builder().productSubCategories(response).build());
+        return ProductSubCategoryListDTO.builder().productSubCategories(response).build();
     }
 
-    public ResponseEntity<ProductListDTO> getProducts(Long id) throws NoContentException {
+    public ProductListDTO getProducts(Long id) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
 
@@ -192,14 +194,14 @@ public class BranchService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ProductListDTO.builder().products(response).build());
+        return ProductListDTO.builder().products(response).build();
     }
 
-    public ResponseEntity<PromotionListDTO> getPromotions(Long id) throws NoContentException {
+    public PromotionListDTO getPromotions(Long id) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
 
@@ -209,14 +211,14 @@ public class BranchService {
             response.add(dto);
         });
 
-        return ResponseEntity.ok(PromotionListDTO.builder().promotions(response).build());
+        return PromotionListDTO.builder().promotions(response).build();
     }
 
-    public ResponseEntity<ReservationListDTO> getReservations(Long id) throws NoContentException {
+    public ReservationListDTO getReservations(Long id) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
 
@@ -226,15 +228,15 @@ public class BranchService {
             response.add(dto);
         });
 
-        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+        return ReservationListDTO.builder().reservations(response).build();
     }
 
-    public ResponseEntity<ReservationListDTO> getReservationsByDate(Long id, Date reservationDate)
+    public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
             throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
 
@@ -245,7 +247,7 @@ public class BranchService {
                     response.add(dto);
                 });
 
-        return ResponseEntity.ok(ReservationListDTO.builder().reservations(response).build());
+        return ReservationListDTO.builder().reservations(response).build();
     }
 
     public ClientListDTO getFavoriteClients(Long id) throws NoContentException {

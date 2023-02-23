@@ -16,7 +16,6 @@ import com.paca.paca.branch.repository.BranchAmenityRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class AmenityService {
 
     private final BranchAmenityRepository branchAmenityRepository;
 
-    private ResponseEntity<AmenityListDTO> getAmenityListDTOByBranch(Optional<Branch> branch) {
+    private AmenityListDTO getAmenityListDTOByBranch(Optional<Branch> branch) {
         List<AmenityDTO> response = new ArrayList<>();
         branchAmenityRepository.findAllByBranchId(branch.get().getId()).forEach(branchAmenity -> response.add(
                 AmenityDTO
@@ -46,10 +45,10 @@ public class AmenityService {
                         .name(branchAmenity.getAmenity().getName())
                         .build()));
 
-        return ResponseEntity.ok(AmenityListDTO.builder().amenities(response).build());
+        return AmenityListDTO.builder().amenities(response).build();
     }
 
-    public ResponseEntity<AmenityListDTO> getAll() {
+    public AmenityListDTO getAll() {
         List<AmenityDTO> response = new ArrayList<>();
         amenityRepository.findAll().forEach(amenity -> response.add(
                 AmenityDTO
@@ -58,10 +57,10 @@ public class AmenityService {
                         .name(amenity.getName())
                         .build()));
 
-        return ResponseEntity.ok(AmenityListDTO.builder().amenities(response).build());
+        return AmenityListDTO.builder().amenities(response).build();
     }
 
-    public ResponseEntity<AmenityListDTO> getBySearchWord(String word) {
+    public AmenityListDTO getBySearchWord(String word) {
         List<AmenityDTO> response = new ArrayList<>();
         amenityRepository.findAllMatching(word).forEach(amenity -> response.add(
                 AmenityDTO
@@ -70,10 +69,10 @@ public class AmenityService {
                         .name(amenity.getName())
                         .build()));
 
-        return ResponseEntity.ok(AmenityListDTO.builder().amenities(response).build());
+        return AmenityListDTO.builder().amenities(response).build();
     }
 
-    public ResponseEntity<AmenityListDTO> getAllByBranchId(Long id) throws NoContentException {
+    public AmenityListDTO getAllByBranchId(Long id) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty())
             throw new NoContentException("Branch does not exists", 12);
@@ -81,7 +80,7 @@ public class AmenityService {
         return getAmenityListDTOByBranch(branch);
     }
 
-    public ResponseEntity<AmenityListDTO> saveAllByBranchId(Long id, AmenityListDTO dto) throws NoContentException {
+    public AmenityListDTO saveAllByBranchId(Long id, AmenityListDTO dto) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty())
             throw new NoContentException("Branch does not exists", 12);
@@ -107,7 +106,7 @@ public class AmenityService {
         return getAmenityListDTOByBranch(branch);
     }
 
-    public ResponseEntity<AmenityListDTO> deleteAllByBranchId(Long id, AmenityListDTO dto)
+    public AmenityListDTO deleteAllByBranchId(Long id, AmenityListDTO dto)
             throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty())
@@ -119,7 +118,8 @@ public class AmenityService {
             if (amenity.isEmpty())
                 throw new NoContentException("Amenity does not exists", 20);
 
-            Optional<BranchAmenity> branchAmenity = branchAmenityRepository.findByBranchIdAndAmenityId(id, amenityId);
+            Optional<BranchAmenity> branchAmenity = branchAmenityRepository
+                    .findByBranchIdAndAmenityId(id, amenityId);
             branchAmenity.ifPresent(branchAmenityRepository::delete);
         });
 
