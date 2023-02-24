@@ -2,9 +2,8 @@ package com.paca.paca.reservation.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Builder
 @Entity
@@ -24,7 +23,19 @@ public class Invoice {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    @CreationTimestamp
     @Column(name = "creation_date")
-    private LocalDateTime creationDate;
+    @Temporal(TemporalType.DATE)
+    private Date creationDate;
+
+    @Column(name = "client_number")
+    private Integer clientNumber;
+
+    @Column(name = "payment")
+    private String payment;
+
+    @Column(name = "price")
+    private Float price;
+
+    @Column(name = "payment_code")
+    private String paymentCode;
 }

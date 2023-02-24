@@ -11,7 +11,9 @@ public interface ReservationStatics {
         int pending = 1;
         int rejected = 2;
         int paid = 3;
-        int closed = 4;
-        int returned = 5;
+        int accepted = 4;
+        int canceled = 5;
+        int closed = 5;
+        int returned = 6;
     }
 }
