@@ -1,6 +1,12 @@
 package com.paca.paca.reservation.controller;
 
+import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
+import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.statics.UserRole;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,6 +47,43 @@ public class ReservationController {
     @GetMapping("/{id}")
     public ResponseEntity<ReservationDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return reservationService.getById(id);
+    }
+
+    @PostMapping("/reject/{id}")
+    public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.business.name()))) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+        reservationService.accept(id, auth.getName());
+    }
+
+    @PostMapping("/reject/{id}")
+    public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.client.name()))) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+        reservationService.accept(id, auth.getName());
+    }
+
+    @PostMapping("/reject/{id}")
+    public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.client.name()))) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+        reservationService.accept(id, auth.getName());
+    }
+
+    @PostMapping("/pay/{id}")
+    public void pay(@PathVariable("id") Long id, @RequestBody ReservationPaymentDTO dto)
+            throws ForbiddenException, NoContentException, BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.business.name()))) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+        reservationService.accept(id, auth.getName());
     }
 
     @PutMapping("/{id}")

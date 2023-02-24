@@ -4,6 +4,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.client.model.Client;
+import com.paca.paca.client.repository.ClientRepository;
+import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
+import com.paca.paca.reservation.model.ClientGroup;
+import com.paca.paca.reservation.model.Invoice;
+import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.reservation.repository.ClientGroupRepository;
+import com.paca.paca.reservation.repository.InvoiceRepository;
+import com.paca.paca.reservation.statics.ReservationStatics;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +41,14 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     private final BranchRepository branchRepository;
+
+    private final ClientGroupRepository clientGroupRepository;
+
+    private final BusinessRepository businessRepository;
+
+    private final ClientRepository clientRepository;
+
+    private final InvoiceRepository invoiceRepository;
 
     public ResponseEntity<ReservationListDTO> getAll() {
         List<ReservationDTO> response = new ArrayList<>();
@@ -58,6 +78,10 @@ public class ReservationService {
             throw new NoContentException(
                     "Branch with id " + dto.getBranchId() + " does not exists",
                     20);
+        }
+
+        if (dto.getPrice() == null) {
+            dto.setStatus(ReservationStatics.Status.paid);
         }
 
         Reservation newReservation = reservationMapper.toEntity(dto);
@@ -94,6 +118,178 @@ public class ReservationService {
                     27);
         }
         reservationRepository.deleteById(id);
+    }
+
+    public void cancel(Long id, String userEmail) throws NoContentException, BadRequestException, ForbiddenException {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + "does not exists");
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
+            throw new BadRequestException("This reservation can't be canceled because it is already returned");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
+            throw new BadRequestException("This reservation can't be canceled because it is already closed");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
+            throw new BadRequestException("This reservation can't be canceled because it is already rejected");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.canceled)){
+            throw new BadRequestException("This reservation can't be canceled because it is already canceled");
+        }
+
+        Long branchId = reservation.get().getBranch().getId();
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException("Branch related to reservation with id" + branchId + "does not exists");
+        }
+
+        Optional<Business> owner = businessRepository.findBusinessByUserEmail(userEmail);
+        if (owner.isEmpty()) {
+            throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
+        }
+
+        Long businessId = branch.get().getBusiness().getId();
+        if (businessId.equals(owner.get().getId())) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+
+        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.canceled).build();
+        Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
+        reservationRepository.save(updatedReservation);
+    }
+
+    public void accept(Long id, String userEmail) throws NoContentException, BadRequestException, ForbiddenException {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + "does not exists");
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
+            throw new BadRequestException("This reservation can't be accepted because it is already returned");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
+            throw new BadRequestException("This reservation can't be accepted because it is already closed");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
+            throw new BadRequestException("This reservation can't be accepted because it is already rejected");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.accepted)){
+            throw new BadRequestException("This reservation can't be accepted because it is already accepted");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.paid)){
+            Long branchId = reservation.get().getBranch().getId();
+            Optional<Branch> branch = branchRepository.findById(branchId);
+            if (branch.isEmpty()) {
+                throw new NoContentException("Branch related to reservation with id" + branchId + "does not exists");
+            }
+
+            Optional<Business> owner = businessRepository.findBusinessByUserEmail(userEmail);
+            if (owner.isEmpty()) {
+                throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
+            }
+
+            Long businessId = branch.get().getBusiness().getId();
+            if (businessId.equals(owner.get().getId())) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }
+
+            ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.accepted).build();
+            Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
+            reservationRepository.save(updatedReservation);
+        }
+    }
+
+    public void reject(Long id, String userEmail) throws NoContentException, BadRequestException, ForbiddenException {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + "does not exists");
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
+            throw new BadRequestException("This reservation can't be rejected because it is already returned");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
+            throw new BadRequestException("This reservation can't be rejected because it is already closed");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
+            throw new BadRequestException("This reservation can't be rejected because it is already rejected");
+        }
+
+        Long branchId = reservation.get().getBranch().getId();
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException("Branch related to reservation with id" + branchId + "does not exists");
+        }
+
+        Optional<Business> owner = businessRepository.findBusinessByUserEmail(userEmail);
+        if (owner.isEmpty()) {
+            throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
+        }
+
+        Long businessId = branch.get().getBusiness().getId();
+        if (businessId.equals(owner.get().getId())) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+
+        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.rejected).build();
+        Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
+        reservationRepository.save(updatedReservation);
+    }
+
+    public void pay(Long id, String userEmail, ReservationPaymentDTO dto)
+            throws NoContentException, BadRequestException, ForbiddenException {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + "does not exists");
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
+            throw new BadRequestException("This reservation can't be paid because it is already returned");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
+            throw new BadRequestException("This reservation can't be paid because it is already closed");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
+            throw new BadRequestException("This reservation can't be paid because it is already returned");
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.paid)){
+            throw new BadRequestException("This reservation can't be paid because it is already paid");
+        }
+
+        Optional<Client> owner = clientRepository.findClientByUserEmail(userEmail);
+        if (owner.isEmpty()) {
+            throw new NoContentException("Client related to user with email" + userEmail + "does not exists");
+        }
+
+        Long ownerId = owner.get().getId();
+        Long reservationId = reservation.get().getId();
+        Optional<ClientGroup> group = clientGroupRepository.findByClientIdAndReservationId(ownerId, reservationId);
+        if (group.isEmpty()) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+
+        ReservationDTO changes = ReservationDTO.builder().status(ReservationStatics.Status.paid).build();
+        Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), changes);
+        reservationRepository.save(updatedReservation);
+
+        Invoice invoice = Invoice.builder()
+                .reservation(reservation.get())
+                .price(reservation.get().getPrice())
+                .payment(reservation.get().getPayment())
+                .clientNumber(reservation.get().getClientNumber())
+                .paymentCode(dto.getPaymentCode())
+                .build();
+        invoiceRepository.save(invoice);
     }
 
 }
