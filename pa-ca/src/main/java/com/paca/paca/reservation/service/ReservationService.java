@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.repository.UserRepository;
@@ -109,10 +110,6 @@ public class ReservationService {
     public void reject(Long id, String userEmail) throws NoContentException, BadRequestException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
-        Optional<Business> business = businessRepository.findBusinessByUserEmail(userEmail);
-        System.out.println("-------------------------------------------------------------------------------");
-        System.out.println(business.get().getId());
-
         if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + "does not exists");
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
@@ -127,10 +124,23 @@ public class ReservationService {
             throw new BadRequestException("This reservation can't be rejected because it is already returned");
         }
 
+        Optional<Business> business = businessRepository.findBusinessByUserEmail(userEmail);
+        if (business.isEmpty()) {
+            throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
+        }
 
+        Long businessId = business.get().getId();
+        Optional<Branch> branch = branchRepository.findByBusinessId(businessId);
+        if (branch.isEmpty()) {
+            throw new NoContentException("Branch related to business with id" + businessId + "does not exists");
+        }
+
+        Long branchId = branch.get().getId();
+        if (!branchId.equals(reservation.get().getId())) {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.rejected).build();
-
         Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
         reservationRepository.save(updatedReservation);
     }

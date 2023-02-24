@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
-
-    Optional<Branch> findById(Long id);
+    Optional<Branch> findByBusinessId(Long id);
 }
