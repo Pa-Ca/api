@@ -1,6 +1,8 @@
 package com.paca.paca.client.repository;
 
+import com.paca.paca.business.model.Business;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.paca.paca.client.model.Client;
@@ -16,4 +18,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Optional<Client> findByUserEmail(String email);
 
     Boolean existsByUserEmail(String email);
+
+    @Query(value="SELECT C.id FROM business C JOIN \"user\" U on U.id = C.user_id WHERE U.email = ?1", nativeQuery=true)
+    Optional<Client> findClientByUserEmail(String userEmail);
 }

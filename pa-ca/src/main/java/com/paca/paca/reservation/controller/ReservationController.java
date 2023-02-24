@@ -61,6 +61,16 @@ public class ReservationController {
         }
     }
 
+    @PostMapping("/pay/{id}")
+    public void pay(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.client.name()))) {
+            reservationService.pay(id, auth.getName());
+        } else {
+            throw new ForbiddenException("Unauthorized access for this operation");
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ReservationDTO> update(
             @PathVariable("id") Long id,
