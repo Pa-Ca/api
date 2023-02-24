@@ -53,18 +53,9 @@ public class ReservationController {
 
     @PostMapping("/reject/{id}")
     public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        System.out.println("-------------------------------------------------------------------------------------z");
-        System.out.println(auth);
-
-        if (auth != null && auth.getAuthorities().stream()
-                .anyMatch( a -> a.getAuthority().equals(UserRole.business.name() )
-        ))
-        {
-
-            reservationService.reject(id);
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.business.name()))) {
+            reservationService.reject(id, auth.getName());
         } else {
             throw new ForbiddenException("Unauthorized access for this operation");
         }

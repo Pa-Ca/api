@@ -4,8 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.statics.ReservationStatics;
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.repository.UserRepository;
 import lombok.Builder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,9 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     private final BranchRepository branchRepository;
+
+    private final UserRepository userRepository;
+    private final BusinessRepository businessRepository;
 
     public ResponseEntity<ReservationListDTO> getAll() {
         List<ReservationDTO> response = new ArrayList<>();
@@ -99,8 +106,13 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public void reject(Long id) throws NoContentException, BadRequestException {
+    public void reject(Long id, String userEmail) throws NoContentException, BadRequestException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        Optional<Business> business = businessRepository.findBusinessByUserEmail(userEmail);
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.println(business.get().getId());
+
         if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + "does not exists");
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
@@ -115,9 +127,9 @@ public class ReservationService {
             throw new BadRequestException("This reservation can't be rejected because it is already returned");
         }
 
-        ReservationDTO dto = ReservationDTO.builder()
-                .status(ReservationStatics.Status.rejected)
-                .build();
+
+
+        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.rejected).build();
 
         Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
         reservationRepository.save(updatedReservation);
