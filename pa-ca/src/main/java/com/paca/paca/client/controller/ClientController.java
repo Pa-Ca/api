@@ -136,5 +136,27 @@ public class ClientController {
             throws NoContentException {
         clientService.deleteFavoriteBranch(id, branchId);
     }
+
+    @GetMapping("/{id}/favorite-branchs")
+    public ResponseEntity<BranchListDTO> getFavoriteBranchs(@PathVariable("id") Long id)
+            throws NoContentException {
+        return ResponseEntity.ok(clientService.getFavoriteBranchs(id));
+    }
+    
+    @PostMapping("/{id}/favorite-branchs/{branchId}")
+    public ResponseEntity<BranchDTO> getFavoriteBranchs(
+            @PathVariable("id") Long id,
+            @PathVariable("branchId") Long branchId)
+            throws NoContentException {
+        return ResponseEntity.ok(clientService.addFavoriteBranch(id, branchId));
+    }
+
+    @DeleteMapping("/{id}/favorite-branchs/{branchId}")
+    public void deleteFavoriteBranchs(
+            @PathVariable("id") Long id,
+            @PathVariable("branchId") Long branchId)
+            throws NoContentException {
+        clientService.deleteFavoriteBranch(id, branchId);
+    }
 }
 

@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
+
 import com.paca.paca.user.model.User;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.Client;
@@ -334,6 +336,80 @@ public class ClientService {
                 });
 
         return ReservationListDTO.builder().reservations(response).build();
+    }
+
+    public BranchListDTO getFavoriteBranchs(Long id) throws NoContentException {
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isEmpty()) {
+            throw new NoContentException(
+                    "Client with id: " + id + " does not exists",
+                    28);
+        }
+
+        List<BranchDTO> response = new ArrayList<>();
+        favoriteBranchRepository.findAllByClientId(id).forEach(fav -> {
+            BranchDTO dto = branchMapper.toDTO(fav.getBranch());
+            dto.setBusinessId(fav.getBranch().getBusiness().getId());
+            response.add(dto);
+        });
+
+        return BranchListDTO.builder().branches(response).build();
+    }
+
+    public BranchDTO addFavoriteBranch(Long id, Long branchId) throws NoContentException, ConflictException {
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isEmpty()) {
+            throw new NoContentException(
+                    "Client with id: " + id + " does not exists",
+                    28);
+        }
+
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + id + " does not exists",
+                    20);
+        }
+
+        Boolean favExists = favoriteBranchRepository.existsByClientIdAndBranchId(id, branchId);
+        if (favExists) {
+            throw new ConflictException("Favorite branch already exists", 32);
+        }
+
+        FavoriteBranch fav = FavoriteBranch.builder()
+                .client(client.get())
+                .branch(branch.get())
+                .build();
+        fav = favoriteBranchRepository.save(fav);
+
+        BranchDTO dto = branchMapper.toDTO(branch.get());
+        dto.setBusinessId(branch.get().getBusiness().getId());
+
+        return dto;
+    }
+
+    public void deleteFavoriteBranch(Long id, Long branchId) throws NoContentException {
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isEmpty()) {
+            throw new NoContentException(
+                    "Client with id: " + id + " does not exists",
+                    28);
+        }
+
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + id + " does not exists",
+                    20);
+        }
+
+        Boolean favExists = favoriteBranchRepository.existsByClientIdAndBranchId(id, branchId);
+        if (!favExists) {
+            throw new ConflictException("Favorite branch does not exists", 33);
+        }
+        
+        FavoriteBranch fav = favoriteBranchRepository.findByClientIdAndBranchId(id, branchId).get();
+        favoriteBranchRepository.deleteById(fav.getId());
     }
 
     public BranchListDTO getFavoriteBranchs(Long id) throws NoContentException {

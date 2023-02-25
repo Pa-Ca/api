@@ -8,7 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BranchRepository extends JpaRepository<Branch, Long> {
-
-    Optional<Branch> findById(Long id);
-}
+public interface BranchRepository extends JpaRepository<Branch, Long> { }
