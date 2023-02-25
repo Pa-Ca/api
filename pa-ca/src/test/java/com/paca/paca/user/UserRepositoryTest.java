@@ -1,58 +1,82 @@
 package com.paca.paca.user;
 
-import com.paca.paca.user.model.Role;
+import com.paca.paca.PacaTest;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
+import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@Testcontainers
 @DataJpaTest
-class UserRepositoryTest {
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+public class UserRepositoryTest extends PacaTest {
+    @Autowired private UserRepository userRepository;
 
-    @Autowired
-    private UserRepository underTest;
+    @Autowired private RoleRepository roleRepository;
 
     @AfterEach
     void restoreTest() {
-        underTest.deleteAll();
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test
-    @Disabled
-    void existsUserByEmail() {
-        // given
-        User user = new User(
-            1L,
-            "user@example.com",
-            "pass-example",
-                new Role((long) UserRole.admin.ordinal(), UserRole.admin)
-        );
-        underTest.save(user);
+    void shouldCheckThatUserExistsByEmail() {
+        String email = "test@test.com";
+        Role role = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
+        User user = User.builder()
+                .id(1L).email(email).password("123456789aA#").verified(false).loggedIn(false).role(role).build();
 
-        // when
-        boolean expected = underTest.existsByEmail(user.getEmail());
+        roleRepository.save(role);
+        userRepository.save(user);
 
-        // then
+        boolean expected = userRepository.existsByEmail(email);
+
         assertThat(expected).isTrue();
     }
 
     @Test
-    @Disabled
-    void doesNotExistsUserById() {
-        // given
-        Long id = 1L;
+    void shouldCheckThatUserDoesNotExistsByEmail() {
+        String email = "test@test.com";
+        boolean expected = userRepository.existsByEmail(email);
 
-        // when
-        boolean expected = underTest.existsById(id);
-
-        // then
         assertThat(expected).isFalse();
     }
 
+    @Test
+    void shouldReturnUserByEmail () {
+        String email = "test@test.com";
+        Role role = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
+        User user = User.builder()
+                .id(1L).email(email).password("123456789aA#").verified(false).loggedIn(false).role(role).build();
+
+        roleRepository.save(role);
+        userRepository.save(user);
+
+        Optional<User> response = userRepository.findByEmail(email);
+
+        assertThat(response).isNotEmpty();
+        assertThat(response.get().getEmail().equals(email)).isTrue();
+    }
+
+    @Test
+    void shouldNotReturnUserByEmail () {
+        String email = "test@test.com";
+        Optional<User> user = userRepository.findByEmail(email);
+
+        assertThat(user).isEmpty();
+    }
 }

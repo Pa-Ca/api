@@ -1,6 +1,8 @@
 package com.paca.paca.auth.config;
 
+import java.util.Optional;
 import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,12 +14,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.paca.paca.user.model.User;
 import com.paca.paca.auth.service.JwtService;
+import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -26,7 +28,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -42,17 +45,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         jwt = authHeader.substring(7);
         try {
-            userEmail = jwtService.extractUsername(jwt);
+            userEmail = jwtService.extractEmail(jwt);
         } catch (Exception e) {
             throw new ForbiddenException("Authentication failed", 9);
         }
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails) && !jwtService.isTokenRefresh(jwt)) {
+            Optional<User> user = userRepository.findByEmail(userEmail);
+            if (user.isEmpty()) {
+                throw new ForbiddenException("Authentication failed", 9);
+            }
+            if (jwtService.isTokenValid(jwt, user.get()) && !jwtService.isTokenRefresh(jwt)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        user.get(),
                         null,
-                        userDetails.getAuthorities());
+                        user.get().getAuthorities());
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

@@ -34,7 +34,6 @@ public class PromotionService {
         List<PromotionDTO> response = new ArrayList<>();
         promotionRepository.findAll().forEach(promotion -> {
             PromotionDTO dto = promotionMapper.toDTO(promotion);
-            dto.setBranchId(promotion.getBranch().getId());
             response.add(dto);
         });
 
@@ -48,7 +47,6 @@ public class PromotionService {
                         26));
 
         PromotionDTO dto = promotionMapper.toDTO(promotion);
-        dto.setBranchId(promotion.getBranch().getId());
         return new ResponseEntity<PromotionDTO>(dto, HttpStatus.OK);
     }
 
@@ -60,14 +58,12 @@ public class PromotionService {
                     20);
         }
 
-        Promotion newPromotion = promotionMapper.toEntity(dto);
-        newPromotion.setBranch(branch.get());
+        Promotion newPromotion = promotionMapper.toEntity(dto, branch.get());
         newPromotion = promotionRepository.save(newPromotion);
 
-        PromotionDTO newDto = promotionMapper.toDTO(newPromotion);
-        newDto.setBranchId(newPromotion.getBranch().getId());
+        PromotionDTO dtoResponse = promotionMapper.toDTO(newPromotion);
 
-        return new ResponseEntity<PromotionDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<PromotionDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<PromotionDTO> update(Long id, PromotionDTO dto) throws NoContentException {
@@ -78,12 +74,11 @@ public class PromotionService {
                     26);
         }
 
-        Promotion newPromotion = promotionMapper.updateModel(current.get(), dto);
+        Promotion newPromotion = promotionMapper.updateModel(dto, current.get());
         newPromotion = promotionRepository.save(newPromotion);
-        PromotionDTO newDto = promotionMapper.toDTO(newPromotion);
-        newDto.setBranchId(newPromotion.getBranch().getId());
+        PromotionDTO dtoResponse = promotionMapper.toDTO(newPromotion);
 
-        return new ResponseEntity<PromotionDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<PromotionDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {

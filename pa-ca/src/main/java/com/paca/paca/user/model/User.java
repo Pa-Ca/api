@@ -33,14 +33,14 @@ public class User implements UserDetails {
     private Boolean loggedIn;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "role_id")
-    private Role roleId;
+    private Role role;
 
     public User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
         this.verified = false;
         this.loggedIn = false;
-        this.roleId = role;
+        this.role = role;
     }
 
     public User(Long id, String email, String password, Role role) {
@@ -49,12 +49,12 @@ public class User implements UserDetails {
         this.password = password;
         this.verified = false;
         this.loggedIn = false;
-        this.roleId = role;
+        this.role = role;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.roleId.getName().name()));
+        return List.of(new SimpleGrantedAuthority(this.role.getName().name()));
     }
 
     @Override

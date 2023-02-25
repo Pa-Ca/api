@@ -7,10 +7,7 @@ import com.paca.paca.auth.utils.EmailValidator;
 
 import java.util.Optional;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -19,12 +16,12 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
+import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -43,8 +40,6 @@ public class AuthenticationService {
 
     private final JwtService jwtService;
 
-    private final UserDetailsService userDetailsService;
-
     private final AuthenticationManager authenticationManager;
 
     private void validateRole(String role) throws BadRequestException {
@@ -58,7 +53,7 @@ public class AuthenticationService {
         }
     }
 
-    public ResponseEntity<LoginResponseDTO> signup(SignupRequestDTO request)
+    public LoginResponseDTO signup(SignupRequestDTO request)
             throws BadRequestException, UnprocessableException, ConflictException {
         // Email Validation
         String email = request.getEmail();
@@ -75,7 +70,6 @@ public class AuthenticationService {
         validateRole(request.getRole());
         Optional<Role> role = roleRepository.findByName(UserRole.valueOf(request.getRole()));
         if (role.isEmpty()) {
-            System.out.println("ROLEEEEEEEEE: " + request.getRole());
             throw new NoContentException("Role " + request.getRole() + " does not exists");
         }
 
@@ -83,24 +77,24 @@ public class AuthenticationService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roleId(role.get())
+                .role(new Role(1L, "client"))
                 .verified(false)
                 .loggedIn(false)
                 .build();
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         // Generate JWT token and Response
         LoginResponseDTO response = LoginResponseDTO.builder()
                 .token(jwtService.generateToken(user, false))
                 .refresh(jwtService.generateToken(user, true))
                 .id(user.getId())
-                .role(user.getRoleId().getName().name())
+                .role(user.getRole().getName().name())
                 .build();
 
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    public ResponseEntity<LoginResponseDTO> login(LoginRequestDTO request)
+    public LoginResponseDTO login(LoginRequestDTO request)
             throws BadRequestException, NoContentException, ForbiddenException {
         String email = request.getEmail();
         String password = request.getPassword();
@@ -130,33 +124,51 @@ public class AuthenticationService {
                 .token(jwtService.generateToken(user, false))
                 .refresh(jwtService.generateToken(user, true))
                 .id(user.getId())
-                .role(user.getRoleId().getName().name())
+                .role(user.getRole().getName().name())
                 .build();
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    public ResponseEntity<RefreshResponseDTO> refresh(RefreshRequestDTO request) throws ForbiddenException {
+    public RefreshResponseDTO refresh(RefreshRequestDTO request) throws ForbiddenException {
         String jwt = request.getRefresh();
         String userEmail;
+
         try {
-            userEmail = jwtService.extractUsername(jwt);
+            userEmail = jwtService.extractEmail(jwt);
         } catch (Exception e) {
-            throw new ForbiddenException("Authentication failed1", 9);
+            throw new ForbiddenException("Authentication failed", 9);
         }
         if (userEmail != null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            if (! jwtService.isTokenValid(jwt, userDetails) || ! jwtService.isTokenRefresh(jwt)) {
+            Optional<User> user = userRepository.findByEmail(userEmail);
+            if (user.isEmpty()) {
                 throw new ForbiddenException("Authentication failed", 9);
             }
-        }
-        else {
+            if (!jwtService.isTokenValid(jwt, user.get()) || !jwtService.isTokenRefresh(jwt)) {
+                throw new ForbiddenException("Authentication failed", 9);
+            }
+        } else {
             throw new ForbiddenException("Authentication failed", 9);
         }
 
-        User user = userRepository.findByEmail(userEmail).orElseThrow();
+        User user = userRepository.findByEmail(userEmail).get();
         RefreshResponseDTO response = RefreshResponseDTO.builder()
                 .token(jwtService.generateToken(user, false))
                 .build();
-        return ResponseEntity.ok(response);
+        return response;
+    }
+
+    public void logout(LogoutDTO request) {
+        String refresh = request.getRefresh();
+        String token = request.getToken();
+
+        if (refresh == null) {
+            throw new BadRequestException("Refresh not found");
+        }
+        if (token == null) {
+            throw new BadRequestException("Token not found");
+        }
+
+        jwtService.addTokenToBlackList(refresh);
+        jwtService.addTokenToBlackList(token);
     }
 }

@@ -13,9 +13,9 @@ INSERT INTO "user" (id, email, password, verified, role_id, logged_in)
         (29, 'user29@example.com', 'password29', false, 2, false),
         (30, 'user30@example.com', 'password30', false, 2, false);
 
-INSERT INTO tier (id, name, reservation_limit, tier_cost)
-    VALUES 
-        (1, 'default', 100, 10);
+INSERT INTO tier VALUES (0, 'basic', 100, 10);
+INSERT INTO tier VALUES (1, 'premium', 500, 50);
+INSERT INTO tier VALUES (2, 'unlimited', -1, 100);
 
 INSERT INTO business (id, user_id, tier_id, name, verified) 
     VALUES

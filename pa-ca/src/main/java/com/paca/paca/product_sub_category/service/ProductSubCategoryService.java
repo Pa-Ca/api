@@ -46,8 +46,6 @@ public class ProductSubCategoryService {
         List<ProductSubCategoryDTO> response = new ArrayList<>();
         productSubCategoryRepository.findAll().forEach(category -> {
             ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(category);
-            dto.setBranchId(category.getBranch().getId());
-            dto.setProductCategoryId(category.getProductCategory().getId());
             response.add(dto);
         });
 
@@ -61,40 +59,37 @@ public class ProductSubCategoryService {
                         23));
 
         ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(category);
-        dto.setBranchId(category.getBranch().getId());
-        dto.setProductCategoryId(category.getProductCategory().getId());
         return new ResponseEntity<ProductSubCategoryDTO>(dto, HttpStatus.OK);
     }
 
-    public ResponseEntity<ProductSubCategoryDTO> save(ProductSubCategoryDTO productSubCategoryDTO)
+    public ResponseEntity<ProductSubCategoryDTO> save(ProductSubCategoryDTO dto)
             throws NoContentException, BadRequestException {
-        Optional<Branch> branch = branchRepository.findById(productSubCategoryDTO.getBranchId());
+        Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + productSubCategoryDTO.getBranchId() + " does not exists",
+                    "Branch with id " + dto.getBranchId() + " does not exists",
                     20);
         }
         Optional<ProductCategory> category = productCategoryRepository
-                .findById(productSubCategoryDTO.getProductCategoryId());
+                .findById(dto.getCategoryId());
         if (category.isEmpty()) {
             throw new NoContentException(
-                    "Product category with id " + productSubCategoryDTO.getProductCategoryId() + " does not exists",
+                    "Product category with id " + dto.getCategoryId() + " does not exists",
                     24);
         }
 
-        ProductSubCategory subCategory = productSubCategoryMapper.toEntity(productSubCategoryDTO);
-        subCategory.setBranch(branch.get());
-        subCategory.setProductCategory(category.get());
+        ProductSubCategory subCategory = productSubCategoryMapper.toEntity(
+                dto,
+                branch.get(),
+                category.get());
         productSubCategoryRepository.save(subCategory);
 
-        ProductSubCategoryDTO newDto = productSubCategoryMapper.toDTO(subCategory);
-        newDto.setBranchId(subCategory.getBranch().getId());
-        newDto.setProductCategoryId(subCategory.getProductCategory().getId());
+        ProductSubCategoryDTO dtoResponse = productSubCategoryMapper.toDTO(subCategory);
 
-        return new ResponseEntity<ProductSubCategoryDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ProductSubCategoryDTO>(dtoResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<ProductSubCategoryDTO> update(Long id, ProductSubCategoryDTO productSubCategoryDTO)
+    public ResponseEntity<ProductSubCategoryDTO> update(Long id, ProductSubCategoryDTO dto)
             throws NoContentException, BadRequestException {
         Optional<ProductSubCategory> current = productSubCategoryRepository.findById(id);
         if (current.isEmpty()) {
@@ -104,14 +99,12 @@ public class ProductSubCategoryService {
         }
 
         ProductSubCategory newProductSubCategory = productSubCategoryMapper.updateModel(
-                current.get(),
-                productSubCategoryDTO);
+                dto,
+                current.get());
         newProductSubCategory = productSubCategoryRepository.save(newProductSubCategory);
-        ProductSubCategoryDTO newDto = productSubCategoryMapper.toDTO(newProductSubCategory);
-        newDto.setBranchId(newProductSubCategory.getBranch().getId());
-        newDto.setProductCategoryId(newProductSubCategory.getProductCategory().getId());
+        ProductSubCategoryDTO dtoResponse = productSubCategoryMapper.toDTO(newProductSubCategory);
 
-        return new ResponseEntity<ProductSubCategoryDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ProductSubCategoryDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {
@@ -135,7 +128,6 @@ public class ProductSubCategoryService {
         List<ProductDTO> response = new ArrayList<>();
         productRepository.findAllBySubCategoryId(id).forEach(product -> {
             ProductDTO dto = productMapper.toDTO(product);
-            dto.setProductSubCategoryId(product.getSubCategory().getId());
             response.add(dto);
         });
 

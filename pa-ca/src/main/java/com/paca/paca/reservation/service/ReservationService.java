@@ -54,7 +54,6 @@ public class ReservationService {
         List<ReservationDTO> response = new ArrayList<>();
         reservationRepository.findAll().forEach(reservation -> {
             ReservationDTO dto = reservationMapper.toDTO(reservation);
-            dto.setBranchId(reservation.getBranch().getId());
             response.add(dto);
         });
 
@@ -68,7 +67,6 @@ public class ReservationService {
                         27));
 
         ReservationDTO dto = reservationMapper.toDTO(reservation);
-        dto.setBranchId(reservation.getBranch().getId());
         return new ResponseEntity<ReservationDTO>(dto, HttpStatus.OK);
     }
 
@@ -88,10 +86,9 @@ public class ReservationService {
         newReservation.setBranch(branch.get());
         newReservation = reservationRepository.save(newReservation);
 
-        ReservationDTO newDto = reservationMapper.toDTO(newReservation);
-        newDto.setBranchId(newReservation.getBranch().getId());
+        ReservationDTO dtoResponse = reservationMapper.toDTO(newReservation);
 
-        return new ResponseEntity<ReservationDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ReservationDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<ReservationDTO> update(Long id, ReservationDTO dto) throws NoContentException {
@@ -102,12 +99,11 @@ public class ReservationService {
                     27);
         }
 
-        Reservation newReservation = reservationMapper.updateModel(current.get(), dto);
+        Reservation newReservation = reservationMapper.updateModel(dto, current.get());
         newReservation = reservationRepository.save(newReservation);
-        ReservationDTO newDto = reservationMapper.toDTO(newReservation);
-        newDto.setBranchId(newReservation.getBranch().getId());
+        ReservationDTO dtoResponse = reservationMapper.toDTO(newReservation);
 
-        return new ResponseEntity<ReservationDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ReservationDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {

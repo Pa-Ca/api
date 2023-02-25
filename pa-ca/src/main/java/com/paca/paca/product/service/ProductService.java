@@ -33,7 +33,6 @@ public class ProductService {
         List<ProductDTO> response = new ArrayList<>();
         productRepository.findAll().forEach(product -> {
             ProductDTO dto = productMapper.toDTO(product);
-            dto.setProductSubCategoryId(product.getSubCategory().getId());
             response.add(dto);
         });
 
@@ -47,30 +46,27 @@ public class ProductService {
                         25));
 
         ProductDTO dto = productMapper.toDTO(product);
-        dto.setProductSubCategoryId(product.getSubCategory().getId());
         return new ResponseEntity<ProductDTO>(dto, HttpStatus.OK);
     }
 
-    public ResponseEntity<ProductDTO> save(ProductDTO productDto) throws NoContentException {
+    public ResponseEntity<ProductDTO> save(ProductDTO dto) throws NoContentException {
         Optional<ProductSubCategory> subCategory = productSubCategoryRepository
-                .findById(productDto.getProductSubCategoryId());
+                .findById(dto.getSubCategoryId());
         if (subCategory.isEmpty()) {
             throw new NoContentException(
-                    "Product sub-category with id " + productDto.getProductSubCategoryId() + " does not exists",
+                    "Product sub-category with id " + dto.getSubCategoryId() + " does not exists",
                     23);
         }
 
-        Product newProduct = productMapper.toEntity(productDto);
-        newProduct.setSubCategory(subCategory.get());
+        Product newProduct = productMapper.toEntity(dto, subCategory.get());
         newProduct = productRepository.save(newProduct);
 
-        ProductDTO newDto = productMapper.toDTO(newProduct);
-        newDto.setProductSubCategoryId(newProduct.getSubCategory().getId());
+        ProductDTO dtoResponse = productMapper.toDTO(newProduct);
 
-        return new ResponseEntity<ProductDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ProductDTO>(dtoResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<ProductDTO> update(Long id, ProductDTO productDto) throws NoContentException {
+    public ResponseEntity<ProductDTO> update(Long id, ProductDTO dto) throws NoContentException {
         Optional<Product> current = productRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
@@ -78,12 +74,11 @@ public class ProductService {
                     25);
         }
 
-        Product newProduct = productMapper.updateModel(current.get(), productDto);
+        Product newProduct = productMapper.updateModel(dto, current.get());
         newProduct = productRepository.save(newProduct);
-        ProductDTO newDto = productMapper.toDTO(newProduct);
-        newDto.setProductSubCategoryId(newProduct.getSubCategory().getId());
+        ProductDTO dtoResponse = productMapper.toDTO(newProduct);
 
-        return new ResponseEntity<ProductDTO>(newDto, HttpStatus.OK);
+        return new ResponseEntity<ProductDTO>(dtoResponse, HttpStatus.OK);
     }
 
     public void delete(Long id) throws NoContentException {
