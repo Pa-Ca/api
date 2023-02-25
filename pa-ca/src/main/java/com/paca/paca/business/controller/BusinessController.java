@@ -2,11 +2,11 @@ package com.paca.paca.business.controller;
 
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.NoContentException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.paca.paca.business.service.BusinessService;
 
@@ -29,6 +29,23 @@ public class BusinessController {
     @GetMapping("/{id}")
     public ResponseEntity<BusinessDTO> getById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(businessService.getById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<BusinessDTO> save(@RequestBody BusinessDTO business)
+            throws NoContentException, ConflictException {
+        return ResponseEntity.ok(businessService.save(business));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BusinessDTO> update(@PathVariable("id") Long id, @RequestBody BusinessDTO business)
+            throws NoContentException {
+        return ResponseEntity.ok(businessService.update(id, business));
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable("id") Long id) throws NoContentException {
+        businessService.delete(id);
     }
 
 }

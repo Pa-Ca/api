@@ -1,7 +1,6 @@
 package com.paca.paca.business.model;
 
 import com.paca.paca.user.model.User;
-import com.paca.paca.business.tier.Tier;
 
 import lombok.Builder;
 import lombok.Getter;
