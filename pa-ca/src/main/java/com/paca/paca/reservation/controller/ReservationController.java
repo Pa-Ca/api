@@ -49,7 +49,7 @@ public class ReservationController {
         return reservationService.getById(id);
     }
 
-    @PostMapping("/reject/{id}")
+    @PostMapping("/cancel/{id}")
     public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.business.name()))) {
@@ -58,7 +58,7 @@ public class ReservationController {
         reservationService.accept(id, auth.getName());
     }
 
-    @PostMapping("/reject/{id}")
+    @PostMapping("/accept/{id}")
     public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.client.name()))) {
@@ -70,6 +70,7 @@ public class ReservationController {
     @PostMapping("/reject/{id}")
     public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // System.out.println(auth.getAuthorities().stream().findFirst().get());
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(UserRole.client.name()))) {
             throw new ForbiddenException("Unauthorized access for this operation");
         }
