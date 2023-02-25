@@ -11,10 +11,15 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
+import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.client.repository.FavoriteBranchRepository;
 
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,7 +39,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ClientRepositoryTest extends PacaTest {
-    
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Autowired
     private ClientRepository clientRepository;
 
@@ -42,10 +53,13 @@ public class ClientRepositoryTest extends PacaTest {
     private FriendRepository friendRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private BranchRepository branchRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private BusinessRepository businessRepository;
+
+    @Autowired
+    private FavoriteBranchRepository favoriteBranchRepository;
 
     private TestUtils utils;
 
@@ -56,6 +70,9 @@ public class ClientRepositoryTest extends PacaTest {
                 .userRepository(userRepository)
                 .clientRepository(clientRepository)
                 .friendRepository(friendRepository)
+                .branchRepository(branchRepository)
+                .businessRepository(businessRepository)
+                .favoriteBranchRepository(favoriteBranchRepository)
                 .build();
     }
 
@@ -66,7 +83,10 @@ public class ClientRepositoryTest extends PacaTest {
 
     @AfterEach
     void restoreTest() {
+        favoriteBranchRepository.deleteAll();
+        branchRepository.deleteAll();
         clientRepository.deleteAll();
+        businessRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
     }
@@ -167,7 +187,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expected).isFalse();
         assertThat(expectedClient.isEmpty()).isTrue();
     }
-    
+
     @Test
     void shouldCheckThatClientExistsByUserEmail() {
         User user = utils.createUser();
@@ -294,7 +314,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedTrue() {
+    void shouldGetAllFriendRequestsByRequesterIdAndAcceptedTrue() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, true, false);
         Friend request2 = utils.createFriendRequest(requester1, null, true, false);
@@ -313,7 +333,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedTrue() {
+    void shouldGetAllFriendRequestsByAddresserIdAndAcceptedTrue() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, true, false);
         Friend request2 = utils.createFriendRequest(null, addresser1, true, false);
@@ -332,7 +352,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByRequesterIdAndRejectedTrue() {
+    void shouldGetAllFriendRequestsByRequesterIdAndRejectedTrue() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, false, true);
         Friend request2 = utils.createFriendRequest(requester1, null, false, true);
@@ -351,7 +371,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByAddresserIdAndRejectedTrue() {
+    void shouldGetAllFriendRequestsByAddresserIdAndRejectedTrue() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, false, true);
         Friend request2 = utils.createFriendRequest(null, addresser1, false, true);
@@ -370,7 +390,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test 
-    void shouldGetAllFriendRequestsExistsByRequesterIdAndAcceptedFalseAndRejectedFalse() {
+    void shouldGetAllFriendRequestsByRequesterIdAndAcceptedFalseAndRejectedFalse() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, false, false);
         Friend request2 = utils.createFriendRequest(requester1, null, false, false);
@@ -389,9 +409,9 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.contains(request1)).isTrue();
         assertThat(requests.contains(request2)).isTrue();
     }
-    
+
     @Test 
-    void shouldGetAllFriendRequestsExistsByAddresserIdAndAcceptedFalseAndRejectedFalse() {
+    void shouldGetAllFriendRequestsByAddresserIdAndAcceptedFalseAndRejectedFalse() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, false, false);
         Friend request2 = utils.createFriendRequest(null, addresser1, false, false);
@@ -409,5 +429,89 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.size()).isEqualTo(2);
         assertThat(requests.contains(request1)).isTrue();
         assertThat(requests.contains(request2)).isTrue();
+    }
+
+    @Test
+    void shouldCreateFavoriteBranch() {
+        Client client = utils.createClient(null);
+        Branch branch = utils.createBranch(null);
+        FavoriteBranch fav = FavoriteBranch.builder()
+                .client(client)
+                .branch(branch)
+                .build();
+
+        FavoriteBranch savedFav = favoriteBranchRepository.save(fav);
+
+        assertThat(savedFav).isNotNull();
+        assertThat(savedFav.getClient().getId()).isEqualTo(fav.getClient().getId());
+        assertThat(savedFav.getBranch().getId()).isEqualTo(fav.getBranch().getId());
+    }
+
+    @Test
+    void shouldGetFavoriteBranchExistsByClientIdAndBranchId() {
+        Client client = utils.createClient(null);
+        Branch branch = utils.createBranch(null);
+        FavoriteBranch favoriteBranch = utils.createFavoriteBranch(client, branch);
+
+        boolean expected = favoriteBranchRepository.existsByClientIdAndBranchId(client.getId(), branch.getId());
+        Optional<FavoriteBranch> expectedFavoriteBranch = favoriteBranchRepository.findByClientIdAndBranchId(
+            client.getId(), 
+            branch.getId()
+        );
+
+        assertThat(expected).isTrue();
+        assertThat(expectedFavoriteBranch).isNotEmpty();
+        assertThat(expectedFavoriteBranch.get().getClient().getId()).isEqualTo(favoriteBranch.getClient().getId());
+        assertThat(expectedFavoriteBranch.get().getBranch().getId()).isEqualTo(favoriteBranch.getBranch().getId());
+    }
+
+    @Test
+    void shouldCheckThatFavoriteBranchDoesNotExistsByClientIdAndBranchId() {
+        Client client = utils.createClient(null);
+        Branch branch = utils.createBranch(null);
+
+        boolean expected = favoriteBranchRepository.existsByClientIdAndBranchId(client.getId(), branch.getId());
+
+        assertThat(expected).isFalse();
+    }
+
+    @Test 
+    void shouldGetAllFavoriteBranchByClientId() {
+        Client client = utils.createClient(null);
+        FavoriteBranch fav1 = utils.createFavoriteBranch(client, null);
+        FavoriteBranch fav2 = utils.createFavoriteBranch(client, null);
+        utils.createFavoriteBranch(null, null);
+        utils.createFavoriteBranch(null, null);
+
+        List<FavoriteBranch> favoriteBranchs = favoriteBranchRepository.findAllByClientId(client.getId());
+
+        assertThat(favoriteBranchs.size()).isEqualTo(2);
+        assertThat(favoriteBranchs.contains(fav1)).isTrue();
+        assertThat(favoriteBranchs.contains(fav2)).isTrue();
+    }
+
+    @Test 
+    void shouldGetAllFavoriteBranchByBranchId() {
+        Branch branch = utils.createBranch(null);
+        FavoriteBranch fav1 = utils.createFavoriteBranch(null, branch);
+        FavoriteBranch fav2 = utils.createFavoriteBranch(null, branch);
+        utils.createFavoriteBranch(null, null);
+        utils.createFavoriteBranch(null, null);
+
+        List<FavoriteBranch> favoriteBranchs = favoriteBranchRepository.findAllByBranchId(branch.getId());
+
+        assertThat(favoriteBranchs.size()).isEqualTo(2);
+        assertThat(favoriteBranchs.contains(fav1)).isTrue();
+        assertThat(favoriteBranchs.contains(fav2)).isTrue();
+    }
+
+    @Test
+    void shouldDeleteFavoriteBranch() {
+        FavoriteBranch fav = utils.createFavoriteBranch(null, null);
+        
+        favoriteBranchRepository.delete(fav);
+
+        List<FavoriteBranch> favs = favoriteBranchRepository.findAll();
+        assertThat(favs.size()).isEqualTo(0);
     }
 }

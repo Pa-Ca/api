@@ -12,11 +12,14 @@ import lombok.RequiredArgsConstructor;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
+import com.paca.paca.branch.dto.ReviewDTO;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.branch.dto.ReviewListDTO;
 import com.paca.paca.branch.utils.BranchMapper;
+import com.paca.paca.branch.utils.ReviewMapper;
 import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
@@ -26,6 +29,7 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.ReviewRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -47,6 +51,8 @@ public class BranchService {
 
     private final BranchMapper branchMapper;
 
+    private final ReviewMapper reviewMapper;
+
     private final ProductMapper productMapper;
 
     private final PromotionMapper promotionMapper;
@@ -56,6 +62,8 @@ public class BranchService {
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
     private final ClientMapper clientMapper;
+
+    private final ReviewRepository reviewRepository;
 
     private final BranchRepository branchRepository;
 
@@ -261,4 +269,21 @@ public class BranchService {
         return ClientListDTO.builder().clients(response).build();
     }
 
+    public ReviewListDTO getReviews(Long id) {
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + id + " does not exists",
+                    20);
+        }
+
+        List<ReviewDTO> response = new ArrayList<>();
+        reviewRepository.findAllByBranchId(id)
+                .forEach(review -> {
+                    ReviewDTO dto = reviewMapper.toDTO(review);
+                    response.add(dto);
+                });
+
+        return ReviewListDTO.builder().reviews(response).build();
+    }
 }
