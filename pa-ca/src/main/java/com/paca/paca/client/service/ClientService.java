@@ -408,5 +408,4 @@ public class ClientService {
         
         FavoriteBranch fav = favoriteBranchRepository.findByClientIdAndBranchId(id, branchId).get();
         favoriteBranchRepository.deleteById(fav.getId());
-    }
-}
+    }}

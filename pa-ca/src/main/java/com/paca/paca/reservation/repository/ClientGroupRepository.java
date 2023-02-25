@@ -22,4 +22,6 @@ public interface ClientGroupRepository extends JpaRepository<ClientGroup, Long> 
             Long id,
             Date reservationDate);
 
+    Optional<ClientGroup> findByClientIdAndReservationId(Long clientId, Long reservationId);
+
 }

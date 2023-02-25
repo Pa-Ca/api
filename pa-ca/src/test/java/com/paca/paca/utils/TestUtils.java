@@ -22,6 +22,7 @@ import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.model.BranchAmenity;
+import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.repository.ClientRepository;
@@ -30,6 +31,7 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
+import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
@@ -61,6 +63,8 @@ public class TestUtils {
     BusinessRepository businessRepository;
 
     BranchAmenityRepository branchAmenityRepository;
+
+    FavoriteBranchRepository favoriteBranchRepository;
 
     ProductCategoryRepository productCategoryRepository;
 
@@ -296,6 +300,27 @@ public class TestUtils {
                 .build();
 
         return dto;
+    }
+
+    public FavoriteBranch createFavoriteBranch(Client client, Branch branch) {
+        if (client == null) {
+            client = createClient(null);
+        }
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        FavoriteBranch favoriteBranch = FavoriteBranch.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .client(client)
+                .branch(branch)
+                .build();
+
+        if (favoriteBranchRepository != null) {
+            favoriteBranch = favoriteBranchRepository.save(favoriteBranch);
+        }
+
+        return favoriteBranch;
     }
 
     public Amenity createAmenity() {

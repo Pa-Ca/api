@@ -2,19 +2,18 @@ package com.paca.paca.branch.controller;
 
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.branch.dto.ReviewListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
-
-import lombok.RequiredArgsConstructor;
-
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 
+import lombok.RequiredArgsConstructor;
 import java.util.Date;
 
 import org.springframework.http.ResponseEntity;
@@ -74,17 +73,20 @@ public class BranchController {
     }
 
     @GetMapping("/{id}/product")
-    public ResponseEntity<ProductListDTO> getProducts(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ProductListDTO> getProducts(@PathVariable("id") Long id)
+            throws NoContentException {
         return ResponseEntity.ok(branchService.getProducts(id));
     }
 
     @GetMapping("/{id}/promotion")
-    public ResponseEntity<PromotionListDTO> getPromotions(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<PromotionListDTO> getPromotions(@PathVariable("id") Long id)
+            throws NoContentException {
         return ResponseEntity.ok(branchService.getPromotions(id));
     }
 
     @GetMapping("/{id}/reservation")
-    public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id)
+            throws NoContentException {
         return ResponseEntity.ok(branchService.getReservations(id));
     }
 
@@ -100,5 +102,11 @@ public class BranchController {
     public ResponseEntity<ClientListDTO> getFavoriteClients(@PathVariable("id") Long id)
             throws NoContentException {
         return ResponseEntity.ok(branchService.getFavoriteClients(id));
+    }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<ReviewListDTO> getReviews(@PathVariable("id") Long id)
+            throws NoContentException {
+        return ResponseEntity.ok(branchService.getReviews(id));
     }
 }
