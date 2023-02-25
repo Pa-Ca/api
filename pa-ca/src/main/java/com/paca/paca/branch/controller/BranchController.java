@@ -11,6 +11,7 @@ import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -37,11 +38,13 @@ public class BranchController {
     private final BranchService branchService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<BranchListDTO> getAll() {
         return ResponseEntity.ok(branchService.getAll());
     }
 
     @PostMapping
+    @ValidateRoles({"business"})
     public ResponseEntity<BranchDTO> save(@RequestBody BranchDTO dto)
             throws NoContentException, BadRequestException {
         return ResponseEntity.ok(branchService.save(dto));
@@ -53,6 +56,7 @@ public class BranchController {
     }
 
     @PutMapping("/{id}")
+    @ValidateRoles({"business"})
     public ResponseEntity<BranchDTO> update(
             @PathVariable("id") Long id,
             @RequestBody BranchDTO dto)
@@ -61,6 +65,7 @@ public class BranchController {
     }
 
     @DeleteMapping("/{id}")
+    @ValidateRoles({"business"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         branchService.delete(id);
     }
@@ -98,6 +103,7 @@ public class BranchController {
         return ResponseEntity.ok(branchService.getReservationsByDate(id, date));
     }
 
+    @ValidateRoles({"business"})
     @GetMapping("/{id}/favorite-clients")
     public ResponseEntity<ClientListDTO> getFavoriteClients(@PathVariable("id") Long id)
             throws NoContentException {

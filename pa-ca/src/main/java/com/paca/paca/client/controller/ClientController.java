@@ -12,6 +12,7 @@ import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.statics.ClientStatics;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,11 +30,13 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<ClientListDTO> getAll() {
         return ResponseEntity.ok(clientService.getAll());
     }
 
     @PostMapping
+    @ValidateRoles({"client"})
     public ResponseEntity<ClientDTO> save(@RequestBody ClientDTO client)
             throws NoContentException, ConflictException {
         return ResponseEntity.ok(clientService.save(client));
@@ -45,36 +48,43 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
+    @ValidateRoles({"client"})
     public ResponseEntity<ClientDTO> update(@PathVariable("id") Long id, @RequestBody ClientDTO client)
             throws NoContentException {
         return ResponseEntity.ok(clientService.update(id, client));
     }
 
     @DeleteMapping("/{id}")
+    @ValidateRoles({"client"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         clientService.delete(id);
     }
 
     @GetMapping("/user/{id}")
+    @ValidateRoles({"client"})
     public ResponseEntity<ClientDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(clientService.getByUserId(id));
     }
 
+    @ValidateRoles({"client"})
     @GetMapping("/{id}/friend/accepted")
     public ResponseEntity<ClientListDTO> getAcceptedFriends(@PathVariable("id") Long id) {
         return ResponseEntity.ok(clientService.getAcceptedFriends(id));
     }
 
+    @ValidateRoles({"client"})
     @GetMapping("/{id}/friend/rejected")
     public ResponseEntity<ClientListDTO> getRejectedFriends(@PathVariable("id") Long id) {
         return ResponseEntity.ok(clientService.getRejectedFriends(id));
     }
 
+    @ValidateRoles({"client"})
     @GetMapping("/{id}/friend/pending")
     public ResponseEntity<ClientListDTO> getPendingFriends(@PathVariable("id") Long id) {
         return ResponseEntity.ok(clientService.getPendingFriends(id));
     }
 
+    @ValidateRoles({"client"})
     @PostMapping("/{id}/friend/pending/{requesterId}")
     public ResponseEntity<FriendDTO> friendRequest(
             @PathVariable("id") Long id,
@@ -82,12 +92,14 @@ public class ClientController {
         return ResponseEntity.ok(clientService.friendRequest(requesterId, id));
     }
 
+    @ValidateRoles({"client"})
     @DeleteMapping("/{id}/friend/pending/{requesterId}")
     public void deleteFriendRequest(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
             throws NoContentException {
         clientService.deleteFriendRequest(requesterId, id);
     }
 
+    @ValidateRoles({"client"})
     @PutMapping("/{id}/friend/pending/{requesterId}/accept")
     public ResponseEntity<FriendDTO> acceptFriendRequest(@PathVariable("id") Long id,
             @PathVariable("requesterId") Long requesterId)
@@ -95,6 +107,7 @@ public class ClientController {
         return ResponseEntity.ok(clientService.acceptFriendRequest(requesterId, id));
     }
 
+    @ValidateRoles({"client"})
     @PutMapping("/{id}/friend/pending/{requesterId}/reject")
     public ResponseEntity<FriendDTO> rejectFriendRequest(@PathVariable("id") Long id,
             @PathVariable("requesterId") Long requesterId)
@@ -102,11 +115,13 @@ public class ClientController {
         return ResponseEntity.ok(clientService.rejectFriendRequest(requesterId, id));
     }
 
+    @ValidateRoles({"client"})
     @GetMapping("/{id}/reservation")
     public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(clientService.getReservations(id));
     }
 
+    @ValidateRoles({"client"})
     @GetMapping("/{id}/reservation/{date}")
     public ResponseEntity<ReservationListDTO> getReservationsByDate(
             @PathVariable("id") Long id,
@@ -115,22 +130,25 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getReservationsByDate(id, date));
     }
 
+    @ValidateRoles({"client"})
     @GetMapping("/{id}/favorite-branchs")
     public ResponseEntity<BranchListDTO> getFavoriteBranchs(@PathVariable("id") Long id)
             throws NoContentException {
         return ResponseEntity.ok(clientService.getFavoriteBranchs(id));
     }
     
+    @ValidateRoles({"client"})
     @PostMapping("/{id}/favorite-branchs/{branchId}")
-    public ResponseEntity<BranchDTO> getFavoriteBranchs(
+    public ResponseEntity<BranchDTO> addFavoriteBranchs(
             @PathVariable("id") Long id,
             @PathVariable("branchId") Long branchId)
             throws NoContentException {
         return ResponseEntity.ok(clientService.addFavoriteBranch(id, branchId));
     }
 
+    @ValidateRoles({"client"})
     @DeleteMapping("/{id}/favorite-branchs/{branchId}")
-    public void deleteFavoriteBranchs(
+    public void deleteFavoriteBranch(
             @PathVariable("id") Long id,
             @PathVariable("branchId") Long branchId)
             throws NoContentException {

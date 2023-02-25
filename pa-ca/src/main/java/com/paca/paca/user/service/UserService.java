@@ -1,7 +1,5 @@
 package com.paca.paca.user.service;
 
-import com.paca.paca.auth.utils.EmailValidator;
-import com.paca.paca.auth.utils.PassValidator;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.statics.UserRole;
@@ -10,6 +8,7 @@ import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.utils.UserMapper;
+import com.paca.paca.auth.utils.AuthUtils;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,13 +79,13 @@ public class UserService {
 
         // Email Validation
         if (userRepository.existsByEmail(dto.getEmail())) {
-            EmailValidator.validate(dto.email);
+            AuthUtils.validateEmail(dto.email);
             if (dto.getEmail() != null) throw new BadRequestException("This email is already taken");
         }
 
         // Password validation
         if (dto.getPassword() != null) {
-            PassValidator.validate(dto.getPassword());
+            AuthUtils.validatePassword(dto.getPassword());
             dto.setPassword(passwordEncoder.encode(dto.getPassword())); // Encode password before entity mapping
         }
 

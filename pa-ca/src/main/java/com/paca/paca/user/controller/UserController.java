@@ -1,12 +1,13 @@
 package com.paca.paca.user.controller;
 
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.statics.UserStatics;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.UnprocessableException;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<UserListDTO> getAll() {
         return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
     }

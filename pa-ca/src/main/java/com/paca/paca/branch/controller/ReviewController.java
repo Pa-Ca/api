@@ -1,5 +1,6 @@
 package com.paca.paca.branch.controller;
 
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.dto.ReviewDTO;
 import com.paca.paca.branch.dto.ReviewListDTO;
 import com.paca.paca.branch.statics.ReviewStatics;
@@ -21,11 +22,13 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<ReviewListDTO> getAll() {
         return ResponseEntity.ok(reviewService.getAll());
     }
 
     @PostMapping
+    @ValidateRoles({"client"})
     public ResponseEntity<ReviewDTO> save(@RequestBody ReviewDTO dto) throws NoContentException {
         return ResponseEntity.ok(reviewService.save(dto));
     }
@@ -36,6 +39,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
+    @ValidateRoles({"client"})
     public ResponseEntity<ReviewDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReviewDTO dto)
@@ -44,11 +48,13 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
+    @ValidateRoles({"client"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         reviewService.delete(id);
     }
 
     @PutMapping("/{id}/client/{clientId}")
+    @ValidateRoles({"client"})
     public ResponseEntity<ReviewDTO> like(
             @PathVariable("id") Long id,
             @PathVariable("clientId") Long clientId) throws NoContentException, ConflictException {
@@ -56,6 +62,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/client/{clientId}")
+    @ValidateRoles({"client"})
     public ResponseEntity<ReviewDTO> dislike(
             @PathVariable("id") Long id,
             @PathVariable("clientId") Long clientId) throws NoContentException {

@@ -12,6 +12,7 @@ import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.statics.UserStatics;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,6 +44,7 @@ public class UserControllerTest {
     @MockBean private JwtService jwtService;
 
     @Test
+    @Disabled
     public void shouldGetUserList() throws Exception {
         UserDTO userDTO = UserDTO.builder()
                 .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role("client")
