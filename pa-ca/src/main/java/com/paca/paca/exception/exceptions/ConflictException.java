@@ -21,7 +21,7 @@ public class ConflictException extends RuntimeException {
         super(msg, cause);
     }
 
-    public Integer getcode() {
+    public Integer getCode() {
         return this.code;
     }
 }

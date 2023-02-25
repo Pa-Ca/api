@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paca.paca.auth.dto.LogoutDTO;
-import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
@@ -32,31 +31,28 @@ public class AuthenticationController {
 
     private final AuthenticationService service;
 
-    private final JwtService jwtService;
-
     @PostMapping(AuthenticationStatics.Endpoint.SIGNUP)
     public ResponseEntity<LoginResponseDTO> signup(
             @RequestBody SignupRequestDTO request)
             throws BadRequestException, NoContentException,UnprocessableException, ConflictException {
-        return service.signup(request);
+        return ResponseEntity.ok(service.signup(request));
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.LOGIN)
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request)
             throws ForbiddenException {
-        return service.login(request);
+        return ResponseEntity.ok(service.login(request));
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.REFRESH)
     public ResponseEntity<RefreshResponseDTO> refresh(@RequestBody RefreshRequestDTO request)
             throws ForbiddenException {
-        return service.refresh(request);
+        return ResponseEntity.ok(service.refresh(request));
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.LOGOUT)
     public void logout(@RequestBody LogoutDTO request) {
-        jwtService.addTokenToBlackList(request.getRefresh());
-        jwtService.addTokenToBlackList(request.getToken());
+        service.logout(request);
     }
 
 }
