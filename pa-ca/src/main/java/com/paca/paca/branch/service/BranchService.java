@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.RequiredArgsConstructor;
-
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
@@ -288,23 +286,4 @@ public class BranchService {
 
         return ReviewListDTO.builder().reviews(response).build();
     }
-
-    public ClientListDTO getFavoriteClients(Long id) throws NoContentException {
-        Optional<Branch> branch = branchRepository.findById(id);
-        if (branch.isEmpty()) {
-            throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
-                    20);
-        }
-
-        List<ClientDTO> response = new ArrayList<>();
-        favoriteBranchRepository.findAllByClientId(id).forEach(fav -> {
-            ClientDTO dto = clientMapper.toDTO(fav.getClient());
-            dto.setUserId(fav.getClient().getUser().getId());
-            response.add(dto);
-        });
-
-        return ClientListDTO.builder().clients(response).build();
-    }
-
 }

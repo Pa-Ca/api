@@ -109,10 +109,4 @@ public class BranchController {
             throws NoContentException {
         return ResponseEntity.ok(branchService.getReviews(id));
     }
-
-    @GetMapping("/{id}/favorite-clients")
-    public ResponseEntity<ClientListDTO> getFavoriteClients(@PathVariable("id") Long id)
-            throws NoContentException {
-        return ResponseEntity.ok(branchService.getFavoriteClients(id));
-    }
 }

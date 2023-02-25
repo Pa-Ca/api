@@ -143,7 +143,7 @@ public class ReservationService {
             throw new NoContentException("Branch related to reservation with id" + branchId + "does not exists");
         }
 
-        Optional<Business> owner = businessRepository.findBusinessByUserEmail(userEmail);
+        Optional<Business> owner = businessRepository.findByUserEmail(userEmail);
         if (owner.isEmpty()) {
             throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
         }
@@ -154,7 +154,7 @@ public class ReservationService {
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.canceled).build();
-        Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
+        Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
         reservationRepository.save(updatedReservation);
     }
 
@@ -186,7 +186,7 @@ public class ReservationService {
                 throw new NoContentException("Branch related to reservation with id" + branchId + "does not exists");
             }
 
-            Optional<Business> owner = businessRepository.findBusinessByUserEmail(userEmail);
+            Optional<Business> owner = businessRepository.findByUserEmail(userEmail);
             if (owner.isEmpty()) {
                 throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
             }
@@ -197,7 +197,7 @@ public class ReservationService {
             }
 
             ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.accepted).build();
-            Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
+            Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
             reservationRepository.save(updatedReservation);
         }
     }
@@ -225,7 +225,7 @@ public class ReservationService {
             throw new NoContentException("Branch related to reservation with id" + branchId + "does not exists");
         }
 
-        Optional<Business> owner = businessRepository.findBusinessByUserEmail(userEmail);
+        Optional<Business> owner = businessRepository.findByUserEmail(userEmail);
         if (owner.isEmpty()) {
             throw new NoContentException("Business related to user with email" + userEmail + "does not exists");
         }
@@ -236,7 +236,7 @@ public class ReservationService {
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.rejected).build();
-        Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), dto);
+        Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
         reservationRepository.save(updatedReservation);
     }
 
@@ -262,7 +262,7 @@ public class ReservationService {
             throw new BadRequestException("This reservation can't be paid because it is already paid");
         }
 
-        Optional<Client> owner = clientRepository.findClientByUserEmail(userEmail);
+        Optional<Client> owner = clientRepository.findByUserEmail(userEmail);
         if (owner.isEmpty()) {
             throw new NoContentException("Client related to user with email" + userEmail + "does not exists");
         }
@@ -275,7 +275,7 @@ public class ReservationService {
         }
 
         ReservationDTO changes = ReservationDTO.builder().status(ReservationStatics.Status.paid).build();
-        Reservation updatedReservation = reservationMapper.updateModel(reservation.get(), changes);
+        Reservation updatedReservation = reservationMapper.updateModel(changes, reservation.get());
         reservationRepository.save(updatedReservation);
 
         Invoice invoice = Invoice.builder()
