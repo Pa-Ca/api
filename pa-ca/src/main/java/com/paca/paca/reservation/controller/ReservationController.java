@@ -22,6 +22,7 @@ import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor.ValidateReservationOwner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,27 +53,31 @@ public class ReservationController {
 
     @ValidateRoles({"client"})
     @PostMapping("/cancel/{id}")
+    @ValidateReservationOwner( isClientOwner = true )
     public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         reservationService.accept(id, auth.getName());
     }
 
     @PostMapping("/accept/{id}")
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
+    @ValidateReservationOwner( isClientOwner = false )
     public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         reservationService.accept(id, auth.getName());
     }
 
     @PostMapping("/reject/{id}")
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
+    @ValidateReservationOwner( isClientOwner = false )
     public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         reservationService.accept(id, auth.getName());
     }
 
     @PostMapping("/pay/{id}")
-    @ValidateRoles({"client"})
+    @ValidateRoles({ "client" })
+    @ValidateReservationOwner( isClientOwner = true )
     public void pay(@PathVariable("id") Long id, @RequestBody ReservationPaymentDTO dto)
             throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -80,6 +85,8 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
+    @ValidateRoles({ "client" })
+    @ValidateReservationOwner( isClientOwner = true )
     public ResponseEntity<ReservationDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReservationDTO dto)

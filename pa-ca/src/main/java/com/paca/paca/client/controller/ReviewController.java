@@ -1,12 +1,14 @@
-package com.paca.paca.branch.controller;
+package com.paca.paca.client.controller;
 
-import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.dto.ReviewDTO;
 import com.paca.paca.branch.dto.ReviewListDTO;
-import com.paca.paca.branch.statics.ReviewStatics;
-import com.paca.paca.branch.service.ReviewService;
+import com.paca.paca.client.service.ReviewService;
+import com.paca.paca.client.statics.ReviewStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.client.utils.ValidateClientInterceptor.ValidateClient;
+import com.paca.paca.client.utils.ValidateReviewOwnerInterceptor.ValidateReviewOwner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +41,8 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
-    @ValidateRoles({"client"})
+    @ValidateReviewOwner
+    @ValidateRoles({ "client" })
     public ResponseEntity<ReviewDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReviewDTO dto)
@@ -47,22 +50,25 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.update(id, dto));
     }
 
+    @ValidateReviewOwner
     @DeleteMapping("/{id}")
     @ValidateRoles({"client"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         reviewService.delete(id);
     }
 
-    @PutMapping("/{id}/client/{clientId}")
     @ValidateRoles({"client"})
+    @ValidateClient(idField = "clientId")
+    @PutMapping("/{id}/client/{clientId}")
     public ResponseEntity<ReviewDTO> like(
             @PathVariable("id") Long id,
             @PathVariable("clientId") Long clientId) throws NoContentException, ConflictException {
         return ResponseEntity.ok(reviewService.like(id, clientId));
     }
 
+    @ValidateRoles({ "client" })
+    @ValidateClient(idField = "clientId")
     @DeleteMapping("/{id}/client/{clientId}")
-    @ValidateRoles({"client"})
     public ResponseEntity<ReviewDTO> dislike(
             @PathVariable("id") Long id,
             @PathVariable("clientId") Long clientId) throws NoContentException {

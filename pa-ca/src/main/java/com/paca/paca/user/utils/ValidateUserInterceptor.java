@@ -1,7 +1,6 @@
-package com.paca.paca.auth.utils;
+package com.paca.paca.user.utils;
 
-import java.util.List;
-import java.util.Arrays;
+import java.util.Map;
 import java.lang.reflect.Method;
 import java.lang.annotation.Target;
 import java.lang.annotation.Inherited;
@@ -14,35 +13,42 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.paca.paca.user.model.User;
+import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class ValidateRolesInterceptor implements HandlerInterceptor {
+public class ValidateUserInterceptor implements HandlerInterceptor {
 
     @Inherited
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
-    public @interface ValidateRoles {
-        String[] value();
+    public @interface ValidateUser {
     }
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
         Method method = ((HandlerMethod) handler).getMethod();
-        ValidateRoles annotation = AnnotationUtils.findAnnotation(method, ValidateRoles.class);
+        ValidateUser annotation = AnnotationUtils.findAnnotation(method, ValidateUser.class);
         if (annotation != null) {
-            List<String> allowedRoles = Arrays.asList(annotation.value());
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (!auth.getAuthorities().stream().anyMatch(a -> allowedRoles.contains(a.getAuthority()))
-                    && !auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            User user = userRepository.findByEmail(auth.getName()).get();
+            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
+            Long userId = Long.parseLong((String) pathVariables.get("id"));
+            if (!user.getId().equals(userId)) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

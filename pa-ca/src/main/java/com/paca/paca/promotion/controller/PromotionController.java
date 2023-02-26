@@ -17,6 +17,7 @@ import com.paca.paca.promotion.service.PromotionService;
 import com.paca.paca.promotion.statics.PromotionStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.promotion.utils.ValidatePromotionOwnerInterceptor.ValidatePromotionOwner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +47,8 @@ public class PromotionController {
     }
 
     @PutMapping("/{id}")
-    @ValidateRoles({"business"})
+    @ValidatePromotionOwner
+    @ValidateRoles({ "business" })
     public ResponseEntity<PromotionDTO> update(
             @PathVariable("id") Long id,
             @RequestBody PromotionDTO dto)
@@ -54,6 +56,7 @@ public class PromotionController {
         return promotionService.update(id, dto);
     }
 
+    @ValidatePromotionOwner
     @DeleteMapping("/{id}")
     @ValidateRoles({"business"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {

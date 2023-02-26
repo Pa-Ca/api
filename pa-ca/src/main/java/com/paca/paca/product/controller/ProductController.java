@@ -17,6 +17,7 @@ import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.product.utils.ValidateProductOwnerInterceptor.ValidateProductOwner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +47,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    @ValidateRoles({"business"})
+    @ValidateProductOwner
+    @ValidateRoles({ "business" })
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductDTO dto)
@@ -54,6 +56,7 @@ public class ProductController {
         return productService.update(id, dto);
     }
 
+    @ValidateProductOwner
     @DeleteMapping("/{id}")
     @ValidateRoles({"business"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {

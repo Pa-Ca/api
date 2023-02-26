@@ -15,4 +15,5 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
     List<Promotion> findAllByBranchId(Long id);
 
+    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
 }

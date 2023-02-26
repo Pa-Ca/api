@@ -15,4 +15,6 @@ public interface ProductSubCategoryRepository extends JpaRepository<ProductSubCa
     List<ProductSubCategory> findAllByBranchIdAndCategoryId(
             Long branchId,
             Long categoryId);
+
+    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
 }

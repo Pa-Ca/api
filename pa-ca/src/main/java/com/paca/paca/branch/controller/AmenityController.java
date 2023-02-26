@@ -7,6 +7,7 @@ import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.branch.statics.AmenityStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor.ValidateBranchOwner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,13 +38,15 @@ public class AmenityController {
         return ResponseEntity.ok(amenityService.getAllByBranchId(id));
     }
 
-    @ValidateRoles({"business"})
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
     @PostMapping(AmenityStatics.Endpoint.AMENITY_FROM_BRANCH_ID_PATH)
     public ResponseEntity<AmenityListDTO> saveBranchAmenities(
             @PathVariable("id") Long id, @RequestBody AmenityListDTO dto) throws NoContentException {
         return ResponseEntity.ok(amenityService.saveAllByBranchId(id, dto));
     }
 
+    @ValidateBranchOwner
     @ValidateRoles({"business"})
     @DeleteMapping(AmenityStatics.Endpoint.AMENITY_FROM_BRANCH_ID_PATH)
     public ResponseEntity<AmenityListDTO> deleteAllByBranchId(
