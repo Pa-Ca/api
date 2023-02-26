@@ -15,10 +15,11 @@ import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
+import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.product.utils.ValidateProductOwnerInterceptor.ValidateProductOwner;
 
 import lombok.RequiredArgsConstructor;
-
-import com.paca.paca.exception.exceptions.NoContentException;
 
 @CrossOrigin
 @RestController
@@ -29,11 +30,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<ProductListDTO> getAll() {
         return productService.getAll();
     }
 
     @PostMapping
+    @ValidateRoles({"business"})
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto) throws NoContentException {
         return productService.save(dto);
     }
@@ -44,6 +47,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @ValidateProductOwner
+    @ValidateRoles({ "business" })
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductDTO dto)
@@ -51,7 +56,9 @@ public class ProductController {
         return productService.update(id, dto);
     }
 
+    @ValidateProductOwner
     @DeleteMapping("/{id}")
+    @ValidateRoles({"business"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         productService.delete(id);
     }
