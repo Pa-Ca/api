@@ -1,7 +1,7 @@
 package com.paca.paca.client.controller;
 
-import com.paca.paca.branch.dto.ReviewDTO;
-import com.paca.paca.branch.dto.ReviewListDTO;
+import com.paca.paca.client.dto.ReviewDTO;
+import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.client.service.ReviewService;
 import com.paca.paca.client.statics.ReviewStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping(ReviewStatics.Endpoint.PATH)
 public class ReviewController {
-    
+
     private final ReviewService reviewService;
 
     @GetMapping
@@ -30,8 +30,9 @@ public class ReviewController {
     }
 
     @PostMapping
-    @ValidateRoles({"client"})
-    public ResponseEntity<ReviewDTO> save(@RequestBody ReviewDTO dto) throws NoContentException {
+    @ValidateRoles({ "client" })
+    public ResponseEntity<ReviewDTO> save(@RequestBody ReviewDTO dto)
+            throws NoContentException, ConflictException {
         return ResponseEntity.ok(reviewService.save(dto));
     }
 
@@ -52,12 +53,12 @@ public class ReviewController {
 
     @ValidateReviewOwner
     @DeleteMapping("/{id}")
-    @ValidateRoles({"client"})
+    @ValidateRoles({ "client" })
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         reviewService.delete(id);
     }
 
-    @ValidateRoles({"client"})
+    @ValidateRoles({ "client" })
     @ValidateClient(idField = "clientId")
     @PutMapping("/{id}/client/{clientId}")
     public ResponseEntity<ReviewDTO> like(
@@ -75,3 +76,4 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.dislike(id, clientId));
     }
 }
+

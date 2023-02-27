@@ -140,7 +140,7 @@ public class ClientService {
         return dto;
     }
 
-    public ClientListDTO getPendingFriends(Long id) {
+    public ClientListDTO getPendingFriends(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
@@ -158,7 +158,7 @@ public class ClientService {
         return ClientListDTO.builder().clients(response).build();
     }
 
-    public ClientListDTO getAcceptedFriends(Long id) {
+    public ClientListDTO getAcceptedFriends(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
@@ -181,7 +181,7 @@ public class ClientService {
         return ClientListDTO.builder().clients(response).build();
     }
 
-    public ClientListDTO getRejectedFriends(Long id) {
+    public ClientListDTO getRejectedFriends(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
@@ -336,7 +336,7 @@ public class ClientService {
         return ReservationListDTO.builder().reservations(response).build();
     }
 
-    public BranchListDTO getFavoriteBranchs(Long id) throws NoContentException {
+    public BranchListDTO getFavoriteBranches(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(

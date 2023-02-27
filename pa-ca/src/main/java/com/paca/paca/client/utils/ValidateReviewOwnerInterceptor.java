@@ -53,7 +53,7 @@ public class ValidateReviewOwnerInterceptor implements HandlerInterceptor {
             Client client = clientRepository.findByUserEmail(auth.getName()).get();
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
             Long reviewId = Long.parseLong((String) pathVariables.get(annotation.idField()));
-            if (reviewRepository.existsByIdAndClientId(reviewId, client.getId())) {
+            if (!reviewRepository.existsByIdAndClientId(reviewId, client.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

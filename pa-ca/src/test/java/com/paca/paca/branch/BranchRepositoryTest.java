@@ -118,16 +118,16 @@ public class BranchRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldGetAllBranchs() {
+    void shouldGetAllBranches() {
         int nUsers = 10;
 
         for (int i = 0; i < nUsers; i++) {
             utils.createBranch(null);
         }
 
-        List<Branch> branchs = branchRepository.findAll();
+        List<Branch> branches = branchRepository.findAll();
 
-        assertThat(branchs.size()).isEqualTo(nUsers);
+        assertThat(branches.size()).isEqualTo(nUsers);
     }
 
     @Test
@@ -165,8 +165,8 @@ public class BranchRepositoryTest extends PacaTest {
 
         branchRepository.delete(branch);
 
-        List<Branch> branchs = branchRepository.findAll();
-        assertThat(branchs.size()).isEqualTo(0);
+        List<Branch> branches = branchRepository.findAll();
+        assertThat(branches.size()).isEqualTo(0);
     }
 
     @Test
