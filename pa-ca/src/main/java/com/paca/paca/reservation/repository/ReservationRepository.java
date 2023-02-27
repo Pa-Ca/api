@@ -20,4 +20,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             Long id,
             Date reservationDate);
 
+    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
+
 }

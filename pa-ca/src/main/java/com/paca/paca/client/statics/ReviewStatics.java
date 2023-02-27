@@ -1,4 +1,4 @@
-package com.paca.paca.branch.statics;
+package com.paca.paca.client.statics;
 
 public interface ReviewStatics {
 

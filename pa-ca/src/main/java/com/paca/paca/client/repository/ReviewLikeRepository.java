@@ -1,11 +1,12 @@
-package com.paca.paca.branch.repository;
-
-import com.paca.paca.branch.model.ReviewLike;
+package com.paca.paca.client.repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
+
+import com.paca.paca.client.model.ReviewLike;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository

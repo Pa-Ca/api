@@ -15,9 +15,11 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 import com.paca.paca.product_sub_category.service.ProductSubCategoryService;
 import com.paca.paca.product_sub_category.statics.ProductSubCategoryStatics;
+import com.paca.paca.product_sub_category.utils.ValidateProductSubCategoryOwnerInterceptor.ValidateProductSubCategoryOwner;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,11 +32,13 @@ public class ProductSubCategoryController {
     private final ProductSubCategoryService productSubCategoryService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<ProductSubCategoryListDTO> getAll() {
         return productSubCategoryService.getAll();
     }
 
     @PostMapping
+    @ValidateRoles({"business"})
     public ResponseEntity<ProductSubCategoryDTO> save(
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
             throws NoContentException, BadRequestException {
@@ -48,6 +52,8 @@ public class ProductSubCategoryController {
     }
 
     @PutMapping("/{id}")
+    @ValidateRoles({ "business" })
+    @ValidateProductSubCategoryOwner
     public ResponseEntity<ProductSubCategoryDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
@@ -56,6 +62,8 @@ public class ProductSubCategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @ValidateRoles({ "business" })
+    @ValidateProductSubCategoryOwner
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         productSubCategoryService.delete(id);
     }

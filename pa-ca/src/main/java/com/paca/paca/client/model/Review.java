@@ -1,8 +1,8 @@
-package com.paca.paca.branch.model;
+package com.paca.paca.client.model;
 
 import java.util.Date;
 
-import com.paca.paca.client.model.Client;
+import com.paca.paca.branch.model.Branch;
 
 import jakarta.persistence.*;
 import lombok.*;

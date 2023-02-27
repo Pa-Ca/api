@@ -1,6 +1,4 @@
-package com.paca.paca.branch.model;
-
-import com.paca.paca.client.model.Client;
+package com.paca.paca.client.model;
 
 import jakarta.persistence.*;
 import lombok.*;

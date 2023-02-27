@@ -1,9 +1,8 @@
 package com.paca.paca.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import com.paca.paca.auth.utils.PassValidator;
+import com.paca.paca.auth.utils.AuthUtils;
 import org.springframework.stereotype.Service;
-import com.paca.paca.auth.utils.EmailValidator;
 
 import java.util.Optional;
 
@@ -14,9 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
-import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
@@ -57,14 +56,14 @@ public class AuthenticationService {
             throws BadRequestException, UnprocessableException, ConflictException {
         // Email Validation
         String email = request.getEmail();
-        EmailValidator.validate(email);
+        AuthUtils.validateEmail(email);
         if (userRepository.existsByEmail(email)) {
             throw new ConflictException("User already exists", 1);
         }
 
         // Password Validation
         String password = request.getPassword();
-        PassValidator.validate(password);
+        AuthUtils.validatePassword(password);
 
         // Role Validation
         validateRole(request.getRole());

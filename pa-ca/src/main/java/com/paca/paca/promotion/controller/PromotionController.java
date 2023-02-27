@@ -15,10 +15,11 @@ import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.promotion.service.PromotionService;
 import com.paca.paca.promotion.statics.PromotionStatics;
+import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.promotion.utils.ValidatePromotionOwnerInterceptor.ValidatePromotionOwner;
 
 import lombok.RequiredArgsConstructor;
-
-import com.paca.paca.exception.exceptions.NoContentException;
 
 @CrossOrigin
 @RestController
@@ -29,11 +30,13 @@ public class PromotionController {
     private final PromotionService promotionService;
 
     @GetMapping
+    @ValidateRoles({})
     public ResponseEntity<PromotionListDTO> getAll() {
         return promotionService.getAll();
     }
 
     @PostMapping
+    @ValidateRoles({"business"})
     public ResponseEntity<PromotionDTO> save(@RequestBody PromotionDTO dto) throws NoContentException {
         return promotionService.save(dto);
     }
@@ -44,6 +47,8 @@ public class PromotionController {
     }
 
     @PutMapping("/{id}")
+    @ValidatePromotionOwner
+    @ValidateRoles({ "business" })
     public ResponseEntity<PromotionDTO> update(
             @PathVariable("id") Long id,
             @RequestBody PromotionDTO dto)
@@ -51,7 +56,9 @@ public class PromotionController {
         return promotionService.update(id, dto);
     }
 
+    @ValidatePromotionOwner
     @DeleteMapping("/{id}")
+    @ValidateRoles({"business"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         promotionService.delete(id);
     }

@@ -9,6 +9,7 @@ import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
+import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.client.model.Client;
@@ -36,6 +37,14 @@ import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+
+import org.mockito.Mockito;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -80,6 +89,18 @@ public class TestUtils {
         return result;
     }
 
+    public void setAuthorities(String role) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role));
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                "user",
+                "password",
+                authorities);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
     public User createUser() {
         Role role = Role.builder()
                 .id((long) UserRole.client.ordinal())
@@ -102,6 +123,22 @@ public class TestUtils {
         }
 
         return user;
+    }
+
+    public UserDTO createUserDTO(User user) {
+        if (user == null) {
+            user = createUser();
+        }
+        UserDTO dto = UserDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .verified(user.getVerified())
+                .loggedIn(user.getLoggedIn())
+                .role(user.getRole().getName().name())
+                .build();
+
+        return dto;
     }
 
     public Client createClient(User user) {
