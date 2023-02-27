@@ -12,26 +12,34 @@ import com.paca.paca.statics.UserRole;
 import com.paca.paca.business.tier.Tier;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
+import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.client.model.FavoriteBranch;
+import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
+import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
@@ -63,9 +71,15 @@ public class TestUtils {
 
     BranchRepository branchRepository;
 
+    ReviewRepository reviewRepository;
+
     AmenityRepository amenityRepository;
 
     BusinessRepository businessRepository;
+
+    ReviewLikeRepository reviewLikeRepository;
+
+    ReservationRepository reservationRepository;
 
     BranchAmenityRepository branchAmenityRepository;
 
@@ -208,6 +222,7 @@ public class TestUtils {
             request = createFriendRequest(null, null, false, false);
         }
         FriendDTO dto = FriendDTO.builder()
+                .id(request.getId())
                 .requesterId(request.getRequester().getId())
                 .addresserId(request.getAddresser().getId())
                 .accepted(request.getAccepted())
@@ -384,5 +399,107 @@ public class TestUtils {
         }
 
         return subCategory;
+    }
+
+    public Review createReview(Client client, Branch branch) {
+        if (client == null) {
+            client = createClient(null);
+        }
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        Review review = Review.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .client(client)
+                .branch(branch)
+                .text("test text")
+                .date(new Date(System.currentTimeMillis()))
+                .build();
+
+        if (reviewRepository != null) {
+            review = reviewRepository.save(review);
+        }
+
+        return review;
+    }
+
+    public ReviewDTO createReviewDTO(Review review) {
+        if (review == null) {
+            review = createReview(null, null);
+        }
+        ReviewDTO dto = ReviewDTO.builder()
+                .id(review.getId())
+                .clientId(review.getClient().getId())
+                .branchId(review.getBranch().getId())
+                .text(review.getText())
+                .date(review.getDate())
+                .build();
+
+        return dto;
+    }
+
+    public ReviewLike createReviewLike(Client client, Review review) {
+        if (client == null) {
+            client = createClient(null);
+        }
+        if (review == null) {
+            review = createReview(null, null);
+        }
+
+        ReviewLike like = ReviewLike.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .client(client)
+                .review(review)
+                .build();
+
+        if (reviewLikeRepository != null) {
+            like = reviewLikeRepository.save(like);
+        }
+
+        return like;
+    }
+
+    public Reservation createReservation(Branch branch) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        Reservation reservation = Reservation.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .requestDate(new Date(System.currentTimeMillis()))
+                .reservationDate(new Date(System.currentTimeMillis()))
+                .clientNumber(5)
+                .payment("payment_test")
+                .status(0)
+                .payDate(new Date(System.currentTimeMillis()))
+                .price(5.0f)
+                .build();
+
+        if (reservationRepository != null) {
+            reservation = reservationRepository.save(reservation);
+        }
+
+        return reservation;
+    }
+
+    public ReservationDTO createReservationDTO(Reservation reservation) {
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+        ReservationDTO dto = ReservationDTO.builder()
+            .id(reservation.getId())
+            .branchId(reservation.getBranch().getId())
+            .requestDate(reservation.getRequestDate())
+            .reservationDate(reservation.getReservationDate())
+            .clientNumber(reservation.getClientNumber())
+            .payment(reservation.getPayment())
+            .status(reservation.getStatus())
+            .payDate(reservation.getPayDate())
+            .price(reservation.getPrice())
+                .build();
+            
+        return dto;
     }
 }

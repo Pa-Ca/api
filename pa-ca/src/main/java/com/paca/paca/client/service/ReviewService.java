@@ -3,14 +3,14 @@ package com.paca.paca.client.service;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Review;
+import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.client.model.ReviewLike;
-import com.paca.paca.branch.dto.ReviewDTO;
-import com.paca.paca.branch.dto.ReviewListDTO;
-import com.paca.paca.client.repository.ClientRepository;
-import com.paca.paca.client.repository.ReviewLikeRepository;
-import com.paca.paca.client.repository.ReviewRepository;
+import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.client.utils.ReviewMapper;
+import com.paca.paca.client.repository.ClientRepository;
+import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -18,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +69,7 @@ public class ReviewService {
         return dto;
     }
 
-    public ReviewDTO save(ReviewDTO dto) throws NoContentException {
+    public ReviewDTO save(ReviewDTO dto) throws NoContentException, ConflictException {
         Optional<Client> client = clientRepository.findById(dto.getClientId());
         if (client.isEmpty()) {
             throw new NoContentException(
@@ -81,6 +81,12 @@ public class ReviewService {
             throw new NoContentException(
                     "Branch with id " + dto.getBranchId() + " does not exists",
                     20);
+        }
+        Boolean exists = reviewRepository.findByClientIdAndBranchId(dto.getClientId(), dto.getBranchId()).isPresent();
+        if (exists) {
+            throw new ConflictException(
+                    "Review already exists",
+                    39);
         }
 
         Review newReview = reviewMapper.toEntity(dto, client.get(), branch.get());

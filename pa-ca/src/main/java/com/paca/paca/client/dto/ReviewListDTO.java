@@ -1,4 +1,4 @@
-package com.paca.paca.branch.dto;
+package com.paca.paca.client.dto;
 
 import lombok.Data;
 import lombok.Builder;

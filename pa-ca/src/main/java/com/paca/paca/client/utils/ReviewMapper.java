@@ -1,9 +1,10 @@
 package com.paca.paca.client.utils;
 
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Review;
-import com.paca.paca.branch.dto.ReviewDTO;
+
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")

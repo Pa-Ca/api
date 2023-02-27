@@ -24,13 +24,13 @@ class BusinessServiceTest {
         //underTest = new UserService(userRepository);
     }
 
-    @Test
-    @Disabled
-    void getAll() {
-        // when
-        underTest.getAll();
+    // @Test
+    // @Disabled
+    // void getAll() {
+    //     // when
+    //     underTest.getAll();
 
-        // then
-        verify(userRepository).findAll();
-    }
+    //     // then
+    //     verify(userRepository).findAll();
+    // }
 }
