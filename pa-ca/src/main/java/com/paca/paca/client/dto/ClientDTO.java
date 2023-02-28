@@ -5,10 +5,14 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ClientDTO {
 
     private Long id;
