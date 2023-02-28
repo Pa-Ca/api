@@ -6,10 +6,13 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.client.model.Review;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.client.utils.ClientMapperImpl;
 import com.paca.paca.client.utils.FriendMapperImpl;
+import com.paca.paca.client.utils.ReviewMapperImpl;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,6 +29,9 @@ public class ClientMapperTest {
 
     @InjectMocks
     private FriendMapperImpl friendMapper;
+
+    @InjectMocks
+    private ReviewMapperImpl reviewMapper;
 
     private TestUtils utils = TestUtils.builder().build();
 
@@ -164,46 +170,120 @@ public class ClientMapperTest {
 
     @Test 
     void shouldPartiallyMapFriendDTOtoFriendEntity() {
-        Friend friend = utils.createFriendRequest(null, null, false, false);
+            Friend friend = utils.createFriendRequest(null, null, false, false);
 
-        // Not changing ID
-        FriendDTO dto = FriendDTO.builder()
-                .id(friend.getId() + 1)
-                .build();
-        Friend updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getId()).isEqualTo(friend.getId());
+            // Not changing ID
+            FriendDTO dto = FriendDTO.builder()
+                            .id(friend.getId() + 1)
+                            .build();
+            Friend updateFriend = friendMapper.updateModel(dto, friend);
+            assertThat(updateFriend).isNotNull();
+            assertThat(updateFriend.getId()).isEqualTo(friend.getId());
 
-        // Not changing Requester ID
-        dto = FriendDTO.builder()
-                .requesterId(friend.getRequester().getId() + 1)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getRequester().getId()).isEqualTo(friend.getRequester().getId());
+            // Not changing Requester ID
+            dto = FriendDTO.builder()
+                            .requesterId(friend.getRequester().getId() + 1)
+                            .build();
+            updateFriend = friendMapper.updateModel(dto, friend);
+            assertThat(updateFriend).isNotNull();
+            assertThat(updateFriend.getRequester().getId()).isEqualTo(friend.getRequester().getId());
 
-        // Not changing Addreser ID
-        dto = FriendDTO.builder()
-                .addresserId(friend.getAddresser().getId() + 1)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getAddresser().getId()).isEqualTo(friend.getAddresser().getId());
+            // Not changing Addreser ID
+            dto = FriendDTO.builder()
+                            .addresserId(friend.getAddresser().getId() + 1)
+                            .build();
+            updateFriend = friendMapper.updateModel(dto, friend);
+            assertThat(updateFriend).isNotNull();
+            assertThat(updateFriend.getAddresser().getId()).isEqualTo(friend.getAddresser().getId());
 
-        // Changing accepted
-        dto = FriendDTO.builder()
-                .accepted(true)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getAccepted()).isEqualTo(dto.getAccepted());
+            // Changing accepted
+            dto = FriendDTO.builder()
+                            .accepted(true)
+                            .build();
+            updateFriend = friendMapper.updateModel(dto, friend);
+            assertThat(updateFriend).isNotNull();
+            assertThat(updateFriend.getAccepted()).isEqualTo(dto.getAccepted());
 
-        // Changing rejected
-        dto = FriendDTO.builder()
-                .rejected(true)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getRejected()).isEqualTo(dto.getRejected());
+            // Changing rejected
+            dto = FriendDTO.builder()
+                            .rejected(true)
+                            .build();
+            updateFriend = friendMapper.updateModel(dto, friend);
+            assertThat(updateFriend).isNotNull();
+            assertThat(updateFriend.getRejected()).isEqualTo(dto.getRejected());
+    }
+
+    @Test 
+    void shouldMapReviewEntityToReviewDTO() {
+        Review review = utils.createReview(null, null);
+
+        ReviewDTO response = reviewMapper.toDTO(review);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(review.getId());
+        assertThat(response.getClientId()).isEqualTo(review.getClient().getId());
+        assertThat(response.getBranchId()).isEqualTo(review.getBranch().getId());
+        assertThat(response.getText()).isEqualTo(review.getText());
+        assertThat(response.getDate()).isEqualTo(review.getDate());
+    }
+    
+    @Test 
+    void shouldMapReviewDTOtoReviewEntity() {
+        Review request = utils.createReview(null, null);
+        ReviewDTO dto = utils.createReviewDTO(request);
+
+        Review requestMapped = reviewMapper.toEntity(dto, request.getClient(), request.getBranch());
+
+        assertThat(requestMapped).isNotNull();
+        assertThat(requestMapped.getId()).isEqualTo(dto.getId());
+        assertThat(requestMapped.getClient().getId()).isEqualTo(request.getClient().getId());
+        assertThat(requestMapped.getBranch().getId()).isEqualTo(request.getBranch().getId());
+        assertThat(requestMapped.getText()).isEqualTo(dto.getText());
+        assertThat(requestMapped.getDate()).isEqualTo(dto.getDate());
+    }
+
+    @Test 
+    void shouldPartiallyMapReviewDTOtoReviewEntity() {
+            Review review = utils.createReview(null, null);
+
+            // Not changing ID
+            ReviewDTO dto = ReviewDTO.builder()
+                            .id(review.getId() + 1)
+                            .build();
+            Review updateReview = reviewMapper.updateModel(dto, review);
+            assertThat(updateReview).isNotNull();
+            assertThat(updateReview.getId()).isEqualTo(review.getId());
+
+            // Not changing Client ID
+            dto = ReviewDTO.builder()
+                            .clientId(review.getClient().getId() + 1)
+                            .build();
+            updateReview = reviewMapper.updateModel(dto, review);
+            assertThat(updateReview).isNotNull();
+            assertThat(updateReview.getClient().getId()).isEqualTo(review.getClient().getId());
+
+            // Not changing Branch ID
+            dto = ReviewDTO.builder()
+                            .branchId(review.getBranch().getId() + 1)
+                            .build();
+            updateReview = reviewMapper.updateModel(dto, review);
+            assertThat(updateReview).isNotNull();
+            assertThat(updateReview.getBranch().getId()).isEqualTo(review.getBranch().getId());
+
+            // Changing text
+            dto = ReviewDTO.builder()
+                            .text(review.getText() + "_test")
+                            .build();
+            updateReview = reviewMapper.updateModel(dto, review);
+            assertThat(updateReview).isNotNull();
+            assertThat(updateReview.getText()).isEqualTo(dto.getText());
+
+            // Changing date
+            dto = ReviewDTO.builder()
+                            .date(new Date(System.currentTimeMillis()))
+                            .build();
+            updateReview = reviewMapper.updateModel(dto, review);
+            assertThat(updateReview).isNotNull();
+            assertThat(updateReview.getDate()).isEqualTo(dto.getDate());
     }
 }

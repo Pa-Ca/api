@@ -11,14 +11,18 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
+import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
+import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -50,6 +54,9 @@ public class ClientRepositoryTest extends PacaTest {
     private ClientRepository clientRepository;
 
     @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
     private FriendRepository friendRepository;
 
     @Autowired
@@ -57,6 +64,9 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Autowired
     private BusinessRepository businessRepository;
+
+    @Autowired
+    private ReviewLikeRepository reviewLikeRepository;
 
     @Autowired
     private FavoriteBranchRepository favoriteBranchRepository;
@@ -69,9 +79,11 @@ public class ClientRepositoryTest extends PacaTest {
                 .roleRepository(roleRepository)
                 .userRepository(userRepository)
                 .clientRepository(clientRepository)
+                .reviewRepository(reviewRepository)
                 .friendRepository(friendRepository)
                 .branchRepository(branchRepository)
                 .businessRepository(businessRepository)
+                .reviewLikeRepository(reviewLikeRepository)
                 .favoriteBranchRepository(favoriteBranchRepository)
                 .build();
     }
@@ -84,6 +96,8 @@ public class ClientRepositoryTest extends PacaTest {
     @AfterEach
     void restoreTest() {
         favoriteBranchRepository.deleteAll();
+        reviewLikeRepository.deleteAll();
+        reviewRepository.deleteAll();
         branchRepository.deleteAll();
         clientRepository.deleteAll();
         businessRepository.deleteAll();
@@ -483,11 +497,11 @@ public class ClientRepositoryTest extends PacaTest {
         utils.createFavoriteBranch(null, null);
         utils.createFavoriteBranch(null, null);
 
-        List<FavoriteBranch> favoriteBranchs = favoriteBranchRepository.findAllByClientId(client.getId());
+        List<FavoriteBranch> favoriteBranches = favoriteBranchRepository.findAllByClientId(client.getId());
 
-        assertThat(favoriteBranchs.size()).isEqualTo(2);
-        assertThat(favoriteBranchs.contains(fav1)).isTrue();
-        assertThat(favoriteBranchs.contains(fav2)).isTrue();
+        assertThat(favoriteBranches.size()).isEqualTo(2);
+        assertThat(favoriteBranches.contains(fav1)).isTrue();
+        assertThat(favoriteBranches.contains(fav2)).isTrue();
     }
 
     @Test 
@@ -498,20 +512,226 @@ public class ClientRepositoryTest extends PacaTest {
         utils.createFavoriteBranch(null, null);
         utils.createFavoriteBranch(null, null);
 
-        List<FavoriteBranch> favoriteBranchs = favoriteBranchRepository.findAllByBranchId(branch.getId());
+        List<FavoriteBranch> favoriteBranches = favoriteBranchRepository.findAllByBranchId(branch.getId());
 
-        assertThat(favoriteBranchs.size()).isEqualTo(2);
-        assertThat(favoriteBranchs.contains(fav1)).isTrue();
-        assertThat(favoriteBranchs.contains(fav2)).isTrue();
+        assertThat(favoriteBranches.size()).isEqualTo(2);
+        assertThat(favoriteBranches.contains(fav1)).isTrue();
+        assertThat(favoriteBranches.contains(fav2)).isTrue();
     }
 
     @Test
     void shouldDeleteFavoriteBranch() {
         FavoriteBranch fav = utils.createFavoriteBranch(null, null);
-        
+
         favoriteBranchRepository.delete(fav);
 
         List<FavoriteBranch> favs = favoriteBranchRepository.findAll();
         assertThat(favs.size()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldCreateReview() {
+        Client client = utils.createClient(null);
+        Branch branch = utils.createBranch(null);
+        Review review = Review.builder()
+                .client(client)
+                .branch(branch)
+                .text("text")
+                .date(new Date(System.currentTimeMillis()))
+                .build();
+
+        Review savedReview = reviewRepository.save(review);
+
+        assertThat(savedReview).isNotNull();
+        assertThat(savedReview.getClient().getId()).isEqualTo(review.getClient().getId());
+        assertThat(savedReview.getBranch().getId()).isEqualTo(review.getBranch().getId());
+        assertThat(savedReview.getText()).isEqualTo(review.getText());
+        assertThat(savedReview.getDate()).isEqualTo(review.getDate());
+    }
+
+    @Test
+    void shouldCheckThatReviewExistsById() {
+        Review review = utils.createReview(null, null);
+
+        boolean expected = reviewRepository.existsById(review.getId());
+        Optional<Review> expectedReview = reviewRepository.findById(review.getId());
+
+        assertThat(expected).isTrue();
+        assertThat(expectedReview.isPresent()).isTrue();
+        assertThat(expectedReview.get().getId()).isEqualTo(review.getId());
+        assertThat(expectedReview.get().getClient().getId()).isEqualTo(review.getClient().getId());
+        assertThat(expectedReview.get().getBranch().getId()).isEqualTo(review.getBranch().getId());
+        assertThat(expectedReview.get().getText()).isEqualTo(review.getText());
+        assertThat(expectedReview.get().getDate()).isEqualTo(review.getDate());
+    }
+
+    @Test
+    void shouldCheckThatReviewDoesNotExistsById() {
+        boolean expected = reviewRepository.existsById(1L);
+        Optional<Review> expectedReview = reviewRepository.findById(1L);
+
+        assertThat(expected).isFalse();
+        assertThat(expectedReview.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldCheckThatReviewExistsByIdAndClientId() {
+        Client client = utils.createClient(null);
+        Review review = utils.createReview(client, null);
+
+        boolean expected = reviewRepository.existsByIdAndClientId(review.getId(), client.getId());
+
+        assertThat(expected).isTrue();
+    }
+
+    @Test
+    void shouldCheckThatReviewDoesNotExistsByIdAndClientId() {
+        Review review = utils.createReview(null, null);
+
+        boolean expected = reviewRepository.existsByIdAndClientId(review.getId(), 1L);
+
+        assertThat(expected).isFalse();
+    }
+
+    @Test
+    void shouldGetReviewByClientIdAndBranchId() {
+        Client client = utils.createClient(null);
+        Branch branch = utils.createBranch(null);
+        Review review = utils.createReview(client, branch);
+
+        Optional<Review> expectedReview = reviewRepository.findByClientIdAndBranchId(
+            client.getId(), 
+            branch.getId()
+        );
+
+        assertThat(expectedReview).isNotEmpty();
+        assertThat(expectedReview.get().getClient().getId()).isEqualTo(review.getClient().getId());
+        assertThat(expectedReview.get().getBranch().getId()).isEqualTo(review.getBranch().getId());
+        assertThat(expectedReview.get().getText()).isEqualTo(review.getText());
+        assertThat(expectedReview.get().getDate()).isEqualTo(review.getDate());
+    }
+
+    @Test
+    void shouldCheckThatReviewDoesNotExistsByClientIdAndBranchId() {
+        Client client = utils.createClient(null);
+        Branch branch = utils.createBranch(null);
+
+        Optional<Review> expectedReview = reviewRepository.findByClientIdAndBranchId(client.getId(), branch.getId());
+
+        assertThat(expectedReview).isEmpty();
+    }
+
+    @Test 
+    void shouldGetAllReviewByBranchId() {
+        Branch branch = utils.createBranch(null);
+        Review review1 = utils.createReview(null, branch);
+        Review review2 = utils.createReview(null, branch);
+        utils.createReview(null, null);
+        utils.createReview(null, null);
+
+        List<Review> reviews = reviewRepository.findAllByBranchId(branch.getId());
+
+        assertThat(reviews.size()).isEqualTo(2);
+        assertThat(reviews.contains(review1)).isTrue();
+        assertThat(reviews.contains(review2)).isTrue();
+    }
+
+    @Test
+    void shouldDeleteReview() {
+        Review review = utils.createReview(null, null);
+
+        reviewRepository.delete(review);
+
+        List<Review> reviews = reviewRepository.findAll();
+        assertThat(reviews.size()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldCreateReviewLike() {
+        Client client = utils.createClient(null);
+        Review review = utils.createReview(null, null);
+        ReviewLike like = ReviewLike.builder()
+                .client(client)
+                .review(review)
+                .build();
+
+        ReviewLike savedLike = reviewLikeRepository.save(like);
+
+        assertThat(savedLike).isNotNull();
+        assertThat(savedLike.getClient().getId()).isEqualTo(like.getClient().getId());
+        assertThat(savedLike.getReview().getId()).isEqualTo(like.getReview().getId());
+    }
+
+    @Test
+    void shouldCheckThatReviewLikeExistsById() {
+        ReviewLike like = utils.createReviewLike(null, null);
+
+        boolean expected = reviewLikeRepository.existsById(like.getId());
+        Optional<ReviewLike> expectedLike = reviewLikeRepository.findById(like.getId());
+
+        assertThat(expected).isTrue();
+        assertThat(expectedLike.isPresent()).isTrue();
+        assertThat(expectedLike.get().getId()).isEqualTo(like.getId());
+        assertThat(expectedLike.get().getClient().getId()).isEqualTo(like.getClient().getId());
+        assertThat(expectedLike.get().getReview().getId()).isEqualTo(like.getReview().getId());
+    }
+
+    @Test
+    void shouldCheckThatReviewLikeDoesNotExistsById() {
+        boolean expected = reviewLikeRepository.existsById(1L);
+        Optional<ReviewLike> expectedLike = reviewLikeRepository.findById(1L);
+
+        assertThat(expected).isFalse();
+        assertThat(expectedLike.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldCheckThatReviewLikeExistsByClientIdAndReviewId() {
+        Client client = utils.createClient(null);
+        Review review = utils.createReview(null, null);
+        ReviewLike like = utils.createReviewLike(client, review);
+
+        boolean expected = reviewLikeRepository.existsByClientIdAndReviewId(client.getId(), review.getId());
+        Optional<ReviewLike> expectedLike = reviewLikeRepository.findByClientIdAndReviewId(client.getId(), review.getId());
+
+        assertThat(expected).isTrue();
+        assertThat(expectedLike.isPresent()).isTrue();
+        assertThat(expectedLike.get().getId()).isEqualTo(like.getId());
+        assertThat(expectedLike.get().getClient().getId()).isEqualTo(like.getClient().getId());
+        assertThat(expectedLike.get().getReview().getId()).isEqualTo(like.getReview().getId());
+    }
+
+    @Test
+    void shouldCheckThatReviewLikeDoesNotExistsByClientIdAndReviewId() {
+        boolean expected = reviewLikeRepository.existsByClientIdAndReviewId(1L, 1L);
+        Optional<ReviewLike> expectedLike = reviewLikeRepository.findByClientIdAndReviewId(1L, 1L);
+
+        assertThat(expected).isFalse();
+        assertThat(expectedLike.isEmpty()).isTrue();
+    }
+
+    @Test 
+    void shouldGetAllReviewLikeByReviewId() {
+        Review review = utils.createReview(null, null);
+        ReviewLike like1 = utils.createReviewLike(null, review);
+        ReviewLike like2 = utils.createReviewLike(null, review);
+        utils.createReviewLike(null, null);
+        utils.createReviewLike(null, null);
+
+        List<ReviewLike> likes = reviewLikeRepository.findAllByReviewId(review.getId());
+
+        assertThat(likes.size()).isEqualTo(2);
+        assertThat(likes.contains(like1)).isTrue();
+        assertThat(likes.contains(like2)).isTrue();
+    }
+
+    @Test
+    void shouldDeleteReviewLike() {
+        ReviewLike like = utils.createReviewLike(null, null);
+
+        reviewLikeRepository.delete(like);
+
+        List<ReviewLike> likes = reviewLikeRepository.findAll();
+        assertThat(likes.size()).isEqualTo(0);
     }
 }
