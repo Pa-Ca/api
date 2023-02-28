@@ -11,24 +11,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.client.dto.ClientListDTO;
+import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.branch.utils.AmenityMapper;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.product.dto.ProductListDTO;
+import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -37,6 +42,7 @@ import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
@@ -59,6 +65,9 @@ public class BranchServiceTest {
     private BranchRepository branchRepository;
 
     @Mock
+    private ReviewRepository reviewRepository;
+
+    @Mock
     private AmenityRepository amenityRepository;
 
     @Mock
@@ -75,6 +84,9 @@ public class BranchServiceTest {
 
     @Mock
     private BranchAmenityRepository branchAmenityRepository;
+
+    @Mock
+    private FavoriteBranchRepository favoriteBranchRepository;
 
     @Mock
     private ProductCategoryRepository productCategoryRepository;
@@ -424,6 +436,64 @@ public class BranchServiceTest {
         ReservationListDTO dtoResponse = branchService.getReservationsByDate(
             branch.getId(),
             new Date(System.currentTimeMillis()));
+
+        assertThat(dtoResponse).isNotNull();
+    }
+
+    @Test 
+    void shouldGetNoContentDueToMissingBranchInGetFavoriteClients() {
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            branchService.getFavoriteClients(1L);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+        }
+    }
+
+    @Test
+    void shouldGetFavoriteClients() {
+        Branch branch = utils.createBranch(null);
+        List<FavoriteBranch> favs = TestUtils.castList(
+                FavoriteBranch.class,
+                Mockito.mock(List.class));
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        when(favoriteBranchRepository.findAllByClientId(any(Long.class))).thenReturn(favs);
+
+        ClientListDTO dtoResponse = branchService.getFavoriteClients(branch.getId());
+
+        assertThat(dtoResponse).isNotNull();
+    }
+
+    @Test 
+    void shouldGetNoContentDueToMissingBranchInGetReviews() {
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            branchService.getReviews(1L);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+        }
+    }
+
+    @Test
+    void shouldGetReviews() {
+        Branch branch = utils.createBranch(null);
+        List<Review> reviews = TestUtils.castList(
+                Review.class,
+                Mockito.mock(List.class));
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        when(reviewRepository.findAllByBranchId(any(Long.class))).thenReturn(reviews);
+
+        ReviewListDTO dtoResponse = branchService.getReviews(branch.getId());
 
         assertThat(dtoResponse).isNotNull();
     }

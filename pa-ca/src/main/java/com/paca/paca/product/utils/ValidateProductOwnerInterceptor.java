@@ -49,10 +49,14 @@ public class ValidateProductOwnerInterceptor implements HandlerInterceptor {
         ValidateProductOwner annotation = AnnotationUtils.findAnnotation(method, ValidateProductOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+                return true;
+            }
+            
             Business business = businessRepository.findByUserEmail(auth.getName()).get();
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
             Long productId = Long.parseLong((String) pathVariables.get("id"));
-            if (productRepository.existsByIdAndSubCategory_Branch_Business_Id(productId, business.getId())) {
+            if (!productRepository.existsByIdAndSubCategory_Branch_Business_Id(productId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

@@ -45,6 +45,10 @@ public class ValidateUserInterceptor implements HandlerInterceptor {
         ValidateUser annotation = AnnotationUtils.findAnnotation(method, ValidateUser.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+                return true;
+            }
+            
             User user = userRepository.findByEmail(auth.getName()).get();
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
             Long userId = Long.parseLong((String) pathVariables.get("id"));
