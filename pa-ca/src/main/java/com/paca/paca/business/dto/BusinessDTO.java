@@ -5,6 +5,8 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BusinessDTO {
     private Long id;
     private Long userId;
