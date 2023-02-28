@@ -50,6 +50,10 @@ public class ValidateReviewOwnerInterceptor implements HandlerInterceptor {
         ValidateReviewOwner annotation = AnnotationUtils.findAnnotation(method, ValidateReviewOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+                return true;
+            }
+            
             Client client = clientRepository.findByUserEmail(auth.getName()).get();
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
             Long reviewId = Long.parseLong((String) pathVariables.get(annotation.idField()));

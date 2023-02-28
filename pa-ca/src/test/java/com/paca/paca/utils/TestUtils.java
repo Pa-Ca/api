@@ -21,8 +21,12 @@ import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
+import com.paca.paca.product.model.Product;
+import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.promotion.model.Promotion;
+import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.reservation.model.Reservation;
@@ -34,13 +38,16 @@ import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
+import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
@@ -75,7 +82,11 @@ public class TestUtils {
 
     AmenityRepository amenityRepository;
 
+    ProductRepository productRepository;
+    
     BusinessRepository businessRepository;
+
+    PromotionRepository promotionRepository;
 
     ReviewLikeRepository reviewLikeRepository;
 
@@ -366,6 +377,40 @@ public class TestUtils {
         return branchAmenity;
     }
 
+    public Product createProduct(ProductSubCategory subCategory) {
+        if (subCategory == null) {
+            subCategory = createProductSubCategory(null, null);
+        }
+        Product product = Product.builder()
+                .subCategory(subCategory)
+                .disabled(false)
+                .name("test name")
+                .price(10.0f)
+                .description("test description")
+                .build();
+
+        if (productRepository != null) {
+            product = productRepository.save(product);
+        }
+
+        return product;
+    }
+    
+    public ProductDTO createProductDTO(Product product) {
+        if (product == null) {
+            product = createProduct(null);
+        }
+        ProductDTO dto = ProductDTO.builder() 
+                .subCategoryId(product.getSubCategory().getId())
+                .disabled(product.getDisabled())
+                .name(product.getName())
+                .price(product.getPrice())
+                .description(product.getDescription())
+                .build();
+
+        return dto;
+    }
+
     public ProductCategory createProductCategory() {
         ProductCategory category = ProductCategory.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
@@ -399,6 +444,20 @@ public class TestUtils {
         }
 
         return subCategory;
+    }
+
+    public ProductSubCategoryDTO createProductSubCategoryDTO(ProductSubCategory subCategory) {
+        if (subCategory == null) {
+            subCategory = createProductSubCategory(null, null);
+        }
+        ProductSubCategoryDTO dto = ProductSubCategoryDTO.builder() 
+                .id(subCategory.getId())
+                .branchId(subCategory.getBranch().getId())
+                .categoryId(subCategory.getCategory().getId())
+                .name(subCategory.getName())
+                .build();
+
+        return dto;
     }
 
     public Review createReview(Client client, Branch branch) {
@@ -489,17 +548,48 @@ public class TestUtils {
             reservation = createReservation(null);
         }
         ReservationDTO dto = ReservationDTO.builder()
-            .id(reservation.getId())
-            .branchId(reservation.getBranch().getId())
-            .requestDate(reservation.getRequestDate())
-            .reservationDate(reservation.getReservationDate())
-            .clientNumber(reservation.getClientNumber())
-            .payment(reservation.getPayment())
-            .status(reservation.getStatus())
-            .payDate(reservation.getPayDate())
-            .price(reservation.getPrice())
+                .id(reservation.getId())
+                .branchId(reservation.getBranch().getId())
+                .requestDate(reservation.getRequestDate())
+                .reservationDate(reservation.getReservationDate())
+                .clientNumber(reservation.getClientNumber())
+                .payment(reservation.getPayment())
+                .status(reservation.getStatus())
+                .payDate(reservation.getPayDate())
+                .price(reservation.getPrice())
                 .build();
-            
+
+        return dto;
+    }
+
+    public Promotion createPromotion(Branch branch) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        Promotion promotion = Promotion.builder() 
+                .branch(branch) 
+                .disabled(false)
+                .text("text test")
+                .build();
+
+        if (promotionRepository != null) {
+            promotion = promotionRepository.save(promotion);
+        }
+
+        return promotion;
+    }
+
+    public PromotionDTO createPromotionDTO(Promotion promotion) {
+        if (promotion == null) {
+            promotion = createPromotion(null);
+        }
+
+        PromotionDTO dto = PromotionDTO.builder() 
+                .branchId(promotion.getBranch().getId()) 
+                .disabled(promotion.getDisabled())
+                .text(promotion.getText())
+                .build();
         return dto;
     }
 }

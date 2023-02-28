@@ -255,7 +255,7 @@ public class BranchService {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id: " + id + " does not exists",
+                    "Branch with id " + id + " does not exists",
                     20);
         }
 
