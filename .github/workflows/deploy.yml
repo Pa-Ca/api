@@ -20,6 +20,6 @@ jobs:
       uses: idoberko2/dokku-deploy-github-action@v1
       with: 
         ssh-private-key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-        dokku-host: 'paca.app'
+        dokku-host: '45.77.94.83'
         app-name: 'paca-api'
         git-push-flags: --force
