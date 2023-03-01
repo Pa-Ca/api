@@ -10,6 +10,7 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.business.tier.Tier;
+import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
@@ -25,9 +26,14 @@ import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.promotion.model.Promotion;
+import com.paca.paca.auth.dto.LoginResponseDTO;
+import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
+import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.ReservationDTO;
@@ -122,6 +128,49 @@ public class TestUtils {
         SecurityContextHolder.setContext(securityContext);
     }
 
+    public SignupRequestDTO createSignupRequestDTO() {
+        return SignupRequestDTO.builder() 
+                .email("test@test.com")
+                .password("123456789aA#$")
+                .role(UserRole.client.name())
+                .build();
+    }
+
+    public LoginRequestDTO createLoginRequestDTO() {
+        return LoginRequestDTO.builder() 
+                .email("test@test.com")
+                .password("123456789aA#$")
+                .build();
+    }
+
+    public RefreshRequestDTO createRefreshRequestDTO() {
+        return RefreshRequestDTO.builder() 
+                .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
+                .build();
+    }
+    
+    public LoginResponseDTO createLoginResponseDTO() {
+        return LoginResponseDTO.builder()
+                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
+                .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
+                .id(1L)
+                .role(UserRole.client.name())
+                .build();
+    }
+
+    public RefreshResponseDTO createRefreshResponseDTO() {
+        return RefreshResponseDTO.builder()
+                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
+                .build();
+    }
+
+    public LogoutDTO createLogoutDTO() {
+        return LogoutDTO.builder()
+                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
+                .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
+                .build();
+    }
+
     public User createUser() {
         Role role = Role.builder()
                 .id((long) UserRole.client.ordinal())
@@ -145,7 +194,7 @@ public class TestUtils {
 
         return user;
     }
-
+    
     public UserDTO createUserDTO(User user) {
         if (user == null) {
             user = createUser();

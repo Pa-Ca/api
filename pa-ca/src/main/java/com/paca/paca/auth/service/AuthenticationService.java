@@ -156,7 +156,7 @@ public class AuthenticationService {
         return response;
     }
 
-    public void logout(LogoutDTO request) {
+    public void logout(LogoutDTO request) throws BadRequestException {
         String refresh = request.getRefresh();
         String token = request.getToken();
 
