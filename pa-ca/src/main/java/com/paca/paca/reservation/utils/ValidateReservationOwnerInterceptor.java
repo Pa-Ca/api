@@ -59,6 +59,10 @@ public class ValidateReservationOwnerInterceptor implements HandlerInterceptor {
         ValidateReservationOwner annotation = AnnotationUtils.findAnnotation(method, ValidateReservationOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+                return true;
+            }
+            
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
             Long reservationId = Long.parseLong((String) pathVariables.get("id"));
 

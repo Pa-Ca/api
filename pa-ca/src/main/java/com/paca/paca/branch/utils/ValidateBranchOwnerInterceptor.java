@@ -49,10 +49,14 @@ public class ValidateBranchOwnerInterceptor implements HandlerInterceptor {
         ValidateBranchOwner annotation = AnnotationUtils.findAnnotation(method, ValidateBranchOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+                return true;
+            }
+            
             Business business = businessRepository.findByUserEmail(auth.getName()).get();
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
             Long branchId = Long.parseLong((String) pathVariables.get("id"));
-            if (branchRepository.existsByIdAndBusinessId(branchId, business.getId())) {
+            if (!branchRepository.existsByIdAndBusinessId(branchId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

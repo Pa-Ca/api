@@ -4,9 +4,11 @@ import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
+import com.paca.paca.branch.dto.AmenityListDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
+import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -37,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class BranchController {
 
     private final BranchService branchService;
+
+    private final AmenityService amenityService;
 
     @GetMapping
     @ValidateRoles({})
@@ -92,12 +96,16 @@ public class BranchController {
         return ResponseEntity.ok(branchService.getPromotions(id));
     }
 
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
     @GetMapping("/{id}/reservation")
     public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id)
             throws NoContentException {
         return ResponseEntity.ok(branchService.getReservations(id));
     }
 
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
     @GetMapping("/{id}/reservation/{date}")
     public ResponseEntity<ReservationListDTO> getReservationsByDate(
             @PathVariable("id") Long id,
@@ -114,9 +122,31 @@ public class BranchController {
         return ResponseEntity.ok(branchService.getFavoriteClients(id));
     }
 
-    @GetMapping("/{id}/reviews")
+    @GetMapping("/{id}/review")
     public ResponseEntity<ReviewListDTO> getReviews(@PathVariable("id") Long id)
             throws NoContentException {
         return ResponseEntity.ok(branchService.getReviews(id));
+    }
+
+    @GetMapping("/{id}/amenity")
+    public ResponseEntity<AmenityListDTO> getAllByBranchId(@PathVariable("id") Long id) throws NoContentException {
+        return ResponseEntity.ok(amenityService.getAllByBranchId(id));
+    }
+
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
+    @PostMapping("/{id}/amenity")
+    public ResponseEntity<AmenityListDTO> saveBranchAmenities(
+            @PathVariable("id") Long id, @RequestBody AmenityListDTO dto) throws NoContentException {
+        return ResponseEntity.ok(amenityService.saveAllByBranchId(id, dto));
+    }
+
+    @ValidateBranchOwner
+    @ValidateRoles({"business"})
+    @DeleteMapping("/{id}/amenity")
+    public ResponseEntity<AmenityListDTO> deleteAllByBranchId(
+            @PathVariable("id") Long id,
+            @RequestBody AmenityListDTO dto) throws NoContentException {
+        return ResponseEntity.ok(amenityService.deleteAllByBranchId(id, dto));
     }
 }
