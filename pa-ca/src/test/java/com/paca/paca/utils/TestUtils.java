@@ -616,7 +616,8 @@ public class TestUtils {
             branch = createBranch(null);
         }
 
-        Promotion promotion = Promotion.builder() 
+        Promotion promotion = Promotion.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch) 
                 .disabled(false)
                 .text("text test")
@@ -634,7 +635,8 @@ public class TestUtils {
             promotion = createPromotion(null);
         }
 
-        PromotionDTO dto = PromotionDTO.builder() 
+        PromotionDTO dto = PromotionDTO.builder()
+                .id(promotion.getId())
                 .branchId(promotion.getBranch().getId()) 
                 .disabled(promotion.getDisabled())
                 .text(promotion.getText())

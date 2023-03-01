@@ -32,18 +32,18 @@ public class PromotionController {
     @GetMapping
     @ValidateRoles({})
     public ResponseEntity<PromotionListDTO> getAll() {
-        return promotionService.getAll();
+        return ResponseEntity.ok(promotionService.getAll());
     }
 
     @PostMapping
     @ValidateRoles({"business"})
     public ResponseEntity<PromotionDTO> save(@RequestBody PromotionDTO dto) throws NoContentException {
-        return promotionService.save(dto);
+        return ResponseEntity.ok(promotionService.save(dto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PromotionDTO> getById(@PathVariable("id") Long id) throws NoContentException {
-        return promotionService.getById(id);
+        return ResponseEntity.ok(promotionService.getById(id));
     }
 
     @PutMapping("/{id}")
@@ -53,7 +53,7 @@ public class PromotionController {
             @PathVariable("id") Long id,
             @RequestBody PromotionDTO dto)
             throws NoContentException {
-        return promotionService.update(id, dto);
+        return ResponseEntity.ok(promotionService.update(id, dto));
     }
 
     @ValidatePromotionOwner
