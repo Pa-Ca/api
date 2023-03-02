@@ -53,6 +53,7 @@ import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
+import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
@@ -471,6 +472,19 @@ public class TestUtils {
         }
 
         return category;
+    }
+
+    public ProductCategoryDTO createProductCategoryDTO(ProductCategory category) {
+        if (category == null) {
+            category = createProductCategory();
+        }
+        ProductCategoryDTO dto = ProductCategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+
+        return dto;
+
     }
 
     public ProductSubCategory createProductSubCategory(Branch branch, ProductCategory category) {
