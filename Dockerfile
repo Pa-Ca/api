@@ -9,5 +9,8 @@ FROM openjdk:17-jdk-alpine
 
 WORKDIR /app
 
-COPY --from=build /app/target/app*.jar /app/app.jar
+COPY --from=build /app/target/*.jar /app/app.jar
+
+RUN ls -l && realpath .
+
 ENTRYPOINT ["java", "-jar", "./app.jar"]
