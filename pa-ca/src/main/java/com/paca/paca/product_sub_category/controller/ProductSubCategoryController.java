@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.product_sub_category.dto.ProductCategoryListDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
@@ -34,7 +35,12 @@ public class ProductSubCategoryController {
     @GetMapping
     @ValidateRoles({})
     public ResponseEntity<ProductSubCategoryListDTO> getAll() {
-        return productSubCategoryService.getAll();
+        return ResponseEntity.ok(productSubCategoryService.getAll());
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<ProductCategoryListDTO> getAllProductCategories() {
+        return ResponseEntity.ok(productSubCategoryService.getAllProductCategories());
     }
 
     @PostMapping
@@ -42,13 +48,13 @@ public class ProductSubCategoryController {
     public ResponseEntity<ProductSubCategoryDTO> save(
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
             throws NoContentException, BadRequestException {
-        return productSubCategoryService.save(productSubCategoryDTO);
+        return ResponseEntity.ok(productSubCategoryService.save(productSubCategoryDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductSubCategoryDTO> getById(
             @PathVariable("id") Long id) throws NoContentException {
-        return productSubCategoryService.getById(id);
+        return ResponseEntity.ok(productSubCategoryService.getById(id));
     }
 
     @PutMapping("/{id}")
@@ -58,7 +64,7 @@ public class ProductSubCategoryController {
             @PathVariable("id") Long id,
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
             throws NoContentException, BadRequestException {
-        return productSubCategoryService.update(id, productSubCategoryDTO);
+        return ResponseEntity.ok(productSubCategoryService.update(id, productSubCategoryDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -70,6 +76,6 @@ public class ProductSubCategoryController {
 
     @GetMapping("/{id}/product")
     public ResponseEntity<ProductListDTO> getAllProducts(@PathVariable("id") Long id) throws NoContentException {
-        return productSubCategoryService.getAllProducts(id);
+        return ResponseEntity.ok(productSubCategoryService.getAllProducts(id));
     }
 }
