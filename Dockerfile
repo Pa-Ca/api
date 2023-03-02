@@ -1,10 +1,10 @@
-FROM openjdk:17-alpine
+# Build stage
+FROM maven:3.8.5-openjdk-17-slim AS build
+COPY pa-ca/pom.xml /app/
+COPY pa-ca/src /app/src
+RUN mvn -f /app/pom.xml clean package
 
-# Set the working directory
-WORKDIR /app
-
-RUN cd pa-ca && ./mvnw package && cd ..
-ARG JAR_FILE=pa-ca/target/*.jar
-COPY ${JAR_FILE} app.jar
-
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+# Run stage
+FROM openjdk:17-jdk-alpine
+COPY --from=build /app/target/app*.jar /app/app.jar
+ENTRYPOINT ENTRYPOINT ["java", "-jar", "./app.jar"]
