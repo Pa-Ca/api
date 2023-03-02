@@ -11,4 +11,4 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar /app/app.jar
 
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+ENTRYPOINT ["/bin/bash", "-c", "java -jar ./app.jar > ./output.log"]
