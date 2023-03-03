@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 import com.paca.paca.user.utils.ValidateUserInterceptor;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor;
+import com.paca.paca.business.utils.ValidateBusinessInterceptor;
 import com.paca.paca.client.utils.ValidateClientInterceptor;
 import com.paca.paca.client.utils.ValidateReviewOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor;
@@ -26,6 +27,9 @@ public class SpringMVCConfig implements WebMvcConfigurer {
 
     @Autowired
     ValidateClientInterceptor validateClientInterceptor;
+
+    @Autowired
+    ValidateBusinessInterceptor validateBusinessInterceptor;
 
     @Autowired
     ValidateBranchOwnerInterceptor validateBranchOwnerInterceptor;
@@ -49,6 +53,7 @@ public class SpringMVCConfig implements WebMvcConfigurer {
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(validateUserInterceptor);
         registry.addInterceptor(validateRolesInterceptor);
+        registry.addInterceptor(validateBusinessInterceptor);
         registry.addInterceptor(validateClientInterceptor);
         registry.addInterceptor(validateBranchOwnerInterceptor);
         registry.addInterceptor(validateReviewOwnerInterceptor);
