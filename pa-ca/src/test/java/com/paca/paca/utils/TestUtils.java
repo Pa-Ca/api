@@ -432,6 +432,7 @@ public class TestUtils {
             subCategory = createProductSubCategory(null, null);
         }
         Product product = Product.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .subCategory(subCategory)
                 .disabled(false)
                 .name("test name")
