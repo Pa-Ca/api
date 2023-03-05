@@ -451,7 +451,8 @@ public class TestUtils {
         if (product == null) {
             product = createProduct(null);
         }
-        ProductDTO dto = ProductDTO.builder() 
+        ProductDTO dto = ProductDTO.builder()
+                .id(product.getId())
                 .subCategoryId(product.getSubCategory().getId())
                 .disabled(product.getDisabled())
                 .name(product.getName())
