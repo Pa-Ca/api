@@ -1,0 +1,25 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - develop
+    
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - id: deploy
+      name: Deploy to dokku
+      uses: idoberko2/dokku-deploy-github-action@v1
+      with: 
+        ssh-private-key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+        dokku-host: '45.77.94.83'
+        app-name: 'paca-api'
+        git-push-flags: --force

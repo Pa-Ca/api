@@ -51,7 +51,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.LOGOUT)
-    public void logout(@RequestBody LogoutDTO request) {
+    public void logout(@RequestBody LogoutDTO request) throws BadRequestException {
         service.logout(request);
     }
 
