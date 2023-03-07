@@ -31,7 +31,7 @@ jobs:
         id: maven-build
         run: |
           ./mvnw clean package -Dmaven.test.skip -q &&
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}} -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}} -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest ./pa-ca
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
 
