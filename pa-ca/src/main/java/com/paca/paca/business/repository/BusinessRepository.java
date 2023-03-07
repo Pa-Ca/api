@@ -10,6 +10,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
 public interface BusinessRepository extends JpaRepository<Business, Long> {
+    Optional<Business> findByUserId(Long userId);
+
+    Boolean existsByUserId(Long userId);
 
     Optional<Business> findByUserEmail(String email);
+
+    Boolean existsByUserEmail(String email);
 }
