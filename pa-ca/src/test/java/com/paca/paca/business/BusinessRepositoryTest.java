@@ -1,5 +1,8 @@
 package com.paca.paca.business;
 
+import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.user.repository.RoleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -10,9 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.paca.paca.PacaTest;
 import com.paca.paca.user.model.User;
-import com.paca.paca.business.tier.Tier;
+import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.business.model.Business;
 import com.paca.paca.user.repository.UserRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -35,16 +37,20 @@ class BusinessRepositoryTest extends PacaTest {
 
     @Autowired
     private BusinessRepository businessRepository;
-
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private TierRepository tierRepository;
     private TestUtils utils;
 
     @BeforeAll
     void initUtils() {
         utils = TestUtils.builder()
+                .roleRepository(roleRepository)
                 .userRepository(userRepository)
+                .tierRepository(tierRepository)
                 .businessRepository(businessRepository)
                 .build();
     }
@@ -58,6 +64,8 @@ class BusinessRepositoryTest extends PacaTest {
     void restoreTest() {
         businessRepository.deleteAll();
         userRepository.deleteAll();
+        roleRepository.deleteAll();
+        tierRepository.deleteAll();
     }
 
     @Test
@@ -120,35 +128,6 @@ class BusinessRepositoryTest extends PacaTest {
         assertThat(expected).isFalse();
         assertThat(expectedBusiness.isEmpty()).isTrue();
     }
-
-
-    // @Test
-    // void shouldCheckThatBusinessExistsByUserId() {
-    //     User user = utils.createUser();
-    //     Business business = utils.createBusiness(user);
-
-    //     boolean expected = businessRepository.existsByUserId(user.getId());
-    //     Optional<Business> expectedBusiness = businessRepository.findByUserId(user.getId());
-
-    //     assertThat(expected).isTrue();
-    //     assertThat(expectedBusiness.isPresent()).isTrue();
-    //     assertThat(expectedBusiness.get().getUser().getId()).isEqualTo(business.getUser().getId());
-    //     assertThat(expectedBusiness.get().getTier().getId()).isEqualTo(business.getTier().getId());
-    //     assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
-    //     assertThat(expectedBusiness.get().getVerified()).isEqualTo(business.getVerified());
-    // }
-
-    // @Test
-    // void shouldCheckThatBusinessDoesNotExistsByUserId() {
-    //     User user = utils.createUser();
-    //     utils.createBusiness(user);
-
-    //     boolean expected = businessRepository.existsByUserId(user.getId() + 1);
-    //     Optional<Business> expectedBusiness = businessRepository.findByUserId(user.getId() + 1);
-
-    //     assertThat(expected).isFalse();
-    //     assertThat(expectedBusiness.isEmpty()).isTrue();
-    // }
    
     @Test
     void shouldDeleteBusiness() {
@@ -156,10 +135,64 @@ class BusinessRepositoryTest extends PacaTest {
         
         businessRepository.delete(business);
 
-        List<Business> businesss = businessRepository.findAll();
-        assertThat(businesss.size()).isEqualTo(0);
+        List<Business> businessList = businessRepository.findAll();
+        assertThat(businessList.size()).isEqualTo(0);
     }
 
+    @Test
+    void shouldCheckThatBusinessExistsByUserId() {
+        User user = utils.createUser();
+        Business business = utils.createBusiness(user);
 
+        boolean expected = businessRepository.existsByUserId(user.getId());
+        Optional<Business> expectedBusiness = businessRepository.findByUserId(user.getId());
 
+        assertThat(expected).isTrue();
+        assertThat(expectedBusiness.isPresent()).isTrue();
+        assertThat(expectedBusiness.get().getId()).isEqualTo(business.getId());
+        assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
+        assertThat(expectedBusiness.get().getVerified()).isEqualTo(business.getVerified());
+        assertThat(expectedBusiness.get().getTier()).isEqualTo(business.getTier());
+    }
+
+    @Test
+    void shouldCheckThatBusinessDoesNotExistsByUserId() {
+        User user = utils.createUser();
+        utils.createBusiness(user);
+
+        boolean expected = businessRepository.existsByUserId(user.getId() + 1);
+        Optional<Business> expectedBusiness = businessRepository.findByUserId(user.getId() + 1);
+
+        assertThat(expected).isFalse();
+        assertThat(expectedBusiness.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldCheckThatBusinessExistsByUserEmail() {
+        User user = utils.createUser();
+        Business business = utils.createBusiness(user);
+
+        boolean expected = businessRepository.existsByUserEmail(user.getEmail());
+        Optional<Business> expectedBusiness = businessRepository.findByUserEmail(user.getEmail());
+
+        assertThat(expected).isTrue();
+        assertThat(expectedBusiness.isPresent()).isTrue();
+        assertThat(expectedBusiness.get().getId()).isEqualTo(business.getId());
+        assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
+        assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
+        assertThat(expectedBusiness.get().getVerified()).isEqualTo(business.getVerified());
+        assertThat(expectedBusiness.get().getTier()).isEqualTo(business.getTier());
+    }
+
+    @Test
+    void shouldCheckThatBusinessDoesNotExistsByUserEmail() {
+        User user = utils.createUser();
+        utils.createBusiness(user);
+
+        boolean expected = businessRepository.existsByUserEmail(user.getEmail() + "a");
+        Optional<Business> expectedBusiness = businessRepository.findByUserEmail(user.getEmail() + "a");
+
+        assertThat(expected).isFalse();
+        assertThat(expectedBusiness.isEmpty()).isTrue();
+    }
 }
