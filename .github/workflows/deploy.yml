@@ -30,7 +30,7 @@ jobs:
       - name: Run maven package script
         id: maven-build
         run:
-          cd ./pa-ca
+          cd ./pa-ca &&
           ./mvnw clean package -Dmaven.test.skip -q &&
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}} -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}}
