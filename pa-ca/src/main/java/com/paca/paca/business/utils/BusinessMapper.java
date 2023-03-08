@@ -2,8 +2,9 @@ package com.paca.paca.business.utils;
 
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.business.tier.Tier;
+import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.user.model.User;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
@@ -12,19 +13,20 @@ public interface BusinessMapper {
     @Mapping(source = "user.id", target = "userId")
     BusinessDTO toDTO(Business business);
 
-//    @Mapping(source = "tier", target = "tier")
-//    @Mapping(target = "verified", defaultExpression = "java(false)")
-//    @Mapping(target = "loggedIn", defaultExpression = "java(false)")
-//    Business toEntity(BusinessDTO dto, BusinessTier role);
-//
-//    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-//    @Mapping(source = "role", target = "role")
-//    @Mapping(target = "email", ignore = true)
-//    @Mapping(target = "verified", ignore = true)
-//    @Mapping(target = "loggedIn", ignore = true)
-//    Business updateEntity(BusinessDTO dto, @MappingTarget Business user, BusinessTier role);
-
-    default Tier stringToTier(BusinessTier tier) {
-        return new Tier(tier);
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "tier", ignore = true)
+    Business toEntity(BusinessDTO dto);
+    default Business toEntity(BusinessDTO dto, Tier tier, User user) {
+        Business business = toEntity(dto);
+        business.setUser(user);
+        business.setTier(tier);
+        return business;
     }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(source = "tier", target = "tier")
+    @Mapping(source = "dto.name", target = "name")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Business updateModel(BusinessDTO dto, @MappingTarget Business business, Tier tier);
 }

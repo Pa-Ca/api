@@ -5,11 +5,13 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.business.tier.Tier;
+import com.paca.paca.business.model.Tier;
 import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
@@ -78,6 +80,8 @@ public class TestUtils {
     RoleRepository roleRepository;
 
     UserRepository userRepository;
+
+    TierRepository tierRepository;
 
     ClientRepository clientRepository;
 
@@ -293,14 +297,50 @@ public class TestUtils {
         return dto;
     }
 
+    public Tier createTier(BusinessTier businessTier) {
+        Tier tier = Tier.builder()
+                .id((long) businessTier.ordinal())
+                .name(businessTier)
+                .reservationLimit(1)
+                .tierCost(1f)
+                .build();
+        return tier;
+    }
+
+    public Tier createTier(BusinessTier businessTier, int reservationLimit, float tierCost) {
+        Tier tier = Tier.builder()
+                .id((long) businessTier.ordinal())
+                .name(businessTier)
+                .reservationLimit(reservationLimit)
+                .tierCost(tierCost)
+                .build();
+        return tier;
+    }
+
     public Business createBusiness(User user) {
         if (user == null) {
             user = createUser();
         }
-        Tier tier = Tier.builder()
-                .id((long) BusinessTier.basic.ordinal())
-                .name(BusinessTier.basic)
+
+        Business business = Business.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .user(user)
+                .name("Test")
+                .verified(false)
+                .tier(createTier(BusinessTier.basic))
                 .build();
+
+        if (businessRepository != null) {
+            business = businessRepository.save(business);
+        }
+        return business;
+    }
+
+    public Business createBusiness(User user, Tier tier) {
+        if (user == null) {
+            user = createUser();
+        }
+
         Business business = Business.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .user(user)
@@ -313,6 +353,21 @@ public class TestUtils {
             business = businessRepository.save(business);
         }
         return business;
+    }
+
+    public BusinessDTO createBusinessDTO(Business business) {
+        if (business == null) {
+            business = createBusiness(null);
+        }
+        BusinessDTO dto = BusinessDTO.builder()
+                .id(business.getId())
+                .userId(business.getUser().getId())
+                .email(business.getUser().getEmail())
+                .name(business.getName())
+                .verified(business.getVerified())
+                .tier(BusinessTier.basic.name())
+                .build();
+        return dto;
     }
 
     public Branch createBranch(Business business) {

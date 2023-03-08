@@ -1,25 +1,75 @@
-name: Deploy
+name: Backend Deployment
 
 on:
   push:
     branches:
       - develop
-    
+
+env:
+  JAVA_VERSION: 1.17
 jobs:
-  deploy:
-
-    runs-on: ubuntu-latest
-
+  build:
+    name: Build Image
+    runs-on: [self-hosted]
+    outputs:
+      BUILD_NUMBER: ${{steps.build-number.outputs.BUILD_NUMBER}}
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - id: deploy
-      name: Deploy to dokku
-      uses: idoberko2/dokku-deploy-github-action@v1
-      with: 
-        ssh-private-key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-        dokku-host: '45.77.94.83'
-        app-name: 'paca-api'
-        git-push-flags: --force
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEM }}
+
+      - name: Build Number
+        id: build-number
+        run: echo "BUILD_NUMBER=$(date '+%-d.%-m.%Y.%-H.%-M.%-S')" >> $GITHUB_OUTPUT
+
+      - name: Run maven package script
+        id: maven-build
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}} -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
+
+  cd:
+    name: Deployment into server
+    needs: build
+    runs-on: [self-hosted]
+    steps:
+      - name: deploy new backend image
+        if: ${{ always() }}
+        run: |
+          docker rm -f paca-api; 
+          docker run --network host -d --name paca-api -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paca_db SPRING_DATASOURCE_USERNAME=postgres SPRING_DATASOURCE_PASSWORD=postgres ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
+
+
+## OLD: DOKKU
+
+#name: Deploy
+#
+#on:
+#  push:
+#    branches:
+#      - develop
+#    
+#jobs:
+#  deploy:
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#      with:
+#        fetch-depth: 0
+#
+#    - id: deploy
+#      name: Deploy to dokku
+#      uses: idoberko2/dokku-deploy-github-action@v1
+#      with: 
+#        ssh-private-key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+#        dokku-host: '45.77.94.83'
+#        app-name: 'paca-api'
+#        git-push-flags: --force

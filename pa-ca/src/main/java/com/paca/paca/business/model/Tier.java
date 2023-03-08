@@ -1,4 +1,4 @@
-package com.paca.paca.business.tier;
+package com.paca.paca.business.model;
 import com.paca.paca.statics.BusinessTier;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,23 +19,8 @@ public class Tier {
     @Column(name = "name")
     private BusinessTier name;
     @Column(name = "reservation_limit")
-    private int reservation_limit;
+    private int reservationLimit;
     @Column(name = "tier_cost")
-    private float tier_cost;
-
-    public Tier(BusinessTier name) {
-        this.id = (long) name.ordinal();
-        this.name = name;
-    }
-
-    public Tier(Long id, BusinessTier name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Tier(Long id, String name) {
-        this.id = id;
-        this.name = BusinessTier.valueOf(name);
-    }
+    private float tierCost;
 
 }
