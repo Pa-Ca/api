@@ -43,7 +43,7 @@ jobs:
         if: ${{ always() }}
         run: |
           docker rm -f paca-api; 
-          docker run --network host -d --name paca-api ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
+          docker run -d --name paca-api ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
 
 
 ## OLD: DOKKU
