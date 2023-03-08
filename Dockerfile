@@ -7,7 +7,6 @@ RUN mvn -f /app/pom.xml clean dependency:purge-local-repository package -Dmaven.
 # Run stage
 FROM openjdk:17-jdk-alpine
 WORKDIR /app
-VOLUME /tmp
 EXPOSE 8080
 COPY --from=build /app/target/*.jar /app/app.jar
 ENTRYPOINT ["/bin/sh", "-c", "java -jar ./app.jar &> ./output.log || sleep 10000"]
