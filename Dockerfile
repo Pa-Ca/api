@@ -8,7 +8,7 @@ RUN mvn -f /app/pom.xml clean dependency:purge-local-repository package -Dmaven.
 FROM openjdk:17-jdk-alpine
 WORKDIR /app
 EXPOSE 8080
-ENV SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paca_db
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/paca_db
 ENV SPRING_DATASOURCE_USERNAME=postgres
 ENV SPRING_DATASOURCE_PASSWORD=postgres
 COPY --from=build /app/target/*.jar /app/app.jar
