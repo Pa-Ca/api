@@ -43,7 +43,7 @@ jobs:
         if: ${{ always() }}
         run: |
           docker rm -f paca-api; 
-          docker run --network host -d --name paca-api -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paca_db SPRING_DATASOURCE_USERNAME=postgres SPRING_DATASOURCE_PASSWORD=postgres ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
+          docker run -d --network host --name paca-api ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
 
 
 ## OLD: DOKKU
