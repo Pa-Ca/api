@@ -487,6 +487,7 @@ public class TestUtils {
             subCategory = createProductSubCategory(null, null);
         }
         Product product = Product.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
                 .subCategory(subCategory)
                 .disabled(false)
                 .name("test name")
@@ -505,7 +506,8 @@ public class TestUtils {
         if (product == null) {
             product = createProduct(null);
         }
-        ProductDTO dto = ProductDTO.builder() 
+        ProductDTO dto = ProductDTO.builder()
+                .id(product.getId())
                 .subCategoryId(product.getSubCategory().getId())
                 .disabled(product.getDisabled())
                 .name(product.getName())

@@ -32,18 +32,18 @@ public class ProductController {
     @GetMapping
     @ValidateRoles({})
     public ResponseEntity<ProductListDTO> getAll() {
-        return productService.getAll();
+        return ResponseEntity.ok(productService.getAll());
     }
 
     @PostMapping
     @ValidateRoles({"business"})
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto) throws NoContentException {
-        return productService.save(dto);
+        return ResponseEntity.ok(productService.save(dto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id) throws NoContentException {
-        return productService.getById(id);
+        return ResponseEntity.ok(productService.getById(id));
     }
 
     @PutMapping("/{id}")
@@ -53,7 +53,7 @@ public class ProductController {
             @PathVariable("id") Long id,
             @RequestBody ProductDTO dto)
             throws NoContentException {
-        return productService.update(id, dto);
+        return ResponseEntity.ok(productService.update(id, dto));
     }
 
     @ValidateProductOwner
