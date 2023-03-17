@@ -8,7 +8,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Optional;
 
+import com.paca.paca.reservation.model.ClientGroup;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
@@ -68,7 +70,9 @@ public class ValidateReservationOwnerInterceptor implements HandlerInterceptor {
 
             if (annotation.isClientOwner()) {
                 Client client = clientRepository.findByUserEmail(auth.getName()).get();
-                if (clientGroupRepository.existsByReservationIdAndClientId(reservationId, client.getId())) {
+                Optional<ClientGroup> clientGroup = clientGroupRepository.findByReservationIdAndClientId(reservationId, client.getId());
+
+                if (clientGroup.isEmpty() || !clientGroup.get().getIsOwner()){
                     throw new ForbiddenException("Unauthorized access for this operation");
                 }
             }

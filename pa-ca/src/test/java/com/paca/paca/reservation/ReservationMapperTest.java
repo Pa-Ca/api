@@ -37,6 +37,9 @@ public class ReservationMapperTest {
         assertThat(response.getStatus()).isEqualTo(reservation.getStatus());
         assertThat(response.getPayDate()).isEqualTo(reservation.getPayDate());
         assertThat(response.getPrice()).isEqualTo(reservation.getPrice());
+        assertThat(response.getOccasion()).isEqualTo(reservation.getOccasion());
+        assertThat(response.getPetition()).isEqualTo(reservation.getPetition());
+        assertThat(response.getByClient()).isEqualTo(reservation.getByClient());
     }
 
     @Test
@@ -55,6 +58,9 @@ public class ReservationMapperTest {
         assertThat(entity.getStatus()).isEqualTo(dto.getStatus());
         assertThat(entity.getPayDate()).isEqualTo(dto.getPayDate());
         assertThat(entity.getPrice()).isEqualTo(dto.getPrice());
+        assertThat(entity.getOccasion()).isEqualTo(dto.getOccasion());
+        assertThat(entity.getPetition()).isEqualTo(dto.getPetition());
+        assertThat(entity.getByClient()).isEqualTo(dto.getByClient());
     }
 
     @Test
@@ -127,10 +133,34 @@ public class ReservationMapperTest {
 
         // Changing price
         dto = ReservationDTO.builder()
-                .price(69.69f)
+                .price(69.69F)
                 .build();
         updatedReservation = reservationMapper.updateModel(dto, reservation);
         assertThat(updatedReservation).isNotNull();
         assertThat(updatedReservation.getPrice()).isEqualTo(dto.getPrice());
+
+        // Changing occasion
+        dto = ReservationDTO.builder()
+                .occasion("Anniversary")
+                .build();
+        updatedReservation = reservationMapper.updateModel(dto, reservation);
+        assertThat(updatedReservation).isNotNull();
+        assertThat(updatedReservation.getOccasion()).isEqualTo(dto.getOccasion());
+
+        // Changing petition
+        dto = ReservationDTO.builder()
+                .petition("Candles")
+                .build();
+        updatedReservation = reservationMapper.updateModel(dto, reservation);
+        assertThat(updatedReservation).isNotNull();
+        assertThat(updatedReservation.getPetition()).isEqualTo(dto.getPetition());
+
+        // Changing byClient
+        dto = ReservationDTO.builder()
+                .byClient(Boolean.TRUE)
+                .build();
+        updatedReservation = reservationMapper.updateModel(dto, reservation);
+        assertThat(updatedReservation).isNotNull();
+        assertThat(updatedReservation.getByClient()).isEqualTo(dto.getByClient());
     }
 }

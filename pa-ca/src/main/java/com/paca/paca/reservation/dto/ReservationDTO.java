@@ -24,4 +24,7 @@ public class ReservationDTO {
     private Integer status;
     private Date payDate;
     private Float price;
+    private String occasion;
+    private String petition;
+    private Boolean byClient;
 }

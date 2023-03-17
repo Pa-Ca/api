@@ -26,4 +26,6 @@ public interface ClientGroupRepository extends JpaRepository<ClientGroup, Long> 
 
     Boolean existsByReservationIdAndClientId(Long reservationId, Long clientId);
 
+    Optional<ClientGroup> findByReservationIdAndClientId(Long reservationId, Long clientId);
+
 }
