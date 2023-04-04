@@ -1,22 +1,23 @@
 package com.paca.paca.reservation;
 
 import com.paca.paca.PacaTest;
+import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.repository.AmenityRepository;
-import com.paca.paca.branch.repository.BranchAmenityRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.reservation.model.Reservation;
-import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.branch.repository.BranchAmenityRepository;
+import com.paca.paca.reservation.repository.ReservationRepository;
+
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.Date;
 import java.util.List;
@@ -52,6 +53,7 @@ class ReservationRepositoryTest extends PacaTest {
     private RoleRepository roleRepository;
 
     private TestUtils utils;
+
     @BeforeAll
     void initUtils() {
         utils = TestUtils.builder()

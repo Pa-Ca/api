@@ -2,9 +2,8 @@ package com.paca.paca.branch.repository;
 
 import com.paca.paca.branch.model.Branch;
 
-import com.paca.paca.business.model.Business;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
