@@ -37,18 +37,18 @@ public class ReservationController {
     @GetMapping
     @ValidateRoles({})
     public ResponseEntity<ReservationListDTO> getAll() {
-        return reservationService.getAll();
-    }
-
-    @PostMapping
-    @ValidateRoles({"client"})
-    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException {
-        return reservationService.save(dto);
+        return ResponseEntity.ok(reservationService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationDTO> getById(@PathVariable("id") Long id) throws NoContentException {
-        return reservationService.getById(id);
+        return ResponseEntity.ok(reservationService.getById(id));
+    }
+
+    @PostMapping
+    @ValidateRoles({"client", "business"})
+    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException {
+        return ResponseEntity.ok(reservationService.save(dto));
     }
 
     @ValidateRoles({"client"})
@@ -85,17 +85,17 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    @ValidateRoles({ "client" })
+    @ValidateRoles({ })
     @ValidateReservationOwner( isClientOwner = true )
     public ResponseEntity<ReservationDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReservationDTO dto)
             throws NoContentException {
-        return reservationService.update(id, dto);
+        return ResponseEntity.ok(reservationService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @ValidateRoles({})
+    @ValidateRoles({"business"})
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         reservationService.delete(id);
     }

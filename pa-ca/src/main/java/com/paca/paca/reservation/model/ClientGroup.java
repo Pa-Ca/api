@@ -24,6 +24,9 @@ public class ClientGroup {
     @JoinColumn(name = "client_id")
     private Client client;
 
+    @Column(name = "is_owner")
+    private Boolean isOwner;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;

@@ -7,6 +7,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.reservation.model.ClientGroup;
+import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.dto.UserDTO;
@@ -101,6 +104,7 @@ public class TestUtils {
 
     ReviewLikeRepository reviewLikeRepository;
 
+    ClientGroupRepository clientGroupRepository;
     ReservationRepository reservationRepository;
 
     BranchAmenityRepository branchAmenityRepository;
@@ -374,7 +378,6 @@ public class TestUtils {
         if (business == null) {
             business = createBusiness(null);
         }
-
         Branch branch = Branch.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .business(business)
@@ -654,6 +657,9 @@ public class TestUtils {
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
                 .price(5.0f)
+                .occasion("Anniversary")
+                .petition("Candles")
+                .byClient(Boolean.TRUE)
                 .build();
 
         if (reservationRepository != null) {
@@ -677,6 +683,9 @@ public class TestUtils {
                 .status(reservation.getStatus())
                 .payDate(reservation.getPayDate())
                 .price(reservation.getPrice())
+                .occasion(reservation.getOccasion())
+                .petition(reservation.getPetition())
+                .byClient(reservation.getByClient())
                 .build();
 
         return dto;
@@ -711,6 +720,36 @@ public class TestUtils {
                 .branchId(promotion.getBranch().getId()) 
                 .disabled(promotion.getDisabled())
                 .text(promotion.getText())
+                .build();
+        return dto;
+    }
+
+    public ClientGroup createClientGroup(Client client, Reservation reservation) {
+        if (client == null) {
+            client = createClient(null);
+        }
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+        ClientGroup clientGroup = ClientGroup.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .client(client)
+                .reservation(reservation)
+                .name("Community")
+                .build();
+
+        if (clientGroupRepository != null) {
+            clientGroup = clientGroupRepository.save(clientGroup);
+        }
+        return clientGroup;
+    }
+
+    public ReservationPaymentDTO createReservationPaymentDTO(String paymentCode){
+        if (paymentCode == null){
+            paymentCode = "paymentCode69";
+        }
+        ReservationPaymentDTO dto = ReservationPaymentDTO.builder()
+                .paymentCode(paymentCode)
                 .build();
         return dto;
     }
