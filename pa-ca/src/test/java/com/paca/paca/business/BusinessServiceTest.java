@@ -1,34 +1,36 @@
 package com.paca.paca.business;
 
-import com.paca.paca.business.dto.BusinessListDTO;
-import com.paca.paca.business.model.Business;
+import com.paca.paca.user.model.User;
+import com.paca.paca.utils.TestUtils;
 import com.paca.paca.business.model.Tier;
-import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.business.service.BusinessService;
-import com.paca.paca.business.utils.BusinessMapper;
+import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.business.model.Business;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.business.dto.BusinessListDTO;
+import com.paca.paca.business.utils.BusinessMapper;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.business.service.BusinessService;
+import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.user.model.User;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.utils.TestUtils;
+
 import junit.framework.TestCase;
+
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class BusinessServiceTest {
@@ -168,7 +170,8 @@ class BusinessServiceTest {
 
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(business));
         when(businessRepository.save(any(Business.class))).thenReturn(business);
-        when(businessMapper.updateModel(any(BusinessDTO.class), any(Business.class), any(Tier.class))).thenReturn(business);
+        when(businessMapper.updateModel(any(BusinessDTO.class), any(Business.class), any(Tier.class)))
+                .thenReturn(business);
         when(businessMapper.toDTO(any(Business.class))).thenReturn(dto);
         when(tierRepository.findByName(any(BusinessTier.class))).thenReturn(Optional.ofNullable(tier));
 

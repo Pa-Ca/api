@@ -54,6 +54,7 @@ public class Reservation {
 
     @Column(name = "petition")
     private String petition;
+
     @Column(name = "by_client")
     private Boolean byClient;
 }

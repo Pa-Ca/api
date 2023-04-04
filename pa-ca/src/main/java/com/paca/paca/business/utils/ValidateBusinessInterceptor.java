@@ -1,4 +1,5 @@
 package com.paca.paca.business.utils;
+
 import java.util.Map;
 import java.lang.reflect.Method;
 import java.lang.annotation.Target;
@@ -23,6 +24,7 @@ import com.paca.paca.exception.exceptions.ForbiddenException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 @Component
 public class ValidateBusinessInterceptor implements HandlerInterceptor {
 
@@ -41,7 +43,9 @@ public class ValidateBusinessInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
         Method method = ((HandlerMethod) handler).getMethod();
-        com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness annotation = AnnotationUtils.findAnnotation(method, com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness.class);
+        com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness annotation = AnnotationUtils
+                .findAnnotation(method,
+                        com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
