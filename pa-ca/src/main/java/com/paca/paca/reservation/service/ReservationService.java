@@ -156,8 +156,8 @@ public class ReservationService {
         }
 
         Long businessId = branch.get().getBusiness().getId();
-        if (businessId.equals(owner.get().getId())) {
-            throw new ForbiddenException("Unauthorized access for this operation");
+        if (!businessId.equals(owner.get().getId())) {
+            throw new ForbiddenException("Unauthorized access for this operation", 75);
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.canceled).build();
@@ -168,38 +168,43 @@ public class ReservationService {
     public void accept(Long id, String userEmail) throws NoContentException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
-        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + " does not exists");
+        if (reservation.isEmpty()) throw new NoContentException(
+                "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
-            throw new BadRequestException("This reservation can't be accepted because it is already returned");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be accepted because it is already returned", 69);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
-            throw new BadRequestException("This reservation can't be accepted because it is already closed");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be accepted because it is already closed", 70);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
-            throw new BadRequestException("This reservation can't be accepted because it is already rejected");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be accepted because it is already rejected", 71);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.accepted)){
-            throw new BadRequestException("This reservation can't be accepted because it is already accepted");
+            throw new BadRequestException("" +
+                    "Reservation with id " + id + " can't be accepted because it is already accepted", 76);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.paid)){
             Long branchId = reservation.get().getBranch().getId();
             Optional<Branch> branch = branchRepository.findById(branchId);
             if (branch.isEmpty()) {
-                throw new NoContentException("Branch related to reservation with id" + branchId + " does not exists");
+                throw new NoContentException("Branch related to reservation with id " + branchId + " does not exists", 73);
             }
 
             Optional<Business> owner = businessRepository.findByUserEmail(userEmail);
             if (owner.isEmpty()) {
-                throw new NoContentException("Business related to user with email" + userEmail + " does not exists");
+                throw new NoContentException("Business related to user with email " + userEmail + " does not exists", 74);
             }
 
             Long businessId = branch.get().getBusiness().getId();
-            if (businessId.equals(owner.get().getId())) {
+            if (!businessId.equals(owner.get().getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
 
@@ -212,29 +217,33 @@ public class ReservationService {
     public void reject(Long id, String userEmail) throws NoContentException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
-        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + " does not exists");
+        if (reservation.isEmpty()) throw new NoContentException(
+                "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
-            throw new BadRequestException("This reservation can't be rejected because it is already returned");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already returned", 69);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
-            throw new BadRequestException("This reservation can't be rejected because it is already closed");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already closed", 70);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
-            throw new BadRequestException("This reservation can't be rejected because it is already rejected");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already rejected", 71);
         }
 
         Long branchId = reservation.get().getBranch().getId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException("Branch related to reservation with id" + branchId + " does not exists");
+            throw new NoContentException("Branch related to reservation with id " + branchId + " does not exists", 73);
         }
 
         Optional<Business> owner = businessRepository.findByUserEmail(userEmail);
         if (owner.isEmpty()) {
-            throw new NoContentException("Business related to user with email" + userEmail + " does not exists");
+            throw new NoContentException("Business related to user with email " + userEmail + " does not exists", 74);
         }
 
         Long businessId = branch.get().getBusiness().getId();
@@ -251,34 +260,42 @@ public class ReservationService {
             throws NoContentException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
-        if (reservation.isEmpty()) throw new NoContentException("Reservation with id " + id + " does not exists");
+        if (reservation.isEmpty()) throw new NoContentException(
+                "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)){
-            throw new BadRequestException("This reservation can't be paid because it is already returned");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be paid because it is already returned", 69);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)){
-            throw new BadRequestException("This reservation can't be paid because it is already closed");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be paid because it is already closed", 70);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)){
-            throw new BadRequestException("This reservation can't be paid because it is already returned");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be paid because it is already rejected", 71);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.paid)){
-            throw new BadRequestException("This reservation can't be paid because it is already paid");
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be paid because it is already paid", 77);
         }
 
         Optional<Client> owner = clientRepository.findByUserEmail(userEmail);
         if (owner.isEmpty()) {
-            throw new NoContentException("Client related to user with email" + userEmail + " does not exists");
+            throw new NoContentException(
+                    "Client related to user with email " + userEmail + " does not exists", 78);
         }
 
         Long ownerId = owner.get().getId();
         Long reservationId = reservation.get().getId();
         Optional<ClientGroup> group = clientGroupRepository.findByClientIdAndReservationId(ownerId, reservationId);
         if (group.isEmpty()) {
-            throw new ForbiddenException("Unauthorized access for this operation");
+            throw new NoContentException(
+                    "Client Group related to client with id " + ownerId +
+                            " and reservation with id "+ reservationId + " does not exists", 79);
         }
 
         ReservationDTO changes = ReservationDTO.builder().status(ReservationStatics.Status.paid).build();

@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.reservation.dto.ReservationPaymentDTO;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.user.model.Role;
@@ -739,5 +740,15 @@ public class TestUtils {
             clientGroup = clientGroupRepository.save(clientGroup);
         }
         return clientGroup;
+    }
+
+    public ReservationPaymentDTO createReservationPaymentDTO(String paymentCode){
+        if (paymentCode == null){
+            paymentCode = "paymentCode69";
+        }
+        ReservationPaymentDTO dto = ReservationPaymentDTO.builder()
+                .paymentCode(paymentCode)
+                .build();
+        return dto;
     }
 }

@@ -4,11 +4,14 @@ import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.reservation.dto.ReservationPaymentDTO;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
@@ -33,6 +36,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
 
+    @Mock
+    private ClientGroupRepository clientGroupRepository;
     @Mock
     private BusinessRepository businessRepository;
     @Mock
@@ -174,79 +179,78 @@ public class ReservationServiceTest {
     // cancel
     @Test
     void shouldGetNoContentDueToMissingReservationInCancelReservation() {
-        ClientGroup clientGroup = utils.createClientGroup(null,null);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(1L, "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Reservation with id " + clientGroup.getReservation().getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(), "Reservation with id " + 1L + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
         }
     }
 
     @Test
     void shouldGetBadRequestWhenTryToCancelReservationDueToReservationAlreadyInOtherStatus() {
-        ClientGroup clientGroup = utils.createClientGroup(null,null);
+        Reservation reservation = utils.createReservation(null);
 
         //returned
-        clientGroup.getReservation().setStatus(ReservationStatics.Status.returned);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
+        reservation.setStatus(ReservationStatics.Status.returned);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
-                    "Reservation with id " + clientGroup.getReservation().getId() +
+                    "Reservation with id " + reservation.getId() +
                             " can't be canceled because it is already returned");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
         }
 
         //closed
-        clientGroup.getReservation().setStatus(ReservationStatics.Status.closed);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
+        reservation.setStatus(ReservationStatics.Status.closed);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
-                    "Reservation with id " + clientGroup.getReservation().getId() +
+                    "Reservation with id " + reservation.getId() +
                             " can't be canceled because it is already closed");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
         }
 
         //rejected
-        clientGroup.getReservation().setStatus(ReservationStatics.Status.rejected);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
+        reservation.setStatus(ReservationStatics.Status.rejected);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
-                    "Reservation with id " + clientGroup.getReservation().getId() +
+                    "Reservation with id " + reservation.getId() +
                             " can't be canceled because it is already rejected");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
         }
 
         //canceled
-        clientGroup.getReservation().setStatus(ReservationStatics.Status.canceled);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
+        reservation.setStatus(ReservationStatics.Status.canceled);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
-                    "Reservation with id " + clientGroup.getReservation().getId() +
+                    "Reservation with id " + reservation.getId() +
                             " can't be canceled because it is already canceled");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 72);
         }
@@ -254,51 +258,352 @@ public class ReservationServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingBranchInCancelReservation() {
-        ClientGroup clientGroup = utils.createClientGroup(null,null);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
+        Reservation reservation = utils.createReservation(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Branch related to reservation with id " + clientGroup.getReservation().getBranch().getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(), "Branch related to reservation with id " + reservation.getBranch().getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 73);
         }
     }
 
     @Test
     void shouldGetNoContentDueToMissingBusinessInCancelReservation() {
-        ClientGroup clientGroup = utils.createClientGroup(null,null);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation().getBranch()));
+        Reservation reservation = utils.createReservation(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.cancel(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Business related to user with email " + clientGroup.getClient().getUser().getEmail()+ " does not exists");
+            Assert.assertEquals(e.getMessage(), "Business related to user with email " + "loquesea@email.com"+ " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 74);
+        }
+    }
+
+    // accept
+    @Test
+    void shouldGetNoContentDueToMissingReservationInAcceptReservation() {
+        Reservation reservation = utils.createReservation(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInCancelReservation() {
-        ClientGroup clientGroup = utils.createClientGroup(null,null);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation()));
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation().getBranch()));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(clientGroup.getReservation().getBranch().getBusiness()));
+    void shouldGetBadRequestWhenTryToAcceptReservationDueToReservationAlreadyInOtherStatus() {
+        Reservation reservation = utils.createReservation(null);
+
+        //returned
+        reservation.setStatus(ReservationStatics.Status.returned);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(clientGroup.getReservation().getId(), clientGroup.getClient().getUser().getEmail());
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be accepted because it is already returned");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
+        }
+
+        //closed
+        reservation.setStatus(ReservationStatics.Status.closed);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be accepted because it is already closed");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
+        }
+
+        //rejected
+        reservation.setStatus(ReservationStatics.Status.rejected);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be accepted because it is already rejected");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
+        }
+
+        //accepted
+        reservation.setStatus(ReservationStatics.Status.accepted);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be accepted because it is already accepted");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 76);
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToMissingBranchInAcceptReservation() {
+        Reservation reservation = utils.createReservation(null);
+        reservation.setStatus(ReservationStatics.Status.paid);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Business related to user with email " + clientGroup.getClient().getUser().getEmail()+ " does not exists");
+            Assert.assertEquals(e.getMessage(), "Branch related to reservation with id " + reservation.getBranch().getId() + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 73);
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToMissingBusinessInAcceptReservation() {
+        Reservation reservation = utils.createReservation(null);
+        reservation.setStatus(ReservationStatics.Status.paid);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Business related to user with email " + "loquesea@email.com"+ " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 74);
         }
     }
+
+    // reject
+    @Test
+    void shouldGetNoContentDueToMissingReservationInRejectReservation() {
+        Reservation reservation = utils.createReservation(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+        }
+    }
+
+    @Test
+    void shouldGetBadRequestWhenTryToRejectReservationDueToReservationAlreadyInOtherStatus() {
+        Reservation reservation = utils.createReservation(null);
+
+        //returned
+        reservation.setStatus(ReservationStatics.Status.returned);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be rejected because it is already returned");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
+        }
+
+        //closed
+        reservation.setStatus(ReservationStatics.Status.closed);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be rejected because it is already closed");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
+        }
+
+        //rejected
+        reservation.setStatus(ReservationStatics.Status.rejected);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be rejected because it is already rejected");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToMissingBranchInRejectReservation() {
+        Reservation reservation = utils.createReservation(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Branch related to reservation with id " + reservation.getBranch().getId() + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 73);
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToMissingBusinessInRejectReservation() {
+        Reservation reservation = utils.createReservation(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Business related to user with email " + "loquesea@email.com"+ " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 74);
+        }
+    }
+
+    // pay
+    @Test
+    void shouldGetNoContentDueToMissingReservationInPayReservation() {
+        Reservation reservation = utils.createReservation(null);
+        ReservationPaymentDTO reservationPaymentDTO = utils.createReservationPaymentDTO(null);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+        }
+    }
+
+    @Test
+    void shouldGetBadRequestWhenTryToPayReservationDueToReservationAlreadyInOtherStatus() {
+        Reservation reservation = utils.createReservation(null);
+        ReservationPaymentDTO reservationPaymentDTO = utils.createReservationPaymentDTO(null);
+
+        //returned
+        reservation.setStatus(ReservationStatics.Status.returned);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be paid because it is already returned");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
+        }
+
+        //closed
+        reservation.setStatus(ReservationStatics.Status.closed);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be paid because it is already closed");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
+        }
+
+        //rejected
+        reservation.setStatus(ReservationStatics.Status.rejected);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be paid because it is already rejected");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
+        }
+
+        //paid
+        reservation.setStatus(ReservationStatics.Status.paid);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+
+        try {
+            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(),
+                    "Reservation with id " + reservation.getId() +
+                            " can't be paid because it is already paid");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 77);
+        }
+    }
+
+//    @Test
+//    void shouldGetNoContentDueToMissingBranchInPayReservation() {
+//        Reservation reservation = utils.createReservation(null);
+//        ReservationPaymentDTO reservationPaymentDTO = utils.createReservationPaymentDTO(null);
+//        ClientGroup clientGroup = utils.createClientGroup(null,reservation);
+//        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+//        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+//        when(clientGroupRepository.findByClientIdAndReservationId(any(Long.class), any(Long.class))).thenReturn(Optional.empty());
+//
+//        try {
+//            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+//            TestCase.fail();
+//        } catch (Exception e) {
+//            Assert.assertTrue(e instanceof NoContentException);
+//            Assert.assertEquals(e.getMessage(), "Client Group related to client with id " + clientGroup.getClient().getId() +
+//                    " and reservation with id "+ reservation.getId() + " does not exists");
+//            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 79);
+//        }
+//    }
 }
