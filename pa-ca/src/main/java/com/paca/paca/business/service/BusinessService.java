@@ -1,21 +1,21 @@
 package com.paca.paca.business.service;
 
-import com.paca.paca.business.model.Business;
-import com.paca.paca.business.model.Tier;
-import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.user.model.User;
-import com.paca.paca.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.paca.paca.business.model.Tier;
+import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.utils.BusinessMapper;
-import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.business.repository.TierRepository;
-
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -40,8 +40,6 @@ public class BusinessService {
             throw new BadRequestException("The role given is not valid");
         }
     }
-
-
 
     public BusinessListDTO getAll() {
         List<BusinessDTO> response = new ArrayList<>();
@@ -87,7 +85,7 @@ public class BusinessService {
             validateTier(dto.getTier());
 
         Optional<Tier> tier = tierRepository.findByName(BusinessTier.valueOf(dto.getTier()));
-        if (tier.isEmpty()){
+        if (tier.isEmpty()) {
             throw new NoContentException(
                     "Tier " + tier.get() + " does not exists",
                     38);
@@ -110,10 +108,8 @@ public class BusinessService {
 
         Optional<Tier> tier = tierRepository.findByName(
                 BusinessTier.valueOf(
-                        (dto.getTier() != null) ? dto.getTier() : current.get().getTier().getName().name()
-                )
-        );
-        if (tier.isEmpty()){
+                        (dto.getTier() != null) ? dto.getTier() : current.get().getTier().getName().name()));
+        if (tier.isEmpty()) {
             throw new NoContentException(
                     "Tier " + tier.get() + " does not exists",
                     38);
@@ -125,7 +121,7 @@ public class BusinessService {
 
         return dtoResponse;
     }
-    
+
     public void delete(Long id) throws NoContentException {
         Optional<Business> current = businessRepository.findById(id);
         if (current.isEmpty()) {
@@ -136,6 +132,7 @@ public class BusinessService {
         businessRepository.deleteById(id);
 
     }
+
     public BusinessDTO getByUserId(Long id) throws NoContentException {
         Business business = businessRepository.findByUserId(id)
                 .orElseThrow(() -> new NoContentException(

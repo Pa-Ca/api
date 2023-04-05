@@ -1,12 +1,10 @@
 package com.paca.paca.product.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.http.ResponseEntity;
 
 import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;

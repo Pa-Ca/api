@@ -1,25 +1,28 @@
 package com.paca.paca.product;
 
-import com.paca.paca.product.dto.ProductDTO;
+import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
+import com.paca.paca.utils.TestUtils;
 import com.paca.paca.product.model.Product;
+import com.paca.paca.product.dto.ProductDTO;
+import org.junit.jupiter.api.extension.ExtendWith;
 import com.paca.paca.product.utils.ProductMapperImpl;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapperImpl;
-import com.paca.paca.utils.TestUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapperImpl;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
 public class ProductMapperTest {
-    @InjectMocks private ProductMapperImpl productMapper;
-    @InjectMocks private ProductSubCategoryMapperImpl productSubCategoryMapper;
+    @InjectMocks
+    private ProductMapperImpl productMapper;
+
+    @InjectMocks
+    private ProductSubCategoryMapperImpl productSubCategoryMapper;
 
     private TestUtils utils = TestUtils.builder().build();
-    
+
     @Test
     void shouldMapProductEntityToProductDTO() {
         Product product = utils.createProduct(null);

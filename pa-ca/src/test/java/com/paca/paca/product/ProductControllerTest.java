@@ -1,44 +1,37 @@
 package com.paca.paca.product;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paca.paca.utils.TestUtils;
 import com.paca.paca.auth.ControllerTest;
-import com.paca.paca.auth.service.JwtService;
-import com.paca.paca.branch.dto.BranchDTO;
-import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.statics.BranchStatics;
-import com.paca.paca.business.model.Business;
-import com.paca.paca.client.dto.ClientDTO;
-import com.paca.paca.client.dto.ClientListDTO;
-import com.paca.paca.client.model.Client;
-import com.paca.paca.client.statics.ClientStatics;
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.product.controller.ProductController;
-import com.paca.paca.product.dto.ProductDTO;
-import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.model.Product;
+import com.paca.paca.product.dto.ProductDTO;
+import com.paca.paca.auth.service.JwtService;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.product.dto.ProductListDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.product.controller.ProductController;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.NoContentException;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -46,11 +39,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = { ProductController.class })
 public class ProductControllerTest extends ControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @MockBean private JwtService jwtService;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
+    private JwtService jwtService;
 
-    @MockBean private ProductService productService;
+    @MockBean
+    private ProductService productService;
 
     private TestUtils utils = TestUtils.builder().build();
 
@@ -67,14 +64,14 @@ public class ProductControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    CoreMatchers.is("Unauthorized access for this operation")));
+                        CoreMatchers.is("Unauthorized access for this operation")));
 
         utils.setAuthorities("business");
         mockMvc.perform(get(ProductStatics.Endpoint.PATH)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    CoreMatchers.is("Unauthorized access for this operation")));
+                        CoreMatchers.is("Unauthorized access for this operation")));
     }
 
     @Test
@@ -107,7 +104,7 @@ public class ProductControllerTest extends ControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    CoreMatchers.is("Unauthorized access for this operation")));
+                        CoreMatchers.is("Unauthorized access for this operation")));
     }
 
     @Test
@@ -158,7 +155,8 @@ public class ProductControllerTest extends ControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId", CoreMatchers.is(dto.getSubCategoryId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId",
+                        CoreMatchers.is(dto.getSubCategoryId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.price", CoreMatchers.is(dto.getPrice().doubleValue())))
@@ -190,7 +188,8 @@ public class ProductControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId", CoreMatchers.is(dto.getSubCategoryId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId",
+                        CoreMatchers.is(dto.getSubCategoryId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.price", CoreMatchers.is(dto.getPrice().doubleValue())))
@@ -269,7 +268,8 @@ public class ProductControllerTest extends ControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId", CoreMatchers.is(dto.getSubCategoryId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId",
+                        CoreMatchers.is(dto.getSubCategoryId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.price", CoreMatchers.is(dto.getPrice().doubleValue())))

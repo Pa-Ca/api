@@ -6,13 +6,14 @@ import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.Optional;
 
@@ -23,9 +24,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest extends PacaTest {
-    @Autowired private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    @Autowired private RoleRepository roleRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @AfterEach
     void restoreTest() {
@@ -57,7 +60,7 @@ public class UserRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldReturnUserByEmail () {
+    void shouldReturnUserByEmail() {
         String email = "test@test.com";
         Role role = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
         User user = User.builder()
@@ -73,7 +76,7 @@ public class UserRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldNotReturnUserByEmail () {
+    void shouldNotReturnUserByEmail() {
         String email = "test@test.com";
         Optional<User> user = userRepository.findByEmail(email);
 

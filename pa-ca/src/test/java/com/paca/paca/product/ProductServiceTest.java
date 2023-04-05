@@ -1,26 +1,28 @@
 package com.paca.paca.product;
 
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.utils.TestUtils;
+import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.dto.ProductListDTO;
-import com.paca.paca.product.model.Product;
-import com.paca.paca.product.repository.ProductRepository;
-import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.utils.ProductMapper;
+import com.paca.paca.product.service.ProductService;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.utils.TestUtils;
+
 import junit.framework.TestCase;
+
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -32,15 +34,23 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
-    @Mock private ProductRepository productRepository;
-    @Mock private ProductSubCategoryRepository productSubCategoryRepository;
-    @Mock private ProductCategoryRepository productCategoryRepository;
-    @Mock private BranchRepository branchRepository;
-    @Mock private BusinessRepository businessRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private ProductMapper productMapper;
+    @Mock
+    private ProductRepository productRepository;
+    @Mock
+    private ProductSubCategoryRepository productSubCategoryRepository;
+    @Mock
+    private ProductCategoryRepository productCategoryRepository;
+    @Mock
+    private BranchRepository branchRepository;
+    @Mock
+    private BusinessRepository businessRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private ProductMapper productMapper;
 
-    @InjectMocks private ProductService productService;
+    @InjectMocks
+    private ProductService productService;
 
     private TestUtils utils = TestUtils.builder().build();
 
@@ -94,7 +104,8 @@ public class ProductServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Product sub-category with id " + dto.getSubCategoryId() + " does not exists");
+            Assert.assertEquals(e.getMessage(),
+                    "Product sub-category with id " + dto.getSubCategoryId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
         }
     }
@@ -104,7 +115,8 @@ public class ProductServiceTest {
         Product product = utils.createProduct(null);
         ProductDTO dto = utils.createProductDTO(product);
 
-        when(productSubCategoryRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(product.getSubCategory()));
+        when(productSubCategoryRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(product.getSubCategory()));
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(productMapper.toEntity(any(ProductDTO.class), any(ProductSubCategory.class))).thenReturn(product);
         when(productMapper.toDTO(any(Product.class))).thenReturn(dto);

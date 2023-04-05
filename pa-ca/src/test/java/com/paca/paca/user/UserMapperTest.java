@@ -1,22 +1,23 @@
 package com.paca.paca.user;
 
-import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.dto.UserDTO;
+import org.mockito.Mock;
+import org.junit.jupiter.api.Test;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
+import com.paca.paca.statics.UserRole;
+import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.utils.UserMapper;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class UserMapperTest {
-    @Mock private UserMapper userMapper;
+    @Mock
+    private UserMapper userMapper;
 
     @Test
     void shouldMapUserEntityToUserDTO() {

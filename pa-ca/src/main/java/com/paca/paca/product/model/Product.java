@@ -2,8 +2,8 @@ package com.paca.paca.product.model;
 
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 
 @Builder
 @Entity

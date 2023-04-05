@@ -1,8 +1,8 @@
 package com.paca.paca.branch.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -13,5 +13,7 @@ public class AmenityDTO {
     private Long id;
     private String name;
 
-    public AmenityDTO(Long id) { this.id = id; }
+    public AmenityDTO(Long id) {
+        this.id = id;
+    }
 }

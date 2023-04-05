@@ -1,11 +1,8 @@
 package com.paca.paca;
 
-import org.apache.logging.log4j.util.StringMap;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import java.util.Map;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.DynamicPropertyRegistry;
 
 public abstract class PacaTest {
     public static final PostgreSQLContainer<?> POSTGRES_SQL_CONTAINER;

@@ -1,11 +1,12 @@
 package com.paca.paca.business.controller;
 
-import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness;
+import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import com.paca.paca.business.service.BusinessService;
 @RestController
 @RequestMapping("/api/v1/business")
 public class BusinessController {
-    
+
     private final BusinessService businessService;
 
     public BusinessController(BusinessService businessService) {
@@ -26,7 +27,6 @@ public class BusinessController {
     public ResponseEntity<BusinessListDTO> getAll() {
         return ResponseEntity.ok(businessService.getAll());
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<BusinessDTO> getById(@PathVariable("id") Long id) {

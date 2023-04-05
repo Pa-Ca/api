@@ -1,7 +1,8 @@
 package com.paca.paca.business.model;
-import com.paca.paca.statics.BusinessTier;
-import jakarta.persistence.*;
+
 import lombok.*;
+import jakarta.persistence.*;
+import com.paca.paca.statics.BusinessTier;
 
 @Entity
 @Builder

@@ -1,37 +1,42 @@
 package com.paca.paca.user;
 
-import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.user.model.Role;
+import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.dto.UserListDTO;
-import com.paca.paca.user.model.Role;
-import com.paca.paca.user.model.User;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.utils.UserMapper;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import com.paca.paca.user.service.UserService;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.exception.exceptions.BadRequestException;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
+import com.paca.paca.utils.TestUtils;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.paca.paca.utils.TestUtils;
+
+import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    @Mock private UserRepository userRepository;
-    @Mock private UserMapper userMapper;
-    @Mock private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UserMapper userMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserService userService;
 
@@ -128,7 +133,7 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(any(String.class))).thenReturn(true);
         try {
             userService.update(1L, UserDTO.builder().email("test@test.com").build());
-        } catch (BadRequestException e){
+        } catch (BadRequestException e) {
             assertThat(e.getMessage()).isEqualTo("This email is already taken");
             assertThat(e.getCode()).isEqualTo(400);
         }
