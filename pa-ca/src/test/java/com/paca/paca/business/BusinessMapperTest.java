@@ -1,20 +1,17 @@
 package com.paca.paca.business;
 
-import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.user.model.User;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import com.paca.paca.utils.TestUtils;
-import com.paca.paca.business.model.Business;
-import com.paca.paca.business.model.Tier;
-import com.paca.paca.business.dto.BusinessDTO;
-
 import org.junit.jupiter.api.extension.ExtendWith;
-import com.paca.paca.business.utils.BusinessMapperImpl;
-
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Date;
+import com.paca.paca.user.model.User;
+import com.paca.paca.utils.TestUtils;
+import com.paca.paca.business.model.Tier;
+import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.business.utils.BusinessMapperImpl;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -25,7 +22,7 @@ public class BusinessMapperTest {
     private BusinessMapperImpl businessMapper;
 
     private TestUtils utils = TestUtils.builder().build();
-    
+
     @Test
     void shouldMapBusinessEntityToBusinessDTO() {
         Business business = utils.createBusiness(null);

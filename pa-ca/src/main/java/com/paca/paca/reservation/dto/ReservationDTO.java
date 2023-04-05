@@ -2,9 +2,9 @@ package com.paca.paca.reservation.dto;
 
 import java.util.Date;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 

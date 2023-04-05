@@ -1,27 +1,26 @@
 package com.paca.paca.business;
 
-import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.business.model.Business;
-import com.paca.paca.user.repository.RoleRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-
-import com.paca.paca.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-
-import com.paca.paca.PacaTest;
-import com.paca.paca.user.model.User;
-import com.paca.paca.business.model.Tier;
-import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.user.repository.UserRepository;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import com.paca.paca.business.repository.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+
+import com.paca.paca.PacaTest;
+import com.paca.paca.user.model.User;
+import com.paca.paca.utils.TestUtils;
+import com.paca.paca.business.model.Tier;
+import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.user.repository.RoleRepository;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.business.repository.BusinessRepository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -104,7 +103,7 @@ class BusinessRepositoryTest extends PacaTest {
 
         assertThat(business.size()).isEqualTo(nUsers);
     }
-    
+
     @Test
     void shouldCheckThatBusinessExistsById() {
         Business business = utils.createBusiness(null);
@@ -128,11 +127,11 @@ class BusinessRepositoryTest extends PacaTest {
         assertThat(expected).isFalse();
         assertThat(expectedBusiness.isEmpty()).isTrue();
     }
-   
+
     @Test
     void shouldDeleteBusiness() {
         Business business = utils.createBusiness(null);
-        
+
         businessRepository.delete(business);
 
         List<Business> businessList = businessRepository.findAll();

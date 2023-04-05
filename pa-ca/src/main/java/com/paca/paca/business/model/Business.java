@@ -16,7 +16,7 @@ import jakarta.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="`business`")
+@Table(name = "`business`")
 public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "business_seq")
@@ -27,12 +27,14 @@ public class Business {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "verified")
     private Boolean verified;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "tier_id")
     private Tier tier;
-
 }
