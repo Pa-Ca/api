@@ -1,5 +1,6 @@
 package com.paca.paca.product;
 
+import com.paca.paca.PacaTest;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.product.model.Product;
@@ -34,7 +35,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ProductRepositoryTest {
+public class ProductRepositoryTest extends PacaTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired

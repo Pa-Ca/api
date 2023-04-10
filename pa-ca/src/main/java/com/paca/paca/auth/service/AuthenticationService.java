@@ -76,7 +76,7 @@ public class AuthenticationService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(new Role(1L, "client"))
+                .role(role.get())
                 .verified(false)
                 .loggedIn(false)
                 .build();
