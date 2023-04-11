@@ -140,6 +140,7 @@ public class BusinessService {
                         12));
 
         BusinessDTO dto = businessMapper.toDTO(business);
+        dto.setUserId(business.getUser().getId());
 
         return dto;
     }

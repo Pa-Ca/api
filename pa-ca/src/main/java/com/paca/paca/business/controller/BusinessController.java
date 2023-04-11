@@ -54,4 +54,8 @@ public class BusinessController {
         businessService.delete(id);
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<BusinessDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
+        return ResponseEntity.ok(businessService.getByUserId(id));
+    }
 }
