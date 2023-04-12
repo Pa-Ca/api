@@ -1,10 +1,11 @@
 package com.paca.paca.auth;
 
+import junit.framework.TestCase;
+
 import org.junit.Assert;
 import org.mockito.Mock;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
-import junit.framework.TestCase;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.security.core.Authentication;
@@ -19,16 +20,20 @@ import com.paca.paca.user.utils.UserMapper;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
+import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.auth.dto.ResetPasswordDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
-import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
+import com.paca.paca.auth.dto.ResetPasswordResponseDTO;
 import com.paca.paca.auth.service.AuthenticationService;
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.exception.exceptions.AuthException;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.auth.repository.JwtBlackListRepository;
+import com.paca.paca.exception.exceptions.ForbiddenException;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
@@ -204,7 +209,7 @@ public class AuthServiceTest {
                 .thenReturn(Optional.ofNullable(role));
         when(passwordEncoder.encode(any(String.class)))
                 .thenReturn(passHash);
-        when(jwtService.generateToken(any(User.class), any(Boolean.class)))
+        when(jwtService.generateToken(any(User.class), any(JwtService.TokenType.class)))
                 .thenReturn(token);
         when(userRepository.save(any(User.class)))
                 .thenReturn(user);
@@ -310,7 +315,7 @@ public class AuthServiceTest {
                 .thenReturn(Optional.ofNullable(user));
         when(authenticationManager.authenticate(any(Authentication.class)))
                 .thenReturn(auth);
-        when(jwtService.generateToken(any(User.class), any(Boolean.class)))
+        when(jwtService.generateToken(any(User.class), any(JwtService.TokenType.class)))
                 .thenReturn(token);
 
         LoginRequestDTO request = LoginRequestDTO.builder()
@@ -478,7 +483,7 @@ public class AuthServiceTest {
                 .thenReturn(true);
         when(jwtService.isTokenRefresh(any(String.class)))
                 .thenReturn(true);
-        when(jwtService.generateToken(any(User.class), any(Boolean.class)))
+        when(jwtService.generateToken(any(User.class), any(JwtService.TokenType.class)))
                 .thenReturn(token);
 
         RefreshRequestDTO request = RefreshRequestDTO.builder()
@@ -489,4 +494,228 @@ public class AuthServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getToken()).isEqualTo(token);
     }
+
+    @Test
+    void shouldGetBadRequestDueToMissingEmailInResetPasswordRequest() {
+        ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder().build();
+
+        try {
+            authenticationService.resetPasswordRequest(request);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(), "Email not found");
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToUserDoesNotExistsInResetPasswordRequest() {
+        String email = "test@test.com";
+
+        ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
+                .email(email)
+                .build();
+
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            authenticationService.resetPasswordRequest(request);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "User with email " + email + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+        }
+    }
+
+    @Test
+    void shouldResetPasswordRequest() {
+        Long id = 1L;
+        String email = "test@test.com";
+        String password = "123456789aA#";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        Role role = Role.builder()
+                .id((long) UserRole.admin.ordinal())
+                .name(UserRole.admin).build();
+        User user = User.builder()
+                .id(id)
+                .email(email)
+                .password(password)
+                .verified(false)
+                .loggedIn(false)
+                .role(role)
+                .build();
+
+        ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
+                .email(email)
+                .build();
+
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
+        when(jwtService.generateToken(any(User.class), any(JwtService.TokenType.class)))
+                .thenReturn(token);
+
+        ResetPasswordResponseDTO response = authenticationService.resetPasswordRequest(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getToken()).isEqualTo(token);
+    }
+
+    @Test
+    void shouldGetForbiddenDueToInvalidTokenInResetPassword() {
+        String password = "12345678";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password(password)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(false);
+
+        try {
+            authenticationService.resetPassword(request, token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Authentication failed");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
+        }
+    }
+
+    @Test
+    void shouldGetForbiddenDueToIncorrectTokenInResetPassword() {
+        String password = "12345678";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password(password)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenResetPassword(any(String.class)))
+                .thenReturn(false);
+
+        try {
+            authenticationService.resetPassword(request, token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Authentication failed");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
+        }
+    }
+
+    @Test
+    void shouldGetUnprocessableDueToPasswordTooShortInResetPassword() {
+        String password = "1234";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password(password)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenResetPassword(any(String.class)))
+                .thenReturn(true);
+
+        try {
+            authenticationService.resetPassword(request, token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Invalid password");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 2);
+        }
+    }
+
+    @Test
+    void shouldGetUnprocessableDueToPasswordTooLongInResetPassword() {
+        String password = "1234";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        for (int i = 0; i < 64; i++) {
+            password += ".";
+        }
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password(password)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenResetPassword(any(String.class)))
+                .thenReturn(true);
+
+        try {
+            authenticationService.resetPassword(request, token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Invalid password");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 3);
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToUserDoesNotExistsInResetPassword() {
+        String password = "12345678";
+        String email = "test@test.com";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password(password)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenResetPassword(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.extractEmail(any(String.class)))
+                .thenReturn(email);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            authenticationService.resetPassword(request, token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "User with email " + email + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+        }
+    }
+
+    @Test
+    void shouldResetPassword() {
+        Long id = 1L;
+        String email = "test@test.com";
+        String password = "123456789aA#";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        Role role = Role.builder()
+                .id((long) UserRole.admin.ordinal())
+                .name(UserRole.admin).build();
+        User user = User.builder()
+                .id(id)
+                .email(email)
+                .password(password)
+                .verified(false)
+                .loggedIn(false)
+                .role(role)
+                .build();
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password(password)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenResetPassword(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.extractEmail(any(String.class)))
+                .thenReturn(email);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
+
+        authenticationService.resetPassword(request, token);
+    }
+
 }

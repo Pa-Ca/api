@@ -29,7 +29,7 @@ public class JwtServiceTest {
     @InjectMocks
     private JwtService jwtService;
 
-    @Test 
+    @Test
     void shouldGenerateToken() {
         Long id = 1L;
         String email = "test@test.com";
@@ -49,14 +49,14 @@ public class JwtServiceTest {
         when(jwtBlackListRepository.findByToken(any(String.class)))
                 .thenReturn(Optional.empty());
 
-        String token = jwtService.generateToken(user, false);
+        String token = jwtService.generateToken(user, JwtService.TokenType.TOKEN);
 
         assertThat(jwtService.extractEmail(token)).isEqualTo(email);
         assertThat(jwtService.isTokenValid(token, user)).isTrue();
         assertThat(jwtService.isTokenRefresh(token)).isFalse();
     }
-    
-    @Test 
+
+    @Test
     void shouldGenerateRefresh() {
         Long id = 1L;
         String email = "test@test.com";
@@ -76,14 +76,41 @@ public class JwtServiceTest {
         when(jwtBlackListRepository.findByToken(any(String.class)))
                 .thenReturn(Optional.empty());
 
-        String refresh = jwtService.generateToken(user, true);
+        String refresh = jwtService.generateToken(user, JwtService.TokenType.REFRESH);
 
         assertThat(jwtService.extractEmail(refresh)).isEqualTo(email);
         assertThat(jwtService.isTokenValid(refresh, user)).isTrue();
         assertThat(jwtService.isTokenRefresh(refresh)).isTrue();
     }
 
-    @Test 
+    @Test
+    void shouldGenerateResetPassword() {
+        Long id = 1L;
+        String email = "test@test.com";
+        String password = "123456789aA#";
+        Role role = Role.builder()
+                .id((long) UserRole.admin.ordinal())
+                .name(UserRole.admin).build();
+        User user = User.builder()
+                .id(id)
+                .email(email)
+                .password(password)
+                .verified(false)
+                .loggedIn(false)
+                .role(role)
+                .build();
+
+        when(jwtBlackListRepository.findByToken(any(String.class)))
+                .thenReturn(Optional.empty());
+
+        String refresh = jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD);
+
+        assertThat(jwtService.extractEmail(refresh)).isEqualTo(email);
+        assertThat(jwtService.isTokenValid(refresh, user)).isTrue();
+        assertThat(jwtService.isTokenResetPassword(refresh)).isTrue();
+    }
+
+    @Test
     void shouldAddToBlackList() {
         Long id = 1L;
         String email = "test@test.com";
@@ -100,7 +127,7 @@ public class JwtServiceTest {
                 .role(role)
                 .build();
 
-        String token = jwtService.generateToken(user, false);
+        String token = jwtService.generateToken(user, JwtService.TokenType.TOKEN);
 
         Date expiration = new Date(System.currentTimeMillis());
         JwtBlackList jwt = JwtBlackList.builder()
