@@ -34,7 +34,7 @@ public class AuthenticationController {
     @PostMapping(AuthenticationStatics.Endpoint.SIGNUP)
     public ResponseEntity<LoginResponseDTO> signup(
             @RequestBody SignupRequestDTO request)
-            throws BadRequestException, NoContentException,UnprocessableException, ConflictException {
+            throws BadRequestException, NoContentException, UnprocessableException, ConflictException {
         return ResponseEntity.ok(service.signup(request));
     }
 
