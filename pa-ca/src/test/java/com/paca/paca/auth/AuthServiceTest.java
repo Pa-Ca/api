@@ -49,13 +49,13 @@ public class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
-    
+
     @Mock
     private UserMapper userMapper;
 
     @Mock
     private PasswordEncoder passwordEncoder;
-    
+
     @Mock
     private JwtService jwtService;
 
@@ -84,7 +84,7 @@ public class AuthServiceTest {
             Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 0);
         }
     }
-    
+
     @Test
     void shouldGetConflictDueToUserAlreadyExistsInSignup() {
         String email = "test@test.com";
@@ -154,98 +154,6 @@ public class AuthServiceTest {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Invalid password");
             Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 3);
-        }
-    }
-
-    @Test
-    void shouldGetUnprocessableDueToPasswordWithoutUpperCaseInSignup() {
-        String email = "test@test.com";
-        String password = "123456789aa#";
-        SignupRequestDTO request = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role(UserRole.admin.name())
-                .build();
-
-        when(userRepository.existsByEmail(any(String.class)))
-                .thenReturn(false);
-
-        try {
-            authenticationService.signup(request);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Invalid password");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 4);
-        }
-    }
-
-    @Test
-    void shouldGetUnprocessableDueToPasswordWithoutLoweCaseInSignup() {
-        String email = "test@test.com";
-        String password = "123456789AA#";
-        SignupRequestDTO request = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role(UserRole.admin.name())
-                .build();
-
-        when(userRepository.existsByEmail(any(String.class)))
-                .thenReturn(false);
-
-        try {
-            authenticationService.signup(request);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Invalid password");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 5);
-        }
-    }
-
-    @Test
-    void shouldGetUnprocessableDueToPasswordWithoutDigitInSignup() {
-        String email = "test@test.com";
-        String password = "FFFFFFFFFAa#";
-        SignupRequestDTO request = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role(UserRole.admin.name())
-                .build();
-
-        when(userRepository.existsByEmail(any(String.class)))
-                .thenReturn(false);
-
-        try {
-            authenticationService.signup(request);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Invalid password");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 6);
-        }
-    }
-
-    @Test
-    void shouldGetUnprocessableDueToPasswordWithoutSpecialInSignup() {
-        String email = "test@test.com";
-        String password = "123456789Aa";
-        SignupRequestDTO request = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role(UserRole.admin.name())
-                .build();
-
-        when(userRepository.existsByEmail(any(String.class)))
-                .thenReturn(false);
-
-        try {
-            authenticationService.signup(request);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Invalid password");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 7);
         }
     }
 
@@ -377,7 +285,7 @@ public class AuthServiceTest {
         }
     }
 
-    @Test 
+    @Test
     void shouldLogin() {
         Long id = 1L;
         String email = "test@test.com";
@@ -438,7 +346,7 @@ public class AuthServiceTest {
             Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
         }
     }
-    
+
     @Test
     void shouldGetForbiddenDueToUserNotFoundInRefresh() {
         String email = "test@test.com";
@@ -463,7 +371,7 @@ public class AuthServiceTest {
         }
     }
 
-    @Test 
+    @Test
     void shouldGetForbiddenDueToRefreshNoValidInRefresh() {
         Long id = 1L;
         String email = "test@test.com";
@@ -501,8 +409,8 @@ public class AuthServiceTest {
             Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
         }
     }
-    
-    @Test 
+
+    @Test
     void shouldGetForbiddenDueToTokenNotIsRefreshInRefresh() {
         Long id = 1L;
         String email = "test@test.com";
@@ -532,7 +440,7 @@ public class AuthServiceTest {
         RefreshRequestDTO request = RefreshRequestDTO.builder()
                 .refresh(refresh)
                 .build();
-        
+
         try {
             authenticationService.refresh(request);
             TestCase.fail();
@@ -543,7 +451,7 @@ public class AuthServiceTest {
         }
     }
 
-    @Test 
+    @Test
     void shouldRefresh() {
         Long id = 1L;
         String email = "test@test.com";

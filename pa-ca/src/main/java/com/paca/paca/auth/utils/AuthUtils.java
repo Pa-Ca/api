@@ -8,9 +8,7 @@ import java.util.regex.Pattern;
 import org.passay.LengthRule;
 import org.passay.RuleResult;
 import org.passay.PasswordData;
-import org.passay.CharacterRule;
 import org.passay.PasswordValidator;
-import org.passay.EnglishCharacterData;
 import org.passay.PropertiesMessageResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +29,7 @@ public class AuthUtils {
             throw new UnprocessableException("Invalid email format", 0);
         }
     }
-    
+
     public static void validatePassword(String password) {
         if (password == null)
             throw new BadRequestException("Password not found");
@@ -46,15 +44,7 @@ public class AuthUtils {
                 // length
                 new LengthRule(
                         AuthenticationStatics.Auth.PASS_MIN_LENGTH,
-                        AuthenticationStatics.Auth.PASS_MAX_LENGTH),
-                // at least one upper-case character
-                new CharacterRule(EnglishCharacterData.UpperCase, 1),
-                // at least one lower-case character
-                new CharacterRule(EnglishCharacterData.LowerCase, 1),
-                // at least one digit character
-                new CharacterRule(EnglishCharacterData.Digit, 1),
-                // at least one symbol (special character)
-                new CharacterRule(EnglishCharacterData.Special, 1));
+                        AuthenticationStatics.Auth.PASS_MAX_LENGTH));
         RuleResult result = validator.validate(new PasswordData(password));
         if (!result.isValid()) {
             List<String> codes = validator.getMessages(result);
@@ -69,4 +59,3 @@ public class AuthUtils {
         }
     }
 }
-

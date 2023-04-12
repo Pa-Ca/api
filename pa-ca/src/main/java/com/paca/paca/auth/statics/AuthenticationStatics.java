@@ -17,18 +17,14 @@ public interface AuthenticationStatics {
     Integer PASS_MAX_LENGTH = 64;
     Map<String, String> PASSWORD_ERRORS_PROPS = Map.ofEntries(
         entry("TOO_SHORT", "2"),
-        entry("TOO_LONG", "3"),
-        entry("INSUFFICIENT_UPPERCASE", "4"),
-        entry("INSUFFICIENT_LOWERCASE", "5"),
-        entry("INSUFFICIENT_DIGIT", "6"),
-        entry("INSUFFICIENT_SPECIAL", "7"));
+        entry("TOO_LONG", "3"));
   }
 
   interface Endpoint {
-    String AUTH_PATH = "/api/v1/auth";
-    String SIGNUP = "/signup";
     String LOGIN = "/login";
-    String REFRESH = "/refresh";
+    String SIGNUP = "/signup";
     String LOGOUT = "/logout";
+    String REFRESH = "/refresh";
+    String AUTH_PATH = "/api/v1/auth";
   }
 }
