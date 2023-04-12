@@ -4,11 +4,14 @@ import com.paca.paca.utils.TestUtils;
 import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.auth.dto.LoginRequestDTO;
+import com.paca.paca.auth.dto.ResetPasswordDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
+import com.paca.paca.auth.dto.ResetPasswordResponseDTO;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.auth.service.AuthenticationService;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -38,7 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = { AuthenticationController.class })
 public class AuthControllerTest extends ControllerTest {
-    
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -54,7 +57,7 @@ public class AuthControllerTest extends ControllerTest {
     private TestUtils utils = TestUtils.builder().build();
 
     @Test
-    public void shouldGetBadRequestInSignup() throws Exception {
+    void shouldGetBadRequestInSignup() throws Exception {
         SignupRequestDTO request = utils.createSignupRequestDTO();
 
         when(authService.signup(any(SignupRequestDTO.class))).thenThrow(new BadRequestException("message", 0));
@@ -68,7 +71,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetNoContentInSignup() throws Exception {
+    void shouldGetNoContentInSignup() throws Exception {
         SignupRequestDTO request = utils.createSignupRequestDTO();
 
         when(authService.signup(any(SignupRequestDTO.class))).thenThrow(new NoContentException("message", 0));
@@ -82,7 +85,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetUnprocessableInSignup() throws Exception {
+    void shouldGetUnprocessableInSignup() throws Exception {
         SignupRequestDTO request = utils.createSignupRequestDTO();
 
         when(authService.signup(any(SignupRequestDTO.class))).thenThrow(new UnprocessableException("message", 0));
@@ -96,7 +99,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetConflictInSignup() throws Exception {
+    void shouldGetConflictInSignup() throws Exception {
         SignupRequestDTO request = utils.createSignupRequestDTO();
 
         when(authService.signup(any(SignupRequestDTO.class))).thenThrow(new ConflictException("message", 0));
@@ -109,7 +112,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test 
+    @Test
     void shouldSignup() throws Exception {
         SignupRequestDTO request = utils.createSignupRequestDTO();
         LoginResponseDTO response = utils.createLoginResponseDTO();
@@ -127,7 +130,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetForbiddenInLogin() throws Exception {
+    void shouldGetForbiddenInLogin() throws Exception {
         LoginRequestDTO request = utils.createLoginRequestDTO();
 
         when(authService.login(any(LoginRequestDTO.class))).thenThrow(new ForbiddenException("message", 0));
@@ -140,7 +143,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test 
+    @Test
     void shouldLogin() throws Exception {
         LoginRequestDTO request = utils.createLoginRequestDTO();
         LoginResponseDTO response = utils.createLoginResponseDTO();
@@ -158,7 +161,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetForbiddenInRefresh() throws Exception {
+    void shouldGetForbiddenInRefresh() throws Exception {
         RefreshRequestDTO request = utils.createRefreshRequestDTO();
 
         when(authService.refresh(any(RefreshRequestDTO.class))).thenThrow(new ForbiddenException("message", 0));
@@ -171,7 +174,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test 
+    @Test
     void shouldRefresh() throws Exception {
         RefreshRequestDTO request = utils.createRefreshRequestDTO();
         RefreshResponseDTO response = utils.createRefreshResponseDTO();
@@ -186,7 +189,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetBadRequestInLogout() throws Exception {
+    void shouldGetBadRequestInLogout() throws Exception {
         LogoutDTO request = utils.createLogoutDTO();
 
         doThrow(new ForbiddenException("message", 0)).when(authService).logout(any(LogoutDTO.class));
@@ -199,7 +202,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test 
+    @Test
     void shouldLogout() throws Exception {
         LogoutDTO request = utils.createLogoutDTO();
 
@@ -210,4 +213,163 @@ public class AuthControllerTest extends ControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    @Test
+    void shouldGetBadRequestExceptionInResetPasswordRequest() throws Exception {
+        ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
+                .email("test@test.com")
+                .build();
+
+        when(authService.resetPasswordRequest(any(ResetPasswordRequestDTO.class)))
+                .thenThrow(new BadRequestException("message", 0));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.RESET_PASSWORD_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    void shouldGetNoContentExceptionInResetPasswordRequest() throws Exception {
+        ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
+                .email("test@test.com")
+                .build();
+
+        when(authService.resetPasswordRequest(any(ResetPasswordRequestDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.RESET_PASSWORD_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    void shouldResetPasswordRequest() throws Exception {
+        ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
+                .email("test@test.com")
+                .build();
+        ResetPasswordResponseDTO response = ResetPasswordResponseDTO.builder()
+                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
+                .build();
+
+        when(authService.resetPasswordRequest(any(ResetPasswordRequestDTO.class))).thenReturn(response);
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.RESET_PASSWORD_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is(response.getToken())));
+    }
+
+    @Test
+    void shouldGetForbiddenExceptionInResetPassword() throws Exception {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password("123455678")
+                .build();
+
+        doThrow(new ForbiddenException("message", 0))
+                .when(authService).resetPassword(any(ResetPasswordDTO.class),
+                        any(String.class));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    void shouldGetBadRequestExceptionInResetPassword() throws Exception {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password("123455678")
+                .build();
+
+        doThrow(new BadRequestException("message", 0))
+                .when(authService).resetPassword(any(ResetPasswordDTO.class),
+                        any(String.class));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    void shouldGetUnprocessableExceptionInResetPassword() throws Exception {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password("123455678")
+                .build();
+
+        doThrow(new UnprocessableException("message", 0))
+                .when(authService).resetPassword(any(ResetPasswordDTO.class),
+                        any(String.class));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    void shouldGetNoContentExceptionInResetPassword() throws Exception {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password("123455678")
+                .build();
+
+        doThrow(new NoContentException("message", 0))
+                .when(authService).resetPassword(any(ResetPasswordDTO.class),
+                        any(String.class));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    void shouldResetPassword() throws Exception {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .password("123455678")
+                .build();
+
+        doNothing().when(authService)
+                .resetPassword(any(ResetPasswordDTO.class),
+                        any(String.class));
+
+        mockMvc.perform(post(
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
 }

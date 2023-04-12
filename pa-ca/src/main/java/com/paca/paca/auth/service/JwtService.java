@@ -27,6 +27,10 @@ import com.paca.paca.exception.exceptions.ForbiddenException;
 @RequiredArgsConstructor
 public class JwtService {
 
+    public enum TokenType {
+        TOKEN, REFRESH, RESET_PASSWORD
+    }
+
     private final JwtBlackListRepository jwtBlackListRepository;
 
     public String extractEmail(String token) {
@@ -38,34 +42,48 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(User user, Boolean isRefresh) {
-        return generateToken(new HashMap<>(), user, isRefresh);
+    public String generateToken(User user, TokenType type) {
+        return generateToken(new HashMap<>(), user, type);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
             User user,
-            Boolean isRefresh) {
+            TokenType type) {
+        Integer expiration = 0;
+
+        switch (type) {
+            case TOKEN:
+                expiration = AuthenticationStatics.Jwt.TOKEN_EXPIRATION;
+                break;
+            case REFRESH:
+                expiration = AuthenticationStatics.Jwt.REFRESH_EXPIRATION;
+                break;
+            case RESET_PASSWORD:
+                expiration = AuthenticationStatics.Jwt.RESET_PASSWORD_EXPIRATION;
+                break;
+        }
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(
-                        System.currentTimeMillis() + (
-                            isRefresh ? AuthenticationStatics.Jwt.REFRESH_EXPIRATION :
-                                        AuthenticationStatics.Jwt.TOKEN_EXPIRATION
-                            )
-                ))
-                .claim("isRefresh", isRefresh)
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .claim("type", type.name())
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean isTokenValid(String token) {
+        return !isTokenExpired(token) &&
+                !jwtBlackListRepository.findByToken(token).isPresent();
     }
 
     public boolean isTokenValid(String token, User user) {
         final String email = extractEmail(token);
         return (email.equals(user.getEmail())) &&
-                !isTokenExpired(token) && 
+                !isTokenExpired(token) &&
                 !jwtBlackListRepository.findByToken(token).isPresent();
     }
 
@@ -75,7 +93,12 @@ public class JwtService {
 
     public boolean isTokenRefresh(String token) {
         Claims claims = extractAllClaims(token);
-        return (boolean) claims.get("isRefresh");
+        return ((String) claims.get("type")).equals(TokenType.REFRESH.name());
+    }
+
+    public boolean isTokenResetPassword(String token) {
+        Claims claims = extractAllClaims(token);
+        return ((String) claims.get("type")).equals(TokenType.RESET_PASSWORD.name());
     }
 
     private Date extractExpiration(String token) {
@@ -102,7 +125,7 @@ public class JwtService {
                     .token(token)
                     .expiration(extractExpiration(token))
                     .build();
-            
+
             jwtBlackListRepository.save(jwt);
         } catch (Exception e) {
             throw new ForbiddenException("Invalid token");
