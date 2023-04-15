@@ -75,5 +75,14 @@ public class ReviewController {
             @PathVariable("clientId") Long clientId) throws NoContentException {
         return ResponseEntity.ok(reviewService.dislike(id, clientId));
     }
+
+    @GetMapping(params = { "page", "size" })
+    @ValidateRoles({})
+    public ResponseEntity<ReviewListDTO> getPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
+        return ResponseEntity.ok(reviewService.getPage(page, size));
+    }
+    
 }
 

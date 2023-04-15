@@ -63,6 +63,7 @@ import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
+
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -70,6 +71,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -123,6 +126,16 @@ public class TestUtils {
         }
 
         return result;
+    }
+
+    public static <T> Page<T> castPage(Class<? extends T> clazz, Page<?> rawCollection) {
+        List<T> result = new ArrayList<>(rawCollection.getContent().size());
+
+        for (int i = 0; i < rawCollection.getContent().size(); i++) {
+            result.add(clazz.cast(rawCollection.getContent().get(i)));
+        }
+
+        return new PageImpl<>(result);
     }
 
     public void setAuthorities(String role) {

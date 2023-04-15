@@ -13,10 +13,20 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.UnprocessableException;
+
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
+
+
+
 
 import java.util.List;
 import java.util.Optional;
@@ -179,4 +189,49 @@ public class ReviewService {
         dto.setLikes(reviewLikeRepository.findAllByReviewId(review.get().getId()).size());
         return dto;
     }
+    // This method returns a list of reviews with pagination
+    public ReviewListDTO getPage(int page, int size) throws UnprocessableException{
+
+        // Now lets add the exeption handling
+        // TODO: Add the corresponding codes to the exceptions
+        if (page < 0) {
+            throw new UnprocessableException(
+                "Page number cannot be less than zero", 
+                40);
+        }
+        if (size < 1) {
+            throw new UnprocessableException(
+                "Size cannot be less than one", 
+                41);
+        }
+
+        
+        // Create a Pageable object that specifies the page and size parameters as well as a sort 
+        // order for the results
+        Pageable paging = PageRequest.of(
+                page,
+                size,
+                // Sort by id descending 
+                // TODO: Add more ways to sort
+                Sort.by("id").descending()
+        );
+        
+        // Query the database for the appropriate page of results using the findAll method of the 
+        // reviewRepository
+        Page<Review> pagedResult = reviewRepository.findAll(paging);
+        
+        // Map the results to a list of ReviewDTO objects using the reviewMapper
+        List<ReviewDTO> response = new ArrayList<>();
+        
+        pagedResult.forEach(review -> {
+            ReviewDTO dto = reviewMapper.toDTO(review);
+            dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
+        response.add(dto);
+        });
+
+    // Return a ReviewListDTO object that contains the list of ReviewDTO objects
+    return ReviewListDTO.builder().reviews(response).build();
+    }
+
+
 }

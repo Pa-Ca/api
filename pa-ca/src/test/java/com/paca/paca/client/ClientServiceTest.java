@@ -36,11 +36,21 @@ import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
+
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+
+
+
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -1019,4 +1029,88 @@ public class ClientServiceTest {
         assertThat(dtoResponse.getClientId()).isEqualTo(like.getReview().getClient().getId());
         assertThat(dtoResponse.getLikes()).isEqualTo(1);
     }
+
+    // Test for getPage method
+    // Lets test the exception when the page is less than 0
+    @Test
+    void shouldGetUnprocessableDueToPageLessThanZeroInGetPage() {
+        try {
+            reviewService.getPage(-1, 10);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+        }
+    }
+    // Lets test the exception when the size is less than 1
+    @Test
+    void shouldGetUnprocessableDueToSizeLessThanOneInGetPage() {
+        try {
+            reviewService.getPage(1, 0);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+        }
+    }
+
+    // Now lets test the that the getPage method works as expected
+    // First lets create 20 reviews
+    // Then lets get the first page with 10 reviews
+    // Then lets get the second page with 10 reviews
+    // Check if the first page has 10 reviews
+    // Check if the second page has 10 reviews
+    @Test
+    void shouldGetPage() {
+        //Page<Review> pagedResult = TestUtils.castPage(Review.class, Mockito.mock(Page.class));
+
+        Pageable pageable = Mockito.mock(Pageable.class);
+        when(pageable.getPageSize()).thenReturn(10);
+        //when(pageable.getPageNumber()).thenReturn(1);
+        
+
+        // Create 20 reviews manually
+        List<Review> reviews  = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            reviews.add(utils.createReview(null, null));
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), reviews.size());
+        Page<Review> pagedResult = new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
+
+        // print the pagedResult
+        System.out.println("pagedResult: " + pagedResult); 
+
+
+        //when(reviewRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
+        // when(pagedResult.getContent()).thenReturn(reviews.subList(0, 10));
+        // when(pagedResult.hasNext()).thenReturn(true);
+        // when(pagedResult.hasPrevious()).thenReturn(false);
+        // when(pagedResult.getTotalPages()).thenReturn(2);
+        // when(pagedResult.getTotalElements()).thenReturn(20L);
+        // when(pagedResult.getNumber()).thenReturn(0);
+        // when(pagedResult.getSize()).thenReturn(10);
+
+
+        
+        when(reviewRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
+        when(reviewMapper.toDTO(any(Review.class))).thenReturn(utils.createReviewDTO(null));
+
+        ReviewListDTO pageResponse = reviewService.getPage(0, 10);
+        ReviewListDTO pageResponse2 = reviewService.getPage(1, 10);
+
+        assertThat(pageResponse).isNotNull();
+        assertThat(pageResponse2).isNotNull();
+
+        assertThat(pageResponse.getReviews().size()).isEqualTo(10);
+        assertThat(pageResponse2.getReviews().size()).isEqualTo(10);
+
+    }
+
+
+
+
 }
