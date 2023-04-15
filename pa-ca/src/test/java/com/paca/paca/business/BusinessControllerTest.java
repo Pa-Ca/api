@@ -332,4 +332,37 @@ public class BusinessControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    // GetByUserID
+    @Test
+    public void shouldGetNoContentInGetBusinessByUserId() throws Exception {
+        when(businessService.getByUserId(anyLong())).thenThrow(new NoContentException("message", 0));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get(BusinessStatics.Endpoint.PATH.concat("/user/1"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    public void shouldGetBusinessByUserId() throws Exception {
+        BusinessDTO dto = utils.createBusinessDTO(null);
+
+        when(businessService.getByUserId(anyLong())).thenReturn(dto);
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get(BusinessStatics.Endpoint.PATH.concat("/user/" + dto.getUserId()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(dto.getUserId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(dto.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(dto.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
+    }
+
 }

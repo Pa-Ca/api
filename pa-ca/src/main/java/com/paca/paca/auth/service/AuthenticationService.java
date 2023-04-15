@@ -17,10 +17,13 @@ import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.auth.dto.ResetPasswordDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
+import com.paca.paca.auth.dto.ResetPasswordResponseDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -76,7 +79,7 @@ public class AuthenticationService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(new Role(1L, "client"))
+                .role(role.get())
                 .verified(false)
                 .loggedIn(false)
                 .build();
@@ -84,8 +87,8 @@ public class AuthenticationService {
 
         // Generate JWT token and Response
         LoginResponseDTO response = LoginResponseDTO.builder()
-                .token(jwtService.generateToken(user, false))
-                .refresh(jwtService.generateToken(user, true))
+                .token(jwtService.generateToken(user, JwtService.TokenType.TOKEN))
+                .refresh(jwtService.generateToken(user, JwtService.TokenType.REFRESH))
                 .id(user.getId())
                 .role(user.getRole().getName().name())
                 .build();
@@ -108,7 +111,10 @@ public class AuthenticationService {
             throw new ForbiddenException("Authentication failed", 9);
         }
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new NoContentException(
+                        "User with email " + email + " does not exists",
+                        30));
 
         try {
             authenticationManager.authenticate(
@@ -120,8 +126,8 @@ public class AuthenticationService {
         }
 
         LoginResponseDTO response = LoginResponseDTO.builder()
-                .token(jwtService.generateToken(user, false))
-                .refresh(jwtService.generateToken(user, true))
+                .token(jwtService.generateToken(user, JwtService.TokenType.TOKEN))
+                .refresh(jwtService.generateToken(user, JwtService.TokenType.REFRESH))
                 .id(user.getId())
                 .role(user.getRole().getName().name())
                 .build();
@@ -151,7 +157,7 @@ public class AuthenticationService {
 
         User user = userRepository.findByEmail(userEmail).get();
         RefreshResponseDTO response = RefreshResponseDTO.builder()
-                .token(jwtService.generateToken(user, false))
+                .token(jwtService.generateToken(user, JwtService.TokenType.TOKEN))
                 .build();
         return response;
     }
@@ -169,5 +175,44 @@ public class AuthenticationService {
 
         jwtService.addTokenToBlackList(refresh);
         jwtService.addTokenToBlackList(token);
+    }
+
+    public ResetPasswordResponseDTO resetPasswordRequest(ResetPasswordRequestDTO request)
+            throws BadRequestException, NoContentException {
+        String email = request.getEmail();
+
+        if (email == null) {
+            throw new BadRequestException("Email not found");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new NoContentException(
+                        "User with email " + email + " does not exists",
+                        30));
+
+        ResetPasswordResponseDTO response = ResetPasswordResponseDTO.builder()
+                .token(jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD))
+                .build();
+        return response;
+    }
+
+    public void resetPassword(ResetPasswordDTO request, String resetPasswordToken)
+            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+        if (!jwtService.isTokenValid(resetPasswordToken)
+                || !jwtService.isTokenResetPassword(resetPasswordToken)) {
+            throw new ForbiddenException("Authentication failed", 9);
+        }
+
+        // Password Validation
+        String password = request.getPassword();
+        AuthUtils.validatePassword(password);
+
+        String email = jwtService.extractEmail(resetPasswordToken);
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new NoContentException(
+                        "User with email " + email + " does not exists",
+                        30));
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 }
