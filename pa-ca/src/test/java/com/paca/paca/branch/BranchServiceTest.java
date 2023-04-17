@@ -43,16 +43,25 @@ import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
+import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
+import com.paca.paca.client.utils.ReviewMapper;
+import com.paca.paca.exception.exceptions.UnprocessableException;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -66,6 +75,9 @@ public class BranchServiceTest {
 
     @Mock
     private ReviewRepository reviewRepository;
+
+    @Mock
+    private ReviewLikeRepository reviewLikeRepository;
 
     @Mock
     private AmenityRepository amenityRepository;
@@ -99,6 +111,9 @@ public class BranchServiceTest {
 
     @Mock
     private AmenityMapper amenityMapper;
+
+    @Mock
+    private ReviewMapper reviewMapper;
 
     @InjectMocks
     private BranchService branchService;
@@ -703,4 +718,71 @@ public class BranchServiceTest {
 
         assertThat(responseDTO).isNotNull();
     }
+
+    // Test for getPage method
+    // Lets test the exception when the page is less than 0
+    @Test
+    void shouldGetUnprocessableDueToPageLessThanZeroInGetPage() {
+        try {
+            branchService.getPage(-1, 10);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+        }
+    }
+    // Lets test the exception when the size is less than 1
+    @Test
+    void shouldGetUnprocessableDueToSizeLessThanOneInGetPage() {
+        try {
+            branchService.getPage(1, 0);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+        }
+    }
+
+    // Now lets test the that the getPage method works as expected
+    // First lets create 20 reviews
+    // Then lets get the first page with 10 reviews
+    // Then lets get the second page with 10 reviews
+    // Check if the first page has 10 reviews
+    // Check if the second page has 10 reviews
+    @Test
+    void shouldGetPage() {
+
+        Pageable pageable = Mockito.mock(Pageable.class);
+        when(pageable.getPageSize()).thenReturn(10);
+                
+
+        // Create 20 reviews manually
+        List<Review> reviews  = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            reviews.add(utils.createReview(null, null));
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), reviews.size());
+        Page<Review> pagedResult = new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
+
+        // print the pagedResult
+        System.out.println("pagedResult: " + pagedResult); 
+        
+        when(reviewRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
+        when(reviewMapper.toDTO(any(Review.class))).thenReturn(utils.createReviewDTO(null));
+
+        ReviewListDTO pageResponse = branchService.getPage(0, 10);
+        ReviewListDTO pageResponse2 = branchService.getPage(1, 10);
+
+        assertThat(pageResponse).isNotNull();
+        assertThat(pageResponse2).isNotNull();
+
+        assertThat(pageResponse.getReviews().size()).isEqualTo(10);
+        assertThat(pageResponse2.getReviews().size()).isEqualTo(10);
+
+    }
+
 }

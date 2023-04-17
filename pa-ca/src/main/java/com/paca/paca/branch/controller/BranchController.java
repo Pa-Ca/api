@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+// Import the module to use RequestParam
+import org.springframework.web.bind.annotation.RequestParam;
+
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
@@ -148,5 +151,13 @@ public class BranchController {
             @PathVariable("id") Long id,
             @RequestBody AmenityListDTO dto) throws NoContentException {
         return ResponseEntity.ok(amenityService.deleteAllByBranchId(id, dto));
+    }
+
+    @GetMapping(params = { "page", "size" })
+    @ValidateRoles({})
+    public ResponseEntity<ReviewListDTO> getPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
+        return ResponseEntity.ok(branchService.getPage(page, size));
     }
 }
