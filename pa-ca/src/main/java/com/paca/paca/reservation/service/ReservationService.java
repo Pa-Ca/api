@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.branch.repository.BranchRepository;
@@ -17,6 +20,7 @@ import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.reservation.dto.ReservationPaymentDTO;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
@@ -32,9 +36,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReservationService {
 
+    private final GuestMapper guestMapper;
+
     private final ReservationMapper reservationMapper;
 
     private final ReservationRepository reservationRepository;
+
+    private final GuestRepository guestRepository;
 
     private final BranchRepository branchRepository;
 
@@ -78,7 +86,15 @@ public class ReservationService {
             dto.setStatus(ReservationStatics.Status.paid);
         }
 
-        Reservation newReservation = reservationMapper.toEntity(dto, branch.get());
+        Reservation newReservation;
+        if (dto.getHaveGuest()) {
+            Guest guest = guestMapper.toEntity(GuestDTO.fromReservationDTO(dto));
+            guest = guestRepository.save(guest);
+            newReservation = reservationMapper.toEntity(dto, branch.get(), guest);
+        } else {
+            newReservation = reservationMapper.toEntity(dto, branch.get());
+        }
+
         newReservation = reservationRepository.save(newReservation);
 
         ReservationDTO dtoResponse = reservationMapper.toDTO(newReservation);

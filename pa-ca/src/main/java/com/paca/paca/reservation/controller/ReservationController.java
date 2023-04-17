@@ -46,14 +46,13 @@ public class ReservationController {
     }
 
     @PostMapping
-    @ValidateRoles({"client", "business"})
     public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException {
         return ResponseEntity.ok(reservationService.save(dto));
     }
 
-    @ValidateRoles({"client"})
+    @ValidateRoles({ "client" })
     @PostMapping("/cancel/{id}")
-    @ValidateReservationOwner( isClientOwner = true )
+    @ValidateReservationOwner(isClientOwner = true)
     public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         reservationService.accept(id, auth.getName());
@@ -61,7 +60,7 @@ public class ReservationController {
 
     @PostMapping("/accept/{id}")
     @ValidateRoles({ "business" })
-    @ValidateReservationOwner( isClientOwner = false )
+    @ValidateReservationOwner(isClientOwner = false)
     public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         reservationService.accept(id, auth.getName());
@@ -69,7 +68,7 @@ public class ReservationController {
 
     @PostMapping("/reject/{id}")
     @ValidateRoles({ "business" })
-    @ValidateReservationOwner( isClientOwner = false )
+    @ValidateReservationOwner(isClientOwner = false)
     public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         reservationService.accept(id, auth.getName());
@@ -77,7 +76,7 @@ public class ReservationController {
 
     @PostMapping("/pay/{id}")
     @ValidateRoles({ "client" })
-    @ValidateReservationOwner( isClientOwner = true )
+    @ValidateReservationOwner(isClientOwner = true)
     public void pay(@PathVariable("id") Long id, @RequestBody ReservationPaymentDTO dto)
             throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -85,8 +84,8 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    @ValidateRoles({ })
-    @ValidateReservationOwner( isClientOwner = true )
+    @ValidateRoles({})
+    @ValidateReservationOwner(isClientOwner = true)
     public ResponseEntity<ReservationDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReservationDTO dto)
@@ -95,7 +94,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         reservationService.delete(id);
     }
