@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import com.paca.paca.auth.utils.AuthUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,6 +42,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    private final MailService mailService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -190,10 +193,9 @@ public class AuthenticationService {
                         "User with email " + email + " does not exists",
                         30));
 
-        ResetPasswordResponseDTO response = ResetPasswordResponseDTO.builder()
-                .token(jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD))
-                .build();
-        return response;
+        String token = jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD);
+        mailService.sendResetPasswordEmail(email, "Reset Password", token);
+        return ResetPasswordResponseDTO.builder().token(token).build();
     }
 
     public void resetPassword(ResetPasswordDTO request, String resetPasswordToken)
