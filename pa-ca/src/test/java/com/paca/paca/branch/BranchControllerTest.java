@@ -28,6 +28,7 @@ import com.paca.paca.branch.controller.BranchController;
 import com.paca.paca.branch.controller.AmenityController;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 
@@ -56,7 +57,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = { BranchController.class, AmenityController.class })
 public class BranchControllerTest extends ControllerTest {
-    
     @Autowired
     private MockMvc mockMvc;
 
@@ -387,7 +387,8 @@ public class BranchControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
         Branch branch = utils.createBranch(business);
 
-        when(branchService.getProductSubCategories(anyLong(), anyLong())).thenThrow(new NoContentException("message", 0));
+        when(branchService.getProductSubCategories(anyLong(), anyLong()))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -406,7 +407,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ProductSubCategoryDTO> subCategoryDTOList = new ArrayList<>();
         subCategoryDTOList.add(utils.createProductSubCategoryDTO(null));
-        ProductSubCategoryListDTO subCategoryListDTO = ProductSubCategoryListDTO.builder().productSubCategories(subCategoryDTOList).build();
+        ProductSubCategoryListDTO subCategoryListDTO = ProductSubCategoryListDTO.builder()
+                .productSubCategories(subCategoryDTOList).build();
 
         when(branchService.getProductSubCategories(anyLong(), anyLong())).thenReturn(subCategoryListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -623,7 +625,8 @@ public class BranchControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
         Branch branch = utils.createBranch(business);
 
-        when(branchService.getReservationsByDate(anyLong(), any(Date.class))).thenThrow(new NoContentException("message", 0));
+        when(branchService.getReservationsByDate(anyLong(), any(Date.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -833,7 +836,8 @@ public class BranchControllerTest extends ControllerTest {
         dtoList.add(utils.createAmenityDTO(null));
         AmenityListDTO amenityListDTO = AmenityListDTO.builder().amenities(dtoList).build();
 
-        when(amenityService.saveAllByBranchId(anyLong(), any(AmenityListDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(amenityService.saveAllByBranchId(anyLong(), any(AmenityListDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -898,7 +902,8 @@ public class BranchControllerTest extends ControllerTest {
         dtoList.add(utils.createAmenityDTO(null));
         AmenityListDTO amenityListDTO = AmenityListDTO.builder().amenities(dtoList).build();
 
-        when(amenityService.deleteAllByBranchId(anyLong(), any(AmenityListDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(amenityService.deleteAllByBranchId(anyLong(), any(AmenityListDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -948,7 +953,6 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.amenities", CoreMatchers.hasItems()));
     }
-    
     @Test
     public void shouldGetAmenityListByWord() throws Exception {
         ArrayList<AmenityDTO> dtoList = new ArrayList<>();
@@ -979,5 +983,55 @@ public class BranchControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
+    }
+    @Test
+    public void shouldGetNoContentDueToMissingBranchInGetPage() throws Exception {
+        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=2&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(20)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Branch with id 1 does not exists")));
+    }
+
+    @Test
+    public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetPage() throws Exception{
+        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=-1&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(40)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
+    }
+
+    @Test
+    public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetPage() throws Exception{
+        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=0"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(41)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
+    }
+
+    @Test
+    public void shouldGetPageByBranchId() throws Exception {
+
+        ArrayList<ReviewDTO> dtoList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            dtoList.add(utils.createReviewDTO(null));
+        }
+
+        ReviewListDTO reviewListDTO = ReviewListDTO.builder().reviews(dtoList).build();
+
+        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenReturn(reviewListDTO);
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reviews", CoreMatchers.hasItems()));
     }
 }

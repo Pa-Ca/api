@@ -719,12 +719,35 @@ public class BranchServiceTest {
         assertThat(responseDTO).isNotNull();
     }
 
+    @Test
+    // We are going to test test the exception when the requested page is from a non existing branch
+    void shouldGetNoContentDueToMissingBranchInGetPage() {
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        Long branchId = 1L;
+        try {
+            branchService.getPage(branchId, 0, 10);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+        }
+    }
+
     // Test for getPage method
     // Lets test the exception when the page is less than 0
     @Test
     void shouldGetUnprocessableDueToPageLessThanZeroInGetPage() {
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        // Mock the branch repository
+        //when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        // Get that branch id
+        Long branchId = branch.getId();
+
         try {
-            branchService.getPage(-1, 10);
+            branchService.getPage(branchId, -1, 10);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof UnprocessableException);
@@ -735,8 +758,15 @@ public class BranchServiceTest {
     // Lets test the exception when the size is less than 1
     @Test
     void shouldGetUnprocessableDueToSizeLessThanOneInGetPage() {
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        // Mock the branch repository
+        //when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        // Get that branch id
+        Long branchId = branch.getId();
+
         try {
-            branchService.getPage(1, 0);
+            branchService.getPage(branchId, 1, 0);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof UnprocessableException);
@@ -744,7 +774,6 @@ public class BranchServiceTest {
             Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
         }
     }
-
     // Now lets test the that the getPage method works as expected
     // First lets create 20 reviews
     // Then lets get the first page with 10 reviews
@@ -753,6 +782,13 @@ public class BranchServiceTest {
     // Check if the second page has 10 reviews
     @Test
     void shouldGetPage() {
+
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        // Mock the branch repository
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        // Get that branch id
+        Long branchId = branch.getId();
 
         Pageable pageable = Mockito.mock(Pageable.class);
         when(pageable.getPageSize()).thenReturn(10);
@@ -771,18 +807,17 @@ public class BranchServiceTest {
         // print the pagedResult
         System.out.println("pagedResult: " + pagedResult); 
         
-        when(reviewRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
+        when(reviewRepository.findAllByBranchId(any(Long.class), any(Pageable.class))).thenReturn(pagedResult);
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(utils.createReviewDTO(null));
 
-        ReviewListDTO pageResponse = branchService.getPage(0, 10);
-        ReviewListDTO pageResponse2 = branchService.getPage(1, 10);
+        ReviewListDTO pageResponse = branchService.getPage(branchId,0, 10);
+        ReviewListDTO pageResponse2 = branchService.getPage(branchId, 1, 10);
 
         assertThat(pageResponse).isNotNull();
         assertThat(pageResponse2).isNotNull();
 
         assertThat(pageResponse.getReviews().size()).isEqualTo(10);
         assertThat(pageResponse2.getReviews().size()).isEqualTo(10);
-
     }
 
 }

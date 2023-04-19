@@ -29,6 +29,7 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -36,7 +37,7 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.client.repository.ReviewRepository;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
@@ -49,10 +50,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
-import com.paca.paca.exception.exceptions.UnprocessableException;
+
 import com.paca.paca.client.model.Review;
 import com.paca.paca.client.repository.ReviewLikeRepository;
-
 
 @Service
 @RequiredArgsConstructor
@@ -299,7 +299,7 @@ public class BranchService {
     }
 
     // This method returns a list of reviews with pagination
-    public ReviewListDTO getPage(int page, int size) throws UnprocessableException{
+    public ReviewListDTO getPage(Long id, int page, int size) throws UnprocessableException, NoContentException{
 
         // Now lets add the exeption handling
         // TODO: Add the corresponding codes to the exceptions
@@ -314,6 +314,12 @@ public class BranchService {
                 41);
         }
 
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + id + " does not exists",
+                    20);
+        }
         
         // Create a Pageable object that specifies the page and size parameters as well as a sort 
         // order for the results
@@ -327,7 +333,7 @@ public class BranchService {
         
         // Query the database for the appropriate page of results using the findAll method of the 
         // reviewRepository
-        Page<Review> pagedResult = reviewRepository.findAll(paging);
+        Page<Review> pagedResult = reviewRepository.findAllByBranchId(id, paging);//.findAll(paging);
         
         // Map the results to a list of ReviewDTO objects using the reviewMapper
         List<ReviewDTO> response = new ArrayList<>();

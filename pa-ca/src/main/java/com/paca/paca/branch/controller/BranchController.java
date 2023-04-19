@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 
 // Import the module to use RequestParam
 import org.springframework.web.bind.annotation.RequestParam;
@@ -153,11 +154,14 @@ public class BranchController {
         return ResponseEntity.ok(amenityService.deleteAllByBranchId(id, dto));
     }
 
-    @GetMapping(params = { "page", "size" })
-    @ValidateRoles({})
+    // Example get http://yourdomain.com/1/reviews?page=2&size=5
+    @GetMapping("/{id}/reviews")
     public ResponseEntity<ReviewListDTO> getPage(
+            @PathVariable("id") Long id,
             @RequestParam("page") int page,
-            @RequestParam("size") int size) {
-        return ResponseEntity.ok(branchService.getPage(page, size));
+            @RequestParam("size") int size 
+            ) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(branchService.getPage(id, page, size));
     }
+
 }
