@@ -17,6 +17,7 @@ public class ReservationDTO {
 
     private Long id;
     private Long branchId;
+    private Long guestId;
     private Date requestDate;
     private Date reservationDate;
     private Integer clientNumber;
@@ -27,4 +28,9 @@ public class ReservationDTO {
     private String occasion;
     private String petition;
     private Boolean byClient;
+    private Boolean haveGuest;
+    private String name;
+    private String surname;
+    private String email;
+    private String phoneNumber;
 }

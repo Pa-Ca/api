@@ -5,11 +5,6 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.reservation.dto.ReservationPaymentDTO;
-import com.paca.paca.reservation.model.ClientGroup;
-import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.user.dto.UserDTO;
@@ -29,9 +24,12 @@ import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
+import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
+import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
@@ -40,25 +38,30 @@ import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
+import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
+import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
@@ -86,6 +89,8 @@ public class TestUtils {
 
     TierRepository tierRepository;
 
+    GuestRepository guestRepository;
+
     ClientRepository clientRepository;
 
     FriendRepository friendRepository;
@@ -97,7 +102,7 @@ public class TestUtils {
     AmenityRepository amenityRepository;
 
     ProductRepository productRepository;
-    
+
     BusinessRepository businessRepository;
 
     PromotionRepository promotionRepository;
@@ -105,6 +110,7 @@ public class TestUtils {
     ReviewLikeRepository reviewLikeRepository;
 
     ClientGroupRepository clientGroupRepository;
+
     ReservationRepository reservationRepository;
 
     BranchAmenityRepository branchAmenityRepository;
@@ -138,7 +144,7 @@ public class TestUtils {
     }
 
     public SignupRequestDTO createSignupRequestDTO() {
-        return SignupRequestDTO.builder() 
+        return SignupRequestDTO.builder()
                 .email("test@test.com")
                 .password("123456789aA#$")
                 .role(UserRole.client.name())
@@ -146,18 +152,18 @@ public class TestUtils {
     }
 
     public LoginRequestDTO createLoginRequestDTO() {
-        return LoginRequestDTO.builder() 
+        return LoginRequestDTO.builder()
                 .email("test@test.com")
                 .password("123456789aA#$")
                 .build();
     }
 
     public RefreshRequestDTO createRefreshRequestDTO() {
-        return RefreshRequestDTO.builder() 
+        return RefreshRequestDTO.builder()
                 .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
                 .build();
     }
-    
+
     public LoginResponseDTO createLoginResponseDTO() {
         return LoginResponseDTO.builder()
                 .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
@@ -203,7 +209,7 @@ public class TestUtils {
 
         return user;
     }
-    
+
     public UserDTO createUserDTO(User user) {
         if (user == null) {
             user = createUser();
@@ -504,7 +510,7 @@ public class TestUtils {
 
         return product;
     }
-    
+
     public ProductDTO createProductDTO(Product product) {
         if (product == null) {
             product = createProduct(null);
@@ -573,7 +579,7 @@ public class TestUtils {
         if (subCategory == null) {
             subCategory = createProductSubCategory(null, null);
         }
-        ProductSubCategoryDTO dto = ProductSubCategoryDTO.builder() 
+        ProductSubCategoryDTO dto = ProductSubCategoryDTO.builder()
                 .id(subCategory.getId())
                 .branchId(subCategory.getBranch().getId())
                 .categoryId(subCategory.getCategory().getId())
@@ -642,6 +648,68 @@ public class TestUtils {
         return like;
     }
 
+    public Guest createGuest() {
+        Guest guest = Guest.builder()
+                .id(ThreadLocalRandom.current().nextLong(9999999))
+                .name("name_test")
+                .surname("surname_test")
+                .email("email_test")
+                .phoneNumber("phone_number_test")
+                .build();
+
+        if (guestRepository != null) {
+            guest = guestRepository.save(guest);
+        }
+
+        return guest;
+    }
+
+    public GuestDTO createGuestDTO(Guest guest) {
+        if (guest == null) {
+            guest = createGuest();
+        }
+        GuestDTO dto = GuestDTO.builder()
+                .id(guest.getId())
+                .name(guest.getName())
+                .surname(guest.getSurname())
+                .email(guest.getEmail())
+                .phoneNumber(guest.getPhoneNumber())
+                .build();
+
+        return dto;
+    }
+
+    public Reservation createReservation(Branch branch, Guest guest) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+        if (guest == null) {
+            guest = createGuest();
+        }
+
+        Reservation reservation = Reservation.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .guest(guest)
+                .requestDate(new Date(System.currentTimeMillis()))
+                .reservationDate(new Date(System.currentTimeMillis()))
+                .clientNumber(5)
+                .payment("payment_test")
+                .status(0)
+                .payDate(new Date(System.currentTimeMillis()))
+                .price(5.0f)
+                .occasion("Anniversary")
+                .petition("Candles")
+                .byClient(Boolean.TRUE)
+                .build();
+
+        if (reservationRepository != null) {
+            reservation = reservationRepository.save(reservation);
+        }
+
+        return reservation;
+    }
+
     public Reservation createReservation(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
@@ -650,6 +718,7 @@ public class TestUtils {
         Reservation reservation = Reservation.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch)
+                .guest(null)
                 .requestDate(new Date(System.currentTimeMillis()))
                 .reservationDate(new Date(System.currentTimeMillis()))
                 .clientNumber(5)
@@ -673,9 +742,11 @@ public class TestUtils {
         if (reservation == null) {
             reservation = createReservation(null);
         }
+
         ReservationDTO dto = ReservationDTO.builder()
                 .id(reservation.getId())
                 .branchId(reservation.getBranch().getId())
+                .guestId(reservation.getGuest() == null ? null : reservation.getGuest().getId())
                 .requestDate(reservation.getRequestDate())
                 .reservationDate(reservation.getReservationDate())
                 .clientNumber(reservation.getClientNumber())
@@ -686,6 +757,7 @@ public class TestUtils {
                 .occasion(reservation.getOccasion())
                 .petition(reservation.getPetition())
                 .byClient(reservation.getByClient())
+                .haveGuest(reservation.getGuest() != null)
                 .build();
 
         return dto;
@@ -698,7 +770,7 @@ public class TestUtils {
 
         Promotion promotion = Promotion.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch) 
+                .branch(branch)
                 .disabled(false)
                 .text("text test")
                 .build();
@@ -717,7 +789,7 @@ public class TestUtils {
 
         PromotionDTO dto = PromotionDTO.builder()
                 .id(promotion.getId())
-                .branchId(promotion.getBranch().getId()) 
+                .branchId(promotion.getBranch().getId())
                 .disabled(promotion.getDisabled())
                 .text(promotion.getText())
                 .build();
@@ -744,8 +816,8 @@ public class TestUtils {
         return clientGroup;
     }
 
-    public ReservationPaymentDTO createReservationPaymentDTO(String paymentCode){
-        if (paymentCode == null){
+    public ReservationPaymentDTO createReservationPaymentDTO(String paymentCode) {
+        if (paymentCode == null) {
             paymentCode = "paymentCode69";
         }
         ReservationPaymentDTO dto = ReservationPaymentDTO.builder()

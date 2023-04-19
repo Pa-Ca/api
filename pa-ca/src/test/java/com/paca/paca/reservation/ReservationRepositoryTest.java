@@ -3,12 +3,14 @@ package com.paca.paca.reservation;
 import com.paca.paca.PacaTest;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
@@ -34,11 +36,15 @@ class ReservationRepositoryTest extends PacaTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
     @Autowired
     private BranchRepository branchRepository;
 
     @Autowired
     private AmenityRepository amenityRepository;
+
+    @Autowired
+    private GuestRepository guestRepository;
 
     @Autowired
     private BranchAmenityRepository branchAmenityRepository;
@@ -62,6 +68,7 @@ class ReservationRepositoryTest extends PacaTest {
                 .businessRepository(businessRepository)
                 .branchAmenityRepository(branchAmenityRepository)
                 .branchRepository(branchRepository)
+                .guestRepository(guestRepository)
                 .reservationRepository((reservationRepository))
                 .build();
     }
@@ -69,10 +76,12 @@ class ReservationRepositoryTest extends PacaTest {
     @BeforeEach
     void restoreReservationDB() {
         reservationRepository.deleteAll();
+        guestRepository.deleteAll();
     }
 
     @AfterEach
     void restoreTest() {
+        guestRepository.deleteAll();
         reservationRepository.deleteAll();
         branchRepository.deleteAll();
         amenityRepository.deleteAll();
@@ -84,9 +93,12 @@ class ReservationRepositoryTest extends PacaTest {
     @Test
     void shouldCreateReservation() {
         Branch branch = utils.createBranch(null);
+        Guest guest = utils.createGuest();
+
         Reservation reservation = Reservation.builder()
                 .id(1L)
                 .branch(branch)
+                .guest(guest)
                 .requestDate(new Date(System.currentTimeMillis()))
                 .reservationDate(new Date(System.currentTimeMillis()))
                 .clientNumber(1)
@@ -103,6 +115,7 @@ class ReservationRepositoryTest extends PacaTest {
 
         assertThat(savedReservation).isNotNull();
         assertThat(savedReservation.getBranch().getId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(savedReservation.getGuest().getId()).isEqualTo(reservation.getGuest().getId());
         assertThat(savedReservation.getRequestDate()).isEqualTo(reservation.getRequestDate());
         assertThat(savedReservation.getReservationDate()).isEqualTo(reservation.getReservationDate());
         assertThat(savedReservation.getClientNumber()).isEqualTo(reservation.getClientNumber());
@@ -130,7 +143,7 @@ class ReservationRepositoryTest extends PacaTest {
 
     @Test
     void shouldCheckThatReservationExistsById() {
-        Reservation reservation = utils.createReservation(null);
+        Reservation reservation = utils.createReservation(null, null);
 
         boolean expected = reservationRepository.existsById(reservation.getId());
         Optional<Reservation> expectedReservation = reservationRepository.findById(reservation.getId());
@@ -138,6 +151,7 @@ class ReservationRepositoryTest extends PacaTest {
         assertThat(expected).isTrue();
         assertThat(expectedReservation.isPresent()).isTrue();
         assertThat(expectedReservation.get().getBranch().getId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(expectedReservation.get().getGuest().getId()).isEqualTo(reservation.getGuest().getId());
         assertThat(expectedReservation.get().getRequestDate()).isEqualTo(reservation.getRequestDate());
         assertThat(expectedReservation.get().getReservationDate()).isEqualTo(reservation.getReservationDate());
         assertThat(expectedReservation.get().getClientNumber()).isEqualTo(reservation.getClientNumber());
@@ -161,7 +175,7 @@ class ReservationRepositoryTest extends PacaTest {
 
     @Test
     void shouldDeleteReservation() {
-        Reservation reservation = utils.createReservation(null);
+        Reservation reservation = utils.createReservation(null, null);
 
         reservationRepository.delete(reservation);
 

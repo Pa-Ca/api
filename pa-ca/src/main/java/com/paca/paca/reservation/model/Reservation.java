@@ -25,6 +25,10 @@ public class Reservation {
     @JoinColumn(name = "branch_id")
     private Branch branch;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "guest_id")
+    private Guest guest;
+
     @Column(name = "request_date")
     @Temporal(TemporalType.DATE)
     private Date requestDate;

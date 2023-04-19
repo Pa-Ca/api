@@ -2,7 +2,10 @@ package com.paca.paca.reservation;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.dto.ReservationListDTO;
@@ -11,6 +14,7 @@ import com.paca.paca.reservation.dto.ReservationPaymentDTO;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
@@ -38,16 +42,24 @@ public class ReservationServiceTest {
 
     @Mock
     private ClientGroupRepository clientGroupRepository;
+
     @Mock
     private BusinessRepository businessRepository;
+
     @Mock
     private BranchRepository branchRepository;
+
+    @Mock
+    private GuestRepository guestRepository;
 
     @Mock
     private ReservationRepository reservationRepository;
 
     @Mock
     private ReservationMapper reservationMapper;
+
+    @Mock
+    private GuestMapper guestMapper;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -91,6 +103,23 @@ public class ReservationServiceTest {
         assertThat(dtoResponse).isNotNull();
         assertThat(dtoResponse.getId()).isEqualTo(reservation.getId());
         assertThat(dtoResponse.getBranchId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(dtoResponse.getGuestId()).isNull();
+    }
+
+    @Test
+    void shouldGetReservationWithGuestById() {
+        Reservation reservation = utils.createReservation(null, null);
+        ReservationDTO dto = utils.createReservationDTO(reservation);
+
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(dto);
+
+        ReservationDTO dtoResponse = reservationService.getById(reservation.getId());
+
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(reservation.getId());
+        assertThat(dtoResponse.getBranchId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(dtoResponse.getGuestId()).isEqualTo(reservation.getGuest().getId());
     }
 
     @Test
@@ -124,6 +153,31 @@ public class ReservationServiceTest {
         assertThat(dtoResponse).isNotNull();
         assertThat(dtoResponse.getId()).isEqualTo(reservation.getId());
         assertThat(dtoResponse.getBranchId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(dtoResponse.getGuestId()).isNull();
+    }
+
+    @Test
+    void shouldSaveReservationWithGuest() {
+        Reservation reservation = utils.createReservation(null, null);
+        ReservationDTO dto = utils.createReservationDTO(reservation);
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(guestMapper.toEntity(any(GuestDTO.class))).thenReturn(reservation.getGuest());
+        when(guestRepository.save(any(Guest.class))).thenReturn(reservation.getGuest());
+        when(reservationMapper.toEntity(
+                any(ReservationDTO.class),
+                any(Branch.class),
+                any(Guest.class)))
+                .thenReturn(reservation);
+        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(dto);
+
+        ReservationDTO dtoResponse = reservationService.save(dto);
+
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(reservation.getId());
+        assertThat(dtoResponse.getBranchId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(dtoResponse.getGuestId()).isEqualTo(reservation.getGuest().getId());
     }
 
     @Test
