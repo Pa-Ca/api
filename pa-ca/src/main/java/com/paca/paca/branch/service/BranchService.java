@@ -31,6 +31,9 @@ import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
+
+import ch.qos.logback.core.filter.Filter;
+
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -298,8 +301,73 @@ public class BranchService {
         return ReviewListDTO.builder().reviews(response).build();
     }
 
+
+    // Nows lets make the pagination of branches
+    // This method returns a list of branches with pagination
+
+    public BranchListDTO getBranchesPage(int page, 
+                                         int size, 
+                                         //String filter, 
+                                         String sorting_by, 
+                                         boolean ascending,
+                                         Float min_price,
+                                         Float max_price,
+                                         Float min_score,
+                                         int min_capacity
+                                         ) throws UnprocessableException, NoContentException{
+
+        // Now lets add the exeption handling
+        if (page < 0) {
+            throw new UnprocessableException(
+                "Page number cannot be less than zero", 
+                40);
+        }
+        if (size < 1) {
+            throw new UnprocessableException(
+                "Size cannot be less than one", 
+                41);
+        }
+        // Create a Pageable object that specifies the page and size parameters as well as a sort
+        // order for the results
+        Pageable paging;
+        if (ascending){
+            paging = PageRequest.of(
+                page,
+                size,
+                Sort.by(sorting_by).ascending()
+            );
+        }else{
+            paging = PageRequest.of(
+                page,
+                size,
+                Sort.by(sorting_by).descending()
+            );
+        } 
+
+        // Lets apply the filters
+        Page<Branch> pagedResult = branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+            min_price,
+            max_price,
+            min_score,
+            min_capacity,
+            paging
+        );
+
+        //Page<Branch> pagedResult = branchRepository.findAll(paging);
+
+        List<BranchDTO> response = new ArrayList<>();
+
+        pagedResult.forEach(branch -> {
+            BranchDTO dto = branchMapper.toDTO(branch);
+            response.add(dto);
+        });
+
+        return BranchListDTO.builder().branches(response).build();
+    }
+     
+
     // This method returns a list of reviews with pagination
-    public ReviewListDTO getPage(Long id, int page, int size) throws UnprocessableException, NoContentException{
+    public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NoContentException{
 
         // Now lets add the exeption handling
         // TODO: Add the corresponding codes to the exceptions
@@ -320,7 +388,7 @@ public class BranchService {
                     "Branch with id " + id + " does not exists",
                     20);
         }
-        
+
         // Create a Pageable object that specifies the page and size parameters as well as a sort 
         // order for the results
         Pageable paging = PageRequest.of(

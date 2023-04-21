@@ -747,7 +747,7 @@ public class BranchServiceTest {
         Long branchId = branch.getId();
 
         try {
-            branchService.getPage(branchId, -1, 10);
+            branchService.getReviewPage(branchId, -1, 10);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof UnprocessableException);
@@ -766,7 +766,7 @@ public class BranchServiceTest {
         Long branchId = branch.getId();
 
         try {
-            branchService.getPage(branchId, 1, 0);
+            branchService.getReviewPage(branchId, 1, 0);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof UnprocessableException);
@@ -810,8 +810,8 @@ public class BranchServiceTest {
         when(reviewRepository.findAllByBranchId(any(Long.class), any(Pageable.class))).thenReturn(pagedResult);
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(utils.createReviewDTO(null));
 
-        ReviewListDTO pageResponse = branchService.getPage(branchId,0, 10);
-        ReviewListDTO pageResponse2 = branchService.getPage(branchId, 1, 10);
+        ReviewListDTO pageResponse = branchService.getReviewPage(branchId,0, 10);
+        ReviewListDTO pageResponse2 = branchService.getReviewPage(branchId, 1, 10);
 
         assertThat(pageResponse).isNotNull();
         assertThat(pageResponse2).isNotNull();

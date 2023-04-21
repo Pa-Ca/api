@@ -156,12 +156,12 @@ public class BranchController {
 
     // Example get http://yourdomain.com/1/reviews?page=2&size=5
     @GetMapping("/{id}/reviews")
-    public ResponseEntity<ReviewListDTO> getPage(
+    public ResponseEntity<ReviewListDTO> getReviewPage(
             @PathVariable("id") Long id,
             @RequestParam("page") int page,
             @RequestParam("size") int size 
             ) throws NoContentException, UnprocessableException {
-        return ResponseEntity.ok(branchService.getPage(id, page, size));
+        return ResponseEntity.ok(branchService.getReviewPage(id, page, size));
     }
 
 }

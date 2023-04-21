@@ -986,7 +986,7 @@ public class BranchControllerTest extends ControllerTest {
     }
     @Test
     public void shouldGetNoContentDueToMissingBranchInGetPage() throws Exception {
-        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
+        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=2&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -997,7 +997,7 @@ public class BranchControllerTest extends ControllerTest {
 
     @Test
     public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetPage() throws Exception{
-        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=-1&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1008,7 +1008,7 @@ public class BranchControllerTest extends ControllerTest {
 
     @Test
     public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetPage() throws Exception{
-        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=0"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1027,7 +1027,7 @@ public class BranchControllerTest extends ControllerTest {
 
         ReviewListDTO reviewListDTO = ReviewListDTO.builder().reviews(dtoList).build();
 
-        when(branchService.getPage(anyLong(), anyInt(), anyInt())).thenReturn(reviewListDTO);
+        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenReturn(reviewListDTO);
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
