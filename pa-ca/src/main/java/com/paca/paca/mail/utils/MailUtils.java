@@ -5,8 +5,9 @@ import java.util.Map;
 import org.jsoup.Jsoup;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
+import com.paca.paca.exception.exceptions.IOException;
 public class MailUtils {
-        public static String htmlToString(String filePath, Map<String, String> data) {
+        public static String htmlToString(String filePath, Map<String, String> data) throws IOException {
             String fileContents = "";
 
             // Parse the html file to string
@@ -14,8 +15,8 @@ public class MailUtils {
                 Resource resource = new ClassPathResource(filePath);
                 File input = resource.getFile();
                 fileContents = String.valueOf(Jsoup.parse(input, "UTF-8", ""));
-            } catch (IOException e) {
-                // handle exception
+            } catch (java.io.IOException e) {
+                throw new IOException("Can't Read email template", 40);
             }
 
             // Add data

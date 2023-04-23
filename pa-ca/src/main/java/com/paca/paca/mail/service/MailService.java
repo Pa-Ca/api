@@ -2,15 +2,15 @@ package com.paca.paca.mail.service;
 
 import java.util.Map;
 import static java.util.Map.entry;
-
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import com.paca.paca.mail.utils.MailUtils;
 import com.paca.paca.mail.statics.MailStatics;
 import org.springframework.stereotype.Service;
+import com.paca.paca.exception.exceptions.IOException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import com.paca.paca.exception.exceptions.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
@@ -21,7 +21,8 @@ public class MailService {
     @Value("${spring.mail.username}")
     private String emailFrom;
 
-    public void sendResetPasswordEmail(String userEmail, String token, String username) {
+    public void sendResetPasswordEmail(String userEmail, String token, String username) throws IOException,
+            MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
@@ -38,13 +39,14 @@ public class MailService {
             helper.setTo(userEmail);
             helper.setSubject(MailStatics.Content.RESET_PASSWORD_SUBJECT);
             helper.setText(htmlMsg, true);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+        } catch (jakarta.mail.MessagingException e) {
+            throw new MessagingException("Email configuration is not valid", 41);
         }
         mailSender.send(mimeMessage);
     }
 
-    public void sendVerifyEmail(String userEmail, String token, String username) {
+    public void sendVerifyEmail(String userEmail, String token, String username) throws IOException,
+            MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
@@ -61,8 +63,8 @@ public class MailService {
             helper.setTo(userEmail);
             helper.setSubject(MailStatics.Content.VERIFY_EMAIL_SUBJECT);
             helper.setText(htmlMsg, true);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+        } catch (jakarta.mail.MessagingException e) {
+            throw new MessagingException("Email configuration is not valid", 41);
         }
         mailSender.send(mimeMessage);
     }

@@ -1,6 +1,7 @@
 package com.paca.paca.auth.service;
 
 import com.paca.paca.auth.dto.*;
+import com.paca.paca.exception.exceptions.*;
 import com.paca.paca.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import com.paca.paca.auth.utils.AuthUtils;
@@ -17,11 +18,6 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.UnprocessableException;
 
 @Service
 @RequiredArgsConstructor
@@ -173,7 +169,7 @@ public class AuthenticationService {
     }
 
     public ResetPasswordResponseDTO resetPasswordRequest(ResetPasswordRequestDTO request)
-            throws BadRequestException, NoContentException {
+            throws BadRequestException, NoContentException, IOException, MessagingException {
         String email = request.getEmail();
 
         if (email == null) {
@@ -212,7 +208,7 @@ public class AuthenticationService {
     }
 
     public VerifyEmailResponseDTO verifyEmailRequest(VerifyEmailRequestDTO request)
-            throws BadRequestException, NoContentException {
+            throws BadRequestException, NoContentException, IOException, MessagingException {
         String email = request.getEmail();
 
         if (email == null) {
