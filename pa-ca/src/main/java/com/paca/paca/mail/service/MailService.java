@@ -44,7 +44,7 @@ public class MailService {
         mailSender.send(mimeMessage);
     }
 
-    public void sendVerifydEmail(String userEmail, String token, String username) {
+    public void sendVerifyEmail(String userEmail, String token, String username) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 

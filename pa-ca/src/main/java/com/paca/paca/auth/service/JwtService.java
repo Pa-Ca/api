@@ -28,7 +28,7 @@ import com.paca.paca.exception.exceptions.ForbiddenException;
 public class JwtService {
 
     public enum TokenType {
-        TOKEN, REFRESH, RESET_PASSWORD
+        TOKEN, REFRESH, RESET_PASSWORD, VERIFY_EMAIL
     }
 
     private final JwtBlackListRepository jwtBlackListRepository;
@@ -61,6 +61,9 @@ public class JwtService {
                 break;
             case RESET_PASSWORD:
                 expiration = AuthenticationStatics.Jwt.RESET_PASSWORD_EXPIRATION;
+                break;
+            case VERIFY_EMAIL:
+                expiration = AuthenticationStatics.Jwt.VERIFY_EMAIL_EXPIRATION;
                 break;
         }
 
@@ -99,6 +102,11 @@ public class JwtService {
     public boolean isTokenResetPassword(String token) {
         Claims claims = extractAllClaims(token);
         return ((String) claims.get("type")).equals(TokenType.RESET_PASSWORD.name());
+    }
+
+    public boolean isTokenVerifyEmail(String token) {
+        Claims claims = extractAllClaims(token);
+        return ((String) claims.get("type")).equals(TokenType.VERIFY_EMAIL.name());
     }
 
     private Date extractExpiration(String token) {
