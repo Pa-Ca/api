@@ -1,10 +1,10 @@
 package com.paca.paca.auth.service;
 
+import com.paca.paca.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import com.paca.paca.auth.utils.AuthUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -194,7 +194,8 @@ public class AuthenticationService {
                         30));
 
         String token = jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD);
-        mailService.sendResetPasswordEmail(email, "Reset Password", token);
+        mailService.sendResetPasswordEmail(email, token, user.getUsername());
+
         return ResetPasswordResponseDTO.builder().token(token).build();
     }
 
