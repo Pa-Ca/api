@@ -1,5 +1,7 @@
 package com.paca.paca.auth;
 
+import com.paca.paca.exception.exceptions.*;
+import com.paca.paca.mail.service.MailService;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
@@ -29,19 +31,13 @@ import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
 import com.paca.paca.auth.dto.ResetPasswordResponseDTO;
 import com.paca.paca.auth.service.AuthenticationService;
-import com.paca.paca.exception.exceptions.AuthException;
-import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
-import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.UnprocessableException;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
@@ -66,6 +62,9 @@ public class AuthServiceTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private MailService mailService;
 
     @InjectMocks
     private AuthenticationService authenticationService;
