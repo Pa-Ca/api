@@ -25,10 +25,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 
 @DataJpaTest
 @Testcontainers
@@ -386,6 +395,97 @@ public class BranchRepositoryTest extends PacaTest {
 
         List<BranchAmenity> branchAmenities = branchAmenityRepository.findAll();
         assertThat(branchAmenities.size()).isEqualTo(0);
+    }
+
+
+    @Test
+    void shouldGetEmptyBranchPageDueToNotMatchingSearchParameters(){
+
+        utils.createTestBranches(null);
+        Pageable paging;
+
+        paging = PageRequest.of(
+                0,
+                20,
+                Sort.by("name").descending()
+            );
+
+        Page<Branch> pagedResult =  branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                1000F, 
+                2000F, 
+                4.0F, 
+                2, 
+                paging);
+
+        assertThat(pagedResult.getTotalElements()).isEqualTo(0);
+    
+    }
+
+
+    @Test
+    void shouldGetFilteredBranchPage(){
+        // Create the branches
+        List<Branch> test_branches = utils.createTestBranches(null);
+
+        // Filter the branches manually
+        List<Branch> filtered_branches = test_branches.stream()
+                            .filter(branch ->   branch.getReservationPrice() >= 30.0 && 
+                                                branch.getReservationPrice() <= 50.0 &&
+                                                branch.getScore() >= 2.0 &&
+                                                branch.getCapacity() >= 10
+                                    )
+                            .collect(Collectors.toList());
+        // Sor the filtered branches by name
+        Collections.sort(filtered_branches, (b1, b2) -> b2.getName().compareTo(b1.getName()));
+        
+        // Create the page
+        Page<Branch> branches_page = new PageImpl<>(filtered_branches);
+
+        Pageable paging;
+
+        paging = PageRequest.of(
+                0,
+                20,
+                Sort.by("name").descending()
+            );
+
+        Page<Branch> pagedResult =  branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                30.0F, 
+                50.0F, 
+                2.0F, 
+                10, 
+                paging);
+
+        assertThat(pagedResult.getTotalElements()).isEqualTo(branches_page.getTotalElements());
+        assertThat(pagedResult.getTotalPages()).isEqualTo(branches_page.getTotalPages());
+        // Assert that the branches are sorted by name
+        assertThat(pagedResult.getContent().get(0).getName()).isEqualTo(branches_page.getContent().get(0).getName());
+        assertThat(pagedResult.getContent().get(1).getName()).isEqualTo(branches_page.getContent().get(1).getName());
+        assertThat(pagedResult.getContent().get(2).getName()).isEqualTo(branches_page.getContent().get(2).getName());
+    }
+
+    @Test
+    void shouldGetBranchPageWithCorrectNumberOfPages(){
+
+        // Creates 5 branches
+        utils.createTestBranches(null);
+
+        Pageable paging = PageRequest.of(
+                0,
+                3,
+                Sort.by("name").descending()
+            );
+
+        // 
+        Page<Branch> pagedResult =  branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                0.0F, 
+                10000.F, 
+                0.0F,
+                0,
+                paging);
+
+        assertThat(pagedResult.getTotalPages()).isEqualTo(2);
+        assertThat(paging.getPageSize()).isEqualTo(3);
     }
 
 }

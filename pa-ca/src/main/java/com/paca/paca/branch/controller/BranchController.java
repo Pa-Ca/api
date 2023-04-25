@@ -156,12 +156,33 @@ public class BranchController {
 
     // Example get http://yourdomain.com/1/reviews?page=2&size=5
     @GetMapping("/{id}/reviews")
-    public ResponseEntity<ReviewListDTO> getReviewPage(
+    public ResponseEntity<ReviewListDTO> getReviewsPage(
             @PathVariable("id") Long id,
             @RequestParam("page") int page,
             @RequestParam("size") int size 
             ) throws NoContentException, UnprocessableException {
-        return ResponseEntity.ok(branchService.getReviewPage(id, page, size));
+        return ResponseEntity.ok(branchService.getReviewsPage(id, page, size));
+    }
+
+    @GetMapping("/branches")
+    public ResponseEntity<BranchListDTO> getBranchesPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sorting_by") String sorting_by,
+            @RequestParam("ascending") boolean ascending,
+            @RequestParam("min_reservation_price") Float min_reservation_price,
+            @RequestParam("max_reservation_price") Float max_reservation_price,
+            @RequestParam("min_score") Float min_score,
+            @RequestParam("min_capacity") int min_capacity
+            ) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(branchService.getBranchesPage(page, 
+                                                                size, 
+                                                                sorting_by, 
+                                                                ascending,
+                                                                min_reservation_price,
+                                                                max_reservation_price,
+                                                                min_score,
+                                                                min_capacity));
     }
 
 }

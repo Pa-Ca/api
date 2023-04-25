@@ -985,8 +985,8 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
     }
     @Test
-    public void shouldGetNoContentDueToMissingBranchInGetPage() throws Exception {
-        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
+    public void shouldGetNoContentDueToMissingBranchInGetReviewsPage() throws Exception {
+        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=2&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -996,8 +996,8 @@ public class BranchControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetPage() throws Exception{
-        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+    public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetReviewsPage() throws Exception{
+        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=-1&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1007,8 +1007,8 @@ public class BranchControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetPage() throws Exception{
-        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+    public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetReviewsPage() throws Exception{
+        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=0"))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1018,7 +1018,7 @@ public class BranchControllerTest extends ControllerTest {
     }
 
     @Test
-    public void shouldGetPageByBranchId() throws Exception {
+    public void shouldGetReviewPageByBranchId() throws Exception {
 
         ArrayList<ReviewDTO> dtoList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -1027,11 +1027,103 @@ public class BranchControllerTest extends ControllerTest {
 
         ReviewListDTO reviewListDTO = ReviewListDTO.builder().reviews(dtoList).build();
 
-        when(branchService.getReviewPage(anyLong(), anyInt(), anyInt())).thenReturn(reviewListDTO);
+        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenReturn(reviewListDTO);
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reviews", CoreMatchers.hasItems()));
     }
+
+    @Test
+    public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetBranchesPage() throws Exception {
+
+        when(branchService.getBranchesPage(
+                anyInt(),
+                anyInt(),
+                anyString(),
+                anyBoolean(),
+                anyFloat(),
+                anyFloat(),
+                anyFloat(),
+                anyInt()
+        )).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=-1&size=10&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(40)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
+    }
+
+    @Test
+    public void shouldGetUnprocessableExceptionToPageSizeLessThanOneInGetBranchesPage() throws Exception {
+
+        when(branchService.getBranchesPage(
+                anyInt(),
+                anyInt(),
+                anyString(),
+                anyBoolean(),
+                anyFloat(),
+                anyFloat(),
+                anyFloat(),
+                anyInt()
+        )).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=0&size=0&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(41)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
+    }
+
+    @Test
+    public void shouldGetUnprocessableExceptionDueToInvalidSortingKeyInGetBranchesPage() throws Exception {
+
+        when(branchService.getBranchesPage(
+                anyInt(),
+                anyInt(),
+                anyString(),
+                anyBoolean(),
+                anyFloat(),
+                anyFloat(),
+                anyFloat(),
+                anyInt()
+        )).thenThrow(new UnprocessableException("Sorting key is not valid", 42));
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=0&size=0&sorting_by=meme&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(42)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Sorting key is not valid")));
+    }
+
+
+    @Test
+    public void shouldGetBranchesPage() throws Exception {
+
+        ArrayList<BranchDTO> dtoList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            dtoList.add(utils.createBranchDTO(null));
+        }
+
+        BranchListDTO branchListDTO = BranchListDTO.builder().branches(dtoList).build();
+
+        when(branchService.getBranchesPage(
+                anyInt(),
+                anyInt(),
+                anyString(),
+                anyBoolean(),
+                anyFloat(),
+                anyFloat(),
+                anyFloat(),
+                anyInt()
+        )).thenReturn(branchListDTO);
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=0&size=0&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
+    }
+
 }

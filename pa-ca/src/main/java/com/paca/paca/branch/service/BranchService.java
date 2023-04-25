@@ -29,6 +29,7 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 
@@ -307,11 +308,10 @@ public class BranchService {
 
     public BranchListDTO getBranchesPage(int page, 
                                          int size, 
-                                         //String filter, 
-                                         String sorting_by, 
+                                         String  sorting_by, 
                                          boolean ascending,
-                                         Float min_price,
-                                         Float max_price,
+                                         Float min_reservation_price,
+                                         Float max_reservation_price,
                                          Float min_score,
                                          int min_capacity
                                          ) throws UnprocessableException, NoContentException{
@@ -327,6 +327,16 @@ public class BranchService {
                 "Size cannot be less than one", 
                 41);
         }
+
+        // Check if sorting_by is in BranchStatics.BranchSortingKeys
+        if (!BranchStatics.BranchSortingKeys.contains(sorting_by)){
+            throw new UnprocessableException(
+                "Sorting key is not valid", 
+                42);
+        }
+
+        
+
         // Create a Pageable object that specifies the page and size parameters as well as a sort
         // order for the results
         Pageable paging;
@@ -344,16 +354,28 @@ public class BranchService {
             );
         } 
 
+        if (min_reservation_price == null){
+            min_reservation_price = 0.0f;
+        }
+        if (max_reservation_price == null){
+            max_reservation_price = Float.POSITIVE_INFINITY;
+        }
+        if (min_score == null){
+            min_score = 0.0f;
+        }
+        if (min_capacity == 0){
+            min_capacity = 1;
+        }
+
         // Lets apply the filters
         Page<Branch> pagedResult = branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-            min_price,
-            max_price,
+            min_reservation_price,
+            max_reservation_price,
             min_score,
             min_capacity,
             paging
         );
 
-        //Page<Branch> pagedResult = branchRepository.findAll(paging);
 
         List<BranchDTO> response = new ArrayList<>();
 

@@ -20,12 +20,10 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     Optional<Branch> findByBusiness_UserEmail(String email);
 
     Page<Branch> findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-        @Nullable Float lowerLimit, 
-        @Nullable Float upperLimit, 
-        @Nullable Float score,
-        @Nullable Integer capacity, 
+        @Nullable Float min_reservation_price, 
+        @Nullable Float max_reservation_price, 
+        @Nullable Float min_score,
+        @Nullable Integer min_capacity, 
         @Nullable Pageable pageable);
-
-
-
+    
 }

@@ -61,7 +61,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
+
+
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -721,12 +724,12 @@ public class BranchServiceTest {
 
     @Test
     // We are going to test test the exception when the requested page is from a non existing branch
-    void shouldGetNoContentDueToMissingBranchInGetPage() {
+    void shouldGetNoContentDueToMissingBranchInGetReviewsPage() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         Long branchId = 1L;
         try {
-            branchService.getPage(branchId, 0, 10);
+            branchService.getReviewsPage(branchId, 0, 10);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof NoContentException);
@@ -738,7 +741,7 @@ public class BranchServiceTest {
     // Test for getPage method
     // Lets test the exception when the page is less than 0
     @Test
-    void shouldGetUnprocessableDueToPageLessThanZeroInGetPage() {
+    void shouldGetUnprocessableDueToPageLessThanZeroInGetReviewsPage() {
         // Create a branch
         Branch branch = utils.createBranch(null);
         // Mock the branch repository
@@ -747,7 +750,7 @@ public class BranchServiceTest {
         Long branchId = branch.getId();
 
         try {
-            branchService.getReviewPage(branchId, -1, 10);
+            branchService.getReviewsPage(branchId, -1, 10);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof UnprocessableException);
@@ -757,7 +760,7 @@ public class BranchServiceTest {
     }
     // Lets test the exception when the size is less than 1
     @Test
-    void shouldGetUnprocessableDueToSizeLessThanOneInGetPage() {
+    void shouldGetUnprocessableDueToSizeLessThanOneInGetReviewsPage() {
         // Create a branch
         Branch branch = utils.createBranch(null);
         // Mock the branch repository
@@ -766,7 +769,7 @@ public class BranchServiceTest {
         Long branchId = branch.getId();
 
         try {
-            branchService.getReviewPage(branchId, 1, 0);
+            branchService.getReviewsPage(branchId, 1, 0);
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof UnprocessableException);
@@ -781,7 +784,7 @@ public class BranchServiceTest {
     // Check if the first page has 10 reviews
     // Check if the second page has 10 reviews
     @Test
-    void shouldGetPage() {
+    void shouldGetPageInReviewsPage() {
 
         // Create a branch
         Branch branch = utils.createBranch(null);
@@ -793,7 +796,6 @@ public class BranchServiceTest {
         Pageable pageable = Mockito.mock(Pageable.class);
         when(pageable.getPageSize()).thenReturn(10);
                 
-
         // Create 20 reviews manually
         List<Review> reviews  = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -810,8 +812,8 @@ public class BranchServiceTest {
         when(reviewRepository.findAllByBranchId(any(Long.class), any(Pageable.class))).thenReturn(pagedResult);
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(utils.createReviewDTO(null));
 
-        ReviewListDTO pageResponse = branchService.getReviewPage(branchId,0, 10);
-        ReviewListDTO pageResponse2 = branchService.getReviewPage(branchId, 1, 10);
+        ReviewListDTO pageResponse = branchService.getReviewsPage(branchId,0, 10);
+        ReviewListDTO pageResponse2 = branchService.getReviewsPage(branchId, 1, 10);
 
         assertThat(pageResponse).isNotNull();
         assertThat(pageResponse2).isNotNull();
@@ -819,5 +821,114 @@ public class BranchServiceTest {
         assertThat(pageResponse.getReviews().size()).isEqualTo(10);
         assertThat(pageResponse2.getReviews().size()).isEqualTo(10);
     }
+
+
+    @Test
+    void  shouldGetUnprocessableExceptionDueToPageLessThanZeroInGetBranchesPage(){
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        // Mock the branch repository
+        //when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        // Get that branch id
+        Long branchId = branch.getId();
+
+        try {
+            branchService.getBranchesPage(
+                -1, 
+                10, 
+                "name",  
+                true, 
+                null, 
+                null, 
+                null, 
+                0
+            );
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+        }
+    }
+
+
+    @Test
+    void  shouldGetUnprocessableDueToSizeLessThanOneInGetBranchesPage(){
+        // Create a branch
+        utils.createBranch(null);
+
+        try {
+            branchService.getBranchesPage(
+                0, 
+                0, 
+                "name",  
+                true, 
+                null, 
+                null, 
+                null, 
+                0
+            );
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+        }
+    }
+
+    @Test
+    void shouldGetUnprocessableDueToInvalidSortingKeyInGetBranchesPage(){
+        utils.createBranch(null);
+
+        try {
+            branchService.getBranchesPage(
+                10, 
+                10, 
+                "meme",  
+                true, 
+                null, 
+                null, 
+                null, 
+                0
+            );
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Sorting key is not valid");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 42);
+        }
+    }
+
+
+    @Test
+    void shouldGetPageInGetBranchesPage(){
+
+        List<Branch> branches = utils.createTestBranches(null);
+
+        when(branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+            any(Float.class), 
+            any(Float.class), 
+            any(Float.class), 
+            any(Integer.class), 
+            any(Pageable.class)
+        )).thenReturn(new PageImpl<>(branches));
+
+
+        BranchListDTO pageResponse = branchService.getBranchesPage(
+            1, 
+            5, // Thsi parameter doestn affect the test
+            "name",  
+            true, 
+            0.0f, 
+            5.0f, 
+            0.0f, 
+            0
+        );
+
+        assertThat(pageResponse).isNotNull();
+        assertThat(pageResponse.getBranches().size()).isEqualTo(branches.size());
+
+    }
+
 
 }
