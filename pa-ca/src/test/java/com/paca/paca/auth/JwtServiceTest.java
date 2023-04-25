@@ -12,6 +12,7 @@ import com.paca.paca.statics.UserRole;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.auth.model.JwtBlackList;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.Date;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(locations = {"classpath:application-test.properties"})
 public class JwtServiceTest {
 
     @Mock
