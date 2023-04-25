@@ -1,5 +1,8 @@
 package com.paca.paca.auth.service;
 
+import com.paca.paca.auth.dto.*;
+import com.paca.paca.exception.exceptions.*;
+import com.paca.paca.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import com.paca.paca.auth.utils.AuthUtils;
 import org.springframework.stereotype.Service;
@@ -13,22 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.auth.dto.LogoutDTO;
-import com.paca.paca.auth.dto.LoginRequestDTO;
-import com.paca.paca.auth.dto.LoginResponseDTO;
-import com.paca.paca.auth.dto.SignupRequestDTO;
-import com.paca.paca.auth.dto.ResetPasswordDTO;
-import com.paca.paca.auth.dto.RefreshRequestDTO;
-import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
-import com.paca.paca.auth.dto.ResetPasswordResponseDTO;
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.UnprocessableException;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +30,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    private final MailService mailService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -178,7 +169,7 @@ public class AuthenticationService {
     }
 
     public ResetPasswordResponseDTO resetPasswordRequest(ResetPasswordRequestDTO request)
-            throws BadRequestException, NoContentException {
+            throws BadRequestException, NoContentException, IOException, MessagingException {
         String email = request.getEmail();
 
         if (email == null) {
@@ -190,10 +181,10 @@ public class AuthenticationService {
                         "User with email " + email + " does not exists",
                         30));
 
-        ResetPasswordResponseDTO response = ResetPasswordResponseDTO.builder()
-                .token(jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD))
-                .build();
-        return response;
+        String token = jwtService.generateToken(user, JwtService.TokenType.RESET_PASSWORD);
+        mailService.sendResetPasswordEmail(email, token, user.getUsername());
+
+        return ResetPasswordResponseDTO.builder().token(token).build();
     }
 
     public void resetPassword(ResetPasswordDTO request, String resetPasswordToken)
@@ -214,5 +205,44 @@ public class AuthenticationService {
                         30));
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
+    }
+
+    public VerifyEmailResponseDTO verifyEmailRequest(VerifyEmailRequestDTO request)
+            throws BadRequestException, NoContentException, IOException, MessagingException {
+        String email = request.getEmail();
+
+        if (email == null) {
+            throw new BadRequestException("Email not found");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                () -> new NoContentException(
+                        "User with email " + email + " does not exists",
+                        30));
+
+        String token = jwtService.generateToken(user, JwtService.TokenType.VERIFY_EMAIL);
+        mailService.sendVerifyEmail(email, token, user.getUsername());
+
+        return VerifyEmailResponseDTO.builder().token(token).build();
+    }
+
+    public void verifyEmail(String verifyEmailToken)
+            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+        if (!jwtService.isTokenValid(verifyEmailToken)
+                || !jwtService.isTokenVerifyEmail(verifyEmailToken)) {
+            throw new ForbiddenException("Authentication failed", 9);
+        }
+
+        String email = jwtService.extractEmail(verifyEmailToken);
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new NoContentException(
+                        "User with email " + email + " does not exists",
+                        30));
+
+        Boolean isVerified = user.getVerified();
+        if (!isVerified) {
+            user.setVerified(true);
+            userRepository.save(user);
+        }
     }
 }

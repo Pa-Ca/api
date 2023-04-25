@@ -14,6 +14,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -27,8 +28,19 @@ import com.paca.paca.exception.exceptions.ForbiddenException;
 @RequiredArgsConstructor
 public class JwtService {
 
+    @Value("${auth.expiration.token}")
+    private Integer EXPIRATION_TOKEN;
+    @Value("${auth.expiration.refresh}")
+    private Integer EXPIRATION_REFRESH;
+    @Value("${auth.expiration.reset.password}")
+    private Integer EXPIRATION_RESET_PASSWORD;
+    @Value("${auth.expiration.verify.email}")
+    private Integer EXPIRATION_VERIFY_EMAIL;
+    @Value("${auth.secret.key}")
+    private String SECRET_KEY;
+
     public enum TokenType {
-        TOKEN, REFRESH, RESET_PASSWORD
+        TOKEN, REFRESH, RESET_PASSWORD, VERIFY_EMAIL
     }
 
     private final JwtBlackListRepository jwtBlackListRepository;
@@ -54,15 +66,22 @@ public class JwtService {
 
         switch (type) {
             case TOKEN:
-                expiration = AuthenticationStatics.Jwt.TOKEN_EXPIRATION;
+                expiration = EXPIRATION_TOKEN;
                 break;
             case REFRESH:
-                expiration = AuthenticationStatics.Jwt.REFRESH_EXPIRATION;
+                expiration = EXPIRATION_REFRESH;
                 break;
             case RESET_PASSWORD:
-                expiration = AuthenticationStatics.Jwt.RESET_PASSWORD_EXPIRATION;
+                expiration = EXPIRATION_RESET_PASSWORD;
+                break;
+            case VERIFY_EMAIL:
+                expiration = EXPIRATION_VERIFY_EMAIL;
                 break;
         }
+
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println(EXPIRATION_TOKEN);
+        System.out.println("-----------------------------------------------------------------------------------------");
 
         return Jwts
                 .builder()
@@ -101,6 +120,11 @@ public class JwtService {
         return ((String) claims.get("type")).equals(TokenType.RESET_PASSWORD.name());
     }
 
+    public boolean isTokenVerifyEmail(String token) {
+        Claims claims = extractAllClaims(token);
+        return ((String) claims.get("type")).equals(TokenType.VERIFY_EMAIL.name());
+    }
+
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -115,7 +139,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(AuthenticationStatics.Jwt.SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

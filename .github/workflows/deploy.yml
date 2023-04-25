@@ -43,33 +43,13 @@ jobs:
         if: ${{ always() }}
         run: |
           docker rm -f paca-api; 
-          docker run -d --network host --name paca-api ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
-
-
-## OLD: DOKKU
-
-#name: Deploy
-#
-#on:
-#  push:
-#    branches:
-#      - develop
-#    
-#jobs:
-#  deploy:
-#
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#    - uses: actions/checkout@v2
-#      with:
-#        fetch-depth: 0
-#
-#    - id: deploy
-#      name: Deploy to dokku
-#      uses: idoberko2/dokku-deploy-github-action@v1
-#      with: 
-#        ssh-private-key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-#        dokku-host: '45.77.94.83'
-#        app-name: 'paca-api'
-#        git-push-flags: --force
+          docker run 
+          -e DB_HOSTNAME=${{secrets.DATABASE_HOSTNAME}}
+          -e GOOGLE_EMAIL_FROM=${{secrets.GOOGLE_EMAIL_FROM}}
+          -e GOOGLE_EMAIL_PASSWORD=${{secrets.GOOGLE_EMAIL_PASSWORD}}
+          -e AUTH_REFRESH_EXPIRATION=${{secrets.AUTH_REFRESH_EXPIRATION}}
+          -e AUTH_RESET_PASSWORD_EXPIRATION=${{secrets.AUTH_RESET_PASSWORD_EXPIRATION}}
+          -e AUTH_SECRET_KEY=${{secrets.AUTH_SECRET_KEY}}
+          -e AUTH_TOKEN_EXPIRATION=${{secrets.AUTH_TOKEN_EXPIRATION}}
+          -e AUTH_VERIFY_EMAIL_EXPIRATION=${{secrets.AUTH_VERIFY_EMAIL_EXPIRATION}}
+          -d --network host --name paca-api ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
