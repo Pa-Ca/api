@@ -66,6 +66,7 @@ import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
+
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -73,6 +74,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -129,6 +132,16 @@ public class TestUtils {
         }
 
         return result;
+    }
+
+    public static <T> Page<T> castPage(Class<? extends T> clazz, Page<?> rawCollection) {
+        List<T> result = new ArrayList<>(rawCollection.getContent().size());
+
+        for (int i = 0; i < rawCollection.getContent().size(); i++) {
+            result.add(clazz.cast(rawCollection.getContent().get(i)));
+        }
+
+        return new PageImpl<>(result);
     }
 
     public void setAuthorities(String role) {
@@ -403,6 +416,68 @@ public class TestUtils {
 
         return branch;
     }
+
+    public List<Branch> createTestBranches(Business business) {
+        if (business == null) {
+            business = createBusiness(null);
+        }
+
+        List<Float> scores = new ArrayList<>();
+        scores.add(1.0F);
+        scores.add(2.0F);
+        scores.add(3.5F);
+        scores.add(4.2F);
+        scores.add(5.0F);
+
+
+        List<Float> reservation_prices = new ArrayList<>();
+        reservation_prices.add(2.0F);
+        reservation_prices.add(20.0F);
+        reservation_prices.add(30.0F);
+        reservation_prices.add(40.5F);
+        reservation_prices.add(50.0F);
+        
+        List<String> names = new ArrayList<>();
+        names.add("name test 1");
+        names.add("name test 2");
+        names.add("name test 3");
+        names.add("name test 4");
+        names.add("name test 5");
+
+        List<Integer> capacities = new ArrayList<>();
+        capacities.add(5);
+        capacities.add(10);
+        capacities.add(15);
+        capacities.add(20);
+        capacities.add(25);
+
+        List<Branch> branches = new ArrayList<>();
+
+        // Lop through the lists and create branches
+        for (int i = 0; i < 5; i++) {
+            Branch branch = Branch.builder()
+                    .id(ThreadLocalRandom.current().nextLong(999999999))
+                    .business(business)
+                    .address("address test")
+                    .coordinates("coordinates test")
+                    .name(names.get(i))
+                    .overview("overview test")
+                    .score(scores.get(i))
+                    .capacity(capacities.get(i))
+                    .reservationPrice(reservation_prices.get(i))
+                    .reserveOff(false)
+                    .build();
+
+            if (branchRepository != null) {
+                branch = branchRepository.save(branch);
+            }
+
+            branches.add(branch);
+        }
+
+        return branches;
+    }
+
 
     public BranchDTO createBranchDTO(Branch branch) {
         if (branch == null) {
