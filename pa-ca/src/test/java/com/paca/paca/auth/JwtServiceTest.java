@@ -12,23 +12,18 @@ import com.paca.paca.statics.UserRole;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.auth.model.JwtBlackList;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.Date;
 import java.util.Optional;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-@TestPropertySource(properties = {
-        "auth.expiration.token=1000",
-        "auth.expiration.refresh=2000",
-        "auth.expiration.reset.password=3000",
-        "auth.expiration.verify.email=4000",
-        "auth.secret.key=test"
-})
 public class JwtServiceTest {
 
     @Mock
@@ -37,8 +32,27 @@ public class JwtServiceTest {
     @InjectMocks
     private JwtService jwtService;
 
+    @BeforeEach
+    public void setJetServiceProperties() {
+        Dotenv dotenv = Dotenv.load();
+        jwtService.setSECRET_KEY(dotenv.get("AUTH_SECRET_KEY"));
+        jwtService.setEXPIRATION_TOKEN(Integer.parseInt(dotenv.get("AUTH_TOKEN_EXPIRATION")));
+        jwtService.setEXPIRATION_REFRESH(Integer.parseInt(dotenv.get("AUTH_REFRESH_EXPIRATION")));
+        jwtService.setEXPIRATION_VERIFY_EMAIL(Integer.parseInt(dotenv.get("AUTH_VERIFY_EMAIL_EXPIRATION")));
+        jwtService.setEXPIRATION_RESET_PASSWORD(Integer.parseInt(dotenv.get("AUTH_RESET_PASSWORD_EXPIRATION")));
+    }
+
     @Test
-    @Disabled
+    public void testPropertiesAreInitialized() {
+        // Verify that the properties annotated with @Value in JwtService are not null
+        assertNotNull(jwtService.getEXPIRATION_TOKEN());
+        assertNotNull(jwtService.getEXPIRATION_REFRESH());
+        assertNotNull(jwtService.getEXPIRATION_RESET_PASSWORD());
+        assertNotNull(jwtService.getEXPIRATION_VERIFY_EMAIL());
+        assertNotNull(jwtService.getSECRET_KEY());
+    }
+
+    @Test
     void shouldGenerateToken() {
         Long id = 1L;
         String email = "test@test.com";
@@ -66,7 +80,6 @@ public class JwtServiceTest {
     }
 
     @Test
-    @Disabled
     void shouldGenerateRefresh() {
         Long id = 1L;
         String email = "test@test.com";
@@ -94,7 +107,6 @@ public class JwtServiceTest {
     }
 
     @Test
-    @Disabled
     void shouldGenerateResetPassword() {
         Long id = 1L;
         String email = "test@test.com";
@@ -122,7 +134,6 @@ public class JwtServiceTest {
     }
 
     @Test
-    @Disabled
     void shouldGenerateVerifyEmail() {
         Long id = 1L;
         String email = "test@test.com";
@@ -150,7 +161,6 @@ public class JwtServiceTest {
     }
 
     @Test
-    @Disabled
     void shouldAddToBlackList() {
         Long id = 1L;
         String email = "test@test.com";
