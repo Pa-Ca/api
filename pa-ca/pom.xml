@@ -98,7 +98,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>6.1.7.Final</version>
         </dependency>
@@ -164,6 +164,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                     <source>11</source>
                     <target>11</target>
                     <annotationProcessorPaths>
@@ -186,7 +189,6 @@
                 </configuration>
             </plugin>
         </plugins>
-
     </build>
 
 </project>

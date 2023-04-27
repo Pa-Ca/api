@@ -6,25 +6,31 @@ import org.jsoup.Jsoup;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
 import com.paca.paca.exception.exceptions.IOException;
-public class MailUtils {
-        public static String htmlToString(String filePath, Map<String, String> data) throws IOException {
-            String fileContents = "";
 
-            // Parse the html file to string
-            try {
-                Resource resource = new ClassPathResource(filePath);
-                File input = resource.getFile();
-                fileContents = String.valueOf(Jsoup.parse(input, "UTF-8", ""));
-            } catch (java.io.IOException e) {
+public class MailUtils {
+    public static String htmlToString(String filePath, Map<String, String> data) throws IOException {
+        String fileContents = "";
+
+        // Parse the html file to string
+        try {
+            Resource resource = new ClassPathResource(filePath);
+
+            if (!resource.exists()) {
                 throw new IOException("Can't Read email template", 40);
             }
 
-            // Add data
-            for (Map.Entry<String, String> entry : data.entrySet()) {
-                fileContents = fileContents.replace(entry.getKey(), entry.getValue());
-            }
-
-             return fileContents;
+            InputStream inputStream = resource.getInputStream();
+            fileContents = String.valueOf(Jsoup.parse(inputStream, "UTF-8", ""));
+        } catch (java.io.IOException e) {
+            throw new IOException("Can't Read email template", 40);
         }
+
+        // Add data
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            fileContents = fileContents.replace(entry.getKey(), entry.getValue());
+        }
+
+        return fileContents;
+    }
 
 }

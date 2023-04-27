@@ -26,11 +26,10 @@ public class MailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
-        String filePath = "/templates/resetPassword.html";
+        String filePath = "/static/templates/resetPassword.html";
         Map<String, String> data = Map.ofEntries(
                 entry(MailStatics.Keys.USERNAME, username),
-                entry(MailStatics.Keys.LINK_URL, MailStatics.Content.RESET_PASSWORD_URL + token)
-        );
+                entry(MailStatics.Keys.LINK_URL, MailStatics.Content.RESET_PASSWORD_URL + token));
 
         String htmlMsg = MailUtils.htmlToString(filePath, data);
 
@@ -53,8 +52,7 @@ public class MailService {
         String filePath = "/templates/verifyEmail.html";
         Map<String, String> data = Map.ofEntries(
                 entry(MailStatics.Keys.USERNAME, username),
-                entry(MailStatics.Keys.LINK_URL, MailStatics.Content.VERIFIED_EMAIL_URL + token)
-        );
+                entry(MailStatics.Keys.LINK_URL, MailStatics.Content.VERIFIED_EMAIL_URL + token));
 
         String htmlMsg = MailUtils.htmlToString(filePath, data);
 

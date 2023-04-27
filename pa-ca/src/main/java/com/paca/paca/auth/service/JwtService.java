@@ -14,13 +14,12 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.paca.paca.user.model.User;
 import com.paca.paca.auth.model.JwtBlackList;
-import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 
@@ -30,12 +29,16 @@ public class JwtService {
 
     @Value("${auth.expiration.token}")
     private Integer EXPIRATION_TOKEN;
+
     @Value("${auth.expiration.refresh}")
     private Integer EXPIRATION_REFRESH;
+
     @Value("${auth.expiration.reset.password}")
     private Integer EXPIRATION_RESET_PASSWORD;
+
     @Value("${auth.expiration.verify.email}")
     private Integer EXPIRATION_VERIFY_EMAIL;
+
     @Value("${auth.secret.key}")
     private String SECRET_KEY;
 
@@ -78,10 +81,6 @@ public class JwtService {
                 expiration = EXPIRATION_VERIFY_EMAIL;
                 break;
         }
-
-        System.out.println("-----------------------------------------------------------------------------------------");
-        System.out.println(EXPIRATION_TOKEN);
-        System.out.println("-----------------------------------------------------------------------------------------");
 
         return Jwts
                 .builder()

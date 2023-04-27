@@ -36,7 +36,6 @@ import com.paca.paca.auth.repository.JwtBlackListRepository;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

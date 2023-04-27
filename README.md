@@ -8,7 +8,7 @@ Correr toda la API usando docker-compose
 
 ```bash
 cd pa-ca
-./mvnw package
+./mvnw package [-Dmaven.test.skip]
 cd ../
 docker-compose up --build
 ```
