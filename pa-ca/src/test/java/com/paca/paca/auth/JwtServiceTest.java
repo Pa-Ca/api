@@ -22,7 +22,13 @@ import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-@TestPropertySource(locations = { "classpath:application-test.properties" })
+@TestPropertySource(properties = {
+        "auth.expiration.token=1000",
+        "auth.expiration.refresh=2000",
+        "auth.expiration.reset.password=3000",
+        "auth.expiration.verify.email=4000",
+        "auth.secret.key=test"
+})
 public class JwtServiceTest {
 
     @Mock
