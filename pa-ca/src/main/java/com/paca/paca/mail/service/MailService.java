@@ -53,7 +53,7 @@ public class MailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
-        String filePath = "/templates/verifyEmail.html";
+        String filePath = "/static/templates/verifyEmail.html";
         Map<String, String> data = Map.ofEntries(
                 entry(MailStatics.Keys.USERNAME, username),
                 entry(MailStatics.Keys.LINK_URL, MailStatics.Content.VERIFIED_EMAIL_URL + token));
