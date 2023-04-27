@@ -1,5 +1,6 @@
 package com.paca.paca.auth;
 
+import com.paca.paca.auth.dto.*;
 import com.paca.paca.exception.exceptions.*;
 import com.paca.paca.mail.service.MailService;
 import junit.framework.TestCase;
@@ -20,16 +21,8 @@ import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.utils.UserMapper;
 import com.paca.paca.auth.service.JwtService;
-import com.paca.paca.auth.dto.LoginRequestDTO;
-import com.paca.paca.auth.dto.LoginResponseDTO;
-import com.paca.paca.auth.dto.SignupRequestDTO;
-import com.paca.paca.auth.dto.ResetPasswordDTO;
-import com.paca.paca.auth.dto.RefreshRequestDTO;
-import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
-import com.paca.paca.auth.dto.ResetPasswordResponseDTO;
 import com.paca.paca.auth.service.AuthenticationService;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
 
@@ -714,6 +707,154 @@ public class AuthServiceTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
 
         authenticationService.resetPassword(request, token);
+    }
+
+    @Test
+    void shouldGetBadRequestDueToMissingEmailInVerifyEmailRequest() {
+        VerifyEmailRequestDTO request = VerifyEmailRequestDTO.builder().build();
+
+        try {
+            authenticationService.verifyEmailRequest(request);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(), "Email not found");
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToUserDoesNotExistsInVerifyEmailRequest() {
+        String email = "test@test.com";
+
+        VerifyEmailRequestDTO request = VerifyEmailRequestDTO.builder().email(email).build();
+
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            authenticationService.verifyEmailRequest(request);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "User with email " + email + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+        }
+    }
+
+    @Test
+    void shouldVerifyEmailRequest() {
+        Long id = 1L;
+        String email = "test@test.com";
+        String password = "123456789aA#";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        Role role = Role.builder()
+                .id((long) UserRole.admin.ordinal())
+                .name(UserRole.admin).build();
+        User user = User.builder()
+                .id(id)
+                .email(email)
+                .password(password)
+                .verified(false)
+                .loggedIn(false)
+                .role(role)
+                .build();
+
+        VerifyEmailRequestDTO request = VerifyEmailRequestDTO.builder()
+                .email(email)
+                .build();
+
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
+        when(jwtService.generateToken(any(User.class), any(JwtService.TokenType.class)))
+                .thenReturn(token);
+
+        VerifyEmailResponseDTO response = authenticationService.verifyEmailRequest(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getToken()).isEqualTo(token);
+    }
+
+    @Test
+    void shouldGetForbiddenDueToInvalidTokenInVerifyEmail() {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        when(jwtService.isTokenValid(any(String.class))).thenReturn(false);
+
+        try {
+            authenticationService.verifyEmail(token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Authentication failed");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
+        }
+    }
+
+    @Test
+    void shouldGetForbiddenDueToIncorrectTokenInVerifyEmail() {
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        when(jwtService.isTokenValid(any(String.class))).thenReturn(true);
+        when(jwtService.isTokenVerifyEmail(any(String.class))).thenReturn(false);
+
+        try {
+            authenticationService.verifyEmail(token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Authentication failed");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
+        }
+    }
+
+    @Test
+    void shouldGetNoContentDueToUserDoesNotExistsInVerifyEmail() {
+        String email = "test@test.com";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenVerifyEmail(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.extractEmail(any(String.class)))
+                .thenReturn(email);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            authenticationService.verifyEmail(token);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "User with email " + email + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+        }
+    }
+
+    @Test
+    void shouldVerifyEmail() {
+        Long id = 1L;
+        String email = "test@test.com";
+        String password = "123456789aA#";
+        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
+        Role role = Role.builder()
+                .id((long) UserRole.admin.ordinal())
+                .name(UserRole.admin).build();
+        User user = User.builder()
+                .id(id)
+                .email(email)
+                .password(password)
+                .verified(false)
+                .loggedIn(false)
+                .role(role)
+                .build();
+
+        when(jwtService.isTokenValid(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.isTokenVerifyEmail(any(String.class)))
+                .thenReturn(true);
+        when(jwtService.extractEmail(any(String.class)))
+                .thenReturn(email);
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
+
+        authenticationService.verifyEmail(token);
     }
 
 }
