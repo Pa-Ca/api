@@ -35,10 +35,10 @@ public class AuthRepositoryTest extends PacaTest {
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         Date expiration = new Date(System.currentTimeMillis());
         JwtBlackList jwt = JwtBlackList.builder()
-            .id(1L)
-            .token(token)
-            .expiration(expiration)
-            .build();
+                .id(1L)
+                .token(token)
+                .expiration(expiration)
+                .build();
         jwtBlackListRepository.save(jwt);
 
         boolean expected = jwtBlackListRepository.findByToken(token).isPresent();
@@ -68,21 +68,20 @@ public class AuthRepositoryTest extends PacaTest {
 
         assertThat(expected).isTrue();
     }
-    
+
     @Test
     void shouldCheckThatJwtDoesNotExistsByExpiration() {
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         Date expiration = new Date(System.currentTimeMillis());
         JwtBlackList jwt = JwtBlackList.builder()
-            .id(1L)
-            .token(token)
-            .expiration(expiration)
-            .build();
+                .id(1L)
+                .token(token)
+                .expiration(expiration)
+                .build();
         jwtBlackListRepository.save(jwt);
         boolean expected = jwtBlackListRepository.findAllByExpirationLessThan(
-            new Date(System.currentTimeMillis() - 100000000)
-        ).size() == 0;
-        
+                new Date(System.currentTimeMillis() - 100000000)).size() == 0;
+
         assertThat(expected).isTrue();
     }
 
@@ -91,10 +90,10 @@ public class AuthRepositoryTest extends PacaTest {
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         Date expiration = new Date(System.currentTimeMillis());
         JwtBlackList jwt = JwtBlackList.builder()
-            .id(1L)
-            .token(token)
-            .expiration(expiration)
-            .build();
+                .id(1L)
+                .token(token)
+                .expiration(expiration)
+                .build();
         jwtBlackListRepository.save(jwt);
         Optional<JwtBlackList> response = jwtBlackListRepository.findByToken(token);
 

@@ -28,8 +28,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,16 +37,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.nullable;
 
 @DataJpaTest
 @Testcontainers
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-
 public class BranchRepositoryTest extends PacaTest {
-    
+
     @Autowired
     private BranchRepository branchRepository;
 
@@ -309,7 +307,7 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(branchAmenities.size()).isEqualTo(nBranchAmenities);
     }
 
-    @Test 
+    @Test
     void shoudlGetAllBranchAmenitiesByBranchId() {
         int nBranchAmenities = 10;
         Branch branch = utils.createBranch(null);
@@ -324,7 +322,7 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(branchAmenities.size()).isEqualTo(nBranchAmenities);
     }
 
-    @Test 
+    @Test
     void shoudlGetAllBranchAmenitiesByAmenityId() {
         int nBranchAmenities = 10;
         Amenity amenity = utils.createAmenity();
@@ -369,8 +367,8 @@ public class BranchRepositoryTest extends PacaTest {
                 branchAmenity.getBranch().getId(),
                 branchAmenity.getAmenity().getId());
         Optional<BranchAmenity> expectedBranchAmenity = branchAmenityRepository.findByBranchIdAndAmenityId(
-            branchAmenity.getBranch().getId(),
-            branchAmenity.getAmenity().getId());
+                branchAmenity.getBranch().getId(),
+                branchAmenity.getAmenity().getId());
 
         assertThat(expected).isTrue();
         assertThat(expectedBranchAmenity.isPresent()).isTrue();
@@ -397,9 +395,8 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(branchAmenities.size()).isEqualTo(0);
     }
 
-
     @Test
-    void shouldGetEmptyBranchPageDueToNotMatchingSearchParameters(){
+    void shouldGetEmptyBranchPageDueToNotMatchingSearchParameters() {
 
         utils.createTestBranches(null);
         Pageable paging;
@@ -407,37 +404,35 @@ public class BranchRepositoryTest extends PacaTest {
         paging = PageRequest.of(
                 0,
                 20,
-                Sort.by("name").descending()
-            );
+                Sort.by("name").descending());
 
-        Page<Branch> pagedResult =  branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                1000F, 
-                2000F, 
-                4.0F, 
-                2, 
-                paging);
+        Page<Branch> pagedResult = branchRepository
+                .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                        1000F,
+                        2000F,
+                        4.0F,
+                        2,
+                        paging);
 
         assertThat(pagedResult.getTotalElements()).isEqualTo(0);
-    
+
     }
 
-
     @Test
-    void shouldGetFilteredBranchPage(){
+    void shouldGetFilteredBranchPage() {
         // Create the branches
         List<Branch> test_branches = utils.createTestBranches(null);
 
         // Filter the branches manually
         List<Branch> filtered_branches = test_branches.stream()
-                            .filter(branch ->   branch.getReservationPrice() >= 30.0 && 
-                                                branch.getReservationPrice() <= 50.0 &&
-                                                branch.getScore() >= 2.0 &&
-                                                branch.getCapacity() >= 10
-                                    )
-                            .collect(Collectors.toList());
+                .filter(branch -> branch.getReservationPrice() >= 30.0 &&
+                        branch.getReservationPrice() <= 50.0 &&
+                        branch.getScore() >= 2.0 &&
+                        branch.getCapacity() >= 10)
+                .collect(Collectors.toList());
         // Sor the filtered branches by name
         Collections.sort(filtered_branches, (b1, b2) -> b2.getName().compareTo(b1.getName()));
-        
+
         // Create the page
         Page<Branch> branches_page = new PageImpl<>(filtered_branches);
 
@@ -446,15 +441,15 @@ public class BranchRepositoryTest extends PacaTest {
         paging = PageRequest.of(
                 0,
                 20,
-                Sort.by("name").descending()
-            );
+                Sort.by("name").descending());
 
-        Page<Branch> pagedResult =  branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                30.0F, 
-                50.0F, 
-                2.0F, 
-                10, 
-                paging);
+        Page<Branch> pagedResult = branchRepository
+                .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                        30.0F,
+                        50.0F,
+                        2.0F,
+                        10,
+                        paging);
 
         assertThat(pagedResult.getTotalElements()).isEqualTo(branches_page.getTotalElements());
         assertThat(pagedResult.getTotalPages()).isEqualTo(branches_page.getTotalPages());
@@ -465,7 +460,7 @@ public class BranchRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldGetBranchPageWithCorrectNumberOfPages(){
+    void shouldGetBranchPageWithCorrectNumberOfPages() {
 
         // Creates 5 branches
         utils.createTestBranches(null);
@@ -473,20 +468,19 @@ public class BranchRepositoryTest extends PacaTest {
         Pageable paging = PageRequest.of(
                 0,
                 3,
-                Sort.by("name").descending()
-            );
+                Sort.by("name").descending());
 
-        // 
-        Page<Branch> pagedResult =  branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                0.0F, 
-                10000.F, 
-                0.0F,
-                0,
-                paging);
+        //
+        Page<Branch> pagedResult = branchRepository
+                .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                        0.0F,
+                        10000.F,
+                        0.0F,
+                        0,
+                        paging);
 
         assertThat(pagedResult.getTotalPages()).isEqualTo(2);
         assertThat(paging.getPageSize()).isEqualTo(3);
     }
 
 }
-

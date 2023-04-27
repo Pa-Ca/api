@@ -1,17 +1,18 @@
 package com.paca.paca.mail;
 
-
-import com.paca.paca.exception.exceptions.IOException;
 import com.paca.paca.mail.utils.MailUtils;
+import com.paca.paca.exception.exceptions.IOException;
+
 import junit.framework.TestCase;
+
 import org.jsoup.Jsoup;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.Resource;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -28,11 +29,10 @@ public class MailUtilsTest {
         String filePath = "/static/templates/error.html";
         Map<String, String> data = Map.ofEntries(
                 entry("${KEY1}", "${VALUE1}"),
-                entry("${KEY2}", "${VALUE2}")
-        );
+                entry("${KEY2}", "${VALUE2}"));
 
         try {
-            String fileContents = mailUtils.htmlToString(filePath, data);
+            MailUtils.htmlToString(filePath, data);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof IOException);
@@ -46,8 +46,7 @@ public class MailUtilsTest {
         String filePath = "/static/templates/index.html";
         Map<String, String> data = Map.ofEntries(
                 entry("${KEY1}", "${VALUE1}"),
-                entry("${KEY2}", "${VALUE2}")
-        );
+                entry("${KEY2}", "${VALUE2}"));
 
         Resource expectedResource = new ClassPathResource(filePath);
         InputStream inputStream = expectedResource.getInputStream();
@@ -56,7 +55,7 @@ public class MailUtilsTest {
             expected = expected.replace(entry.getKey(), entry.getValue());
         }
 
-        String fileContents = mailUtils.htmlToString(filePath, data);
+        String fileContents = MailUtils.htmlToString(filePath, data);
 
         Assert.assertEquals(fileContents, expected);
     }

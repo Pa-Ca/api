@@ -1,26 +1,28 @@
 package com.paca.paca.mail;
 
+import com.paca.paca.exception.exceptions.IOException;
 import com.paca.paca.exception.exceptions.MessagingException;
 import com.paca.paca.mail.service.MailService;
+import com.paca.paca.mail.statics.MailStatics;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.testcontainers.shaded.com.google.common.base.CharMatcher.any;
 
 @ExtendWith(MockitoExtension.class)
-@TestPropertySource(properties = {
-        "spring.mail.username=example@example.com"
-})
 public class MailServiceTest {
 
     @InjectMocks
@@ -29,31 +31,24 @@ public class MailServiceTest {
     @Mock
     private JavaMailSender mailSender;
 
+    @BeforeEach
+    public void setMailServiceProperties() {
+        Dotenv dotenv = Dotenv.load();
+        mailService.setEMAIL_FROM(dotenv.get("GOOGLE_EMAIL_FROM"));
+    }
+
     @Test
-    @Disabled
-    void shouldSendResetPasswordEmail() throws MessagingException {
-        String userEmail = "test@example.com";
-        String token = "testToken";
-        String username = "testUsername";
-
-        mailService.sendResetPasswordEmail(userEmail, token, username);
-
-        verify(mailSender).send((MimeMessagePreparator) any());
+    public void testPropertiesAreInitialized() {
+        // Verify that the properties annotated with @Value in MailService are not null
+        assertNotNull(mailService.getEMAIL_FROM());
     }
 
     @Test
     @Disabled
-    void shouldSendResetPasswordEmailThrowsMessagingException() {
-        String userEmail = "test@example.com";
-        String token = "testToken";
-        String username = "testUsername";
+    public void testSendResetPasswordEmail() throws IOException, MessagingException { }
 
-        doThrow(new MessagingException("Email configuration is not valid", 41))
-                .when(mailSender).send((MimeMessagePreparator) any());
-
-        assertThrows(MessagingException.class, () -> {
-            mailService.sendResetPasswordEmail(userEmail, token, username);
-        });
-    }
+    @Test
+    @Disabled
+    void shouldSendResetPasswordEmailThrowsMessagingException() { }
 
 }

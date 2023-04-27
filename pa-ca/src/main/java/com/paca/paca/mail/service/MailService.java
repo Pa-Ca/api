@@ -5,6 +5,8 @@ import static java.util.Map.entry;
 import jakarta.mail.internet.MimeMessage;
 import com.paca.paca.mail.utils.MailUtils;
 import com.paca.paca.mail.statics.MailStatics;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 import com.paca.paca.exception.exceptions.IOException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,13 +15,15 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import com.paca.paca.exception.exceptions.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Getter
+@Setter
 @Service
 public class MailService {
     @Autowired
     private JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
-    private String emailFrom;
+    private String EMAIL_FROM;
 
     public void sendResetPasswordEmail(String userEmail, String token, String username) throws IOException,
             MessagingException {
@@ -34,7 +38,7 @@ public class MailService {
         String htmlMsg = MailUtils.htmlToString(filePath, data);
 
         try {
-            helper.setFrom(emailFrom);
+            helper.setFrom(EMAIL_FROM);
             helper.setTo(userEmail);
             helper.setSubject(MailStatics.Content.RESET_PASSWORD_SUBJECT);
             helper.setText(htmlMsg, true);
@@ -57,7 +61,7 @@ public class MailService {
         String htmlMsg = MailUtils.htmlToString(filePath, data);
 
         try {
-            helper.setFrom(emailFrom);
+            helper.setFrom(EMAIL_FROM);
             helper.setTo(userEmail);
             helper.setSubject(MailStatics.Content.VERIFY_EMAIL_SUBJECT);
             helper.setText(htmlMsg, true);
