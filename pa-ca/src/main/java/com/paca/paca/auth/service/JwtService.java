@@ -11,8 +11,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +26,8 @@ import com.paca.paca.auth.model.JwtBlackList;
 import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 
+@Getter
+@Setter
 @Service
 @RequiredArgsConstructor
 public class JwtService {
