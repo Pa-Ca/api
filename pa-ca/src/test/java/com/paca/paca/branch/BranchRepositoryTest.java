@@ -108,6 +108,8 @@ public class BranchRepositoryTest extends PacaTest {
                 .capacity(42)
                 .reservationPrice(37.0F)
                 .reserveOff(false)
+                .averageReserveTime(1.0F)
+                .visibility(true)
                 .build();
 
         Branch savedBranch = branchRepository.save(branch);
@@ -122,6 +124,8 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(savedBranch.getCapacity()).isEqualTo(branch.getCapacity());
         assertThat(savedBranch.getReservationPrice()).isEqualTo(branch.getReservationPrice());
         assertThat(savedBranch.getReserveOff()).isEqualTo(branch.getReserveOff());
+        assertThat(savedBranch.getAverageReserveTime()).isEqualTo(branch.getAverageReserveTime());
+        assertThat(savedBranch.getVisibility()).isEqualTo(branch.getVisibility());
     }
 
     @Test
@@ -155,6 +159,8 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(expectedBranch.get().getCapacity()).isEqualTo(branch.getCapacity());
         assertThat(expectedBranch.get().getReservationPrice()).isEqualTo(branch.getReservationPrice());
         assertThat(expectedBranch.get().getReserveOff()).isEqualTo(branch.getReserveOff());
+        assertThat(expectedBranch.get().getAverageReserveTime()).isEqualTo(branch.getAverageReserveTime());
+        assertThat(expectedBranch.get().getVisibility()).isEqualTo(branch.getVisibility());
     }
 
     @Test
