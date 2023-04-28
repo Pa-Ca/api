@@ -30,7 +30,7 @@ public class AuthenticationController {
 
     @PostMapping(AuthenticationStatics.Endpoint.LOGIN)
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request)
-            throws ForbiddenException {
+            throws BadRequestException, ForbiddenException {
         return ResponseEntity.ok(service.login(request));
     }
 
