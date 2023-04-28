@@ -41,7 +41,7 @@ public class AuthenticationService {
 
         try {
             UserRole.valueOf(role);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             throw new BadRequestException("The role given is not valid");
         }
     }
@@ -88,7 +88,7 @@ public class AuthenticationService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO request)
-            throws BadRequestException, NoContentException, ForbiddenException {
+            throws BadRequestException, ForbiddenException {
         String email = request.getEmail();
         String password = request.getPassword();
 
@@ -102,10 +102,7 @@ public class AuthenticationService {
             throw new ForbiddenException("Authentication failed", 9);
         }
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new NoContentException(
-                        "User with email " + email + " does not exists",
-                        30));
+        User user = userRepository.findByEmail(request.getEmail()).get();
 
         try {
             authenticationManager.authenticate(
@@ -189,6 +186,13 @@ public class AuthenticationService {
 
     public void resetPassword(ResetPasswordDTO request, String resetPasswordToken)
             throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+        String email;
+
+        try {
+            email = jwtService.extractEmail(resetPasswordToken);
+        } catch (Exception e) {
+            throw new ForbiddenException("Authentication failed", 9);
+        }
         if (!jwtService.isTokenValid(resetPasswordToken)
                 || !jwtService.isTokenResetPassword(resetPasswordToken)) {
             throw new ForbiddenException("Authentication failed", 9);
@@ -198,7 +202,6 @@ public class AuthenticationService {
         String password = request.getPassword();
         AuthUtils.validatePassword(password);
 
-        String email = jwtService.extractEmail(resetPasswordToken);
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new NoContentException(
                         "User with email " + email + " does not exists",
@@ -228,12 +231,18 @@ public class AuthenticationService {
 
     public void verifyEmail(String verifyEmailToken)
             throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+        String email;
+
+        try {
+            email = jwtService.extractEmail(verifyEmailToken);
+        } catch (Exception e) {
+            throw new ForbiddenException("Authentication failed", 9);
+        }
         if (!jwtService.isTokenValid(verifyEmailToken)
                 || !jwtService.isTokenVerifyEmail(verifyEmailToken)) {
             throw new ForbiddenException("Authentication failed", 9);
         }
 
-        String email = jwtService.extractEmail(verifyEmailToken);
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new NoContentException(
                         "User with email " + email + " does not exists",
