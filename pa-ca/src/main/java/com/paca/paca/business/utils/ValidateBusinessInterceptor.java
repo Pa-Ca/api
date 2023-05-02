@@ -1,6 +1,7 @@
 package com.paca.paca.business.utils;
 
 import java.util.Map;
+import java.util.Optional;
 import java.lang.reflect.Method;
 import java.lang.annotation.Target;
 import java.lang.annotation.Inherited;
@@ -52,10 +53,14 @@ public class ValidateBusinessInterceptor implements HandlerInterceptor {
                 return true;
             }
 
-            Business business = businessRepository.findByUserEmail(auth.getName()).get();
+            Optional<Business> business = businessRepository.findByUserEmail(auth.getName());
+            if (business.isEmpty()) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }
+
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long businessId = Long.parseLong((String) pathVariables.get(annotation.idField()));
-            if (!business.getId().equals(businessId)) {
+            if (!business.get().getId().equals(businessId)) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

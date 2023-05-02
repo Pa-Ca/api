@@ -7,10 +7,10 @@ import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.paca.paca.auth.dto.SignupRequestDTO;
-import com.paca.paca.auth.dto.VerifyEmailRequestDTO;
-import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.auth.dto.ResetPasswordDTO;
+import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paca.paca.auth.dto.VerifyEmailRequestDTO;
 import com.paca.paca.auth.dto.ResetPasswordRequestDTO;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 
@@ -185,6 +185,18 @@ public class AuthIntegrationTest extends PacaTest {
                 .email(UUID.randomUUID().toString() + "_test@test.com")
                 .password("123456789")
                 .role("bad_role")
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signupRequest)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("The role given is not valid")));
+
+        signupRequest = SignupRequestDTO.builder()
+                .email(UUID.randomUUID().toString() + "_test@test.com")
+                .password("123456789")
+                .role("admin")
                 .build();
         mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -505,5 +517,4 @@ public class AuthIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")));
 
     }
-
 }
