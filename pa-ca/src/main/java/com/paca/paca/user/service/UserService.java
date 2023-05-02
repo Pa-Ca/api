@@ -1,23 +1,22 @@
 package com.paca.paca.user.service;
 
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.dto.UserDTO;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.model.User;
-import com.paca.paca.user.utils.UserMapper;
+import com.paca.paca.user.dto.UserDTO;
+import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.auth.utils.AuthUtils;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
+import com.paca.paca.user.utils.UserMapper;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 
-import java.util.ArrayList;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class UserService {
@@ -28,17 +27,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private void validateRole(String role) throws BadRequestException {
-        if (role.isEmpty())
-            throw new BadRequestException("The role attribute not found");
-
-        try {
-            UserRole.valueOf(role);
-        } catch (Exception e) {
-            throw new BadRequestException("The role given is not valid");
-        }
-    }
-
     public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -47,24 +35,26 @@ public class UserService {
 
     public UserListDTO getAll() {
         List<UserDTO> response = new ArrayList<>();
-        userRepository.findAll().forEach(user -> response.add (
-            UserDTO
-                .builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .verified(user.getVerified())
-                .loggedIn(user.getLoggedIn())
-                .role(user.getRole().getName().name())
-                .build()
-        ));
+        userRepository.findAll().forEach(user -> response.add(
+                UserDTO
+                        .builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .password(user.getPassword())
+                        .verified(user.getVerified())
+                        .loggedIn(user.getLoggedIn())
+                        .role(user.getRole().getName().name())
+                        .build()));
 
         return UserListDTO.builder().users(response).build();
     }
 
-    public UserDTO getById(Long id) throws BadRequestException {
+    public UserDTO getById(Long id) throws NoContentException {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) throw new BadRequestException("User does not exists");
+        if (user.isEmpty())
+            throw new NoContentException(
+                    "User with id " + id + " does not exists",
+                    12);
         else {
             UserDTO response = userMapper.toDTO(user.get());
             return response;
@@ -72,16 +62,12 @@ public class UserService {
     }
 
     public UserDTO update(Long id, UserDTO dto)
-            throws BadRequestException, UnprocessableException, ConflictException {
+            throws NoContentException, UnprocessableException, ConflictException {
         Optional<User> current = userRepository.findById(id);
         if (current.isEmpty())
-            throw new BadRequestException("User does not exists");
-
-        // Email Validation
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            AuthUtils.validateEmail(dto.email);
-            if (dto.getEmail() != null) throw new BadRequestException("This email is already taken");
-        }
+            throw new NoContentException(
+                    "User with id " + id + " does not exists",
+                    12);
 
         // Password validation
         if (dto.getPassword() != null) {
@@ -89,13 +75,7 @@ public class UserService {
             dto.setPassword(passwordEncoder.encode(dto.getPassword())); // Encode password before entity mapping
         }
 
-        // Role validation
-        if (dto.getRole() != null)
-            validateRole(dto.getRole());
-
-        User user = userMapper.updateEntity(dto, current.get(), UserRole.valueOf(
-                (dto.role != null) ? dto.role : current.get().getRole().getName().name()
-        ));
+        User user = userMapper.updateEntity(dto, current.get(), current.get().getRole().getName());
 
         userRepository.save(user);
         return userMapper.toDTO(user);

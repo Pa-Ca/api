@@ -18,10 +18,9 @@ public interface UserMapper {
     User toEntity(UserDTO dto, UserRole role);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "role", target = "role")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
     @Mapping(target = "email", ignore = true)
-    @Mapping(target = "verified", ignore = true)
-    @Mapping(target = "loggedIn", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     User updateEntity(UserDTO dto, @MappingTarget User user, UserRole role);
 

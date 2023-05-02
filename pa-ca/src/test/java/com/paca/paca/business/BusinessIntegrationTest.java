@@ -489,7 +489,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .tier("basic")
                 .build();
 
-        // Token dont match with business to edit
+        // Token don't match with the business to edit
         mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "0"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + businessToken)

@@ -19,31 +19,31 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(UserStatics.Endpoint.USER_PATH)
+@RequestMapping(UserStatics.Endpoint.PATH)
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
     @ValidateRoles({})
+    @GetMapping(UserStatics.Endpoint.GET_ALL)
     public ResponseEntity<UserListDTO> getAll() {
         return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(UserStatics.Endpoint.GET_BY_ID)
     public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id) throws BadRequestException {
         return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
     }
 
     @ValidateUser
-    @PatchMapping("/{id}")
+    @PatchMapping(UserStatics.Endpoint.UPDATE)
     public ResponseEntity<UserDTO> update(@PathVariable("id") Long id, @RequestBody UserDTO user)
             throws BadRequestException, UnprocessableException, ConflictException {
         return new ResponseEntity<>(userService.update(id, user), HttpStatus.OK);
     }
 
     @ValidateUser
-    @DeleteMapping("/{id}")
+    @DeleteMapping(UserStatics.Endpoint.DELETE)
     public void delete(@PathVariable("id") Long id) throws BadRequestException {
         userService.delete(id);
     }
