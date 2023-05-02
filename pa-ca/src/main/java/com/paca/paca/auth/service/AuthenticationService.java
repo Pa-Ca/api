@@ -36,8 +36,13 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private void validateRole(String role) throws BadRequestException {
-        if (role.isEmpty())
+        if (role.isEmpty()) {
             throw new BadRequestException("The role attribute not found");
+        }
+
+        if (role.equals("admin")) {
+            throw new BadRequestException("The role given is not valid");
+        }
 
         try {
             UserRole.valueOf(role);

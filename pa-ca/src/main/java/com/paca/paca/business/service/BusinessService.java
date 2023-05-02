@@ -32,12 +32,12 @@ public class BusinessService {
 
     private void validateTier(String tier) throws BadRequestException {
         if (tier.isEmpty())
-            throw new BadRequestException("The role attribute not found");
+            throw new BadRequestException("The tier attribute not found");
 
         try {
             BusinessTier.valueOf(tier);
         } catch (Exception e) {
-            throw new BadRequestException("The role given is not valid");
+            throw new BadRequestException("The tier given is not valid");
         }
     }
 
@@ -106,16 +106,18 @@ public class BusinessService {
                     28);
         }
 
-        Optional<Tier> tier = tierRepository.findByName(
-                BusinessTier.valueOf(
-                        (dto.getTier() != null) ? dto.getTier() : current.get().getTier().getName().name()));
-        if (tier.isEmpty()) {
-            throw new NoContentException(
-                    "Tier " + tier.get() + " does not exists",
-                    38);
+        Tier tier;
+        if (dto.getTier() != null) {
+            validateTier(dto.getTier());
+            tier = tierRepository.findByName(BusinessTier.valueOf(dto.getTier())).orElseThrow(
+                    () -> new NoContentException(
+                            "Tier " + dto.getTier() + " does not exists",
+                            38));
+        } else {
+            tier = current.get().getTier();
         }
 
-        Business newBusiness = businessMapper.updateModel(dto, current.get(), tier.get());
+        Business newBusiness = businessMapper.updateModel(dto, current.get(), tier);
         newBusiness = businessRepository.save(newBusiness);
         BusinessDTO dtoResponse = businessMapper.toDTO(newBusiness);
 
@@ -144,5 +146,4 @@ public class BusinessService {
 
         return dto;
     }
-
 }

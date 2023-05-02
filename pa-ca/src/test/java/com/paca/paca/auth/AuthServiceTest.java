@@ -183,8 +183,8 @@ public class AuthServiceTest {
         String passHash = "$2a$10$3JJoqbyYXtUDCWt9.H7wKOXeBsEAv3R5uf30qA/8QtCu9GFjqjWSa";
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         Role role = Role.builder()
-                .id((long) UserRole.admin.ordinal())
-                .name(UserRole.admin).build();
+                .id((long) UserRole.client.ordinal())
+                .name(UserRole.client).build();
         User user = User.builder()
                 .id(id)
                 .email(email)
@@ -208,7 +208,7 @@ public class AuthServiceTest {
         SignupRequestDTO request = SignupRequestDTO.builder()
                 .email(email)
                 .password(password)
-                .role(UserRole.admin.name())
+                .role(UserRole.client.name())
                 .build();
         LoginResponseDTO response = authenticationService.signup(request);
 
