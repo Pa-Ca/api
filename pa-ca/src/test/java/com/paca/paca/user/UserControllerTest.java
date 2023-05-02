@@ -49,7 +49,7 @@ public class UserControllerTest extends ControllerTest {
 
     @MockBean
     private JwtService jwtService;
-    
+
     @MockBean
     private UserService userService;
 
@@ -66,7 +66,7 @@ public class UserControllerTest extends ControllerTest {
         UserListDTO userListDTO = UserListDTO.builder().users(userDTOList).build();
         when(userService.getAll()).thenReturn(userListDTO);
 
-        mockMvc.perform(get(UserStatics.Endpoint.USER_PATH)
+        mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.users", CoreMatchers.hasItems()));
@@ -76,21 +76,29 @@ public class UserControllerTest extends ControllerTest {
     public void shouldGetUserById() throws Exception {
         utils.setAuthorities("admin");
         UserDTO userDTO = UserDTO.builder()
-                .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role("client")
+                .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false)
+                .role("client")
                 .build();
         when(userService.getById(anyLong())).thenReturn(userDTO);
 
-        ResultActions response = mockMvc.perform(get(UserStatics.Endpoint.USER_PATH.concat("/1"))
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions response = mockMvc
+                .perform(get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
+                        .contentType(MediaType.APPLICATION_JSON));
 
         response
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(userDTO.getId().intValue())))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(userDTO.getEmail())))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.password", CoreMatchers.is(userDTO.getPassword())))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(userDTO.getVerified())))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.loggedIn", CoreMatchers.is(userDTO.getLoggedIn())))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.role", CoreMatchers.is(userDTO.getRole())));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(userDTO.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                        CoreMatchers.is(userDTO.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password",
+                        CoreMatchers.is(userDTO.getPassword())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
+                        CoreMatchers.is(userDTO.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.loggedIn",
+                        CoreMatchers.is(userDTO.getLoggedIn())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role",
+                        CoreMatchers.is(userDTO.getRole())));
     }
 
     @Test
@@ -98,13 +106,14 @@ public class UserControllerTest extends ControllerTest {
         utils.setAuthorities("admin");
         when(userService.getById(anyLong())).thenThrow(new BadRequestException("message", 0));
 
-        ResultActions response = mockMvc.perform(get(UserStatics.Endpoint.USER_PATH.concat("/1"))
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions response = mockMvc
+                .perform(get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
+                        .contentType(MediaType.APPLICATION_JSON));
 
         response
-            .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
     @Test
@@ -120,7 +129,8 @@ public class UserControllerTest extends ControllerTest {
         when(userService.update(anyLong(), any(UserDTO.class))).thenReturn(userResponseDTO);
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
 
-        ResultActions response = mockMvc.perform(patch(UserStatics.Endpoint.USER_PATH.concat("/" + user.getId()))
+        ResultActions response = mockMvc.perform(patch(
+                (UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", user.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRequestDTO)));
 
@@ -146,9 +156,11 @@ public class UserControllerTest extends ControllerTest {
         utils.setAuthorities(user.getRole().getName().name());
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
-        when(userService.update(anyLong(), any(UserDTO.class))).thenThrow(new BadRequestException("message", 0));
+        when(userService.update(anyLong(), any(UserDTO.class)))
+                .thenThrow(new BadRequestException("message", 0));
 
-        ResultActions response = mockMvc.perform(patch(UserStatics.Endpoint.USER_PATH.concat("/" + user.getId()))
+        ResultActions response = mockMvc.perform(patch(
+                (UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", user.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(UserDTO.builder().build())));
 
@@ -164,9 +176,11 @@ public class UserControllerTest extends ControllerTest {
         utils.setAuthorities(user.getRole().getName().name());
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
-        when(userService.update(anyLong(), any(UserDTO.class))).thenThrow(new UnprocessableException("message", 0));
+        when(userService.update(anyLong(), any(UserDTO.class)))
+                .thenThrow(new UnprocessableException("message", 0));
 
-        ResultActions response = mockMvc.perform(patch(UserStatics.Endpoint.USER_PATH.concat("/" + user.getId()))
+        ResultActions response = mockMvc.perform(patch(
+                (UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", user.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(UserDTO.builder().build())));
 
@@ -185,7 +199,8 @@ public class UserControllerTest extends ControllerTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
         when(userService.update(anyLong(), any(UserDTO.class))).thenThrow(new ConflictException("message", 0));
 
-        ResultActions response = mockMvc.perform(patch(UserStatics.Endpoint.USER_PATH.concat("/" + user.getId()))
+        ResultActions response = mockMvc.perform(patch(
+                (UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", user.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(UserDTO.builder().build())));
 
@@ -203,7 +218,8 @@ public class UserControllerTest extends ControllerTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
         doNothing().when(userService).delete(anyLong());
 
-        ResultActions response = mockMvc.perform(delete(UserStatics.Endpoint.USER_PATH.concat("/" + user.getId()))
+        ResultActions response = mockMvc.perform(delete(
+                (UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", user.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON));
 
         response
@@ -218,7 +234,8 @@ public class UserControllerTest extends ControllerTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
         doThrow(new BadRequestException("message", 0)).when(userService).delete(anyLong());
 
-        ResultActions response = mockMvc.perform(delete(UserStatics.Endpoint.USER_PATH.concat("/" + user.getId()))
+        ResultActions response = mockMvc.perform(delete(
+                (UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", user.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON));
 
         response
@@ -226,5 +243,4 @@ public class UserControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
-
 }

@@ -8,7 +8,7 @@ import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.utils.UserMapper;
 import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.NoContentException;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -78,8 +78,8 @@ public class UserServiceTest {
             userService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assertions.assertTrue(e instanceof BadRequestException);
-            Assertions.assertEquals(e.getMessage(), "User does not exists");
+            Assertions.assertTrue(e instanceof NoContentException);
+            Assertions.assertEquals(e.getMessage(), "User with id 1 does not exists");
         }
     }
 
@@ -103,7 +103,6 @@ public class UserServiceTest {
         when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
         when(userMapper.updateEntity(any(UserDTO.class), any(User.class), any(UserRole.class))).thenReturn(expected);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(user));
-        when(userRepository.existsByEmail(any(String.class))).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(user);
         UserDTO response = userService.update(1L, userDTO);
 
@@ -116,26 +115,9 @@ public class UserServiceTest {
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
         try {
             userService.update(1L, UserDTO.builder().build());
-        } catch (BadRequestException e){
-            assertThat(e.getMessage()).isEqualTo("User does not exists");
-            assertThat(e.getCode()).isEqualTo(400);
-        }
-    }
-
-    @Test
-    void shouldGetBadRequestFromUpdateUserByIdBecauseEmailIsTaken() {
-        Role admin = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
-        User user = User.builder()
-                .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role(admin)
-                .build();
-
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(user));
-        when(userRepository.existsByEmail(any(String.class))).thenReturn(true);
-        try {
-            userService.update(1L, UserDTO.builder().email("test@test.com").build());
-        } catch (BadRequestException e) {
-            assertThat(e.getMessage()).isEqualTo("This email is already taken");
-            assertThat(e.getCode()).isEqualTo(400);
+        } catch (NoContentException e){
+            assertThat(e.getMessage()).isEqualTo("User with id 1 does not exists");
+            assertThat(e.getCode()).isEqualTo(12);
         }
     }
 }
