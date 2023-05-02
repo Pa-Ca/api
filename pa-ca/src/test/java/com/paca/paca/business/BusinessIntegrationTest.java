@@ -37,8 +37,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import junit.framework.TestCase;
+import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -612,8 +612,8 @@ public class BusinessIntegrationTest extends PacaTest {
                         .header("Authorization", "Bearer " + businessToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(28)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(12)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Business with id 0 does not exists")));
+                        CoreMatchers.is("User with id 0 does not exists")));
     }
 }

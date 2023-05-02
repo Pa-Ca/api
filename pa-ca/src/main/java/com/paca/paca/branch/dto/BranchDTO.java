@@ -23,4 +23,6 @@ public class BranchDTO {
     private Integer capacity;
     private Float reservationPrice;
     private Boolean reserveOff;
+    private Float averageReserveTime;
+    private Boolean visibility;
 }

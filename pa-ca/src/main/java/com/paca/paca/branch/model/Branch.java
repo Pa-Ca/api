@@ -46,4 +46,10 @@ public class Branch {
 
     @Column(name = "reserve_off")
     private Boolean reserveOff;
+
+    @Column(name = "average_reserve_time")
+    private Float averageReserveTime;
+
+    @Column(name = "visibility")
+    private Boolean visibility;
 }
