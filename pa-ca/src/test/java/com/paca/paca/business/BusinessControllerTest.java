@@ -2,9 +2,11 @@ package com.paca.paca.business;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.auth.ControllerTest;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paca.paca.business.service.BusinessService;
@@ -392,4 +394,58 @@ public class BusinessControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
     }
 
+    // GetAllBranches
+    @Test
+    public void shouldGetForbiddenDueToInvalidRoleInGetAllBranches() throws Exception {
+        Business business = utils.createBusiness(null);
+
+        utils.setAuthorities("client");
+
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                business.getId().toString()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Unauthorized access for this operation")));
+    }
+
+    @Test
+    public void shouldGetForbiddenDueToInvalidUserInGetAllBranches() throws Exception {
+        Business business = utils.createBusiness(null);
+        BusinessDTO businessDTO = utils.createBusinessDTO(business);
+
+        when(businessService.update(anyLong(), any(BusinessDTO.class))).thenReturn(businessDTO);
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                business.getId().toString() + "1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(businessDTO)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Unauthorized access for this operation")));
+    }
+
+    public void shouldGetAllBranches() throws Exception {
+        Business business = utils.createBusiness(null);
+        BusinessDTO businessDTO = utils.createBusinessDTO(business);
+
+        ArrayList<BranchDTO> dtoList = new ArrayList<>();
+        dtoList.add(utils.createBranchDTO(null));
+        BranchListDTO businessListDTO = BranchListDTO.builder().branches(dtoList).build();
+
+        when(businessService.getAllBranchesById(anyLong())).thenReturn(businessListDTO);
+        when(businessService.update(anyLong(), any(BusinessDTO.class))).thenReturn(businessDTO);
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                business.getId().toString()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
+    }
 }

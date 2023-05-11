@@ -76,7 +76,7 @@ public class BranchService {
 
     private final ReviewRepository reviewRepository;
 
-    private final ReviewLikeRepository reviewLikeRepository; // Added
+    private final ReviewLikeRepository reviewLikeRepository;
 
     private final BranchRepository branchRepository;
 

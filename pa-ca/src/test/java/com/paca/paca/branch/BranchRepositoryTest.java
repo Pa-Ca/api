@@ -403,7 +403,6 @@ public class BranchRepositoryTest extends PacaTest {
 
     @Test
     void shouldGetEmptyBranchPageDueToNotMatchingSearchParameters() {
-
         utils.createTestBranches(null);
         Pageable paging;
 
@@ -489,4 +488,18 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(paging.getPageSize()).isEqualTo(3);
     }
 
+    @Test
+    void shouldGetAllByBusinessId() {
+        int nBranches = 10;
+        Business business = utils.createBusiness(null);
+
+        for (int i = 0; i < nBranches; i++) {
+            utils.createBranch(business);
+            utils.createBranch(null);
+        }
+
+        List<Branch> branches = branchRepository.findAllByBusinessId(business.getId());
+
+        assertThat(branches.size()).isEqualTo(nBranches);
+    }
 }

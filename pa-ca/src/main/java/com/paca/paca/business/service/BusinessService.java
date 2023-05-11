@@ -3,11 +3,15 @@ package com.paca.paca.business.service;
 import com.paca.paca.user.model.User;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -26,8 +30,15 @@ import java.util.Optional;
 public class BusinessService {
 
     private final BusinessRepository businessRepository;
+
+    private final BranchRepository branchRepository;
+
     private final TierRepository tierRepository;
+
+    private final BranchMapper branchMapper;
+
     private final BusinessMapper businessMapper;
+
     private final UserRepository userRepository;
 
     private void validateTier(String tier) throws BadRequestException {
@@ -145,5 +156,15 @@ public class BusinessService {
         dto.setUserId(business.getUser().getId());
 
         return dto;
+    }
+
+    public BranchListDTO getAllBranchesById(Long id) {
+        List<BranchDTO> response = new ArrayList<>();
+        branchRepository.findAllByBusinessId(id).forEach(branch -> {
+            BranchDTO dto = branchMapper.toDTO(branch);
+            response.add(dto);
+        });
+
+        return BranchListDTO.builder().branches(response).build();
     }
 }

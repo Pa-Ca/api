@@ -7,10 +7,12 @@ import com.paca.paca.PacaTest;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.paca.paca.branch.statics.BranchStatics;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -184,7 +186,7 @@ public class BusinessIntegrationTest extends PacaTest {
     }
 
     @Test
-    public void should_Save_GetByID_GetByUserID_Update_And_Delete() throws Exception {
+    public void should_Save_GetByID_GetByUserID_GetAllBranches_Update_And_Delete() throws Exception {
         // Create user
         String email = UUID.randomUUID().toString() + "_test@test.com";
         String password = "123456789";
@@ -251,6 +253,49 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)));
+
+        // Create branches
+        BranchDTO branchDTO = BranchDTO.builder()
+                .businessId(id.longValue())
+                .address("address test")
+                .coordinates("coordinates test")
+                .name("test")
+                .overview("overview test")
+                .score(1.0F)
+                .capacity(1)
+                .reservationPrice(1.0F)
+                .reserveOff(false)
+                .averageReserveTime(1.0F)
+                .visibility(true)
+                .build();
+        mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
+                .header("Authorization", "Bearer " + token)
+                .content(objectMapper.writeValueAsString(branchDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
+                .header("Authorization", "Bearer " + token)
+                .content(objectMapper.writeValueAsString(branchDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Get all branches
+        response = mockMvc
+                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                        id.toString()))
+                        .header("Authorization", "Bearer " + this.adminToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String content = response.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(content);
+        JsonNode listNode = jsonNode.get("branches");
+        List<BranchDTO> list = objectMapper.convertValue(
+                listNode,
+                new TypeReference<List<BranchDTO>>() {
+                });
+        assertEquals(list.size(), 2);
 
         // Update business
         String fakeEmail = UUID.randomUUID().toString() + "_test@fake.com";

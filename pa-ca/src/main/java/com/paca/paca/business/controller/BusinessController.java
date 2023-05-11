@@ -1,6 +1,7 @@
 package com.paca.paca.business.controller;
 
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.statics.BusinessStatics;
 import com.paca.paca.business.service.BusinessService;
@@ -58,5 +59,12 @@ public class BusinessController {
     @GetMapping(BusinessStatics.Endpoint.GET_BY_USER_ID)
     public ResponseEntity<BusinessDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(businessService.getByUserId(id));
+    }
+
+    @ValidateBusiness
+    @ValidateRoles({ "business" })
+    @GetMapping(BusinessStatics.Endpoint.GET_BRANCHES)
+    public ResponseEntity<BranchListDTO> getAllBranches(@PathVariable("id") Long id) throws NoContentException {
+        return ResponseEntity.ok(businessService.getAllBranchesById(id));
     }
 }

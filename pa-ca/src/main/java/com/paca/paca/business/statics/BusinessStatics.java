@@ -10,5 +10,6 @@ public interface BusinessStatics {
         String DELETE = "/{id}";
         String GET_BY_ID = "/{id}";
         String GET_BY_USER_ID = "/user/{id}";
+        String GET_BRANCHES = "/{id}/branches";
     }
 }
