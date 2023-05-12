@@ -80,6 +80,7 @@ class BusinessRepositoryTest extends PacaTest {
                 .name("test")
                 .verified(false)
                 .tier(tier)
+                .phoneNumber("Test phone")
                 .build();
 
         Business savedBusiness = businessRepository.save(business);
@@ -89,6 +90,7 @@ class BusinessRepositoryTest extends PacaTest {
         assertThat(savedBusiness.getTier().getId()).isEqualTo(business.getTier().getId());
         assertThat(savedBusiness.getName()).isEqualTo(business.getName());
         assertThat(savedBusiness.getVerified()).isEqualTo(business.getVerified());
+        assertThat(savedBusiness.getPhoneNumber()).isEqualTo(business.getPhoneNumber());
     }
 
     @Test
@@ -117,6 +119,7 @@ class BusinessRepositoryTest extends PacaTest {
         assertThat(expectedBusiness.get().getTier().getId()).isEqualTo(business.getTier().getId());
         assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
         assertThat(expectedBusiness.get().getVerified()).isEqualTo(business.getVerified());
+        assertThat(expectedBusiness.get().getPhoneNumber()).isEqualTo(business.getPhoneNumber());
     }
 
     @Test
@@ -152,6 +155,7 @@ class BusinessRepositoryTest extends PacaTest {
         assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
         assertThat(expectedBusiness.get().getVerified()).isEqualTo(business.getVerified());
         assertThat(expectedBusiness.get().getTier()).isEqualTo(business.getTier());
+        assertThat(expectedBusiness.get().getPhoneNumber()).isEqualTo(business.getPhoneNumber());
     }
 
     @Test
@@ -181,6 +185,7 @@ class BusinessRepositoryTest extends PacaTest {
         assertThat(expectedBusiness.get().getName()).isEqualTo(business.getName());
         assertThat(expectedBusiness.get().getVerified()).isEqualTo(business.getVerified());
         assertThat(expectedBusiness.get().getTier()).isEqualTo(business.getTier());
+        assertThat(expectedBusiness.get().getPhoneNumber()).isEqualTo(business.getPhoneNumber());
     }
 
     @Test

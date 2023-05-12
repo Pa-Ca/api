@@ -35,6 +35,7 @@ public class BusinessMapperTest {
         assertThat(response.getTier()).isEqualTo(business.getTier().getName().name());
         assertThat(response.getName()).isEqualTo(business.getName());
         assertThat(response.getVerified()).isEqualTo(business.getVerified());
+        assertThat(response.getPhoneNumber()).isEqualTo(business.getPhoneNumber());
     }
 
     @Test
@@ -51,6 +52,7 @@ public class BusinessMapperTest {
         assertThat(entity.getName()).isEqualTo(dto.getName());
         assertThat(entity.getVerified()).isEqualTo(dto.getVerified());
         assertThat(entity.getTier().getName().name()).isEqualTo(dto.getTier());
+        assertThat(entity.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
     }
 
     @Test
@@ -99,5 +101,13 @@ public class BusinessMapperTest {
         updatedBusiness = businessMapper.updateModel(dto, business, newTier);
         assertThat(updatedBusiness).isNotNull();
         assertThat(updatedBusiness.getTier().getName().name()).isEqualTo(dto.getTier());
+
+        // Changing phone number
+        dto = BusinessDTO.builder()
+                .phoneNumber("new phone")
+                .build();
+        updatedBusiness = businessMapper.updateModel(dto, business, tier);
+        assertThat(updatedBusiness).isNotNull();
+        assertThat(updatedBusiness.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
     }
 }

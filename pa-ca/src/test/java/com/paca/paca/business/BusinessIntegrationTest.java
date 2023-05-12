@@ -212,6 +212,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .name("Test name")
                 .verified(false)
                 .tier("basic")
+                .phoneNumber("Test phone")
                 .build();
         response = mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -222,6 +223,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("Test name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("Test phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)))
                 .andReturn();
         responseJson = response.getResponse().getContentAsString();
@@ -239,6 +241,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("Test name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("Test phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)));
 
         // Get business by user id
@@ -252,6 +255,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("Test name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("Test phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)));
 
         // Create branches
@@ -306,6 +310,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .name("New name")
                 .verified(true)
                 .tier("premium")
+                .phoneNumber("new phone")
                 .build();
         response = mockMvc
                 .perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
@@ -319,6 +324,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("New name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(true)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("premium")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("new phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)))
                 .andReturn();
         responseJson = response.getResponse().getContentAsString();
@@ -351,6 +357,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .name("Test name")
                 .verified(false)
                 .tier("basic")
+                .phoneNumber("Test phone")
                 .build();
 
         // No token exception
