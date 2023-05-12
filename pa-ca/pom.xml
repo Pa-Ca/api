@@ -165,8 +165,8 @@
 
         <dependency>
             <groupId>com.google.http-client</groupId>
-            <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.43.1</version>
+            <artifactId>google-http-client-gson</artifactId>
+            <version>1.21.0</version>
         </dependency>
 
     </dependencies>
