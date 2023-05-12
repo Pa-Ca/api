@@ -3,11 +3,15 @@ package com.paca.paca.business.service;
 import com.paca.paca.user.model.User;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -26,18 +30,25 @@ import java.util.Optional;
 public class BusinessService {
 
     private final BusinessRepository businessRepository;
+
+    private final BranchRepository branchRepository;
+
     private final TierRepository tierRepository;
+
+    private final BranchMapper branchMapper;
+
     private final BusinessMapper businessMapper;
+
     private final UserRepository userRepository;
 
     private void validateTier(String tier) throws BadRequestException {
         if (tier.isEmpty())
-            throw new BadRequestException("The role attribute not found");
+            throw new BadRequestException("The tier attribute not found");
 
         try {
             BusinessTier.valueOf(tier);
         } catch (Exception e) {
-            throw new BadRequestException("The role given is not valid");
+            throw new BadRequestException("The tier given is not valid");
         }
     }
 
@@ -106,16 +117,18 @@ public class BusinessService {
                     28);
         }
 
-        Optional<Tier> tier = tierRepository.findByName(
-                BusinessTier.valueOf(
-                        (dto.getTier() != null) ? dto.getTier() : current.get().getTier().getName().name()));
-        if (tier.isEmpty()) {
-            throw new NoContentException(
-                    "Tier " + tier.get() + " does not exists",
-                    38);
+        Tier tier;
+        if (dto.getTier() != null) {
+            validateTier(dto.getTier());
+            tier = tierRepository.findByName(BusinessTier.valueOf(dto.getTier())).orElseThrow(
+                    () -> new NoContentException(
+                            "Tier " + dto.getTier() + " does not exists",
+                            38));
+        } else {
+            tier = current.get().getTier();
         }
 
-        Business newBusiness = businessMapper.updateModel(dto, current.get(), tier.get());
+        Business newBusiness = businessMapper.updateModel(dto, current.get(), tier);
         newBusiness = businessRepository.save(newBusiness);
         BusinessDTO dtoResponse = businessMapper.toDTO(newBusiness);
 
@@ -145,4 +158,13 @@ public class BusinessService {
         return dto;
     }
 
+    public BranchListDTO getAllBranchesById(Long id) {
+        List<BranchDTO> response = new ArrayList<>();
+        branchRepository.findAllByBusinessId(id).forEach(branch -> {
+            BranchDTO dto = branchMapper.toDTO(branch);
+            response.add(dto);
+        });
+
+        return BranchListDTO.builder().branches(response).build();
+    }
 }

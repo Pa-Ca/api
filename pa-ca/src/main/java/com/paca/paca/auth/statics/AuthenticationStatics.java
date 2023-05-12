@@ -15,11 +15,12 @@ public interface AuthenticationStatics {
   }
 
   interface Endpoint {
+    String AUTH_PATH = "/api/v1/auth";
+
     String LOGIN = "/login";
     String SIGNUP = "/signup";
     String LOGOUT = "/logout";
     String REFRESH = "/refresh";
-    String AUTH_PATH = "/api/v1/auth";
     String RESET_PASSWORD = "/reset-password";
     String GOOGLE_LOGIN = "/google/login";
     String GOOGLE_SIGNUP = "/google/signup";

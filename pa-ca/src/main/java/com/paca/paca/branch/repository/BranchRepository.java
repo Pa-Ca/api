@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,11 +20,13 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     Optional<Branch> findByBusiness_UserEmail(String email);
 
+    List<Branch> findAllByBusinessId(Long businessId);
+
     Page<Branch> findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-        @Nullable Float min_reservation_price, 
-        @Nullable Float max_reservation_price, 
-        @Nullable Float min_score,
-        @Nullable Integer min_capacity, 
-        @Nullable Pageable pageable);
-    
+            @Nullable Float min_reservation_price,
+            @Nullable Float max_reservation_price,
+            @Nullable Float min_score,
+            @Nullable Integer min_capacity,
+            @Nullable Pageable pageable);
+
 }

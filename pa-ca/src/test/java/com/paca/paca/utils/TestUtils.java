@@ -408,6 +408,8 @@ public class TestUtils {
                 .capacity(42)
                 .reservationPrice(37.0F)
                 .reserveOff(false)
+                .averageReserveTime(1.0F)
+                .visibility(true)
                 .build();
 
         if (branchRepository != null) {

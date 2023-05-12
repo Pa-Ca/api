@@ -114,6 +114,11 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
+    public boolean isToken(String token) {
+        Claims claims = extractAllClaims(token);
+        return ((String) claims.get("type")).equals(TokenType.TOKEN.name());
+    }
+
     public boolean isTokenRefresh(String token) {
         Claims claims = extractAllClaims(token);
         return ((String) claims.get("type")).equals(TokenType.REFRESH.name());

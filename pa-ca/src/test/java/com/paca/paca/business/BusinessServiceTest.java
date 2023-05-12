@@ -2,14 +2,17 @@ package com.paca.paca.business;
 
 import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
+import com.paca.paca.branch.model.Branch;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.business.service.BusinessService;
+import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -30,6 +33,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +42,11 @@ class BusinessServiceTest {
     private BusinessRepository businessRepository;
 
     @Mock
+    private BranchRepository branchRepository;
+
+    @Mock
     private UserRepository userRepository;
+
     @Mock
     private TierRepository tierRepository;
 
@@ -228,5 +236,16 @@ class BusinessServiceTest {
         assertThat(dtoResponse).isNotNull();
         assertThat(dtoResponse.getId()).isEqualTo(business.getId());
         assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
+    }
+
+    @Test
+    void shouldGetAllBranchesById() {
+        Business business = utils.createBusiness(null);
+        List<Branch> branches = TestUtils.castList(Branch.class, Mockito.mock(List.class));
+
+        when(branchRepository.findAllByBusinessId(anyLong())).thenReturn(branches);
+        BranchListDTO responseDTO = businessService.getAllBranchesById(business.getId());
+
+        assertThat(responseDTO).isNotNull();
     }
 }

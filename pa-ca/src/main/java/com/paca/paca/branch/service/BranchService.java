@@ -33,8 +33,6 @@ import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 
-import ch.qos.logback.core.filter.Filter;
-
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -78,8 +76,8 @@ public class BranchService {
 
     private final ReviewRepository reviewRepository;
 
-    private final ReviewLikeRepository reviewLikeRepository; // Added
-    
+    private final ReviewLikeRepository reviewLikeRepository;
+
     private final BranchRepository branchRepository;
 
     private final ProductRepository productRepository;
@@ -302,80 +300,74 @@ public class BranchService {
         return ReviewListDTO.builder().reviews(response).build();
     }
 
-
     // Nows lets make the pagination of branches
     // This method returns a list of branches with pagination
 
-    public BranchListDTO getBranchesPage(int page, 
-                                         int size, 
-                                         String  sorting_by, 
-                                         boolean ascending,
-                                         Float min_reservation_price,
-                                         Float max_reservation_price,
-                                         Float min_score,
-                                         int min_capacity
-                                         ) throws UnprocessableException, NoContentException{
+    public BranchListDTO getBranchesPage(int page,
+            int size,
+            String sorting_by,
+            boolean ascending,
+            Float min_reservation_price,
+            Float max_reservation_price,
+            Float min_score,
+            int min_capacity) throws UnprocessableException, NoContentException {
 
         // Now lets add the exeption handling
         if (page < 0) {
             throw new UnprocessableException(
-                "Page number cannot be less than zero", 
-                40);
+                    "Page number cannot be less than zero",
+                    40);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                "Size cannot be less than one", 
-                41);
+                    "Size cannot be less than one",
+                    41);
         }
 
         // Check if sorting_by is in BranchStatics.BranchSortingKeys
-        if (!BranchStatics.BranchSortingKeys.contains(sorting_by)){
+        if (!BranchStatics.BranchSortingKeys.contains(sorting_by)) {
             throw new UnprocessableException(
-                "Sorting key is not valid", 
-                42);
+                    "Sorting key is not valid",
+                    42);
         }
 
-        
-
-        // Create a Pageable object that specifies the page and size parameters as well as a sort
+        // Create a Pageable object that specifies the page and size parameters as well
+        // as a sort
         // order for the results
         Pageable paging;
-        if (ascending){
+        if (ascending) {
             paging = PageRequest.of(
-                page,
-                size,
-                Sort.by(sorting_by).ascending()
-            );
-        }else{
+                    page,
+                    size,
+                    Sort.by(sorting_by).ascending());
+        } else {
             paging = PageRequest.of(
-                page,
-                size,
-                Sort.by(sorting_by).descending()
-            );
-        } 
+                    page,
+                    size,
+                    Sort.by(sorting_by).descending());
+        }
 
-        if (min_reservation_price == null){
+        if (min_reservation_price == null) {
             min_reservation_price = 0.0f;
         }
-        if (max_reservation_price == null){
+        if (max_reservation_price == null) {
             max_reservation_price = Float.POSITIVE_INFINITY;
         }
-        if (min_score == null){
+        if (min_score == null) {
             min_score = 0.0f;
         }
-        if (min_capacity == 0){
+        if (min_capacity == 0) {
             min_capacity = 1;
         }
 
         // Lets apply the filters
-        Page<Branch> pagedResult = branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-            min_reservation_price,
-            max_reservation_price,
-            min_score,
-            min_capacity,
-            paging
-        );
-
+        Page<Branch> pagedResult = branchRepository
+                .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
+                        min_reservation_price,
+                        max_reservation_price,
+                        min_score,
+                        min_capacity,
+                        paging);
 
         List<BranchDTO> response = new ArrayList<>();
 
@@ -386,22 +378,21 @@ public class BranchService {
 
         return BranchListDTO.builder().branches(response).build();
     }
-     
 
     // This method returns a list of reviews with pagination
-    public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NoContentException{
+    public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NoContentException {
 
         // Now lets add the exeption handling
         // TODO: Add the corresponding codes to the exceptions
         if (page < 0) {
             throw new UnprocessableException(
-                "Page number cannot be less than zero", 
-                40);
+                    "Page number cannot be less than zero",
+                    40);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                "Size cannot be less than one", 
-                41);
+                    "Size cannot be less than one",
+                    41);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
@@ -411,30 +402,31 @@ public class BranchService {
                     20);
         }
 
-        // Create a Pageable object that specifies the page and size parameters as well as a sort 
+        // Create a Pageable object that specifies the page and size parameters as well
+        // as a sort
         // order for the results
         Pageable paging = PageRequest.of(
                 page,
                 size,
-                // Sort by id descending 
+                // Sort by id descending
                 // TODO: Add more ways to sort
-                Sort.by("id").descending()
-        );
-        
-        // Query the database for the appropriate page of results using the findAll method of the 
+                Sort.by("id").descending());
+
+        // Query the database for the appropriate page of results using the findAll
+        // method of the
         // reviewRepository
-        Page<Review> pagedResult = reviewRepository.findAllByBranchId(id, paging);//.findAll(paging);
-        
+        Page<Review> pagedResult = reviewRepository.findAllByBranchId(id, paging);// .findAll(paging);
+
         // Map the results to a list of ReviewDTO objects using the reviewMapper
         List<ReviewDTO> response = new ArrayList<>();
-        
+
         pagedResult.forEach(review -> {
             ReviewDTO dto = reviewMapper.toDTO(review);
             dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
-        response.add(dto);
+            response.add(dto);
         });
 
-    // Return a ReviewListDTO object that contains the list of ReviewDTO objects
-    return ReviewListDTO.builder().reviews(response).build();
+        // Return a ReviewListDTO object that contains the list of ReviewDTO objects
+        return ReviewListDTO.builder().reviews(response).build();
     }
 }

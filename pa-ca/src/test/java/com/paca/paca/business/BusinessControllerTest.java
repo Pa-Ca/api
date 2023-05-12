@@ -2,9 +2,11 @@ package com.paca.paca.business;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.auth.ControllerTest;
+import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paca.paca.business.service.BusinessService;
@@ -62,14 +64,14 @@ public class BusinessControllerTest extends ControllerTest {
         when(businessService.getAll()).thenReturn(businessListDTO);
 
         utils.setAuthorities("client");
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(get(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_ALL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("Unauthorized access for this operation")));
 
         utils.setAuthorities("business");
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(get(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_ALL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -86,7 +88,7 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("admin");
 
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(get(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_ALL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.business", CoreMatchers.hasItems()));
@@ -102,7 +104,7 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -119,7 +121,7 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -136,7 +138,7 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
@@ -153,15 +155,18 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH)
+        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(dto.getUserId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId",
+                        CoreMatchers.is(dto.getUserId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(dto.getEmail())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(dto.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
+                        CoreMatchers.is(dto.getVerified())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
     }
 
@@ -172,7 +177,7 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH.concat("/1"))
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -187,14 +192,19 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH.concat("/" + dto.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                        dto.getId().toString()))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(dto.getUserId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId",
+                        CoreMatchers.is(dto.getUserId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(dto.getEmail())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(dto.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
+                        CoreMatchers.is(dto.getVerified())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
     }
 
@@ -206,7 +216,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(put(BusinessStatics.Endpoint.PATH.concat("/" + business.getId()))
+        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(businessDTO)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -224,7 +235,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(put(BusinessStatics.Endpoint.PATH.concat("/" + (business.getId() + 1)))
+        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString() + "1"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(businessDTO)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -237,12 +249,14 @@ public class BusinessControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
         BusinessDTO businessDTO = utils.createBusinessDTO(business);
 
-        when(businessService.update(anyLong(), any(BusinessDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(businessService.update(anyLong(), any(BusinessDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(put(BusinessStatics.Endpoint.PATH.concat("/" + business.getId()))
+        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(businessDTO)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -260,17 +274,24 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(put(BusinessStatics.Endpoint.PATH.concat("/" + business.getId()))
+        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(businessDTO)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(businessDTO.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(businessDTO.getId().intValue())))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(businessDTO.getUserId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(businessDTO.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(businessDTO.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(businessDTO.getVerified())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(businessDTO.getTier())));
+                        MockMvcResultMatchers.jsonPath("$.userId",
+                                CoreMatchers.is(businessDTO.getUserId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                        CoreMatchers.is(businessDTO.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                        CoreMatchers.is(businessDTO.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
+                        CoreMatchers.is(businessDTO.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tier",
+                        CoreMatchers.is(businessDTO.getTier())));
     }
 
     // Delete
@@ -280,7 +301,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(delete(BusinessStatics.Endpoint.PATH.concat("/" + business.getId()))
+        mockMvc.perform(delete((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -295,7 +317,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(delete(BusinessStatics.Endpoint.PATH.concat("/" + (business.getId() + 1)))
+        mockMvc.perform(delete((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()) + "1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -311,7 +334,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(delete(BusinessStatics.Endpoint.PATH.concat("/" + business.getId()))
+        mockMvc.perform(delete((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -327,7 +351,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(delete(BusinessStatics.Endpoint.PATH.concat("/" + business.getId()))
+        mockMvc.perform(delete((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -339,7 +364,7 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH.concat("/user/1"))
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}", "1"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -354,15 +379,73 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BusinessStatics.Endpoint.PATH.concat("/user/" + dto.getUserId()))
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}",
+                dto.getUserId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(dto.getUserId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId",
+                        CoreMatchers.is(dto.getUserId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(dto.getEmail())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(dto.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
+                        CoreMatchers.is(dto.getVerified())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
     }
 
+    // GetAllBranches
+    @Test
+    public void shouldGetForbiddenDueToInvalidRoleInGetAllBranches() throws Exception {
+        Business business = utils.createBusiness(null);
+
+        utils.setAuthorities("client");
+
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                business.getId().toString()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Unauthorized access for this operation")));
+    }
+
+    @Test
+    public void shouldGetForbiddenDueToInvalidUserInGetAllBranches() throws Exception {
+        Business business = utils.createBusiness(null);
+        BusinessDTO businessDTO = utils.createBusinessDTO(business);
+
+        when(businessService.update(anyLong(), any(BusinessDTO.class))).thenReturn(businessDTO);
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                business.getId().toString() + "1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(businessDTO)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Unauthorized access for this operation")));
+    }
+
+    public void shouldGetAllBranches() throws Exception {
+        Business business = utils.createBusiness(null);
+        BusinessDTO businessDTO = utils.createBusinessDTO(business);
+
+        ArrayList<BranchDTO> dtoList = new ArrayList<>();
+        dtoList.add(utils.createBranchDTO(null));
+        BranchListDTO businessListDTO = BranchListDTO.builder().branches(dtoList).build();
+
+        when(businessService.getAllBranchesById(anyLong())).thenReturn(businessListDTO);
+        when(businessService.update(anyLong(), any(BusinessDTO.class))).thenReturn(businessDTO);
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                business.getId().toString()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
+    }
 }

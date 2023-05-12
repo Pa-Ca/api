@@ -53,7 +53,7 @@ public class BranchController {
     }
 
     @PostMapping
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public ResponseEntity<BranchDTO> save(@RequestBody BranchDTO dto)
             throws NoContentException, BadRequestException {
         return ResponseEntity.ok(branchService.save(dto));
@@ -76,7 +76,7 @@ public class BranchController {
 
     @DeleteMapping("/{id}")
     @ValidateBranchOwner
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         branchService.delete(id);
     }
@@ -146,7 +146,7 @@ public class BranchController {
     }
 
     @ValidateBranchOwner
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     @DeleteMapping("/{id}/amenity")
     public ResponseEntity<AmenityListDTO> deleteAllByBranchId(
             @PathVariable("id") Long id,
@@ -159,8 +159,7 @@ public class BranchController {
     public ResponseEntity<ReviewListDTO> getReviewsPage(
             @PathVariable("id") Long id,
             @RequestParam("page") int page,
-            @RequestParam("size") int size 
-            ) throws NoContentException, UnprocessableException {
+            @RequestParam("size") int size) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(branchService.getReviewsPage(id, page, size));
     }
 
@@ -173,16 +172,16 @@ public class BranchController {
             @RequestParam("min_reservation_price") Float min_reservation_price,
             @RequestParam("max_reservation_price") Float max_reservation_price,
             @RequestParam("min_score") Float min_score,
-            @RequestParam("min_capacity") int min_capacity
-            ) throws NoContentException, UnprocessableException {
-        return ResponseEntity.ok(branchService.getBranchesPage(page, 
-                                                                size, 
-                                                                sorting_by, 
-                                                                ascending,
-                                                                min_reservation_price,
-                                                                max_reservation_price,
-                                                                min_score,
-                                                                min_capacity));
+            @RequestParam("min_capacity") int min_capacity) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(branchService.getBranchesPage(
+                page,
+                size,
+                sorting_by,
+                ascending,
+                min_reservation_price,
+                max_reservation_price,
+                min_score,
+                min_capacity));
     }
 
 }

@@ -1,7 +1,9 @@
 package com.paca.paca.business.controller;
 
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
+import com.paca.paca.business.statics.BusinessStatics;
 import com.paca.paca.business.service.BusinessService;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -16,46 +18,53 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/business")
+@RequestMapping(BusinessStatics.Endpoint.PATH)
 public class BusinessController {
 
     private final BusinessService businessService;
 
-    @GetMapping
     @ValidateRoles({})
+    @GetMapping(BusinessStatics.Endpoint.GET_ALL)
     public ResponseEntity<BusinessListDTO> getAll() {
         return ResponseEntity.ok(businessService.getAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(BusinessStatics.Endpoint.GET_BY_ID)
     public ResponseEntity<BusinessDTO> getById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(businessService.getById(id));
     }
 
-    @PostMapping
     @ValidateRoles({ "business" })
+    @PostMapping(BusinessStatics.Endpoint.SAVE)
     public ResponseEntity<BusinessDTO> save(@RequestBody BusinessDTO business)
             throws NoContentException, ConflictException {
         return ResponseEntity.ok(businessService.save(business));
     }
 
     @ValidateBusiness
-    @PutMapping("/{id}")
     @ValidateRoles({ "business" })
+    @PutMapping(BusinessStatics.Endpoint.UPDATE)
     public ResponseEntity<BusinessDTO> update(@PathVariable("id") Long id, @RequestBody BusinessDTO business)
             throws NoContentException {
         return ResponseEntity.ok(businessService.update(id, business));
     }
 
     @ValidateBusiness
-    @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @DeleteMapping(BusinessStatics.Endpoint.DELETE)
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         businessService.delete(id);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping(BusinessStatics.Endpoint.GET_BY_USER_ID)
     public ResponseEntity<BusinessDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(businessService.getByUserId(id));
+    }
+
+    @ValidateBusiness
+    @ValidateRoles({ "business" })
+    @GetMapping(BusinessStatics.Endpoint.GET_BRANCHES)
+    public ResponseEntity<BranchListDTO> getAllBranches(@PathVariable("id") Long id) throws NoContentException {
+        return ResponseEntity.ok(businessService.getAllBranchesById(id));
     }
 }
