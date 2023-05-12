@@ -21,8 +21,14 @@ public interface AuthenticationStatics {
     String REFRESH = "/refresh";
     String AUTH_PATH = "/api/v1/auth";
     String RESET_PASSWORD = "/reset-password";
+    String GOOGLE_LOGIN = "/google/login";
+    String GOOGLE_SIGNUP = "/google/signup";
     String RESET_PASSWORD_REQUEST = "/reset-password-request";
     String VERIFY_EMAIL = "/verify-email";
     String VERIFY_EMAIL_REQUEST = "/verify-email-request";
+  }
+
+  interface Password {
+    String PASSWORD_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
   }
 }

@@ -35,17 +35,6 @@ public class AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
-    private void validateRole(String role) throws BadRequestException {
-        if (role.isEmpty())
-            throw new BadRequestException("The role attribute not found");
-
-        try {
-            UserRole.valueOf(role);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("The role given is not valid");
-        }
-    }
-
     public LoginResponseDTO signup(SignupRequestDTO request)
             throws BadRequestException, UnprocessableException, ConflictException {
         // Email Validation
@@ -60,7 +49,7 @@ public class AuthenticationService {
         AuthUtils.validatePassword(password);
 
         // Role Validation
-        validateRole(request.getRole());
+        AuthUtils.validateRole(request.getRole());
         Optional<Role> role = roleRepository.findByName(UserRole.valueOf(request.getRole()));
         if (role.isEmpty()) {
             throw new NoContentException("Role " + request.getRole() + " does not exists");
