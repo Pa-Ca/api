@@ -93,7 +93,8 @@ public class UserIntegrationTest extends PacaTest {
                 .password(password)
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.LOGIN)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.LOGIN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -115,7 +116,8 @@ public class UserIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -142,7 +144,7 @@ public class UserIntegrationTest extends PacaTest {
                 new TypeReference<List<UserDTO>>() {
                 });
 
-        assertEquals(list.size(), 39);
+        assertEquals(41, list.size());
     }
 
     @Test
@@ -186,7 +188,8 @@ public class UserIntegrationTest extends PacaTest {
                 .role("business")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())

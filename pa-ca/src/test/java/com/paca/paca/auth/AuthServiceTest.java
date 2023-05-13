@@ -1,8 +1,5 @@
 package com.paca.paca.auth;
 
-import com.paca.paca.auth.dto.*;
-import com.paca.paca.exception.exceptions.*;
-import com.paca.paca.mail.service.MailService;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
@@ -16,11 +13,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import com.paca.paca.auth.dto.*;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.utils.UserMapper;
+import com.paca.paca.exception.exceptions.*;
 import com.paca.paca.auth.service.JwtService;
+import com.paca.paca.mail.service.MailService;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.auth.service.AuthenticationService;
@@ -552,12 +552,30 @@ public class AuthServiceTest {
     }
 
     @Test
+    void shouldGetForbiddenDueToMissingTokenAndMissingEmail() {
+        String password = "12345678";
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .newPassword(password)
+                .build();
+
+        try {
+            authenticationService.resetPassword(request, null);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Authentication failed");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
+        }
+    }
+
+    @Test
     void shouldGetForbiddenDueToInvalidTokenInResetPassword() {
         String password = "12345678";
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
 
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
 
         when(jwtService.isTokenValid(any(String.class)))
@@ -579,7 +597,7 @@ public class AuthServiceTest {
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
 
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
 
         when(jwtService.isTokenValid(any(String.class)))
@@ -603,7 +621,7 @@ public class AuthServiceTest {
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
 
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
 
         when(jwtService.isTokenValid(any(String.class)))
@@ -630,7 +648,7 @@ public class AuthServiceTest {
         }
 
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
 
         when(jwtService.isTokenValid(any(String.class)))
@@ -655,7 +673,7 @@ public class AuthServiceTest {
         String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
 
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
 
         when(jwtService.isTokenValid(any(String.class)))
@@ -677,6 +695,30 @@ public class AuthServiceTest {
     }
 
     @Test
+    void shouldGetForbiddenDueToInvalidOldPasswordInResetPassword() {
+        String password = "12345678";
+        String email = "test@test.com";
+
+        ResetPasswordDTO request = ResetPasswordDTO.builder()
+                .email(email)
+                .oldPassword(password)
+                .newPassword(password)
+                .build();
+
+        when(authenticationManager.authenticate(any(Authentication.class)))
+                .thenThrow(new AuthException("Exception"));
+
+        try {
+            authenticationService.resetPassword(request, null);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Authentication failed");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
+        }
+    }
+
+    @Test
     void shouldResetPassword() {
         Long id = 1L;
         String email = "test@test.com";
@@ -694,8 +736,9 @@ public class AuthServiceTest {
                 .role(role)
                 .build();
 
+        // Reset password with token
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
 
         when(jwtService.isTokenValid(any(String.class)))
@@ -707,6 +750,19 @@ public class AuthServiceTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
 
         authenticationService.resetPassword(request, token);
+
+        // Reset password with old password
+        request = ResetPasswordDTO.builder()
+                .email(email)
+                .oldPassword(password)
+                .newPassword(password)
+                .build();
+
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(user));
+        when(authenticationManager.authenticate(any(Authentication.class)))
+                .thenReturn(new UsernamePasswordAuthenticationToken(email, password));
+
+        authenticationService.resetPassword(request, null);
     }
 
     @Test
