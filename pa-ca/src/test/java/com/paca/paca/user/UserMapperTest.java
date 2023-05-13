@@ -1,11 +1,12 @@
 package com.paca.paca.user;
 
+import com.paca.paca.user.dto.UserRequestDTO;
+import com.paca.paca.user.dto.UserResponseDTO;
 import org.mockito.Mock;
 import org.junit.jupiter.api.Test;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.utils.UserMapper;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,13 +27,12 @@ public class UserMapperTest {
                 .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role(role)
                 .build();
 
-        UserDTO userDTO = UserDTO.builder()
-                .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false)
-                .role(role.getName().name())
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .id(1L).email("test@test.com").verified(false).loggedIn(false).role(role.getName().name())
                 .build();
 
-        when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
-        UserDTO response = userMapper.toDTO(user);
+        when(userMapper.toDTO(any(User.class))).thenReturn(userResponseDTO);
+        UserResponseDTO response = userMapper.toDTO(user);
 
         assertThat(response).isNotNull();
         assertThat(response.getRole()).isEqualTo(role.getName().name());
@@ -45,12 +45,12 @@ public class UserMapperTest {
                 .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role(role)
                 .build();
 
-        UserDTO userDTO = UserDTO.builder()
+        UserRequestDTO userRequestDTO = UserRequestDTO.builder()
                 .id(1L).email("test@test.com").password("123456789aA#").role(role.getName().name())
                 .build();
 
-        when(userMapper.toEntity(any(UserDTO.class), any(UserRole.class))).thenReturn(user);
-        User response = userMapper.toEntity(userDTO, role.getName());
+        when(userMapper.toEntity(any(UserRequestDTO.class), any(UserRole.class))).thenReturn(user);
+        User response = userMapper.toEntity(userRequestDTO, role.getName());
 
         assertThat(response).isNotNull();
         assertThat(response.getRole()).isEqualTo(role);
@@ -70,16 +70,16 @@ public class UserMapperTest {
                 .id(1L).email("test@test.com").password("123456789aB#").verified(false).loggedIn(false).role(client)
                 .build();
 
-        UserDTO userDTO = UserDTO.builder()
+        UserRequestDTO userRequestDTO = UserRequestDTO.builder()
                 .email("").password("123456789aB#").verified(true).loggedIn(true).role(client.getName().name())
                 .build();
 
-        when(userMapper.updateEntity(any(UserDTO.class), any(User.class), any(UserRole.class))).thenReturn(expected);
-        User response = userMapper.updateEntity(userDTO, user, UserRole.client);
+        when(userMapper.updateEntity(any(UserRequestDTO.class), any(User.class), any(UserRole.class))).thenReturn(expected);
+        User response = userMapper.updateEntity(userRequestDTO, user, UserRole.client);
 
         assertThat(response).isNotNull();
-        assertThat(response.getRole().getName().name()).isEqualTo(userDTO.getRole());
-        assertThat(response.getPassword()).isEqualTo(userDTO.getPassword());
+        assertThat(response.getRole().getName().name()).isEqualTo(userRequestDTO.getRole());
+        assertThat(response.getPassword()).isEqualTo(userRequestDTO.getPassword());
         assertThat(response.getEmail()).isEqualTo(user.getEmail());
         assertThat(response.getVerified()).isEqualTo(user.getVerified());
         assertThat(response.getLoggedIn()).isEqualTo(user.getLoggedIn());

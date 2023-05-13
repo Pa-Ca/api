@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UserResponseDTO {
     public Long id;
     public String email;
-    public String password;
     public Boolean verified;
     public Boolean loggedIn;
     public String role;
+    public String provider;
+    public String provider_id;
+    public Integer reservationStatus;
 }
