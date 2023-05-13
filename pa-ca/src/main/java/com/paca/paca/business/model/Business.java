@@ -37,4 +37,7 @@ public class Business {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "tier_id")
     private Tier tier;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 }

@@ -177,18 +177,36 @@ public class AuthenticationService {
             throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
         String email;
 
-        try {
-            email = jwtService.extractEmail(resetPasswordToken);
-        } catch (Exception e) {
+        if (resetPasswordToken == null && request.getEmail() == null) {
             throw new ForbiddenException("Authentication failed", 9);
+        } else if (resetPasswordToken != null) {
+            try {
+                email = jwtService.extractEmail(resetPasswordToken);
+            } catch (Exception e) {
+                throw new ForbiddenException("Authentication failed", 9);
+            }
+        } else {
+            email = request.getEmail();
         }
-        if (!jwtService.isTokenValid(resetPasswordToken)
-                || !jwtService.isTokenResetPassword(resetPasswordToken)) {
-            throw new ForbiddenException("Authentication failed", 9);
+
+        if (resetPasswordToken != null) {
+            if (!jwtService.isTokenValid(resetPasswordToken)
+                    || !jwtService.isTokenResetPassword(resetPasswordToken)) {
+                throw new ForbiddenException("Authentication failed", 9);
+            }
+        } else {
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                email,
+                                request.getOldPassword()));
+            } catch (Exception e) {
+                throw new ForbiddenException("Authentication failed", 9);
+            }
         }
 
         // Password Validation
-        String password = request.getPassword();
+        String password = request.getNewPassword();
         AuthUtils.validatePassword(password);
 
         User user = userRepository.findByEmail(email).orElseThrow(

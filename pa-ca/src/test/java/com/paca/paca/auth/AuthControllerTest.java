@@ -48,6 +48,7 @@ public class AuthControllerTest extends ControllerTest {
 
     private TestUtils utils = TestUtils.builder().build();
 
+    // Signup
     @Test
     void shouldGetBadRequestInSignup() throws Exception {
         SignupRequestDTO request = utils.createSignupRequestDTO();
@@ -135,6 +136,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
+    // Login
     @Test
     void shouldLogin() throws Exception {
         LoginRequestDTO request = utils.createLoginRequestDTO();
@@ -180,6 +182,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is(response.getToken())));
     }
 
+    // Logout
     @Test
     void shouldGetBadRequestInLogout() throws Exception {
         LogoutDTO request = utils.createLogoutDTO();
@@ -206,6 +209,7 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    // Reset password request
     @Test
     void shouldGetBadRequestExceptionInResetPasswordRequest() throws Exception {
         ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
@@ -261,20 +265,22 @@ public class AuthControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is(response.getToken())));
     }
 
+    // Reset password
     @Test
     void shouldGetForbiddenExceptionInResetPassword() throws Exception {
-        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password("123455678")
+                .email("Test email")
+                .newPassword("12345678")
+                .oldPassword("87654321")
                 .build();
 
         doThrow(new ForbiddenException("message", 0))
                 .when(authService).resetPassword(any(ResetPasswordDTO.class),
-                        any(String.class));
+                        isNull());
 
         mockMvc.perform(post(
                 AuthenticationStatics.Endpoint.AUTH_PATH
-                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -284,18 +290,19 @@ public class AuthControllerTest extends ControllerTest {
 
     @Test
     void shouldGetBadRequestExceptionInResetPassword() throws Exception {
-        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password("123455678")
+                .email("Test email")
+                .newPassword("12345678")
+                .oldPassword("87654321")
                 .build();
 
         doThrow(new BadRequestException("message", 0))
                 .when(authService).resetPassword(any(ResetPasswordDTO.class),
-                        any(String.class));
+                        isNull());
 
         mockMvc.perform(post(
                 AuthenticationStatics.Endpoint.AUTH_PATH
-                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -305,18 +312,19 @@ public class AuthControllerTest extends ControllerTest {
 
     @Test
     void shouldGetUnprocessableExceptionInResetPassword() throws Exception {
-        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password("123455678")
+                .email("Test email")
+                .newPassword("12345678")
+                .oldPassword("87654321")
                 .build();
 
         doThrow(new UnprocessableException("message", 0))
                 .when(authService).resetPassword(any(ResetPasswordDTO.class),
-                        any(String.class));
+                        isNull());
 
         mockMvc.perform(post(
                 AuthenticationStatics.Endpoint.AUTH_PATH
-                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
@@ -326,18 +334,19 @@ public class AuthControllerTest extends ControllerTest {
 
     @Test
     void shouldGetNoContentExceptionInResetPassword() throws Exception {
-        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password("123455678")
+                .email("Test email")
+                .newPassword("12345678")
+                .oldPassword("87654321")
                 .build();
 
         doThrow(new NoContentException("message", 0))
                 .when(authService).resetPassword(any(ResetPasswordDTO.class),
-                        any(String.class));
+                        isNull());
 
         mockMvc.perform(post(
                 AuthenticationStatics.Endpoint.AUTH_PATH
-                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -347,24 +356,24 @@ public class AuthControllerTest extends ControllerTest {
 
     @Test
     void shouldResetPassword() throws Exception {
-        String token = "eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks";
         ResetPasswordDTO request = ResetPasswordDTO.builder()
-                .password("123455678")
+                .newPassword("12345678")
+                .oldPassword("87654321")
                 .build();
 
         doNothing().when(authService)
                 .resetPassword(any(ResetPasswordDTO.class),
-                        any(String.class));
+                        isNull());
 
         mockMvc.perform(post(
                 AuthenticationStatics.Endpoint.AUTH_PATH
-                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/" + token))
+                        .concat(AuthenticationStatics.Endpoint.RESET_PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-// adsasdadadadaad
+    // Verify email
     @Test
     void shouldGetBadRequestExceptionInVerifyEmailRequest() throws Exception {
         VerifyEmailRequestDTO request = VerifyEmailRequestDTO.builder()
@@ -375,9 +384,9 @@ public class AuthControllerTest extends ControllerTest {
                 .thenThrow(new BadRequestException("message", 0));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
@@ -393,9 +402,9 @@ public class AuthControllerTest extends ControllerTest {
                 .thenThrow(new NoContentException("message", 0));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
@@ -413,9 +422,9 @@ public class AuthControllerTest extends ControllerTest {
         when(authService.verifyEmailRequest(any(VerifyEmailRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                AuthenticationStatics.Endpoint.AUTH_PATH.concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is(response.getToken())));
     }
@@ -428,9 +437,9 @@ public class AuthControllerTest extends ControllerTest {
                 .when(authService).verifyEmail(any(String.class));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH
-                                .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
-                        .contentType(MediaType.APPLICATION_JSON))
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
@@ -444,9 +453,9 @@ public class AuthControllerTest extends ControllerTest {
                 .when(authService).verifyEmail(any(String.class));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH
-                                .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
-                        .contentType(MediaType.APPLICATION_JSON))
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
@@ -460,9 +469,9 @@ public class AuthControllerTest extends ControllerTest {
                 .when(authService).verifyEmail(any(String.class));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH
-                                .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL+ "/" + token))
-                        .contentType(MediaType.APPLICATION_JSON))
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
@@ -476,9 +485,9 @@ public class AuthControllerTest extends ControllerTest {
                 .when(authService).verifyEmail(any(String.class));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH
-                                .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
-                        .contentType(MediaType.APPLICATION_JSON))
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
@@ -492,9 +501,9 @@ public class AuthControllerTest extends ControllerTest {
                 .verifyEmail(any(String.class));
 
         mockMvc.perform(post(
-                        AuthenticationStatics.Endpoint.AUTH_PATH
-                                .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
-                        .contentType(MediaType.APPLICATION_JSON))
+                AuthenticationStatics.Endpoint.AUTH_PATH
+                        .concat(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/" + token))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 

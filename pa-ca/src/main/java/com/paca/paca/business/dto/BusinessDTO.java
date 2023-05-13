@@ -14,4 +14,5 @@ public class BusinessDTO {
     private String name;
     private Boolean verified;
     private String tier;
+    private String phoneNumber;
 }

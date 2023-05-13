@@ -1,5 +1,8 @@
 package com.paca.paca.auth.config;
 
+import java.util.Map;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Optional;
 import java.io.IOException;
 
@@ -14,16 +17,16 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.paca.paca.user.model.User;
-import com.paca.paca.auth.service.JwtService;
-import com.paca.paca.auth.statics.AuthenticationStatics;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.exception.exceptions.ForbiddenException;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import com.paca.paca.user.model.User;
+import com.paca.paca.auth.service.JwtService;
+import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.auth.statics.AuthenticationStatics;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -33,11 +36,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
 
+    private void throwsForbidden(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        Map<String, Object> errorBody = new HashMap<>();
+        errorBody.put("timestamp", new Date());
+        errorBody.put("code", 9);
+        errorBody.put("status", "Forbidden");
+        errorBody.put("message", "Authentication failed");
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("application/json");
+        response.getWriter().write(mapper.writeValueAsString(errorBody));
+    }
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ForbiddenException, ServletException, IOException {
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String jwt;
         final String userEmail;
         final AntPathMatcher matcher = new AntPathMatcher();
@@ -49,19 +64,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new ForbiddenException("Authentication failed", 9);
+            throwsForbidden(response);
+            return;
         }
 
         jwt = authHeader.substring(7);
         try {
             userEmail = jwtService.extractEmail(jwt);
         } catch (Exception e) {
-            throw new ForbiddenException("Authentication failed", 9);
+            throwsForbidden(response);
+            return;
         }
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             Optional<User> user = userRepository.findByEmail(userEmail);
             if (user.isEmpty()) {
-                throw new ForbiddenException("Authentication failed", 9);
+                throwsForbidden(response);
+                return;
             }
             if (jwtService.isTokenValid(jwt, user.get()) && jwtService.isToken(jwt)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

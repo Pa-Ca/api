@@ -51,8 +51,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.resetPasswordRequest(request));
     }
 
+    @PostMapping(AuthenticationStatics.Endpoint.RESET_PASSWORD)
+    public void resetPassword(@RequestBody ResetPasswordDTO request)
+            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+        service.resetPassword(request, null);
+    }
+
     @PostMapping(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/{token}")
-    public void resetPassword(@RequestBody ResetPasswordDTO request, @PathVariable("token") String token)
+    public void resetPasswordWithToken(@RequestBody ResetPasswordDTO request, @PathVariable("token") String token)
             throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
         service.resetPassword(request, token);
     }

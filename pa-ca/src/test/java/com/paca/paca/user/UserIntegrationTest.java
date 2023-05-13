@@ -16,9 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.paca.paca.auth.statics.AuthenticationStatics;
-import com.paca.paca.exception.exceptions.ForbiddenException;
 
-import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import junit.framework.TestCase;
 import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootTest
@@ -96,7 +93,8 @@ public class UserIntegrationTest extends PacaTest {
                 .password(password)
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.LOGIN)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.LOGIN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -118,7 +116,8 @@ public class UserIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -145,34 +144,29 @@ public class UserIntegrationTest extends PacaTest {
                 new TypeReference<List<UserRequestDTO>>() {
                 });
 
-        assertEquals(list.size(), 39);
+        assertEquals(41, list.size());
     }
 
     @Test
     public void getAllExceptions() throws Exception {
         // No token exception
-        try {
-            mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
-                    .contentType(MediaType.APPLICATION_JSON));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // Invalid token
-        try {
-            mockMvc.perform(get(UserStatics.Endpoint.PATH +
-                    UserStatics.Endpoint.GET_ALL)
-                    .header("Authorization", "Bearer a")
-                    .contentType(MediaType.APPLICATION_JSON));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
+                .header("Authorization", "Bearer a")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // No admin user exception
         mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
@@ -194,7 +188,8 @@ public class UserIntegrationTest extends PacaTest {
                 .role("business")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -256,29 +251,23 @@ public class UserIntegrationTest extends PacaTest {
     @Test
     public void getByIdExceptions() throws Exception {
         // No token exception
-        try {
-            mockMvc.perform(
-                    get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
-                            .contentType(MediaType.APPLICATION_JSON));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // Invalid token
-        try {
-            mockMvc.perform(
-                    get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer a"));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
+                .header("Authorization", "Bearer a")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // User don't exists
         mockMvc.perform(get((UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_BY_ID).replace("{id}", "0"))
@@ -293,29 +282,23 @@ public class UserIntegrationTest extends PacaTest {
     @Test
     public void updateExceptions() throws Exception {
         // No token exception
-        try {
-            mockMvc.perform(
-                    patch((UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", "1"))
-                            .contentType(MediaType.APPLICATION_JSON));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(patch((UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", "1"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // Invalid token
-        try {
-            mockMvc.perform(
-                    patch((UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", "1"))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer a"));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(patch((UserStatics.Endpoint.PATH + UserStatics.Endpoint.UPDATE).replace("{id}", "1"))
+                .header("Authorization", "Bearer a")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         String email = UUID.randomUUID().toString() + "_test@test.com";
         UserRequestDTO dto = UserRequestDTO.builder()
@@ -339,32 +322,26 @@ public class UserIntegrationTest extends PacaTest {
     @Test
     public void deleteExceptions() throws Exception {
         // No token exception
-        try {
-            mockMvc.perform(
-                    put((UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", "1"))
-                            .contentType(MediaType.APPLICATION_JSON));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(delete((UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", "1"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // Invalid token
-        try {
-            mockMvc.perform(
-                    put((UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", "1"))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer a"));
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Authentication failed");
-            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 9);
-        }
+        mockMvc.perform(delete((UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", "1"))
+                .header("Authorization", "Bearer a")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                        CoreMatchers.is(9)));
 
         // Token dont match with business to edit
-        mockMvc.perform(patch((UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", "0"))
+        mockMvc.perform(delete((UserStatics.Endpoint.PATH + UserStatics.Endpoint.DELETE).replace("{id}", "0"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + clientToken))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())

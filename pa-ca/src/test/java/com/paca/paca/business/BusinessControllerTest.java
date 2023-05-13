@@ -167,7 +167,9 @@ public class BusinessControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
                         CoreMatchers.is(dto.getVerified())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())));
     }
 
     // GetByID
@@ -205,7 +207,9 @@ public class BusinessControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
                         CoreMatchers.is(dto.getVerified())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())));
     }
 
     // UpdateById
@@ -291,7 +295,9 @@ public class BusinessControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
                         CoreMatchers.is(businessDTO.getVerified())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier",
-                        CoreMatchers.is(businessDTO.getTier())));
+                        CoreMatchers.is(businessDTO.getTier())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(businessDTO.getPhoneNumber())));
     }
 
     // Delete
@@ -379,7 +385,8 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}",
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace(
+                "{id}",
                 dto.getUserId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -391,7 +398,9 @@ public class BusinessControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
                         CoreMatchers.is(dto.getVerified())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is(dto.getTier())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())));
     }
 
     // GetAllBranches
@@ -401,8 +410,9 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
-                business.getId().toString()))
+        mockMvc.perform(get(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                        business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -419,8 +429,9 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
-                business.getId().toString() + "1"))
+        mockMvc.perform(get(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                        business.getId().toString() + "1"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(businessDTO)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -428,6 +439,7 @@ public class BusinessControllerTest extends ControllerTest {
                         CoreMatchers.is("Unauthorized access for this operation")));
     }
 
+    @Test
     public void shouldGetAllBranches() throws Exception {
         Business business = utils.createBusiness(null);
         BusinessDTO businessDTO = utils.createBusinessDTO(business);
@@ -442,8 +454,9 @@ public class BusinessControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
-                business.getId().toString()))
+        mockMvc.perform(get(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
+                        business.getId().toString()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));

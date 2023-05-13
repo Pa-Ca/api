@@ -66,7 +66,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -82,7 +83,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .password(password)
                 .build();
         response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.LOGIN)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.LOGIN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -98,7 +100,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .refresh(refresh)
                 .build();
         response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.REFRESH)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.REFRESH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -123,7 +126,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")));
     }
 
     @Test
@@ -138,7 +142,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Invalid email format")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Invalid email format")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)));
 
         // Create a valid user
@@ -164,7 +169,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("User already exists")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("User already exists")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(1)));
 
         // Exception for invalid password
@@ -177,7 +183,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Invalid password")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Invalid password")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(2)));
 
         // Exception for invalid role
@@ -191,7 +198,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("The role given is not valid")));
+                        MockMvcResultMatchers.jsonPath("$.message",
+                                CoreMatchers.is("The role given is not valid")));
 
         signupRequest = SignupRequestDTO.builder()
                 .email(UUID.randomUUID().toString() + "_test@test.com")
@@ -203,7 +211,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("The role given is not valid")));
+                        MockMvcResultMatchers.jsonPath("$.message",
+                                CoreMatchers.is("The role given is not valid")));
     }
 
     @Test
@@ -220,7 +229,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
 
         // Create a valid user
@@ -243,7 +253,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
     }
 
@@ -259,7 +270,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -278,7 +290,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
 
         // Exception for not refresh token
@@ -289,12 +302,13 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
     }
 
     @Test
-    public void shouldResetPassword() throws Exception {
+    public void shouldResetPasswordWithToken() throws Exception {
         String email = UUID.randomUUID().toString() + "_test@test.com";
         String password = "123456789";
 
@@ -305,7 +319,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -333,7 +348,7 @@ public class AuthIntegrationTest extends PacaTest {
         // Change password
         String newPassword = "password098";
         ResetPasswordDTO resetPassword = ResetPasswordDTO.builder()
-                .password(newPassword)
+                .newPassword(newPassword)
                 .build();
         mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
                 + AuthenticationStatics.Endpoint.RESET_PASSWORD
@@ -352,7 +367,70 @@ public class AuthIntegrationTest extends PacaTest {
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")));
+
+        // Verify that you can login with the new password
+        loginRequest = LoginRequestDTO.builder()
+                .email(email)
+                .password(newPassword)
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.LOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role", CoreMatchers.is("client")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(id)));
+    }
+
+    @Test
+    public void shouldResetPasswordWithOldPassword() throws Exception {
+        String email = UUID.randomUUID().toString() + "_test@test.com";
+        String password = "123456789";
+
+        // Signup
+        SignupRequestDTO signupRequest = SignupRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .role("client")
+                .build();
+        MvcResult response = mockMvc
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signupRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role", CoreMatchers.is("client")))
+                .andReturn();
+        String responseJson = response.getResponse().getContentAsString();
+        JsonNode responseNode = objectMapper.readTree(responseJson);
+        Integer id = Integer.parseInt(responseNode.get("id").asText());
+
+        // Change password
+        String newPassword = "password098";
+        ResetPasswordDTO resetPassword = ResetPasswordDTO.builder()
+                .email(email)
+                .newPassword(newPassword)
+                .oldPassword(password)
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                + AuthenticationStatics.Endpoint.RESET_PASSWORD)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPassword)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Verify that you cannot login with the old password
+        LoginRequestDTO loginRequest = LoginRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.LOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")));
 
         // Verify that you can login with the new password
         loginRequest = LoginRequestDTO.builder()
@@ -386,7 +464,7 @@ public class AuthIntegrationTest extends PacaTest {
     }
 
     @Test
-    public void resetPasswordExceptions() throws Exception {
+    public void resetPasswordWithTokenExceptions() throws Exception {
         String email = UUID.randomUUID().toString() + "_test@test.com";
         String password = "123456789";
 
@@ -419,7 +497,7 @@ public class AuthIntegrationTest extends PacaTest {
 
         // Exception for invalid token
         ResetPasswordDTO resetPassword = ResetPasswordDTO.builder()
-                .password(password)
+                .newPassword(password)
                 .build();
         mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
                 + AuthenticationStatics.Endpoint.RESET_PASSWORD
@@ -427,12 +505,13 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(resetPassword)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
 
         // Exception for invalid password
         resetPassword = ResetPasswordDTO.builder()
-                .password("a")
+                .newPassword("a")
                 .build();
         mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
                 + AuthenticationStatics.Endpoint.RESET_PASSWORD
@@ -440,7 +519,70 @@ public class AuthIntegrationTest extends PacaTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(resetPassword)))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Invalid password")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Invalid password")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(2)));
+    }
+
+    @Test
+    public void resetPasswordWithOldPasswordExceptions() throws Exception {
+        String email = UUID.randomUUID().toString() + "_test@test.com";
+        String password = "123456789";
+
+        // Create a valid user
+        SignupRequestDTO signupRequest = SignupRequestDTO.builder()
+                .email(email)
+                .password(password)
+                .role("client")
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signupRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role", CoreMatchers.is("client")));
+
+        // Exception for missing email
+        ResetPasswordDTO resetPassword = ResetPasswordDTO.builder()
+                .oldPassword(password)
+                .newPassword(password)
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                + AuthenticationStatics.Endpoint.RESET_PASSWORD)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPassword)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
+
+        // Exception for incorrect password
+        resetPassword = ResetPasswordDTO.builder()
+                .email(email)
+                .oldPassword(password + "a")
+                .newPassword(password)
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                + AuthenticationStatics.Endpoint.RESET_PASSWORD)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPassword)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(9)));
+
+        // Exception for invalid password
+        resetPassword = ResetPasswordDTO.builder()
+                .email(email)
+                .oldPassword(password)
+                .newPassword("a")
+                .build();
+        mockMvc.perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                + AuthenticationStatics.Endpoint.RESET_PASSWORD)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPassword)))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Invalid password")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(2)));
     }
 
@@ -456,7 +598,8 @@ public class AuthIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -514,7 +657,8 @@ public class AuthIntegrationTest extends PacaTest {
                 + "/a")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Authentication failed")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Authentication failed")));
 
     }
 }

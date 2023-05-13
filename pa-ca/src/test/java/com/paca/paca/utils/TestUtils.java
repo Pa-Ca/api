@@ -67,7 +67,6 @@ import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
 import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
 
-
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -367,6 +366,7 @@ public class TestUtils {
                 .name("Test")
                 .verified(false)
                 .tier(createTier(BusinessTier.basic))
+                .phoneNumber("test phone")
                 .build();
 
         if (businessRepository != null) {
@@ -386,6 +386,7 @@ public class TestUtils {
                 .name("Test")
                 .verified(false)
                 .tier(tier)
+                .phoneNumber("test phone")
                 .build();
 
         if (businessRepository != null) {
@@ -405,6 +406,7 @@ public class TestUtils {
                 .name(business.getName())
                 .verified(business.getVerified())
                 .tier(BusinessTier.basic.name())
+                .phoneNumber(business.getPhoneNumber())
                 .build();
         return dto;
     }
@@ -447,14 +449,13 @@ public class TestUtils {
         scores.add(4.2F);
         scores.add(5.0F);
 
-
         List<Float> reservation_prices = new ArrayList<>();
         reservation_prices.add(2.0F);
         reservation_prices.add(20.0F);
         reservation_prices.add(30.0F);
         reservation_prices.add(40.5F);
         reservation_prices.add(50.0F);
-        
+
         List<String> names = new ArrayList<>();
         names.add("name test 1");
         names.add("name test 2");
@@ -495,7 +496,6 @@ public class TestUtils {
 
         return branches;
     }
-
 
     public BranchDTO createBranchDTO(Branch branch) {
         if (branch == null) {
