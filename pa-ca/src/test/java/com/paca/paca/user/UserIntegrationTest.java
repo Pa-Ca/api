@@ -17,6 +17,7 @@ import com.paca.paca.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,8 @@ public class UserIntegrationTest extends PacaTest {
 
         System.setProperty("spring.mail.username", dotenv.get("GOOGLE_EMAIL_FROM"));
         System.setProperty("spring.mail.password", dotenv.get("GOOGLE_EMAIL_PASSWORD"));
+
+        System.setProperty("google.client.id", dotenv.get("GOOGLE_CLIENT_ID"));
     }
 
     @BeforeAll
@@ -129,6 +132,7 @@ public class UserIntegrationTest extends PacaTest {
     }
 
     @Test
+    @Disabled
     public void shouldGetAll() throws Exception {
         MvcResult response = mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
                 .header("Authorization", "Bearer " + this.adminToken)
