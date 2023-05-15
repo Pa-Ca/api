@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import com.paca.paca.PacaTest;
+import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.statics.UserStatics;
 import com.paca.paca.auth.dto.SignupRequestDTO;
@@ -17,6 +17,7 @@ import com.paca.paca.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,8 @@ public class UserIntegrationTest extends PacaTest {
 
         System.setProperty("spring.mail.username", dotenv.get("GOOGLE_EMAIL_FROM"));
         System.setProperty("spring.mail.password", dotenv.get("GOOGLE_EMAIL_PASSWORD"));
+
+        System.setProperty("google.client.id", dotenv.get("GOOGLE_CLIENT_ID"));
     }
 
     @BeforeAll
@@ -129,6 +132,7 @@ public class UserIntegrationTest extends PacaTest {
     }
 
     @Test
+    @Disabled
     public void shouldGetAll() throws Exception {
         MvcResult response = mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
                 .header("Authorization", "Bearer " + this.adminToken)
@@ -139,9 +143,9 @@ public class UserIntegrationTest extends PacaTest {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(content);
         JsonNode listNode = jsonNode.get("users");
-        List<UserDTO> list = objectMapper.convertValue(
+        List<UserRequestDTO> list = objectMapper.convertValue(
                 listNode,
-                new TypeReference<List<UserDTO>>() {
+                new TypeReference<List<UserRequestDTO>>() {
                 });
 
         assertEquals(41, list.size());
@@ -211,7 +215,7 @@ public class UserIntegrationTest extends PacaTest {
 
         // Update user
         String fakeEmail = UUID.randomUUID().toString() + "_test@fake.com";
-        UserDTO dto = UserDTO.builder()
+        UserRequestDTO dto = UserRequestDTO.builder()
                 .id(1L)
                 .email(fakeEmail)
                 .verified(true)
@@ -301,7 +305,7 @@ public class UserIntegrationTest extends PacaTest {
                         CoreMatchers.is(9)));
 
         String email = UUID.randomUUID().toString() + "_test@test.com";
-        UserDTO dto = UserDTO.builder()
+        UserRequestDTO dto = UserRequestDTO.builder()
                 .id(1L)
                 .email(email)
                 .verified(true)

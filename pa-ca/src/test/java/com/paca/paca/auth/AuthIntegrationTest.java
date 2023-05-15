@@ -52,6 +52,8 @@ public class AuthIntegrationTest extends PacaTest {
 
         System.setProperty("spring.mail.username", dotenv.get("GOOGLE_EMAIL_FROM"));
         System.setProperty("spring.mail.password", dotenv.get("GOOGLE_EMAIL_PASSWORD"));
+
+        System.setProperty("google.client.id", dotenv.get("GOOGLE_CLIENT_ID"));
     }
 
     @Test

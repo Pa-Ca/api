@@ -18,6 +18,7 @@ import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
+import com.paca.paca.user.statics.UserStatics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -103,6 +104,10 @@ public class BusinessService {
         }
         Business newBusiness = businessMapper.toEntity(dto, tier.get(), user.get());
         newBusiness = businessRepository.save(newBusiness);
+
+        // Change user status to fully registered
+        user.get().setRegistrationStatus(UserStatics.RegistrationStatus.registered);
+        userRepository.save(user.get());
 
         BusinessDTO dtoResponse = businessMapper.toDTO(newBusiness);
 
