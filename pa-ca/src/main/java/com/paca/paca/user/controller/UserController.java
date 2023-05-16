@@ -1,7 +1,8 @@
 package com.paca.paca.user.controller;
 
-import com.paca.paca.user.dto.UserDTO;
+import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.user.dto.UserListDTO;
+import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.statics.UserStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -40,14 +41,14 @@ public class UserController {
 
     @GetMapping(UserStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get user by ID", description = "Gets the data of a user given its ID")
-    public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id) throws BadRequestException {
+    public ResponseEntity<UserResponseDTO> getById(@PathVariable("id") Long id) throws BadRequestException {
         return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
     }
 
     @ValidateUser
     @PatchMapping(UserStatics.Endpoint.UPDATE)
     @Operation(summary = "Update user", description = "Updates the data of a user given its ID")
-    public ResponseEntity<UserDTO> update(@PathVariable("id") Long id, @RequestBody UserDTO user)
+    public ResponseEntity<UserResponseDTO> update(@PathVariable("id") Long id, @RequestBody UserRequestDTO user)
             throws BadRequestException, UnprocessableException, ConflictException {
         return new ResponseEntity<>(userService.update(id, user), HttpStatus.OK);
     }

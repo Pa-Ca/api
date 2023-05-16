@@ -10,4 +10,9 @@ public interface UserStatics {
         String DELETE = "/{id}";
         String GET_BY_ID = "/{id}";
     }
+
+    interface RegistrationStatus {
+        int unregistered = 0;
+        int registered = 1;
+    }
 }
