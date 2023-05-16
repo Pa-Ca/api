@@ -186,9 +186,10 @@ public class BranchController {
 
     // Example get  http://yourdomain.com/1/reservations?reservation_date=2020-12-12&page=2&size=5
     @GetMapping("/{id}/reservations")
-    public ResponseEntity<ReservationListDTO> getReservationPage(
+    @ValidateRoles({ "business" })
+    public ResponseEntity<ReservationListDTO> getReservationsPage(
             @PathVariable("id") Long id,
-            @RequestParam("reservation_date") Date reservation_date,
+            @RequestParam("reservation_date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date reservation_date,
             @RequestParam("page") int page,
             @RequestParam("size") int size
             ) throws NoContentException, UnprocessableException {
