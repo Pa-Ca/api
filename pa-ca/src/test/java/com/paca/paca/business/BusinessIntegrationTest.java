@@ -263,6 +263,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .reserveOff(false)
                 .averageReserveTime(1.0F)
                 .visibility(true)
+                .phoneNumber("test phone")
+                .type("test type")
                 .build();
         mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
                 .header("Authorization", "Bearer " + token)

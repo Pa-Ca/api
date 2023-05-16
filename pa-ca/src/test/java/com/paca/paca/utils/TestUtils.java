@@ -412,6 +412,8 @@ public class TestUtils {
                 .reserveOff(false)
                 .averageReserveTime(1.0F)
                 .visibility(true)
+                .phoneNumber("test phone")
+                .type("test type")
                 .build();
 
         if (branchRepository != null) {

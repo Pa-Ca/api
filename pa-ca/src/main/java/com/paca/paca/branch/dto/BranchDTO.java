@@ -25,4 +25,6 @@ public class BranchDTO {
     private Boolean reserveOff;
     private Float averageReserveTime;
     private Boolean visibility;
+    private String phoneNumber;
+    private String type;
 }

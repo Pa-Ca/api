@@ -52,4 +52,10 @@ public class Branch {
 
     @Column(name = "visibility")
     private Boolean visibility;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "type")
+    private String type;
 }
