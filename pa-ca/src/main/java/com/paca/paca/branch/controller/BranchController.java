@@ -184,4 +184,14 @@ public class BranchController {
                 min_capacity));
     }
 
+    // Example get  http://yourdomain.com/1/reservations?reservation_date=2020-12-12&page=2&size=5
+    @GetMapping("/{id}/reservations")
+    public ResponseEntity<ReservationListDTO> getReservationPage(
+            @PathVariable("id") Long id,
+            @RequestParam("reservation_date") Date reservation_date,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+            ) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(branchService.getReservationsPage(id, reservation_date, page, size));
+    }
 }
