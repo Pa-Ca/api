@@ -462,7 +462,7 @@ public class BranchService {
                 page,
                 size,
                 // Sort by id descending
-                Sort.by("reservation_date").descending());
+                Sort.by("reservationDate").descending());
 
         // Query the database for the appropriate page of results using the findAll
         // method of the reservation repository
