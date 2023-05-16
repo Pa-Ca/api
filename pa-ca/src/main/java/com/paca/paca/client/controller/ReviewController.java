@@ -10,6 +10,9 @@ import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.client.utils.ValidateClientInterceptor.ValidateClient;
 import com.paca.paca.client.utils.ValidateReviewOwnerInterceptor.ValidateReviewOwner;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -18,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ReviewStatics.Endpoint.PATH)
+@Tag(name = "12. Review", description = "Review Management Controller")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -76,6 +81,4 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.dislike(id, clientId));
     }
 
-      
 }
-

@@ -36,7 +36,12 @@ public class ValidateRolesInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
-        Method method = ((HandlerMethod) handler).getMethod();
+        Method method;
+        try {
+            method = ((HandlerMethod) handler).getMethod();
+        } catch (Exception e) {
+            return true;
+        }
         ValidateRoles annotation = AnnotationUtils.findAnnotation(method, ValidateRoles.class);
         if (annotation != null) {
             List<String> allowedRoles = Arrays.asList(annotation.value());

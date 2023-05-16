@@ -26,10 +26,15 @@ import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor.Valid
 
 import lombok.RequiredArgsConstructor;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ReservationStatics.Endpoint.PATH)
+@Tag(name = "06. Reservation", description = "Reservation Management Controller")
 public class ReservationController {
 
     private final ReservationService reservationService;

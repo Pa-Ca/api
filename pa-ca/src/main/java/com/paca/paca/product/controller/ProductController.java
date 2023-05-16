@@ -21,10 +21,15 @@ import com.paca.paca.product.utils.ValidateProductOwnerInterceptor.ValidateProdu
 
 import lombok.RequiredArgsConstructor;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ProductStatics.Endpoint.PATH)
+@Tag(name = "10. Product", description = "Product Management Controller")
 public class ProductController {
 
     private final ProductService productService;
@@ -36,7 +41,7 @@ public class ProductController {
     }
 
     @PostMapping
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto) throws NoContentException {
         return ResponseEntity.ok(productService.save(dto));
     }
@@ -58,7 +63,7 @@ public class ProductController {
 
     @ValidateProductOwner
     @DeleteMapping("/{id}")
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         productService.delete(id);
     }

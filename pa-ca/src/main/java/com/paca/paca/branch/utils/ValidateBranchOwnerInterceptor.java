@@ -45,7 +45,12 @@ public class ValidateBranchOwnerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
-        Method method = ((HandlerMethod) handler).getMethod();
+        Method method;
+        try {
+            method = ((HandlerMethod) handler).getMethod();
+        } catch (Exception e) {
+            return true;
+        }
         ValidateBranchOwner annotation = AnnotationUtils.findAnnotation(method, ValidateBranchOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();

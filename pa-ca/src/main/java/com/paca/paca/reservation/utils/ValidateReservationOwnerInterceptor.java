@@ -57,26 +57,31 @@ public class ValidateReservationOwnerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
-        Method method = ((HandlerMethod) handler).getMethod();
+        Method method;
+        try {
+            method = ((HandlerMethod) handler).getMethod();
+        } catch (Exception e) {
+            return true;
+        }
         ValidateReservationOwner annotation = AnnotationUtils.findAnnotation(method, ValidateReservationOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
                 return true;
             }
-            
-            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
+
+            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long reservationId = Long.parseLong((String) pathVariables.get("id"));
 
             if (annotation.isClientOwner()) {
                 Client client = clientRepository.findByUserEmail(auth.getName()).get();
-                Optional<ClientGroup> clientGroup = clientGroupRepository.findByReservationIdAndClientId(reservationId, client.getId());
+                Optional<ClientGroup> clientGroup = clientGroupRepository.findByReservationIdAndClientId(reservationId,
+                        client.getId());
 
-                if (clientGroup.isEmpty() || !clientGroup.get().getIsOwner()){
+                if (clientGroup.isEmpty() || !clientGroup.get().getIsOwner()) {
                     throw new ForbiddenException("Unauthorized access for this operation");
                 }
-            }
-            else {
+            } else {
                 Business business = businessRepository.findByUserEmail(auth.getName()).get();
                 if (reservationRepository.existsByIdAndBranch_Business_Id(reservationId, business.getId())) {
                     throw new ForbiddenException("Unauthorized access for this operation");

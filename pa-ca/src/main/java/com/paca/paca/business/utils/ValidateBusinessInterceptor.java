@@ -43,7 +43,12 @@ public class ValidateBusinessInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
-        Method method = ((HandlerMethod) handler).getMethod();
+        Method method;
+        try {
+            method = ((HandlerMethod) handler).getMethod();
+        } catch (Exception e) {
+            return true;
+        }
         com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness annotation = AnnotationUtils
                 .findAnnotation(method,
                         com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness.class);

@@ -24,10 +24,15 @@ import com.paca.paca.product_sub_category.utils.ValidateProductSubCategoryOwnerI
 
 import lombok.RequiredArgsConstructor;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ProductSubCategoryStatics.Endpoint.PATH)
+@Tag(name = "09. Product Sub-Category", description = "Product Sub-Category Management Controller")
 public class ProductSubCategoryController {
 
     private final ProductSubCategoryService productSubCategoryService;
@@ -44,7 +49,7 @@ public class ProductSubCategoryController {
     }
 
     @PostMapping
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public ResponseEntity<ProductSubCategoryDTO> save(
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
             throws NoContentException, BadRequestException {

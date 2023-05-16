@@ -18,12 +18,17 @@ import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ReservationStatics.Endpoint.GUEST_PATH)
+@Tag(name = "07. Guest", description = "Guest Management Controller")
 public class GuestController {
 
     private final GuestService guestService;

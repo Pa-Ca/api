@@ -12,20 +12,24 @@ import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.statics.ClientStatics;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.client.utils.ValidateClientInterceptor.ValidateClient;
 
 import lombok.RequiredArgsConstructor;
 
-import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.Date;
 
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ClientStatics.Endpoint.PATH)
+@Tag(name = "05. Client", description = "Client Management Controller")
 public class ClientController {
 
     private final ClientService clientService;
@@ -169,4 +173,3 @@ public class ClientController {
         clientService.deleteFavoriteBranch(id, branchId);
     }
 }
-

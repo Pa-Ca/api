@@ -6,6 +6,9 @@ import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.branch.statics.AmenityStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -14,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(AmenityStatics.Endpoint.AMENITY_PATH)
+@Tag(name = "08. Amenity", description = "Amenity Management Controller")
 public class AmenityController {
 
     private final AmenityService amenityService;

@@ -21,10 +21,15 @@ import com.paca.paca.promotion.utils.ValidatePromotionOwnerInterceptor.ValidateP
 
 import lombok.RequiredArgsConstructor;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(PromotionStatics.Endpoint.PATH)
+@Tag(name = "11. Promotion", description = "Promotion Management Controller")
 public class PromotionController {
 
     private final PromotionService promotionService;
@@ -36,7 +41,7 @@ public class PromotionController {
     }
 
     @PostMapping
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public ResponseEntity<PromotionDTO> save(@RequestBody PromotionDTO dto) throws NoContentException {
         return ResponseEntity.ok(promotionService.save(dto));
     }
@@ -58,7 +63,7 @@ public class PromotionController {
 
     @ValidatePromotionOwner
     @DeleteMapping("/{id}")
-    @ValidateRoles({"business"})
+    @ValidateRoles({ "business" })
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         promotionService.delete(id);
     }

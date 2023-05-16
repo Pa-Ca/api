@@ -12,6 +12,13 @@ public interface AuthenticationStatics {
     Map<String, String> PASSWORD_ERRORS_PROPS = Map.ofEntries(
         entry("TOO_SHORT", "2"),
         entry("TOO_LONG", "3"));
+    String[] ALLOW_MATCHES = {
+        "/swagger-ui**",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/swagger-ui/index.html/**",
+        AuthenticationStatics.Endpoint.AUTH_PATH + "/**"
+    };
   }
 
   interface Endpoint {
