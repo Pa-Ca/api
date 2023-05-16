@@ -5,9 +5,10 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.paca.paca.user.dto.UserRequestDTO;
+import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
-import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.auth.dto.LogoutDTO;
@@ -222,14 +223,29 @@ public class TestUtils {
         return user;
     }
 
-    public UserDTO createUserDTO(User user) {
+    public UserRequestDTO createUserRequestDTO(User user) {
         if (user == null) {
             user = createUser();
         }
-        UserDTO dto = UserDTO.builder()
+        UserRequestDTO dto = UserRequestDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .verified(user.getVerified())
+                .loggedIn(user.getLoggedIn())
+                .role(user.getRole().getName().name())
+                .build();
+
+        return dto;
+    }
+
+    public UserResponseDTO createUserResponseDTO(User user) {
+        if (user == null) {
+            user = createUser();
+        }
+        UserResponseDTO dto = UserResponseDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
                 .verified(user.getVerified())
                 .loggedIn(user.getLoggedIn())
                 .role(user.getRole().getName().name())

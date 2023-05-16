@@ -4,7 +4,9 @@ import java.util.Map;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.security.SecureRandom;
 
+import com.paca.paca.statics.UserRole;
 import org.passay.LengthRule;
 import org.passay.RuleResult;
 import org.passay.PasswordData;
@@ -20,6 +22,36 @@ import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
 public class AuthUtils {
+
+    public static String randomPasswordGenerator(int length) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(AuthenticationStatics.Password.PASSWORD_CHARACTERS.length());
+            char c = AuthenticationStatics.Password.PASSWORD_CHARACTERS.charAt(index);
+            password.append(c);
+        }
+
+        return password.toString();
+    }
+
+    public static void validateRole(String role) throws BadRequestException {
+        if (role.isEmpty()) {
+            throw new BadRequestException("The role attribute not found");
+        }
+
+        if (role.equals("admin")) {
+            throw new BadRequestException("The role given is not valid");
+        }
+
+        try {
+            UserRole.valueOf(role);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("The role given is not valid");
+        }
+    }
+
     public static void validateEmail(String email)
             throws BadRequestException, UnprocessableException, ConflictException {
         if (email == null)

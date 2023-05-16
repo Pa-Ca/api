@@ -1,27 +1,27 @@
 -- Clients
 
-INSERT INTO "user" (id, email, password, verified, role_id, logged_in)
+INSERT INTO "user" (id, email, password, verified, role_id, logged_in, registration_status)
     VALUES 
-        (1, 'user1@email.com', 'password1', false, 1, false),
-        (2, 'user2@email.com', 'password2', false, 1, false),
-        (3, 'user3@email.com', 'password3', false, 1, false),
-        (4, 'user4@email.com', 'password4', false, 1, false),
-        (5, 'user5@email.com', 'password5', false, 1, false),
-        (6, 'user6@email.com', 'password6', false, 1, false),
-        (7, 'user7@email.com', 'password7', false, 1, false),
-        (8, 'user8@email.com', 'password8', false, 1, false),
-        (9, 'user9@email.com', 'password9', false, 1, false),
-        (10, 'user10@email.com', 'password10', false, 1, false),
-        (11, 'user11@email.com', 'password11', false, 1, false),
-        (12, 'user12@email.com', 'password12', false, 1, false),
-        (13, 'user13@email.com', 'password13', false, 1, false),
-        (14, 'user14@email.com', 'password14', false, 1, false),
-        (15, 'user15@email.com', 'password15', false, 1, false),
-        (16, 'user16@email.com', 'password16', false, 1, false),
-        (17, 'user17@email.com', 'password17', false, 1, false),
-        (18, 'user18@email.com', 'password18', false, 1, false),
-        (19, 'user19@email.com', 'password19', false, 1, false),
-        (20, 'user20@email.com', 'password20', false, 1, false);
+        (1, 'user1@email.com', 'password1', false, 1, false, 0),
+        (2, 'user2@email.com', 'password2', false, 1, false, 0),
+        (3, 'user3@email.com', 'password3', false, 1, false, 0),
+        (4, 'user4@email.com', 'password4', false, 1, false, 0),
+        (5, 'user5@email.com', 'password5', false, 1, false, 0),
+        (6, 'user6@email.com', 'password6', false, 1, false, 0),
+        (7, 'user7@email.com', 'password7', false, 1, false, 0),
+        (8, 'user8@email.com', 'password8', false, 1, false, 0),
+        (9, 'user9@email.com', 'password9', false, 1, false, 0),
+        (10, 'user10@email.com', 'password10', false, 1, false, 0),
+        (11, 'user11@email.com', 'password11', false, 1, false, 0),
+        (12, 'user12@email.com', 'password12', false, 1, false, 0),
+        (13, 'user13@email.com', 'password13', false, 1, false, 0),
+        (14, 'user14@email.com', 'password14', false, 1, false, 0),
+        (15, 'user15@email.com', 'password15', false, 1, false, 0),
+        (16, 'user16@email.com', 'password16', false, 1, false, 0),
+        (17, 'user17@email.com', 'password17', false, 1, false, 0),
+        (18, 'user18@email.com', 'password18', false, 1, false, 0),
+        (19, 'user19@email.com', 'password19', false, 1, false, 0),
+        (20, 'user20@email.com', 'password20', false, 1, false, 0);
 
 INSERT INTO client (id, user_id, name, surname, stripe_customer_id, phone_number, address, date_of_birth)
     VALUES 
