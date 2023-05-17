@@ -1,8 +1,17 @@
 package com.paca.paca.branch.model;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.math.BigDecimal;
+
+import org.hibernate.annotations.Type;
+
 import com.paca.paca.business.model.Business;
 
 import jakarta.persistence.*;
+
+import io.hypersistence.utils.hibernate.type.interval.PostgreSQLIntervalType;
+
 import lombok.*;
 
 @Builder
@@ -23,11 +32,11 @@ public class Branch {
     @JoinColumn(name = "business_id")
     private Business business;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "location")
+    private String location;
 
-    @Column(name = "coordinates")
-    private String coordinates;
+    @Column(name = "maps_link")
+    private String mapsLink;
 
     @Column(name = "name")
     private String name;
@@ -42,13 +51,14 @@ public class Branch {
     private Integer capacity;
 
     @Column(name = "reservation_price")
-    private Float reservationPrice;
+    private BigDecimal reservationPrice;
 
     @Column(name = "reserve_off")
     private Boolean reserveOff;
 
+    @Type(PostgreSQLIntervalType.class)
     @Column(name = "average_reserve_time")
-    private Float averageReserveTime;
+    private Duration averageReserveTime;
 
     @Column(name = "visibility")
     private Boolean visibility;
@@ -58,4 +68,10 @@ public class Branch {
 
     @Column(name = "type")
     private String type;
+
+    @Column(name = "hour_in")
+    private LocalTime hourIn;
+
+    @Column(name = "hour_out")
+    private LocalTime hourOut;
 }

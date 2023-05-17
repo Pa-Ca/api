@@ -2,7 +2,10 @@ package com.paca.paca.utils;
 
 import java.util.List;
 import java.util.Date;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.paca.paca.user.dto.UserRequestDTO;
@@ -418,18 +421,20 @@ public class TestUtils {
         Branch branch = Branch.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .business(business)
-                .address("address test")
-                .coordinates("coordinates test")
+                .location("location test")
+                .mapsLink("mapsLink test")
                 .name("name test")
                 .overview("overview test")
                 .score(4.0F)
                 .capacity(42)
-                .reservationPrice(37.0F)
+                .reservationPrice(BigDecimal.valueOf(37.0F))
                 .reserveOff(false)
-                .averageReserveTime(1.0F)
+                .averageReserveTime(Duration.ofHours(2).plusMinutes(45))
                 .visibility(true)
                 .phoneNumber("test phone")
                 .type("test type")
+                .hourIn(LocalTime.of(8, 0))
+                .hourOut(LocalTime.of(8, 0))
                 .build();
 
         if (branchRepository != null) {
@@ -451,12 +456,12 @@ public class TestUtils {
         scores.add(4.2F);
         scores.add(5.0F);
 
-        List<Float> reservation_prices = new ArrayList<>();
-        reservation_prices.add(2.0F);
-        reservation_prices.add(20.0F);
-        reservation_prices.add(30.0F);
-        reservation_prices.add(40.5F);
-        reservation_prices.add(50.0F);
+        List<BigDecimal> reservation_prices = new ArrayList<>();
+        reservation_prices.add(BigDecimal.valueOf(2.0F));
+        reservation_prices.add(BigDecimal.valueOf(20.0F));
+        reservation_prices.add(BigDecimal.valueOf(31.0F));
+        reservation_prices.add(BigDecimal.valueOf(40.5F));
+        reservation_prices.add(BigDecimal.valueOf(49.0F));
 
         List<String> names = new ArrayList<>();
         names.add("name test 1");
@@ -479,8 +484,8 @@ public class TestUtils {
             Branch branch = Branch.builder()
                     .id(ThreadLocalRandom.current().nextLong(999999999))
                     .business(business)
-                    .address("address test")
-                    .coordinates("coordinates test")
+                    .location("location test")
+                    .mapsLink("mapsLink test")
                     .name(names.get(i))
                     .overview("overview test")
                     .score(scores.get(i))
@@ -506,8 +511,8 @@ public class TestUtils {
         BranchDTO dto = BranchDTO.builder()
                 .id(branch.getId())
                 .businessId(branch.getBusiness().getId())
-                .address(branch.getAddress())
-                .coordinates(branch.getCoordinates())
+                .location(branch.getLocation())
+                .mapsLink(branch.getMapsLink())
                 .name(branch.getName())
                 .overview(branch.getOverview())
                 .score(branch.getScore())

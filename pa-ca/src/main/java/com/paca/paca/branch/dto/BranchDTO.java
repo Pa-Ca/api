@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.math.BigDecimal;
+
 @Builder
 @Getter
 @Setter
@@ -15,16 +19,18 @@ public class BranchDTO {
 
     private Long id;
     private Long businessId;
-    private String address;
-    private String coordinates;
+    private String location;
+    private String mapsLink;
     private String name;
     private String overview;
     private Float score;
     private Integer capacity;
-    private Float reservationPrice;
+    private BigDecimal reservationPrice;
     private Boolean reserveOff;
-    private Float averageReserveTime;
+    private Duration averageReserveTime;
     private Boolean visibility;
     private String phoneNumber;
     private String type;
+    private LocalTime hourIn;
+    private LocalTime hourOut;
 }

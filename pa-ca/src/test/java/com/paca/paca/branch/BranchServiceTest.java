@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.math.BigDecimal;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -898,8 +899,8 @@ public class BranchServiceTest {
         List<Branch> branches = utils.createTestBranches(null);
 
         when(branchRepository.findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                any(Float.class),
-                any(Float.class),
+                any(BigDecimal.class),
+                any(BigDecimal.class),
                 any(Float.class),
                 any(Integer.class),
                 any(Pageable.class))).thenReturn(new PageImpl<>(branches));
@@ -909,8 +910,8 @@ public class BranchServiceTest {
                 5, // Thsi parameter doestn affect the test
                 "name",
                 true,
-                0.0f,
-                5.0f,
+                BigDecimal.valueOf(0.0f),
+                BigDecimal.valueOf(5.0f),
                 0.0f,
                 0);
 

@@ -2,6 +2,9 @@ package com.paca.paca.business;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.math.BigDecimal;
 
 import com.paca.paca.PacaTest;
 import com.paca.paca.user.model.Role;
@@ -10,14 +13,15 @@ import com.paca.paca.statics.UserRole;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
-import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.paca.paca.business.statics.BusinessStatics;
 import com.paca.paca.auth.statics.AuthenticationStatics;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.runner.RunWith;
 import org.hamcrest.CoreMatchers;
@@ -97,7 +101,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .password(password)
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.LOGIN)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.LOGIN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -119,7 +124,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .role("business")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -130,15 +136,20 @@ public class BusinessIntegrationTest extends PacaTest {
         this.businessToken = responseNode.get("token").asText();
     }
 
+    @BeforeAll
+    public void registerModules() {
+        objectMapper.registerModule(new JavaTimeModule());
+    }
+
     @Test
     public void shouldGetAll() throws Exception {
-        MvcResult response = mockMvc.perform(get(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_ALL)
-                .header("Authorization", "Bearer " + this.adminToken)
-                .contentType(MediaType.APPLICATION_JSON))
+        MvcResult response = mockMvc
+                .perform(get(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_ALL)
+                        .header("Authorization", "Bearer " + this.adminToken)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String content = response.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(content);
         JsonNode listNode = jsonNode.get("business");
         List<BusinessDTO> list = objectMapper.convertValue(
@@ -190,7 +201,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .role("business")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -217,7 +229,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("Test name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("Test phone")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is("Test phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)))
                 .andReturn();
         responseJson = response.getResponse().getContentAsString();
@@ -235,11 +248,13 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("Test name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("Test phone")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is("Test phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)));
 
         // Get business by user id
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}",
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace(
+                "{id}",
                 userId.toString()))
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -249,24 +264,27 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("Test name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("Test phone")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is("Test phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)));
 
         // Create branches
         BranchDTO branchDTO = BranchDTO.builder()
                 .businessId(id.longValue())
-                .address("address test")
-                .coordinates("coordinates test")
+                .location("location test")
+                .mapsLink("mapsLink test")
                 .name("test")
                 .overview("overview test")
                 .score(1.0F)
                 .capacity(1)
-                .reservationPrice(1.0F)
+                .reservationPrice(BigDecimal.valueOf(1.0F))
                 .reserveOff(false)
-                .averageReserveTime(1.0F)
+                .averageReserveTime(Duration.ofHours(2).plusMinutes(45))
                 .visibility(true)
                 .phoneNumber("test phone")
                 .type("test type")
+                .hourIn(LocalTime.of(8, 0))
+                .hourOut(LocalTime.of(8, 0))
                 .build();
         mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
                 .header("Authorization", "Bearer " + token)
@@ -281,14 +299,14 @@ public class BusinessIntegrationTest extends PacaTest {
 
         // Get all branches
         response = mockMvc
-                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES).replace("{id}",
-                        id.toString()))
+                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES)
+                        .replace("{id}",
+                                id.toString()))
                         .header("Authorization", "Bearer " + this.adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String content = response.getResponse().getContentAsString();
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(content);
         JsonNode listNode = jsonNode.get("branches");
         List<BranchDTO> list = objectMapper.convertValue(
@@ -309,7 +327,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .phoneNumber("new phone")
                 .build();
         response = mockMvc
-                .perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                .perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace(
+                        "{id}",
                         id.toString()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
@@ -320,7 +339,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("New name")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(true)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("premium")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is("new phone")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is("new phone")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)))
                 .andReturn();
         responseJson = response.getResponse().getContentAsString();
@@ -382,7 +402,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .role("client")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -407,7 +428,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("User with email " + dto.getEmail() + " does not exists")));
+                        CoreMatchers.is("User with email " + dto.getEmail()
+                                + " does not exists")));
 
         // Create valid user
         signupRequest = SignupRequestDTO.builder()
@@ -416,7 +438,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .role("business")
                 .build();
         response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -444,7 +467,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(email)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(dto.getVerified())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.verified",
+                        CoreMatchers.is(dto.getVerified())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("basic")));
 
         // Business already exists
@@ -455,13 +479,15 @@ public class BusinessIntegrationTest extends PacaTest {
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(12)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Business with email " + dto.getEmail() + " already exists")));
+                        CoreMatchers.is("Business with email " + dto.getEmail()
+                                + " already exists")));
     }
 
     @Test
     public void getByIdExceptions() throws Exception {
         // No token exception
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                "1"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -470,7 +496,8 @@ public class BusinessIntegrationTest extends PacaTest {
                         CoreMatchers.is(9)));
 
         // Invalid token
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}", "1"))
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                "1"))
                 .header("Authorization", "Bearer a")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -480,7 +507,8 @@ public class BusinessIntegrationTest extends PacaTest {
                         CoreMatchers.is(9)));
 
         // Business don't exists
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}", "0"))
+        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                "0"))
                 .header("Authorization", "Bearer " + businessToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -492,7 +520,8 @@ public class BusinessIntegrationTest extends PacaTest {
     @Test
     public void updateExceptions() throws Exception {
         // No token exception
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
+        mockMvc.perform(put(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -501,7 +530,8 @@ public class BusinessIntegrationTest extends PacaTest {
                         CoreMatchers.is(9)));
 
         // Invalid token
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
+        mockMvc.perform(put(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
                 .header("Authorization", "Bearer a")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -520,7 +550,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .build();
 
         // Token don't match with the business to edit
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "0"))
+        mockMvc.perform(put(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "0"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + businessToken)
                 .content(objectMapper.writeValueAsString(dto)))
@@ -535,7 +566,8 @@ public class BusinessIntegrationTest extends PacaTest {
                 .role("business")
                 .build();
         MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH + AuthenticationStatics.Endpoint.SIGNUP)
+                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                        + AuthenticationStatics.Endpoint.SIGNUP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -576,7 +608,8 @@ public class BusinessIntegrationTest extends PacaTest {
     @Test
     public void deleteExceptions() throws Exception {
         // No token exception
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
+        mockMvc.perform(put(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
                 .header("Authorization", "Bearer a")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -586,7 +619,8 @@ public class BusinessIntegrationTest extends PacaTest {
                         CoreMatchers.is(9)));
 
         // Invalid token
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
+        mockMvc.perform(put(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
                 .header("Authorization", "Bearer a")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -596,7 +630,8 @@ public class BusinessIntegrationTest extends PacaTest {
                         CoreMatchers.is(9)));
 
         // Token dont match with business to edit
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "0"))
+        mockMvc.perform(put(
+                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "0"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + businessToken))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -608,7 +643,8 @@ public class BusinessIntegrationTest extends PacaTest {
     public void getByUserIdExceptions() throws Exception {
         // No token exception
         mockMvc.perform(
-                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}", "1"))
+                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                        .replace("{id}", "1"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -618,7 +654,8 @@ public class BusinessIntegrationTest extends PacaTest {
 
         // Invalid token
         mockMvc.perform(
-                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}", "1"))
+                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                        .replace("{id}", "1"))
                         .header("Authorization", "Bearer a")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -629,7 +666,8 @@ public class BusinessIntegrationTest extends PacaTest {
 
         // Business don't exists
         mockMvc.perform(
-                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace("{id}", "0"))
+                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                        .replace("{id}", "0"))
                         .header("Authorization", "Bearer " + businessToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())

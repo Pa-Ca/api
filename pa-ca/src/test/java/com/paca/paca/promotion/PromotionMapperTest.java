@@ -15,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
 public class PromotionMapperTest {
-    
+
     @InjectMocks
     private PromotionMapperImpl promotionMapper;
 
@@ -33,8 +33,8 @@ public class PromotionMapperTest {
         assertThat(response.getDisabled()).isEqualTo(promotion.getDisabled());
         assertThat(response.getText()).isEqualTo(promotion.getText());
     }
-    
-    @Test 
+
+    @Test
     void shouldMapPromotionDTOtoPromotionEntity() {
         Branch branch = utils.createBranch(null);
         PromotionDTO dto = utils.createPromotionDTO(utils.createPromotion(branch));
@@ -76,7 +76,7 @@ public class PromotionMapperTest {
         assertThat(updatedPromotion).isNotNull();
         assertThat(updatedPromotion.getDisabled()).isEqualTo(dto.getDisabled());
 
-        // Changing coordinates
+        // Changing text
         dto = PromotionDTO.builder()
                 .text("new text_test")
                 .build();

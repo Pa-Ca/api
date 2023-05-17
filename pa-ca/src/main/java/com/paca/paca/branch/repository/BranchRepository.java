@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
@@ -23,8 +24,8 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     List<Branch> findAllByBusinessId(Long businessId);
 
     Page<Branch> findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-            @Nullable Float min_reservation_price,
-            @Nullable Float max_reservation_price,
+            @Nullable BigDecimal min_reservation_price,
+            @Nullable BigDecimal max_reservation_price,
             @Nullable Float min_score,
             @Nullable Integer min_capacity,
             @Nullable Pageable pageable);

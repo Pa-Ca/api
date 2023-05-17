@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.math.BigDecimal;
 
 import lombok.RequiredArgsConstructor;
 
@@ -192,8 +193,8 @@ public class BranchController {
             @RequestParam("size") int size,
             @RequestParam("sorting_by") String sorting_by,
             @RequestParam("ascending") boolean ascending,
-            @RequestParam("min_reservation_price") Float min_reservation_price,
-            @RequestParam("max_reservation_price") Float max_reservation_price,
+            @RequestParam("min_reservation_price") BigDecimal min_reservation_price,
+            @RequestParam("max_reservation_price") BigDecimal max_reservation_price,
             @RequestParam("min_score") Float min_score,
             @RequestParam("min_capacity") int min_capacity) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(branchService.getBranchesPage(

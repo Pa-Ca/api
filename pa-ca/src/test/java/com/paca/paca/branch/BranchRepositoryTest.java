@@ -31,9 +31,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -100,26 +103,28 @@ public class BranchRepositoryTest extends PacaTest {
         Branch branch = Branch.builder()
                 .id(1L)
                 .business(business)
-                .address("address test")
-                .coordinates("coordinates test")
+                .location("location test")
+                .mapsLink("mapsLink test")
                 .name("name test")
                 .overview("overview test")
                 .score(4.0F)
                 .capacity(42)
-                .reservationPrice(37.0F)
+                .reservationPrice(BigDecimal.valueOf(37.0F))
                 .reserveOff(false)
-                .averageReserveTime(1.0F)
+                .averageReserveTime(Duration.ofHours(2).plusMinutes(45))
                 .visibility(true)
                 .phoneNumber("test phone")
                 .type("test type")
+                .hourIn(LocalTime.of(8, 0))
+                .hourOut(LocalTime.of(8, 0))
                 .build();
 
         Branch savedBranch = branchRepository.save(branch);
 
         assertThat(savedBranch).isNotNull();
         assertThat(savedBranch.getBusiness().getId()).isEqualTo(branch.getBusiness().getId());
-        assertThat(savedBranch.getAddress()).isEqualTo(branch.getAddress());
-        assertThat(savedBranch.getCoordinates()).isEqualTo(branch.getCoordinates());
+        assertThat(savedBranch.getLocation()).isEqualTo(branch.getLocation());
+        assertThat(savedBranch.getMapsLink()).isEqualTo(branch.getMapsLink());
         assertThat(savedBranch.getName()).isEqualTo(branch.getName());
         assertThat(savedBranch.getOverview()).isEqualTo(branch.getOverview());
         assertThat(savedBranch.getScore()).isEqualTo(branch.getScore());
@@ -130,6 +135,8 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(savedBranch.getVisibility()).isEqualTo(branch.getVisibility());
         assertThat(savedBranch.getPhoneNumber()).isEqualTo(branch.getPhoneNumber());
         assertThat(savedBranch.getType()).isEqualTo(branch.getType());
+        assertThat(savedBranch.getHourIn()).isEqualTo(branch.getHourIn());
+        assertThat(savedBranch.getHourOut()).isEqualTo(branch.getHourOut());
     }
 
     @Test
@@ -155,8 +162,8 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(expected).isTrue();
         assertThat(expectedBranch.isPresent()).isTrue();
         assertThat(expectedBranch.get().getBusiness().getId()).isEqualTo(branch.getBusiness().getId());
-        assertThat(expectedBranch.get().getAddress()).isEqualTo(branch.getAddress());
-        assertThat(expectedBranch.get().getCoordinates()).isEqualTo(branch.getCoordinates());
+        assertThat(expectedBranch.get().getLocation()).isEqualTo(branch.getLocation());
+        assertThat(expectedBranch.get().getMapsLink()).isEqualTo(branch.getMapsLink());
         assertThat(expectedBranch.get().getName()).isEqualTo(branch.getName());
         assertThat(expectedBranch.get().getOverview()).isEqualTo(branch.getOverview());
         assertThat(expectedBranch.get().getScore()).isEqualTo(branch.getScore());
@@ -167,6 +174,8 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(expectedBranch.get().getVisibility()).isEqualTo(branch.getVisibility());
         assertThat(expectedBranch.get().getPhoneNumber()).isEqualTo(branch.getPhoneNumber());
         assertThat(expectedBranch.get().getType()).isEqualTo(branch.getType());
+        assertThat(expectedBranch.get().getHourIn()).isEqualTo(branch.getHourIn());
+        assertThat(expectedBranch.get().getHourOut()).isEqualTo(branch.getHourOut());
     }
 
     @Test
@@ -419,8 +428,8 @@ public class BranchRepositoryTest extends PacaTest {
 
         Page<Branch> pagedResult = branchRepository
                 .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                        1000F,
-                        2000F,
+                        BigDecimal.valueOf(1000F),
+                        BigDecimal.valueOf(2000F),
                         4.0F,
                         2,
                         paging);
@@ -436,8 +445,8 @@ public class BranchRepositoryTest extends PacaTest {
 
         // Filter the branches manually
         List<Branch> filtered_branches = test_branches.stream()
-                .filter(branch -> branch.getReservationPrice() >= 30.0 &&
-                        branch.getReservationPrice() <= 50.0 &&
+                .filter(branch -> branch.getReservationPrice().compareTo(BigDecimal.valueOf(30.0)) == 1 &&
+                        branch.getReservationPrice().compareTo(BigDecimal.valueOf(50.0)) == -1 &&
                         branch.getScore() >= 2.0 &&
                         branch.getCapacity() >= 10)
                 .collect(Collectors.toList());
@@ -456,8 +465,8 @@ public class BranchRepositoryTest extends PacaTest {
 
         Page<Branch> pagedResult = branchRepository
                 .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                        30.0F,
-                        50.0F,
+                        BigDecimal.valueOf(30.0F),
+                        BigDecimal.valueOf(50.0F),
                         2.0F,
                         10,
                         paging);
@@ -484,8 +493,8 @@ public class BranchRepositoryTest extends PacaTest {
         //
         Page<Branch> pagedResult = branchRepository
                 .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                        0.0F,
-                        10000.F,
+                        BigDecimal.valueOf(0.0F),
+                        BigDecimal.valueOf(10000.F),
                         0.0F,
                         0,
                         paging);

@@ -40,8 +40,8 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.login(request));
     }
 
-    @Operation(summary = "Refresh token operation", description = "Given a refresh token, returns an authorization token")
     @PostMapping(AuthenticationStatics.Endpoint.REFRESH)
+    @Operation(summary = "Refresh token operation", description = "Given a refresh token, returns an authorization token")
     public ResponseEntity<RefreshResponseDTO> refresh(@RequestBody RefreshRequestDTO request)
             throws ForbiddenException {
         return ResponseEntity.ok(service.refresh(request));

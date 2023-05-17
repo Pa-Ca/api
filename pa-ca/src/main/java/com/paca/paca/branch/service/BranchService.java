@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
 
@@ -307,8 +308,8 @@ public class BranchService {
             int size,
             String sorting_by,
             boolean ascending,
-            Float min_reservation_price,
-            Float max_reservation_price,
+            BigDecimal min_reservation_price,
+            BigDecimal max_reservation_price,
             Float min_score,
             int min_capacity) throws UnprocessableException, NoContentException {
 
@@ -348,10 +349,10 @@ public class BranchService {
         }
 
         if (min_reservation_price == null) {
-            min_reservation_price = 0.0f;
+            min_reservation_price = BigDecimal.valueOf(0L);
         }
         if (max_reservation_price == null) {
-            max_reservation_price = Float.POSITIVE_INFINITY;
+            max_reservation_price = BigDecimal.valueOf(Long.MAX_VALUE);
         }
         if (min_score == null) {
             min_score = 0.0f;

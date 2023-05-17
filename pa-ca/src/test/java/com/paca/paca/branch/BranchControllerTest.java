@@ -47,6 +47,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.math.BigDecimal;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -177,18 +178,26 @@ public class BranchControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.businessId", CoreMatchers.is(dto.getBusinessId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(dto.getAddress())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.coordinates", CoreMatchers.is(dto.getCoordinates())))
+                        MockMvcResultMatchers.jsonPath("$.businessId",
+                                CoreMatchers.is(dto.getBusinessId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.location",
+                        CoreMatchers.is(dto.getLocation())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mapsLink",
+                        CoreMatchers.is(dto.getMapsLink())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.overview", CoreMatchers.is(dto.getOverview())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.score", CoreMatchers.is((double) dto.getScore())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity", CoreMatchers.is(dto.getCapacity())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.overview",
+                        CoreMatchers.is(dto.getOverview())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.score",
+                        CoreMatchers.is((double) dto.getScore())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity",
+                        CoreMatchers.is(dto.getCapacity())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservationPrice",
-                        CoreMatchers.is((double) dto.getReservationPrice())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff", CoreMatchers.is(dto.getReserveOff())));
+                        CoreMatchers.is(dto.getReservationPrice().doubleValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff",
+                        CoreMatchers.is(dto.getReserveOff())));
     }
 
     @Test
@@ -215,18 +224,26 @@ public class BranchControllerTest extends ControllerTest {
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + dto.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.businessId", CoreMatchers.is(dto.getBusinessId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(dto.getAddress())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.coordinates", CoreMatchers.is(dto.getCoordinates())))
+                        MockMvcResultMatchers.jsonPath("$.businessId",
+                                CoreMatchers.is(dto.getBusinessId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.location",
+                        CoreMatchers.is(dto.getLocation())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mapsLink",
+                        CoreMatchers.is(dto.getMapsLink())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.overview", CoreMatchers.is(dto.getOverview())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.score", CoreMatchers.is((double) dto.getScore())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity", CoreMatchers.is(dto.getCapacity())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.overview",
+                        CoreMatchers.is(dto.getOverview())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.score",
+                        CoreMatchers.is((double) dto.getScore())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity",
+                        CoreMatchers.is(dto.getCapacity())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservationPrice",
-                        CoreMatchers.is((double) dto.getReservationPrice())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff", CoreMatchers.is(dto.getReserveOff())));
+                        CoreMatchers.is(dto.getReservationPrice().doubleValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff",
+                        CoreMatchers.is(dto.getReserveOff())));
     }
 
     @Test
@@ -270,7 +287,8 @@ public class BranchControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
         BranchDTO dto = utils.createBranchDTO(branch);
 
-        when(branchService.update(anyLong(), any(BranchDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(branchService.update(anyLong(), any(BranchDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -300,18 +318,26 @@ public class BranchControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.businessId", CoreMatchers.is(dto.getBusinessId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(dto.getAddress())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.coordinates", CoreMatchers.is(dto.getCoordinates())))
+                        MockMvcResultMatchers.jsonPath("$.businessId",
+                                CoreMatchers.is(dto.getBusinessId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.location",
+                        CoreMatchers.is(dto.getLocation())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mapsLink",
+                        CoreMatchers.is(dto.getMapsLink())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.overview", CoreMatchers.is(dto.getOverview())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.score", CoreMatchers.is((double) dto.getScore())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity", CoreMatchers.is(dto.getCapacity())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.overview",
+                        CoreMatchers.is(dto.getOverview())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.score",
+                        CoreMatchers.is((double) dto.getScore())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity",
+                        CoreMatchers.is(dto.getCapacity())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservationPrice",
-                        CoreMatchers.is((double) dto.getReservationPrice())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff", CoreMatchers.is(dto.getReserveOff())));
+                        CoreMatchers.is(dto.getReservationPrice().doubleValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff",
+                        CoreMatchers.is(dto.getReserveOff())));
     }
 
     @Test
@@ -419,7 +445,8 @@ public class BranchControllerTest extends ControllerTest {
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/product-category/1"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.productSubCategories", CoreMatchers.hasItems()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.productSubCategories",
+                        CoreMatchers.hasItems()));
     }
 
     @Test
@@ -504,7 +531,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(branchService.getReservations(anyLong())).thenReturn(reservationListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -525,7 +553,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(branchService.getReservations(anyLong())).thenReturn(reservationListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -564,7 +593,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(branchService.getReservations(anyLong())).thenReturn(reservationListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -584,7 +614,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(branchService.getReservationsByDate(anyLong(), any(Date.class))).thenReturn(reservationListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -592,7 +623,8 @@ public class BranchControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -605,7 +637,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(branchService.getReservationsByDate(anyLong(), any(Date.class))).thenReturn(reservationListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -613,7 +646,8 @@ public class BranchControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -632,7 +666,8 @@ public class BranchControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -645,7 +680,8 @@ public class BranchControllerTest extends ControllerTest {
         Branch branch = utils.createBranch(business);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(branchService.getReservationsByDate(anyLong(), any(Date.class))).thenReturn(reservationListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
@@ -653,7 +689,8 @@ public class BranchControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservations", CoreMatchers.hasItems()));
@@ -880,7 +917,8 @@ public class BranchControllerTest extends ControllerTest {
         dtoList.add(utils.createAmenityDTO(null));
         AmenityListDTO amenityListDTO = AmenityListDTO.builder().amenities(dtoList).build();
 
-        when(amenityService.deleteAllByBranchId(anyLong(), any(AmenityListDTO.class))).thenReturn(amenityListDTO);
+        when(amenityService.deleteAllByBranchId(anyLong(), any(AmenityListDTO.class)))
+                .thenReturn(amenityListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -925,7 +963,8 @@ public class BranchControllerTest extends ControllerTest {
         dtoList.add(utils.createAmenityDTO(null));
         AmenityListDTO amenityListDTO = AmenityListDTO.builder().amenities(dtoList).build();
 
-        when(amenityService.deleteAllByBranchId(anyLong(), any(AmenityListDTO.class))).thenReturn(amenityListDTO);
+        when(amenityService.deleteAllByBranchId(anyLong(), any(AmenityListDTO.class)))
+                .thenReturn(amenityListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
@@ -953,6 +992,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.amenities", CoreMatchers.hasItems()));
     }
+
     @Test
     public void shouldGetAmenityListByWord() throws Exception {
         ArrayList<AmenityDTO> dtoList = new ArrayList<>();
@@ -984,6 +1024,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
     }
+
     @Test
     public void shouldGetNoContentDueToMissingBranchInGetReviewsPage() throws Exception {
         when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
@@ -1043,8 +1084,8 @@ public class BranchControllerTest extends ControllerTest {
                 anyInt(),
                 anyString(),
                 anyBoolean(),
-                anyFloat(),
-                anyFloat(),
+                any(BigDecimal.class),
+                any(BigDecimal.class),
                 anyFloat(),
                 anyInt()
         )).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
@@ -1064,8 +1105,8 @@ public class BranchControllerTest extends ControllerTest {
                 anyInt(),
                 anyString(),
                 anyBoolean(),
-                anyFloat(),
-                anyFloat(),
+                any(BigDecimal.class),
+                any(BigDecimal.class),
                 anyFloat(),
                 anyInt()
         )).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
@@ -1085,8 +1126,8 @@ public class BranchControllerTest extends ControllerTest {
                 anyInt(),
                 anyString(),
                 anyBoolean(),
-                anyFloat(),
-                anyFloat(),
+                any(BigDecimal.class),
+                any(BigDecimal.class),
                 anyFloat(),
                 anyInt()
         )).thenThrow(new UnprocessableException("Sorting key is not valid", 42));
@@ -1097,7 +1138,6 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(42)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Sorting key is not valid")));
     }
-
 
     @Test
     public void shouldGetBranchesPage() throws Exception {
@@ -1114,13 +1154,13 @@ public class BranchControllerTest extends ControllerTest {
                 anyInt(),
                 anyString(),
                 anyBoolean(),
+                any(BigDecimal.class),
+                any(BigDecimal.class),
                 anyFloat(),
-                anyFloat(),
-                anyFloat(),
-                anyInt()
-        )).thenReturn(branchListDTO);
+                anyInt())).thenReturn(branchListDTO);
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=0&size=0&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat(
+                "/branches?page=0&size=0&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
