@@ -42,16 +42,21 @@ public class ValidateClientInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
-        Method method = ((HandlerMethod) handler).getMethod();
+        Method method;
+        try {
+            method = ((HandlerMethod) handler).getMethod();
+        } catch (Exception e) {
+            return true;
+        }
         ValidateClient annotation = AnnotationUtils.findAnnotation(method, ValidateClient.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
                 return true;
             }
-            
+
             Client client = clientRepository.findByUserEmail(auth.getName()).get();
-            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
+            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long clientId = Long.parseLong((String) pathVariables.get(annotation.idField()));
             if (!client.getId().equals(clientId)) {
                 throw new ForbiddenException("Unauthorized access for this operation");

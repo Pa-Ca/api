@@ -1,9 +1,10 @@
 package com.paca.paca.user;
 
+import com.paca.paca.user.dto.UserRequestDTO;
+import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.user.utils.UserMapper;
 import com.paca.paca.user.service.UserService;
@@ -58,14 +59,13 @@ public class UserServiceTest {
                 .id(id).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role(role)
                 .build();
 
-        UserDTO userDTO = UserDTO.builder()
-                .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false)
-                .role(role.getName().name())
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .id(1L).email("test@test.com").verified(false).loggedIn(false).role(role.getName().name())
                 .build();
 
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(user));
-        when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
-        UserDTO responseDTO = userService.getById(id);
+        when(userMapper.toDTO(any(User.class))).thenReturn(userResponseDTO);
+        UserResponseDTO responseDTO = userService.getById(user.getId());
 
         assertThat(responseDTO).isNotNull();
         assertThat(responseDTO.getId()).isEqualTo(id);
@@ -92,29 +92,32 @@ public class UserServiceTest {
                 .id(1L).email("test@test.com").password("123456789aA#").verified(false).loggedIn(false).role(admin)
                 .build();
         User expected = User.builder()
-                .id(1L).email("test@test.com").password("123456789aB#").verified(false).loggedIn(false).role(client)
+                .id(1L).email("test@test.com").password("123456789aA#").verified(true).loggedIn(false).role(client)
                 .build();
-        UserDTO userDTO = UserDTO.builder()
+        UserRequestDTO userRequestDTO = UserRequestDTO.builder()
                 .id(1L).email("test2@test.com").password("123456789aB$").verified(true).loggedIn(true)
                 .role(UserRole.client.name())
                 .build();
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .id(1L).email("test@test.com").verified(true).loggedIn(false).role(UserRole.client.name())
+                .build();
 
         when(passwordEncoder.encode(any(String.class))).thenReturn(passHash);
-        when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
-        when(userMapper.updateEntity(any(UserDTO.class), any(User.class), any(UserRole.class))).thenReturn(expected);
+        when(userMapper.toDTO(any(User.class))).thenReturn(userResponseDTO);
+        when(userMapper.updateEntity(any(UserRequestDTO.class), any(User.class), any(UserRole.class))).thenReturn(expected);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
-        UserDTO response = userService.update(1L, userDTO);
+        UserResponseDTO response = userService.update(1L, userRequestDTO);
 
         assertThat(response).isNotNull();
-        assertThat(response.getPassword()).isEqualTo(userDTO.getPassword());
+        assertThat(response.getVerified()).isEqualTo(userRequestDTO.getVerified());
     }
 
     @Test
     void shouldGetBadRequestFromUpdateUserByIdBecauseUserDoesNotExists() {
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
         try {
-            userService.update(1L, UserDTO.builder().build());
+            userService.update(1L, UserRequestDTO.builder().build());
         } catch (NoContentException e){
             assertThat(e.getMessage()).isEqualTo("User with id 1 does not exists");
             assertThat(e.getCode()).isEqualTo(12);

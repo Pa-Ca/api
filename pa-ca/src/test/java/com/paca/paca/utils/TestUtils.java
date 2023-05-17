@@ -5,9 +5,10 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.paca.paca.user.dto.UserRequestDTO;
+import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
-import com.paca.paca.user.dto.UserDTO;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.auth.dto.LogoutDTO;
@@ -222,14 +223,29 @@ public class TestUtils {
         return user;
     }
 
-    public UserDTO createUserDTO(User user) {
+    public UserRequestDTO createUserRequestDTO(User user) {
         if (user == null) {
             user = createUser();
         }
-        UserDTO dto = UserDTO.builder()
+        UserRequestDTO dto = UserRequestDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .verified(user.getVerified())
+                .loggedIn(user.getLoggedIn())
+                .role(user.getRole().getName().name())
+                .build();
+
+        return dto;
+    }
+
+    public UserResponseDTO createUserResponseDTO(User user) {
+        if (user == null) {
+            user = createUser();
+        }
+        UserResponseDTO dto = UserResponseDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
                 .verified(user.getVerified())
                 .loggedIn(user.getLoggedIn())
                 .role(user.getRole().getName().name())
@@ -412,6 +428,8 @@ public class TestUtils {
                 .reserveOff(false)
                 .averageReserveTime(1.0F)
                 .visibility(true)
+                .phoneNumber("test phone")
+                .type("test type")
                 .build();
 
         if (branchRepository != null) {
@@ -901,5 +919,52 @@ public class TestUtils {
                 .paymentCode(paymentCode)
                 .build();
         return dto;
+    }
+    
+    public List<Reservation> createTestReservations(Branch branch_1, 
+                                                    Branch branch_2, 
+                                                    Date date_1, 
+                                                    Date date_2) {
+        /*
+         * Creates test reservations for testing the ReservationService
+         * It creates two branches, two dates, and 10 reservations for each branch and date
+         */
+        // 
+        List<Reservation> reservations = new ArrayList<>();
+
+        for (int i = 0; i < 20; i++) {
+            Branch branch;
+            Date date;
+            if (i % 2 == 0){
+                branch = branch_1;
+                date  = date_1;
+            }else{
+                branch = branch_2;
+                date  = date_2;
+            }
+            Reservation reservation = Reservation.builder()
+                                    .id(ThreadLocalRandom.current().nextLong(999999999))
+                                    .branch(branch)
+                                    .guest(null)
+                                    .requestDate(new Date(System.currentTimeMillis()))
+                                    .reservationDate(date)
+                                    .clientNumber(5)
+                                    .payment("payment_test")
+                                    .status(0)
+                                    .payDate(new Date(System.currentTimeMillis()))
+                                    .price(5.0f)
+                                    .occasion("Anniversary")
+                                    .petition("Candles")
+                                    .byClient(Boolean.TRUE)
+                                    .build();
+
+            if (branchRepository != null) {
+                reservation = reservationRepository.save(reservation);
+            }
+
+            reservations.add(reservation);
+        }
+
+        return reservations;
     }
 }

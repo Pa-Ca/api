@@ -30,4 +30,6 @@ pgdata/
 
 # Environment
 .env
-.vscode/settings.json
+
+# Visual Studio Code
+.vscode/

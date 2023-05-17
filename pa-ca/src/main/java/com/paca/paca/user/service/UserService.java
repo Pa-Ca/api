@@ -1,7 +1,8 @@
 package com.paca.paca.user.service;
 
+import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.model.User;
-import com.paca.paca.user.dto.UserDTO;
+import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.user.dto.UserListDTO;
 import com.paca.paca.auth.utils.AuthUtils;
 import com.paca.paca.user.utils.UserMapper;
@@ -34,13 +35,12 @@ public class UserService {
     }
 
     public UserListDTO getAll() {
-        List<UserDTO> response = new ArrayList<>();
+        List<UserResponseDTO> response = new ArrayList<>();
         userRepository.findAll().forEach(user -> response.add(
-                UserDTO
+                UserResponseDTO
                         .builder()
                         .id(user.getId())
                         .email(user.getEmail())
-                        .password(user.getPassword())
                         .verified(user.getVerified())
                         .loggedIn(user.getLoggedIn())
                         .role(user.getRole().getName().name())
@@ -49,19 +49,19 @@ public class UserService {
         return UserListDTO.builder().users(response).build();
     }
 
-    public UserDTO getById(Long id) throws NoContentException {
+    public UserResponseDTO getById(Long id) throws NoContentException {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty())
             throw new NoContentException(
                     "User with id " + id + " does not exists",
                     12);
         else {
-            UserDTO response = userMapper.toDTO(user.get());
+            UserResponseDTO response = userMapper.toDTO(user.get());
             return response;
         }
     }
 
-    public UserDTO update(Long id, UserDTO dto)
+    public UserResponseDTO update(Long id, UserRequestDTO dto)
             throws NoContentException, UnprocessableException, ConflictException {
         Optional<User> current = userRepository.findById(id);
         if (current.isEmpty())

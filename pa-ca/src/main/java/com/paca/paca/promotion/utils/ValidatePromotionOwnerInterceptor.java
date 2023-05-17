@@ -45,17 +45,22 @@ public class ValidatePromotionOwnerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws ForbiddenException {
-        Method method = ((HandlerMethod) handler).getMethod();
+        Method method;
+        try {
+            method = ((HandlerMethod) handler).getMethod();
+        } catch (Exception e) {
+            return true;
+        }
         ValidatePromotionOwner annotation = AnnotationUtils.findAnnotation(method, ValidatePromotionOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
                 return true;
             }
-            
+
             Business business = businessRepository.findByUserEmail(auth.getName()).get();
-            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);  
-            Long promotionId = Long.parseLong((String) pathVariables.get("id")); 
+            Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            Long promotionId = Long.parseLong((String) pathVariables.get("id"));
             if (!promotionRepository.existsByIdAndBranch_Business_Id(promotionId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }

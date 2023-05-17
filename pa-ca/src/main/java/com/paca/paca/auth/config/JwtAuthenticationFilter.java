@@ -2,6 +2,7 @@ package com.paca.paca.auth.config;
 
 import java.util.Map;
 import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
 import java.io.IOException;
@@ -58,7 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final AntPathMatcher matcher = new AntPathMatcher();
         final String authHeader = request.getHeader("Authorization");
 
-        if (matcher.match(AuthenticationStatics.Endpoint.AUTH_PATH + "/**", request.getRequestURI())) {
+        if (Arrays.stream(AuthenticationStatics.Auth.ALLOW_MATCHES)
+                .anyMatch(match -> matcher.match(match, request.getRequestURI()))) {
             filterChain.doFilter(request, response);
             return;
         }

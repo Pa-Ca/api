@@ -1,17 +1,17 @@
 -- Business
 
-INSERT INTO "user" (id, email, password, verified, role_id, logged_in) 
+INSERT INTO "user" (id, email, password, verified, role_id, logged_in, registration_status) 
     VALUES
-        (21, 'user21@example.com', 'password21', false, 2, false),
-        (22, 'user22@example.com', 'password22', false, 2, false),
-        (23, 'user23@example.com', 'password23', false, 2, false),
-        (24, 'user24@example.com', 'password24', false, 2, false),
-        (25, 'user25@example.com', 'password25', false, 2, false),
-        (26, 'user26@example.com', 'password26', false, 2, false),
-        (27, 'user27@example.com', 'password27', false, 2, false),
-        (28, 'user28@example.com', 'password28', false, 2, false),
-        (29, 'user29@example.com', 'password29', false, 2, false),
-        (30, 'user30@example.com', 'password30', false, 2, false);
+        (21, 'user21@example.com', 'password21', false, 2, false, 0),
+        (22, 'user22@example.com', 'password22', false, 2, false, 0),
+        (23, 'user23@example.com', 'password23', false, 2, false, 0),
+        (24, 'user24@example.com', 'password24', false, 2, false, 0),
+        (25, 'user25@example.com', 'password25', false, 2, false, 0),
+        (26, 'user26@example.com', 'password26', false, 2, false, 0),
+        (27, 'user27@example.com', 'password27', false, 2, false, 0),
+        (28, 'user28@example.com', 'password28', false, 2, false, 0),
+        (29, 'user29@example.com', 'password29', false, 2, false, 0),
+        (30, 'user30@example.com', 'password30', false, 2, false, 0);
 
 INSERT INTO tier VALUES (0, 'basic', 100, 10);
 INSERT INTO tier VALUES (1, 'premium', 500, 50);

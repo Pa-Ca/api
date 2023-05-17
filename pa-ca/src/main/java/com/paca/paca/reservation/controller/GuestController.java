@@ -18,35 +18,45 @@ import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ReservationStatics.Endpoint.GUEST_PATH)
+@Tag(name = "08. Guest", description = "Guest Management Controller")
 public class GuestController {
 
     private final GuestService guestService;
 
     @GetMapping
     @ValidateRoles({})
+    @Operation(summary = "Get all user guest", description = "Returns a list with all user guest")
     public ResponseEntity<GuestListDTO> getAll() {
         return ResponseEntity.ok(guestService.getAll());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get user guest by ID", description = "Gets the data of a user guest given its ID")
     public ResponseEntity<GuestDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(guestService.getById(id));
     }
 
     @PostMapping
     @ValidateRoles({})
+    @Operation(summary = "Create new user guest", description = "Create a new user guest in the app")
     public ResponseEntity<GuestDTO> save(@RequestBody GuestDTO dto) {
         return ResponseEntity.ok(guestService.save(dto));
     }
 
-    @PutMapping("/{id}")
     @ValidateRoles({})
+    @PutMapping("/{id}")
+    @Operation(summary = "Update user guest", description = "Updates the data of a user guest given its ID")
     public ResponseEntity<GuestDTO> update(
             @PathVariable("id") Long id,
             @RequestBody GuestDTO dto)
@@ -54,8 +64,9 @@ public class GuestController {
         return ResponseEntity.ok(guestService.update(id, dto));
     }
 
-    @DeleteMapping("/{id}")
     @ValidateRoles({})
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user guest", description = "Delete the data of a user guest given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         guestService.delete(id);
     }

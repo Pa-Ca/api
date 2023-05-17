@@ -1,4 +1,4 @@
-package com.paca.paca.user.dto;
+package com.paca.paca.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-    public Long id;
-    public String email;
-    public String password;
-    public Boolean verified;
-    public Boolean loggedIn;
+public class GoogleLoginRequestDTO {
+    private String token;
     public String role;
 }
