@@ -180,9 +180,8 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id",
                         CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.businessId",
-                                CoreMatchers.is(dto.getBusinessId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.businessId",
+                        CoreMatchers.is(dto.getBusinessId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.location",
                         CoreMatchers.is(dto.getLocation())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.mapsLink",
@@ -197,10 +196,22 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservationPrice",
                         CoreMatchers.is(dto.getReservationPrice().doubleValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff",
-                        CoreMatchers.is(dto.getReserveOff())));
+                        CoreMatchers.is(dto.getReserveOff())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.averageReserveTime",
+                        CoreMatchers.is(dto.getAverageReserveTime().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.visibility",
+                        CoreMatchers.is(dto.getVisibility())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.type",
+                        CoreMatchers.is(dto.getType())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.hourIn",
+                        CoreMatchers.is(dto.getHourIn().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.hourOut",
+                        CoreMatchers.is(dto.getHourOut().toString())));
     }
 
-    @Test
+  @Test
     public void shouldGetNoContentInGetBranchById() throws Exception {
         when(branchService.getById(anyLong())).thenThrow(new NoContentException("message", 0));
 
@@ -243,7 +254,19 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservationPrice",
                         CoreMatchers.is(dto.getReservationPrice().doubleValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff",
-                        CoreMatchers.is(dto.getReserveOff())));
+                        CoreMatchers.is(dto.getReserveOff())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.averageReserveTime",
+                        CoreMatchers.is(dto.getAverageReserveTime().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.visibility",
+                        CoreMatchers.is(dto.getVisibility())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.type",
+                        CoreMatchers.is(dto.getType())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.hourIn",
+                        CoreMatchers.is(dto.getHourIn().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.hourOut",
+                        CoreMatchers.is(dto.getHourOut().toString())));
     }
 
     @Test
@@ -337,7 +360,19 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservationPrice",
                         CoreMatchers.is(dto.getReservationPrice().doubleValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reserveOff",
-                        CoreMatchers.is(dto.getReserveOff())));
+                        CoreMatchers.is(dto.getReserveOff())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.averageReserveTime",
+                        CoreMatchers.is(dto.getAverageReserveTime().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.visibility",
+                        CoreMatchers.is(dto.getVisibility())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.type",
+                        CoreMatchers.is(dto.getType())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.hourIn",
+                        CoreMatchers.is(dto.getHourIn().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.hourOut",
+                        CoreMatchers.is(dto.getHourOut().toString())));
     }
 
     @Test
@@ -814,7 +849,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reviews", CoreMatchers.hasItems()));
     }
 
-    @Test
+  @Test
     public void shouldGetNoContentInGetAmenityListByBranchId() throws Exception {
         when(amenityService.getAllByBranchId(anyLong())).thenThrow(new NoContentException("message", 0));
 
@@ -1025,7 +1060,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
     }
 
-    @Test
+  @Test
     public void shouldGetNoContentDueToMissingBranchInGetReviewsPage() throws Exception {
         when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
 
@@ -1036,7 +1071,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Branch with id 1 does not exists")));
     }
 
-    @Test
+  @Test
     public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetReviewsPage() throws Exception{
         when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
 
@@ -1047,7 +1082,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
     }
 
-    @Test
+  @Test
     public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetReviewsPage() throws Exception{
         when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
 
@@ -1076,7 +1111,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reviews", CoreMatchers.hasItems()));
     }
 
-    @Test
+  @Test
     public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetBranchesPage() throws Exception {
 
         when(branchService.getBranchesPage(
@@ -1097,7 +1132,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
     }
 
-    @Test
+  @Test
     public void shouldGetUnprocessableExceptionToPageSizeLessThanOneInGetBranchesPage() throws Exception {
 
         when(branchService.getBranchesPage(
@@ -1118,7 +1153,7 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
     }
 
-    @Test
+  @Test
     public void shouldGetUnprocessableExceptionDueToInvalidSortingKeyInGetBranchesPage() throws Exception {
 
         when(branchService.getBranchesPage(

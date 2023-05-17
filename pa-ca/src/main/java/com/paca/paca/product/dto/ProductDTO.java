@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Builder
 @Getter
 @Setter
@@ -17,6 +19,6 @@ public class ProductDTO {
     private Long subCategoryId;
     private Boolean disabled;
     private String name;
-    private Float price;
+    private BigDecimal price;
     private String description;
 }

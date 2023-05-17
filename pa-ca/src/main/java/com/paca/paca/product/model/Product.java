@@ -1,8 +1,11 @@
 package com.paca.paca.product.model;
 
+import java.math.BigDecimal;
+
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 
 import lombok.*;
+
 import jakarta.persistence.*;
 
 @Builder
@@ -30,7 +33,7 @@ public class Product {
     private String name;
 
     @Column(name = "price")
-    private Float price;
+    private BigDecimal price;
 
     @Column(name = "description")
     private String description;

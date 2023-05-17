@@ -2,16 +2,19 @@ package com.paca.paca.product;
 
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
-import org.junit.jupiter.api.extension.ExtendWith;
 import com.paca.paca.product.utils.ProductMapperImpl;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapperImpl;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import java.math.BigDecimal;
 
 @ExtendWith(SpringExtension.class)
 public class ProductMapperTest {
@@ -108,7 +111,7 @@ public class ProductMapperTest {
 
         // Changing price
         dto = ProductDTO.builder()
-                .price(product.getPrice() + 1f)
+                .price(product.getPrice().add(BigDecimal.valueOf(1)))
                 .build();
         updatedproduct = productMapper.updateModel(dto, product);
         assertThat(updatedproduct).isNotNull();

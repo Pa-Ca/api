@@ -1,6 +1,7 @@
 package com.paca.paca.reservation.model;
 
 import java.util.Date;
+import java.math.BigDecimal;
 
 import com.paca.paca.branch.model.Branch;
 
@@ -30,11 +31,11 @@ public class Reservation {
     private Guest guest;
 
     @Column(name = "request_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date requestDate;
 
     @Column(name = "reservation_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date reservationDate;
 
     @Column(name = "client_number")
@@ -47,11 +48,11 @@ public class Reservation {
     private Integer status;
 
     @Column(name = "pay_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date payDate;
 
     @Column(name = "price")
-    private Float price;
+    private BigDecimal price;
 
     @Column(name = "occasion")
     private String occasion;

@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -105,7 +106,7 @@ class ReservationRepositoryTest extends PacaTest {
                 .payment("69")
                 .status(1)
                 .payDate(new Date(System.currentTimeMillis()))
-                .price(6.9F)
+                .price(BigDecimal.valueOf(6.9F))
                 .occasion("Anniversary")
                 .petition("Candles")
                 .byClient(Boolean.TRUE)
@@ -116,12 +117,13 @@ class ReservationRepositoryTest extends PacaTest {
         assertThat(savedReservation).isNotNull();
         assertThat(savedReservation.getBranch().getId()).isEqualTo(reservation.getBranch().getId());
         assertThat(savedReservation.getGuest().getId()).isEqualTo(reservation.getGuest().getId());
-        assertThat(savedReservation.getRequestDate()).isEqualTo(reservation.getRequestDate());
-        assertThat(savedReservation.getReservationDate()).isEqualTo(reservation.getReservationDate());
+        assertThat(new Date(savedReservation.getRequestDate().getTime())).isEqualTo(reservation.getRequestDate());
+        assertThat(new Date(savedReservation.getReservationDate().getTime()))
+                .isEqualTo(reservation.getReservationDate());
         assertThat(savedReservation.getClientNumber()).isEqualTo(reservation.getClientNumber());
         assertThat(savedReservation.getPayment()).isEqualTo(reservation.getPayment());
         assertThat(savedReservation.getStatus()).isEqualTo(reservation.getStatus());
-        assertThat(savedReservation.getPayDate()).isEqualTo(reservation.getPayDate());
+        assertThat(new Date(savedReservation.getPayDate().getTime())).isEqualTo(reservation.getPayDate());
         assertThat(savedReservation.getPrice()).isEqualTo(reservation.getPrice());
         assertThat(savedReservation.getOccasion()).isEqualTo(reservation.getOccasion());
         assertThat(savedReservation.getPetition()).isEqualTo(reservation.getPetition());

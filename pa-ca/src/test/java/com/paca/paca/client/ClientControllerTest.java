@@ -171,12 +171,18 @@ public class ClientControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(dto.getEmail())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname", CoreMatchers.is(dto.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is(dto.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(dto.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname",
+                        CoreMatchers.is(dto.getSurname())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address",
+                        CoreMatchers.is(dto.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
+                        CoreMatchers.is(dto.getDateOfBirth().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(dto.getStripeCustomerId())));
     }
@@ -205,12 +211,20 @@ public class ClientControllerTest extends ControllerTest {
         mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/" + clientDTO.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(clientDTO.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(clientDTO.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(clientDTO.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname", CoreMatchers.is(clientDTO.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is(clientDTO.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(clientDTO.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(clientDTO.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                        CoreMatchers.is(clientDTO.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                        CoreMatchers.is(clientDTO.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname",
+                        CoreMatchers.is(clientDTO.getSurname())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(clientDTO.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address",
+                        CoreMatchers.is(clientDTO.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
+                        CoreMatchers.is(clientDTO.getDateOfBirth().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(clientDTO.getStripeCustomerId())));
     }
@@ -253,7 +267,8 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ClientDTO clientDTO = utils.createClientDTO(client);
 
-        when(clientService.update(anyLong(), any(ClientDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(clientService.update(anyLong(), any(ClientDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("client");
@@ -280,12 +295,20 @@ public class ClientControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(clientDTO)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(clientDTO.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(clientDTO.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(clientDTO.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname", CoreMatchers.is(clientDTO.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is(clientDTO.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(clientDTO.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(clientDTO.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                        CoreMatchers.is(clientDTO.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                        CoreMatchers.is(clientDTO.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname",
+                        CoreMatchers.is(clientDTO.getSurname())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(clientDTO.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address",
+                        CoreMatchers.is(clientDTO.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
+                        CoreMatchers.is(clientDTO.getDateOfBirth().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(clientDTO.getStripeCustomerId())));
     }
@@ -373,12 +396,20 @@ public class ClientControllerTest extends ControllerTest {
         mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/user/" + client.getUser().getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(clientDTO.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(clientDTO.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(clientDTO.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname", CoreMatchers.is(clientDTO.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", CoreMatchers.is(clientDTO.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address", CoreMatchers.is(clientDTO.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(clientDTO.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                        CoreMatchers.is(clientDTO.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                        CoreMatchers.is(clientDTO.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname",
+                        CoreMatchers.is(clientDTO.getSurname())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(clientDTO.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.address",
+                        CoreMatchers.is(clientDTO.getAddress())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
+                        CoreMatchers.is(clientDTO.getDateOfBirth().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(clientDTO.getStripeCustomerId())));
     }
@@ -611,7 +642,8 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("business");
 
         mockMvc.perform(post(
-                ClientStatics.Endpoint.PATH.concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                ClientStatics.Endpoint.PATH.concat(
+                        "/" + addresser.getId() + "/friend/pending/" + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -631,7 +663,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(post(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + (requester.getId() + 1)))
+                        .concat("/" + addresser.getId() + "/friend/pending/"
+                                + (requester.getId() + 1)))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -650,7 +683,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(post(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                        .concat("/" + addresser.getId() + "/friend/pending/"
+                                + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -668,7 +702,8 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("client");
 
         mockMvc.perform(post(
-                ClientStatics.Endpoint.PATH.concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                ClientStatics.Endpoint.PATH.concat(
+                        "/" + addresser.getId() + "/friend/pending/" + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -687,16 +722,20 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("client");
 
         mockMvc.perform(post(
-                ClientStatics.Endpoint.PATH.concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                ClientStatics.Endpoint.PATH.concat(
+                        "/" + addresser.getId() + "/friend/pending/" + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.requesterId",
                         CoreMatchers.is(dto.getRequesterId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.addresserId",
                         CoreMatchers.is(dto.getAddresserId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.accepted", CoreMatchers.is(dto.getAccepted())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.rejected", CoreMatchers.is(dto.getRejected())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accepted",
+                        CoreMatchers.is(dto.getAccepted())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.rejected",
+                        CoreMatchers.is(dto.getRejected())));
     }
 
     @Test
@@ -710,7 +749,8 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("business");
 
         mockMvc.perform(delete(
-                ClientStatics.Endpoint.PATH.concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                ClientStatics.Endpoint.PATH.concat(
+                        "/" + addresser.getId() + "/friend/pending/" + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -729,7 +769,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(delete(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + (requester.getId() + 1)))
+                        .concat("/" + addresser.getId() + "/friend/pending/"
+                                + (requester.getId() + 1)))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -749,7 +790,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(delete(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                        .concat("/" + addresser.getId() + "/friend/pending/"
+                                + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -767,7 +809,8 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("client");
 
         mockMvc.perform(delete(
-                ClientStatics.Endpoint.PATH.concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()))
+                ClientStatics.Endpoint.PATH.concat(
+                        "/" + addresser.getId() + "/friend/pending/" + requester.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -785,7 +828,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/accept"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/accept"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -805,7 +849,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + (addresser.getId() + 1) + "/friend/pending/" + requester.getId() + "/accept"))
+                        .concat("/" + (addresser.getId() + 1) + "/friend/pending/"
+                                + requester.getId() + "/accept"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -817,14 +862,16 @@ public class ClientControllerTest extends ControllerTest {
         Client addresser = utils.createClient(null);
         Client requester = utils.createClient(null);
 
-        when(clientService.acceptFriendRequest(anyLong(), anyLong())).thenThrow(new NoContentException("message", 0));
+        when(clientService.acceptFriendRequest(anyLong(), anyLong()))
+                .thenThrow(new NoContentException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(addresser));
 
         utils.setAuthorities("client");
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/accept"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/accept"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -836,14 +883,16 @@ public class ClientControllerTest extends ControllerTest {
         Client addresser = utils.createClient(null);
         Client requester = utils.createClient(null);
 
-        when(clientService.acceptFriendRequest(anyLong(), anyLong())).thenThrow(new ConflictException("message", 0));
+        when(clientService.acceptFriendRequest(anyLong(), anyLong()))
+                .thenThrow(new ConflictException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(addresser));
 
         utils.setAuthorities("client");
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/accept"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/accept"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -863,16 +912,20 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/accept"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/accept"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.requesterId",
                         CoreMatchers.is(dto.getRequesterId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.addresserId",
                         CoreMatchers.is(dto.getAddresserId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.accepted", CoreMatchers.is(dto.getAccepted())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.rejected", CoreMatchers.is(dto.getRejected())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accepted",
+                        CoreMatchers.is(dto.getAccepted())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.rejected",
+                        CoreMatchers.is(dto.getRejected())));
     }
 
     @Test
@@ -888,7 +941,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/reject"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/reject"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -908,7 +962,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + (addresser.getId() + 1) + "/friend/pending/" + requester.getId() + "/reject"))
+                        .concat("/" + (addresser.getId() + 1) + "/friend/pending/"
+                                + requester.getId() + "/reject"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -920,14 +975,16 @@ public class ClientControllerTest extends ControllerTest {
         Client addresser = utils.createClient(null);
         Client requester = utils.createClient(null);
 
-        when(clientService.rejectFriendRequest(anyLong(), anyLong())).thenThrow(new NoContentException("message", 0));
+        when(clientService.rejectFriendRequest(anyLong(), anyLong()))
+                .thenThrow(new NoContentException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(addresser));
 
         utils.setAuthorities("client");
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/reject"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/reject"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -939,14 +996,16 @@ public class ClientControllerTest extends ControllerTest {
         Client addresser = utils.createClient(null);
         Client requester = utils.createClient(null);
 
-        when(clientService.rejectFriendRequest(anyLong(), anyLong())).thenThrow(new ConflictException("message", 0));
+        when(clientService.rejectFriendRequest(anyLong(), anyLong()))
+                .thenThrow(new ConflictException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(addresser));
 
         utils.setAuthorities("client");
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/reject"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/reject"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -966,16 +1025,20 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(put(
                 ClientStatics.Endpoint.PATH
-                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId() + "/reject"))
+                        .concat("/" + addresser.getId() + "/friend/pending/" + requester.getId()
+                                + "/reject"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.requesterId",
                         CoreMatchers.is(dto.getRequesterId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.addresserId",
                         CoreMatchers.is(dto.getAddresserId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.accepted", CoreMatchers.is(dto.getAccepted())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.rejected", CoreMatchers.is(dto.getRejected())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accepted",
+                        CoreMatchers.is(dto.getAccepted())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.rejected",
+                        CoreMatchers.is(dto.getRejected())));
     }
 
     @Test
@@ -983,7 +1046,8 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(clientService.getReservations(anyLong())).thenReturn(reservationListDTO);
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
@@ -1002,7 +1066,8 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(clientService.getReservations(anyLong())).thenReturn(reservationListDTO);
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
@@ -1039,7 +1104,8 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(clientService.getReservations(anyLong())).thenReturn(reservationListDTO);
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
@@ -1057,14 +1123,16 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(clientService.getReservationsByDate(anyLong(), any(Date.class))).thenReturn(reservationListDTO);
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1076,14 +1144,16 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(clientService.getReservationsByDate(anyLong(), any(Date.class))).thenReturn(reservationListDTO);
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/" + (client.getId() + 1) + "/reservation/2000-01-01"))
+        mockMvc.perform(get(ClientStatics.Endpoint.PATH
+                .concat("/" + (client.getId() + 1) + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1102,7 +1172,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1114,14 +1185,16 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         reservationDTOList.add(utils.createReservationDTO(null));
-        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList)
+                .build();
 
         when(clientService.getReservationsByDate(anyLong(), any(Date.class))).thenReturn(reservationListDTO);
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/reservation/2000-01-01"))
+        mockMvc.perform(get(
+                ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/reservation/2000-01-01"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservations", CoreMatchers.hasItems()));
@@ -1158,7 +1231,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get(ClientStatics.Endpoint.PATH.concat("/" + (client.getId() + 1) + "/favorite-branches"))
+        mockMvc.perform(get(
+                ClientStatics.Endpoint.PATH.concat("/" + (client.getId() + 1) + "/favorite-branches"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1211,7 +1285,8 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("business");
 
         mockMvc.perform(
-                post(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
+                post(ClientStatics.Endpoint.PATH
+                        .concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1231,7 +1306,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(
                 post(ClientStatics.Endpoint.PATH
-                        .concat("/" + (client.getId() + 1) + "/favorite-branches/" + branch.getId()))
+                        .concat("/" + (client.getId() + 1) + "/favorite-branches/"
+                                + branch.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1243,13 +1319,15 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
 
-        when(clientService.addFavoriteBranch(anyLong(), anyLong())).thenThrow(new NoContentException("message", 0));
+        when(clientService.addFavoriteBranch(anyLong(), anyLong()))
+                .thenThrow(new NoContentException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("client");
 
         mockMvc.perform(
-                post(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
+                post(ClientStatics.Endpoint.PATH
+                        .concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1261,13 +1339,15 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
 
-        when(clientService.addFavoriteBranch(anyLong(), anyLong())).thenThrow(new ConflictException("message", 0));
+        when(clientService.addFavoriteBranch(anyLong(), anyLong()))
+                .thenThrow(new ConflictException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("client");
 
         mockMvc.perform(
-                post(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
+                post(ClientStatics.Endpoint.PATH
+                        .concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1286,10 +1366,12 @@ public class ClientControllerTest extends ControllerTest {
         utils.setAuthorities("client");
 
         mockMvc.perform(
-                post(ClientStatics.Endpoint.PATH.concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
+                post(ClientStatics.Endpoint.PATH
+                        .concat("/" + client.getId() + "/favorite-branches/" + branch.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(branch.getId().intValue())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(branch.getId().intValue())));
     }
 
     @Test
@@ -1323,7 +1405,8 @@ public class ClientControllerTest extends ControllerTest {
 
         mockMvc.perform(
                 delete(ClientStatics.Endpoint.PATH
-                        .concat("/" + (client.getId() + 1) + "/favorite-branches/" + branch.getId()))
+                        .concat("/" + (client.getId() + 1) + "/favorite-branches/"
+                                + branch.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1335,7 +1418,8 @@ public class ClientControllerTest extends ControllerTest {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
 
-        doThrow(new NoContentException("message", 0)).when(clientService).deleteFavoriteBranch(anyLong(), anyLong());
+        doThrow(new NoContentException("message", 0)).when(clientService).deleteFavoriteBranch(anyLong(),
+                anyLong());
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
 
         utils.setAuthorities("client");
@@ -1472,12 +1556,15 @@ public class ClientControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientId",
                         CoreMatchers.is(dto.getClientId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branchId",
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date",
+                        CoreMatchers.is(dto.getDate().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.likes", CoreMatchers.is(dto.getLikes())));
     }
 
@@ -1505,13 +1592,18 @@ public class ClientControllerTest extends ControllerTest {
         mockMvc.perform(get(ReviewStatics.Endpoint.PATH.concat("/" + reviewDTO.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(reviewDTO.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(reviewDTO.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientId",
                         CoreMatchers.is(reviewDTO.getClientId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branchId",
                         CoreMatchers.is(reviewDTO.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(reviewDTO.getText())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.likes", CoreMatchers.is(reviewDTO.getLikes())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.text",
+                        CoreMatchers.is(reviewDTO.getText())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date",
+                        CoreMatchers.is(reviewDTO.getDate().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.likes",
+                        CoreMatchers.is(reviewDTO.getLikes())));
     }
 
     @Test
@@ -1560,7 +1652,8 @@ public class ClientControllerTest extends ControllerTest {
         Review review = utils.createReview(client, null);
         ReviewDTO dto = utils.createReviewDTO(review);
 
-        when(reviewService.update(anyLong(), any(ReviewDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(reviewService.update(anyLong(), any(ReviewDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(clientRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(client));
         when(reviewRepository.existsByIdAndClientId(anyLong(), anyLong())).thenReturn(true);
 
@@ -1590,12 +1683,15 @@ public class ClientControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientId",
                         CoreMatchers.is(dto.getClientId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branchId",
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date",
+                        CoreMatchers.is(dto.getDate().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.likes", CoreMatchers.is(dto.getLikes())));
     }
 
@@ -1680,7 +1776,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(put(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(put(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1699,8 +1796,10 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(put(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + (client.getId() + 1)))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                put(ReviewStatics.Endpoint.PATH
+                        .concat("/" + review.getId() + "/client/" + (client.getId() + 1)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("Unauthorized access for this operation")));
@@ -1716,7 +1815,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(put(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(put(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1733,7 +1833,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(put(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(put(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1751,15 +1852,19 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(put(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(put(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientId",
                         CoreMatchers.is(dto.getClientId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branchId",
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date",
+                        CoreMatchers.is(dto.getDate().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.likes", CoreMatchers.is(dto.getLikes())));
     }
 
@@ -1774,7 +1879,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(delete(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(delete(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1793,8 +1899,10 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(delete(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + (client.getId() + 1)))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                delete(ReviewStatics.Endpoint.PATH
+                        .concat("/" + review.getId() + "/client/" + (client.getId() + 1)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("Unauthorized access for this operation")));
@@ -1810,7 +1918,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(delete(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(delete(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1827,7 +1936,8 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(delete(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(delete(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -1845,15 +1955,19 @@ public class ClientControllerTest extends ControllerTest {
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(delete(ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
+        mockMvc.perform(delete(
+                ReviewStatics.Endpoint.PATH.concat("/" + review.getId() + "/client/" + client.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientId",
                         CoreMatchers.is(dto.getClientId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branchId",
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date",
+                        CoreMatchers.is(dto.getDate().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.likes", CoreMatchers.is(dto.getLikes())));
     }
 

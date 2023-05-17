@@ -23,5 +23,6 @@ public class JwtBlackList {
     private String token;
 
     @Column(name = "expiration")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date expiration;
 }

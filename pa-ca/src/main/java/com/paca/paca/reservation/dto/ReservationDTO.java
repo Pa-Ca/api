@@ -1,6 +1,7 @@
 package com.paca.paca.reservation.dto;
 
 import java.util.Date;
+import java.math.BigDecimal;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,7 @@ public class ReservationDTO {
     private String payment;
     private Integer status;
     private Date payDate;
-    private Float price;
+    private BigDecimal price;
     private String occasion;
     private String petition;
     private Boolean byClient;

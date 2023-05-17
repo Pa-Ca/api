@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.math.BigDecimal;
 
 @Builder
 @Entity
@@ -24,7 +25,7 @@ public class Invoice {
     private Reservation reservation;
 
     @Column(name = "creation_date")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate;
 
     @Column(name = "client_number")
@@ -34,7 +35,7 @@ public class Invoice {
     private String payment;
 
     @Column(name = "price")
-    private Float price;
+    private BigDecimal price;
 
     @Column(name = "payment_code")
     private String paymentCode;

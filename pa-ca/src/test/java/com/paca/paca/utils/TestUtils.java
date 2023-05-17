@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.paca.paca.user.dto.UserRequestDTO;
-import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
@@ -31,8 +29,10 @@ import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
+import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
@@ -269,7 +269,7 @@ public class TestUtils {
                 .stripeCustomerId("stripe_id_test")
                 .phoneNumber("+580000000")
                 .address("Test address")
-                .dateOfBirth(new Date(System.currentTimeMillis()))
+                .dateOfBirth(new java.sql.Date(System.currentTimeMillis()))
                 .build();
         if (clientRepository != null) {
             client = clientRepository.save(client);
@@ -343,12 +343,12 @@ public class TestUtils {
                 .id((long) businessTier.ordinal())
                 .name(businessTier)
                 .reservationLimit(1)
-                .tierCost(1f)
+                .tierCost(BigDecimal.valueOf(1f))
                 .build();
         return tier;
     }
 
-    public Tier createTier(BusinessTier businessTier, int reservationLimit, float tierCost) {
+    public Tier createTier(BusinessTier businessTier, int reservationLimit, BigDecimal tierCost) {
         Tier tier = Tier.builder()
                 .id((long) businessTier.ordinal())
                 .name(businessTier)
@@ -433,8 +433,8 @@ public class TestUtils {
                 .visibility(true)
                 .phoneNumber("test phone")
                 .type("test type")
-                .hourIn(LocalTime.of(8, 0))
-                .hourOut(LocalTime.of(8, 0))
+                .hourIn(LocalTime.of(8, 5, 1))
+                .hourOut(LocalTime.of(8, 5, 1))
                 .build();
 
         if (branchRepository != null) {
@@ -519,6 +519,12 @@ public class TestUtils {
                 .capacity(branch.getCapacity())
                 .reservationPrice(branch.getReservationPrice())
                 .reserveOff(branch.getReserveOff())
+                .averageReserveTime(branch.getAverageReserveTime())
+                .visibility(branch.getVisibility())
+                .phoneNumber(branch.getPhoneNumber())
+                .type(branch.getType())
+                .hourIn(branch.getHourIn())
+                .hourOut(branch.getHourOut())
                 .build();
 
         return dto;
@@ -600,7 +606,7 @@ public class TestUtils {
                 .subCategory(subCategory)
                 .disabled(false)
                 .name("test name")
-                .price(10.0f)
+                .price(BigDecimal.valueOf(10.0f))
                 .description("test description")
                 .build();
 
@@ -702,7 +708,7 @@ public class TestUtils {
                 .client(client)
                 .branch(branch)
                 .text("test text")
-                .date(new Date(System.currentTimeMillis()))
+                .date(new Date())
                 .build();
 
         if (reviewRepository != null) {
@@ -797,7 +803,7 @@ public class TestUtils {
                 .payment("payment_test")
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
-                .price(5.0f)
+                .price(BigDecimal.valueOf(5.0f))
                 .occasion("Anniversary")
                 .petition("Candles")
                 .byClient(Boolean.TRUE)
@@ -825,7 +831,7 @@ public class TestUtils {
                 .payment("payment_test")
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
-                .price(5.0f)
+                .price(BigDecimal.valueOf(5.0f))
                 .occasion("Anniversary")
                 .petition("Candles")
                 .byClient(Boolean.TRUE)

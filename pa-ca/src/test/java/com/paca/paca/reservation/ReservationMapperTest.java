@@ -15,6 +15,7 @@ import com.paca.paca.reservation.utils.ReservationMapperImpl;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.Date;
+import java.math.BigDecimal;
 
 @ExtendWith(SpringExtension.class)
 public class ReservationMapperTest {
@@ -160,7 +161,7 @@ public class ReservationMapperTest {
 
                 // Changing price
                 dto = ReservationDTO.builder()
-                                .price(69.69F)
+                                .price(BigDecimal.valueOf(69.69F))
                                 .build();
                 updatedReservation = reservationMapper.updateModel(dto, reservation);
                 assertThat(updatedReservation).isNotNull();
