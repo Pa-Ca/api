@@ -1201,4 +1201,86 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.branches", CoreMatchers.hasItems()));
     }
 
+    @Test
+    public void shouldGetForbiddenDueToInvalidRoleInGetReservationsPage() throws Exception {
+        // Business business = utils.createBusiness(null);
+        // Branch branch = utils.createBranch(business);
+        // ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
+        // reservationDTOList.add(utils.createReservationDTO(null));
+        // ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+
+        // when(branchService.getReservations(anyLong())).thenReturn(reservationListDTO);
+        // when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+        // when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
+
+        utils.setAuthorities("client");
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                        CoreMatchers.is("Unauthorized access for this operation")));
+    }
+
+
+    @Test
+    public void shouldGetNoContentDueToMissingBranchInGetReservationsPage() throws Exception {
+        
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new NoContentException("Branch with id 1 does not exists", 20));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(20)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Branch with id 1 does not exists")));
+    }
+
+    @Test
+    public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetReservationsPage() throws Exception{
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=-1&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(40)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
+    }
+
+    @Test
+    public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetReservationsPage() throws Exception{
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(41)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
+    }
+
+    @Test
+    public void shouldGetReservationsPageByBranchIdInGetReservationsPage() throws Exception {
+
+        ArrayList<ReservationDTO> dtoList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            dtoList.add(utils.createReservationDTO(null));
+        }
+
+        ReservationListDTO reviewListDTO =  ReservationListDTO.builder().reservations(dtoList).build();
+
+        utils.setAuthorities("business");
+
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenReturn(reviewListDTO);
+
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservations", CoreMatchers.hasItems()));
+    }
+
 }

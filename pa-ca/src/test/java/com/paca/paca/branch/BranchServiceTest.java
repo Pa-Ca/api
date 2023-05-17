@@ -45,6 +45,7 @@ import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
@@ -114,6 +115,9 @@ public class BranchServiceTest {
 
     @Mock
     private ReviewMapper reviewMapper;
+
+    @Mock
+    private ReservationMapper reservationMapper;
 
     @InjectMocks
     private BranchService branchService;
@@ -805,9 +809,6 @@ public class BranchServiceTest {
         int end = Math.min((start + pageable.getPageSize()), reviews.size());
         Page<Review> pagedResult = new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
 
-        // print the pagedResult
-        System.out.println("pagedResult: " + pagedResult);
-
         when(reviewRepository.findAllByBranchId(any(Long.class), any(Pageable.class))).thenReturn(pagedResult);
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(utils.createReviewDTO(null));
 
@@ -879,7 +880,7 @@ public class BranchServiceTest {
             branchService.getBranchesPage(
                     10,
                     10,
-                    "meme",
+                    "invalid_key_string",
                     true,
                     null,
                     null,
@@ -907,7 +908,7 @@ public class BranchServiceTest {
 
         BranchListDTO pageResponse = branchService.getBranchesPage(
                 1,
-                5, // Thsi parameter doestn affect the test
+                5, // This parameter doesn't affect the test
                 "name",
                 true,
                 BigDecimal.valueOf(0.0f),
@@ -918,6 +919,99 @@ public class BranchServiceTest {
         assertThat(pageResponse).isNotNull();
         assertThat(pageResponse.getBranches().size()).isEqualTo(branches.size());
 
+    }
+
+    @Test
+    // We are going to test test the exception when the requested page is from a non existing branch
+    void shouldGetNoContentDueToMissingBranchInGetReservationsPage() {
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        Date date = new Date();
+        Long branchId = 1L;
+        try {
+            branchService.getReservationsPage(branchId, date, 0, 10);
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+        }
+    }
+
+    // Test for getPage method
+    // Lets test the exception when the page is less than 0
+    @Test
+    void shouldGetUnprocessableDueToPageLessThanZeroInGetReservationsPage() {
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        Long branchId = branch.getId();
+        Date date = new Date();
+
+        try {
+            branchService.getReservationsPage(branchId, date, -1, 10);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+        }
+    }
+
+    // Lets test the exception when the size is less than 1
+    @Test
+    void shouldGetUnprocessableDueToSizeLessThanOneInGetReservationsPage() {
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        Long branchId = branch.getId();
+        Date date = new Date();
+
+        try {
+            branchService.getReservationsPage(branchId, date, 1, 0);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof UnprocessableException);
+            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+        }
+    }
+
+
+    // Now lets test the that the getPageReservationsPAge method works as expected
+    // First lets create 20 reservations
+    // Then lets get the first page with 10 reservations
+    // Then lets get the second page with 10 reservations
+    // Check if the first page has 10 reservations
+    // Check if the second page has 10 reservations
+    @Test
+    void shouldGetPageInGetReservationsPage() {
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+        // Mock the branch repository
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        // Get that branch id
+        Long branchId = branch.getId();
+        Pageable pageable = Mockito.mock(Pageable.class);
+        when(pageable.getPageSize()).thenReturn(10);
+        // Create 20 reservations manually
+        List<Reservation> reservations = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            reservations.add(utils.createReservation(null, null));
+        }
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), reservations.size());
+        Page<Reservation> pagedResult = new PageImpl<>(reservations.subList(start, end), pageable, reservations.size());
+        
+        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(any(Long.class), any(Date.class), any(Pageable.class))).thenReturn(pagedResult);
+        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(utils.createReservationDTO(null));
+        
+        Date date = new Date();
+        ReservationListDTO pageResponse = branchService.getReservationsPage(branchId, date , 0, 10);
+        ReservationListDTO pageResponse2 = branchService.getReservationsPage(branchId, date, 1, 10);
+        
+        assertThat(pageResponse).isNotNull();
+        assertThat(pageResponse2).isNotNull();
+        assertThat(pageResponse.getReservations().size()).isEqualTo(10);
+        assertThat(pageResponse2.getReservations().size()).isEqualTo(10);
     }
 
 }

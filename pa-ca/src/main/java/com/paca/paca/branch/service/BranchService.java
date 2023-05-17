@@ -29,6 +29,7 @@ import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.client.repository.ReviewRepository;
@@ -429,5 +430,54 @@ public class BranchService {
 
         // Return a ReviewListDTO object that contains the list of ReviewDTO objects
         return ReviewListDTO.builder().reviews(response).build();
+    }
+
+
+    // This method returns a page of reservations with pagination
+    public ReservationListDTO getReservationsPage(Long id, Date reservationDate, int page, int size) throws UnprocessableException, NoContentException {
+
+        // Now lets add the exeption handling
+        // TODO: Add the corresponding codes to the exceptions
+        if (page < 0) {
+            throw new UnprocessableException(
+                    "Page number cannot be less than zero",
+                    40);
+        }
+        if (size < 1) {
+            throw new UnprocessableException(
+                    "Size cannot be less than one",
+                    41);
+        }
+
+        Optional<Branch> branch = branchRepository.findById(id);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + id + " does not exists",
+                    20);
+        }
+
+        // Create a Pageable object that specifies the page and size parameters as well
+        // as a sort
+        // order for the results
+        Pageable paging = PageRequest.of(
+                page,
+                size,
+                // Sort by id descending
+                Sort.by("reservationDate").descending());
+
+        // Query the database for the appropriate page of results using the findAll
+        // method of the reservation repository
+        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate, paging);// .findAll(paging);
+
+        // Map the results to a list of ReservationDTO objects using the ReservationMapper
+        List<ReservationDTO> response = new ArrayList<>();
+
+        pagedResult.forEach(reservation -> {
+            ReservationDTO dto = reservationMapper.toDTO(reservation);
+            response.add(dto);
+        });
+
+        // Return a ReservationListDTO object that contains the list of ReservationDTO objects
+        return ReservationListDTO.builder().reservations(response).build();
     }
 }
