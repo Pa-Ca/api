@@ -17,5 +17,5 @@ public class UserResponseDTO {
     public String role;
     public String provider;
     public String provider_id;
-    public Integer reservationStatus;
+    public Integer registrationStatus;
 }

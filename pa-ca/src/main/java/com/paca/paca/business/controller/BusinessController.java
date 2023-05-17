@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping(BusinessStatics.Endpoint.PATH)
-@Tag(name = "03. Business", description = "Business Management Controller")
+@Tag(name = "04. Business", description = "Business Management Controller")
 public class BusinessController {
 
     private final BusinessService businessService;

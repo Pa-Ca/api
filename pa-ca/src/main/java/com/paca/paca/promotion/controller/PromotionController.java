@@ -22,6 +22,7 @@ import com.paca.paca.promotion.utils.ValidatePromotionOwnerInterceptor.ValidateP
 import lombok.RequiredArgsConstructor;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @CrossOrigin
@@ -29,24 +30,27 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping(PromotionStatics.Endpoint.PATH)
-@Tag(name = "11. Promotion", description = "Promotion Management Controller")
+@Tag(name = "12. Promotion", description = "Promotion Management Controller")
 public class PromotionController {
 
     private final PromotionService promotionService;
 
     @GetMapping
     @ValidateRoles({})
+    @Operation(summary = "Get all promotions", description = "Returns a list with all promotions")
     public ResponseEntity<PromotionListDTO> getAll() {
         return ResponseEntity.ok(promotionService.getAll());
     }
 
     @PostMapping
     @ValidateRoles({ "business" })
+    @Operation(summary = "Create new promotion", description = "Create a new promotion in the app")
     public ResponseEntity<PromotionDTO> save(@RequestBody PromotionDTO dto) throws NoContentException {
         return ResponseEntity.ok(promotionService.save(dto));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get promotion by ID", description = "Gets the data of a promotion given its ID")
     public ResponseEntity<PromotionDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(promotionService.getById(id));
     }
@@ -54,6 +58,7 @@ public class PromotionController {
     @PutMapping("/{id}")
     @ValidatePromotionOwner
     @ValidateRoles({ "business" })
+    @Operation(summary = "Update promotion", description = "Updates the data of a promotion given its ID")
     public ResponseEntity<PromotionDTO> update(
             @PathVariable("id") Long id,
             @RequestBody PromotionDTO dto)
@@ -64,6 +69,7 @@ public class PromotionController {
     @ValidatePromotionOwner
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @Operation(summary = "Delete promotion", description = "Delete the data of a promotion given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         promotionService.delete(id);
     }

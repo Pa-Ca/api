@@ -1,7 +1,7 @@
 package com.paca.paca.user.controller;
 
-import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.user.dto.UserListDTO;
+import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.user.service.UserService;
 import com.paca.paca.user.statics.UserStatics;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping(UserStatics.Endpoint.PATH)
-@Tag(name = "02. User", description = "User Management Controller")
+@Tag(name = "03. User", description = "User Management Controller")
 public class UserController {
 
     private final UserService userService;

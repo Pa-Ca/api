@@ -22,6 +22,7 @@ import com.paca.paca.product.utils.ValidateProductOwnerInterceptor.ValidateProdu
 import lombok.RequiredArgsConstructor;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @CrossOrigin
@@ -29,24 +30,27 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping(ProductStatics.Endpoint.PATH)
-@Tag(name = "10. Product", description = "Product Management Controller")
+@Tag(name = "11. Product", description = "Product Management Controller")
 public class ProductController {
 
     private final ProductService productService;
 
     @GetMapping
     @ValidateRoles({})
+    @Operation(summary = "Get all products", description = "Returns a list with all products")
     public ResponseEntity<ProductListDTO> getAll() {
         return ResponseEntity.ok(productService.getAll());
     }
 
     @PostMapping
     @ValidateRoles({ "business" })
+    @Operation(summary = "Create new product", description = "Create a new product in the app")
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto) throws NoContentException {
         return ResponseEntity.ok(productService.save(dto));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get product by ID", description = "Gets the data of a product given its ID")
     public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(productService.getById(id));
     }
@@ -54,6 +58,7 @@ public class ProductController {
     @PutMapping("/{id}")
     @ValidateProductOwner
     @ValidateRoles({ "business" })
+    @Operation(summary = "Update product", description = "Updates the data of a product given its ID")
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductDTO dto)
@@ -64,6 +69,7 @@ public class ProductController {
     @ValidateProductOwner
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @Operation(summary = "Delete product", description = "Delete the data of a product given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         productService.delete(id);
     }
