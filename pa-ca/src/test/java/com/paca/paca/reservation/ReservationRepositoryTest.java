@@ -115,7 +115,6 @@ class ReservationRepositoryTest extends PacaTest {
                 .payDate(new Date(System.currentTimeMillis()))
                 .price(BigDecimal.valueOf(6.9F))
                 .occasion("Anniversary")
-                .petition("Candles")
                 .byClient(Boolean.TRUE)
                 .build();
 
@@ -133,7 +132,6 @@ class ReservationRepositoryTest extends PacaTest {
         assertThat(new Date(savedReservation.getPayDate().getTime())).isEqualTo(reservation.getPayDate());
         assertThat(savedReservation.getPrice()).isEqualTo(reservation.getPrice());
         assertThat(savedReservation.getOccasion()).isEqualTo(reservation.getOccasion());
-        assertThat(savedReservation.getPetition()).isEqualTo(reservation.getPetition());
         assertThat(savedReservation.getByClient()).isEqualTo(reservation.getByClient());
     }
 
@@ -169,7 +167,6 @@ class ReservationRepositoryTest extends PacaTest {
         assertThat(expectedReservation.get().getPayDate()).isEqualTo(reservation.getPayDate());
         assertThat(expectedReservation.get().getPrice()).isEqualTo(reservation.getPrice());
         assertThat(expectedReservation.get().getOccasion()).isEqualTo(reservation.getOccasion());
-        assertThat(expectedReservation.get().getPetition()).isEqualTo(reservation.getPetition());
         assertThat(expectedReservation.get().getByClient()).isEqualTo(reservation.getByClient());
     }
 

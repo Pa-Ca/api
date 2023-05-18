@@ -805,7 +805,6 @@ public class TestUtils {
                 .payDate(new Date(System.currentTimeMillis()))
                 .price(BigDecimal.valueOf(5.0f))
                 .occasion("Anniversary")
-                .petition("Candles")
                 .byClient(Boolean.TRUE)
                 .build();
 
@@ -833,7 +832,6 @@ public class TestUtils {
                 .payDate(new Date(System.currentTimeMillis()))
                 .price(BigDecimal.valueOf(5.0f))
                 .occasion("Anniversary")
-                .petition("Candles")
                 .byClient(Boolean.TRUE)
                 .build();
 
@@ -861,7 +859,6 @@ public class TestUtils {
                 .payDate(reservation.getPayDate())
                 .price(reservation.getPrice())
                 .occasion(reservation.getOccasion())
-                .petition(reservation.getPetition())
                 .byClient(reservation.getByClient())
                 .haveGuest(reservation.getGuest() != null)
                 .build();
@@ -966,7 +963,6 @@ public class TestUtils {
                     .payDate(new Date(System.currentTimeMillis()))
                     .price(BigDecimal.valueOf(5.0f))
                     .occasion("Anniversary")
-                    .petition("Candles")
                     .byClient(Boolean.TRUE)
                     .build();
 
