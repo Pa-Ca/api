@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
@@ -243,6 +244,9 @@ public class BranchService {
             ReservationDTO dto = reservationMapper.toDTO(reservation);
             response.add(dto);
         });
+
+        // Sort reservations by date
+        response.sort(Comparator.comparing(ReservationDTO::getReservationDate));
 
         return ReservationListDTO.builder().reservations(response).build();
     }
