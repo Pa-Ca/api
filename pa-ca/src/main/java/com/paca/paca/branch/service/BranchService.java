@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -40,9 +41,12 @@ import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
+import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.reservation.repository.ClientGroupRepository;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
@@ -80,6 +84,10 @@ public class BranchService {
 
     private final ReviewLikeRepository reviewLikeRepository;
 
+    private final GuestRepository guestRepository;
+
+    private final ClientRepository clientRepository;
+
     private final BranchRepository branchRepository;
 
     private final ProductRepository productRepository;
@@ -90,11 +98,13 @@ public class BranchService {
 
     private final ReservationRepository reservationRepository;
 
+    private final ClientGroupRepository clientGroupRepository;
+
+    private final FavoriteBranchRepository favoriteBranchRepository;
+
     private final ProductCategoryRepository productCategoryRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
-
-    private final FavoriteBranchRepository favoriteBranchRepository;
 
     public BranchListDTO getAll() {
         List<BranchDTO> response = new ArrayList<>();
@@ -244,7 +254,13 @@ public class BranchService {
             response.add(dto);
         });
 
-        return ReservationListDTO.builder().reservations(response).build();
+        // Complete reservations
+        List<ReservationDTO> result = response.stream().map(reservation -> {
+            reservation.completeData(guestRepository, clientGroupRepository, clientRepository);
+            return reservation;
+        }).collect(Collectors.toList());
+
+        return ReservationListDTO.builder().reservations(result).build();
     }
 
     public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
@@ -263,7 +279,13 @@ public class BranchService {
                     response.add(dto);
                 });
 
-        return ReservationListDTO.builder().reservations(response).build();
+        // Complete reservations
+        List<ReservationDTO> result = response.stream().map(reservation -> {
+            reservation.completeData(guestRepository, clientGroupRepository, clientRepository);
+            return reservation;
+        }).collect(Collectors.toList());
+
+        return ReservationListDTO.builder().reservations(result).build();
     }
 
     public ClientListDTO getFavoriteClients(Long id) throws NoContentException {
@@ -432,9 +454,9 @@ public class BranchService {
         return ReviewListDTO.builder().reviews(response).build();
     }
 
-
     // This method returns a page of reservations with pagination
-    public ReservationListDTO getReservationsPage(Long id, Date reservationDate, int page, int size) throws UnprocessableException, NoContentException {
+    public ReservationListDTO getReservationsPage(Long id, Date reservationDate, int page, int size)
+            throws UnprocessableException, NoContentException {
 
         // Now lets add the exeption handling
         // TODO: Add the corresponding codes to the exceptions
@@ -467,9 +489,11 @@ public class BranchService {
 
         // Query the database for the appropriate page of results using the findAll
         // method of the reservation repository
-        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate, paging);// .findAll(paging);
+        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id,
+                reservationDate, paging);// .findAll(paging);
 
-        // Map the results to a list of ReservationDTO objects using the ReservationMapper
+        // Map the results to a list of ReservationDTO objects using the
+        // ReservationMapper
         List<ReservationDTO> response = new ArrayList<>();
 
         pagedResult.forEach(reservation -> {
@@ -477,7 +501,14 @@ public class BranchService {
             response.add(dto);
         });
 
-        // Return a ReservationListDTO object that contains the list of ReservationDTO objects
-        return ReservationListDTO.builder().reservations(response).build();
+        // Complete reservations
+        List<ReservationDTO> result = response.stream().map(reservation -> {
+            reservation.completeData(guestRepository, clientGroupRepository, clientRepository);
+            return reservation;
+        }).collect(Collectors.toList());
+
+        // Return a ReservationListDTO object that contains the list of ReservationDTO
+        // objects
+        return ReservationListDTO.builder().reservations(result).build();
     }
 }
