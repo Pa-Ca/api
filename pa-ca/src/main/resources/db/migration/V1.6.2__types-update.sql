@@ -1,4 +1,4 @@
--- -- Date: 2023-05-14
+-- -- Date: 2023-05-17
 
 -- Branch update
 ALTER TABLE branch ADD COLUMN hour_in TIME;

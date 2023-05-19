@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import com.paca.paca.PacaTest;
-import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
+import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.statics.UserStatics;
 import com.paca.paca.auth.dto.SignupRequestDTO;
@@ -17,7 +17,6 @@ import com.paca.paca.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -132,7 +131,6 @@ public class UserIntegrationTest extends PacaTest {
     }
 
     @Test
-    @Disabled
     public void shouldGetAll() throws Exception {
         MvcResult response = mockMvc.perform(get(UserStatics.Endpoint.PATH + UserStatics.Endpoint.GET_ALL)
                 .header("Authorization", "Bearer " + this.adminToken)
@@ -148,7 +146,8 @@ public class UserIntegrationTest extends PacaTest {
                 new TypeReference<List<UserRequestDTO>>() {
                 });
 
-        assertEquals(41, list.size());
+        List<User> users = userRepository.findAll();
+        assertEquals(users.size(), list.size());
     }
 
     @Test
