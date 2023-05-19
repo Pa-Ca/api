@@ -57,9 +57,6 @@ public class Reservation {
     @Column(name = "occasion")
     private String occasion;
 
-    @Column(name = "petition")
-    private String petition;
-
     @Column(name = "by_client")
     private Boolean byClient;
 }

@@ -27,7 +27,6 @@ public class ReservationDTO {
     private Date payDate;
     private BigDecimal price;
     private String occasion;
-    private String petition;
     private Boolean byClient;
     private Boolean haveGuest;
     private String name;
