@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.Review;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ReviewDTO;
@@ -26,27 +28,27 @@ import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.product.utils.ProductMapper;
+import com.paca.paca.branch.statics.BranchStatics;
+import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
-import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.client.repository.ReviewRepository;
+import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
-
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
-import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.product_sub_category.model.ProductCategory;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
-import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
@@ -58,9 +60,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
-
-import com.paca.paca.client.model.Review;
-import com.paca.paca.client.repository.ReviewLikeRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -253,6 +252,8 @@ public class BranchService {
             ReservationDTO dto = reservationMapper.toDTO(reservation);
             response.add(dto);
         });
+        // Sort reservations by date
+        response.sort(Comparator.comparing(ReservationDTO::getReservationDate));
 
         // Complete reservations
         List<ReservationDTO> result = response.stream().map(reservation -> {
