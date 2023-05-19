@@ -65,7 +65,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = true)
     public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.accept(id, auth.getName());
+        reservationService.cancel(id, auth.getName());
     }
 
     @PostMapping("/accept/{id}")
@@ -83,7 +83,16 @@ public class ReservationController {
     @Operation(summary = "Reject a reservation", description = "Reject a reservation given your id")
     public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.accept(id, auth.getName());
+        reservationService.reject(id, auth.getName());
+    }
+
+    @PostMapping("/close/{id}")
+    @ValidateRoles({ "business" })
+    @ValidateReservationOwner(isClientOwner = false)
+    @Operation(summary = "Reject a reservation", description = "Reject a reservation given your id")
+    public void close(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        reservationService.close(id, auth.getName());
     }
 
     @PostMapping("/pay/{id}")
@@ -93,7 +102,7 @@ public class ReservationController {
     public void pay(@PathVariable("id") Long id, @RequestBody ReservationPaymentDTO dto)
             throws ForbiddenException, NoContentException, BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.accept(id, auth.getName());
+        //reservationService.pay(id, auth.getName());
     }
 
     @PutMapping("/{id}")

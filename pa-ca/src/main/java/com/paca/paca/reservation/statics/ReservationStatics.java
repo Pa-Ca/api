@@ -10,11 +10,13 @@ public interface ReservationStatics {
     interface Status {
         int unset = 0;
         int pending = 1;
-        int rejected = 2;
-        int paid = 3;
-        int accepted = 4;
-        int canceled = 5;
-        int closed = 6;
-        int returned = 7;
+        int accepted = 2;
+        int rejected = 3;
+        int closed = 4;
+
+        // Needs an agreement
+        int canceled = 90;
+        int paid = 91;
+        int returned = 92;
     }
 }
