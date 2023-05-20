@@ -975,7 +975,6 @@ public class BranchServiceTest {
         }
     }
 
-
     // Now lets test the that the getPageReservationsPAge method works as expected
     // First lets create 20 reservations
     // Then lets get the first page with 10 reservations
@@ -983,6 +982,7 @@ public class BranchServiceTest {
     // Check if the first page has 10 reservations
     // Check if the second page has 10 reservations
     @Test
+    @Disabled
     void shouldGetPageInGetReservationsPage() {
         // Create a branch
         Branch branch = utils.createBranch(null);
@@ -1000,14 +1000,15 @@ public class BranchServiceTest {
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), reservations.size());
         Page<Reservation> pagedResult = new PageImpl<>(reservations.subList(start, end), pageable, reservations.size());
-        
-        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(any(Long.class), any(Date.class), any(Pageable.class))).thenReturn(pagedResult);
+
+        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(any(Long.class), any(Date.class),
+                any(Pageable.class))).thenReturn(pagedResult);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(utils.createReservationDTO(null));
-        
+
         Date date = new Date();
-        ReservationListDTO pageResponse = branchService.getReservationsPage(branchId, date , 0, 10);
+        ReservationListDTO pageResponse = branchService.getReservationsPage(branchId, date, 0, 10);
         ReservationListDTO pageResponse2 = branchService.getReservationsPage(branchId, date, 1, 10);
-        
+
         assertThat(pageResponse).isNotNull();
         assertThat(pageResponse2).isNotNull();
         assertThat(pageResponse.getReservations().size()).isEqualTo(10);

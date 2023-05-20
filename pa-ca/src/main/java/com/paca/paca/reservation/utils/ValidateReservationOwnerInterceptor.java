@@ -83,7 +83,7 @@ public class ValidateReservationOwnerInterceptor implements HandlerInterceptor {
                 }
             } else {
                 Business business = businessRepository.findByUserEmail(auth.getName()).get();
-                if (reservationRepository.existsByIdAndBranch_Business_Id(reservationId, business.getId())) {
+                if (!reservationRepository.existsByIdAndBranch_Business_Id(reservationId, business.getId())) {
                     throw new ForbiddenException("Unauthorized access for this operation");
                 }
             }
