@@ -982,7 +982,6 @@ public class BranchServiceTest {
     // Check if the first page has 10 reservations
     // Check if the second page has 10 reservations
     @Test
-    @Disabled
     void shouldGetPageInGetReservationsPage() {
         // Create a branch
         Branch branch = utils.createBranch(null);

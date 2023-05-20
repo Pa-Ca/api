@@ -236,7 +236,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.cancel(1L, "loquesea@email.com");
+            reservationService.cancel(1L);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
@@ -254,7 +254,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(reservation.getId(), "loquesea@email.com");
+            reservationService.cancel(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -269,7 +269,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(reservation.getId(), "loquesea@email.com");
+            reservationService.cancel(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -284,7 +284,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(reservation.getId(), "loquesea@email.com");
+            reservationService.cancel(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -299,7 +299,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.cancel(reservation.getId(), "loquesea@email.com");
+            reservationService.cancel(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -317,31 +317,13 @@ public class ReservationServiceTest {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.cancel(reservation.getId(), "loquesea@email.com");
+            reservationService.cancel(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(),
                     "Branch related to reservation with id " + reservation.getBranch().getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 73);
-        }
-    }
-
-    @Test
-    void shouldGetNoContentDueToMissingBusinessInCancelReservation() {
-        Reservation reservation = utils.createReservation(null);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
-
-        try {
-            reservationService.cancel(reservation.getId(), "loquesea@email.com");
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(),
-                    "Business related to user with email " + "loquesea@email.com" + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 74);
         }
     }
 
@@ -352,7 +334,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
@@ -370,7 +352,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -385,7 +367,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -400,7 +382,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -415,7 +397,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -434,32 +416,13 @@ public class ReservationServiceTest {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
+            reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(),
                     "Branch related to reservation with id " + reservation.getBranch().getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 73);
-        }
-    }
-
-    @Test
-    void shouldGetNoContentDueToMissingBusinessInAcceptReservation() {
-        Reservation reservation = utils.createReservation(null);
-        reservation.setStatus(ReservationStatics.Status.paid);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
-
-        try {
-            reservationService.accept(reservation.getId(), "loquesea@email.com");
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(),
-                    "Business related to user with email " + "loquesea@email.com" + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 74);
         }
     }
 
@@ -470,7 +433,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            reservationService.reject(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
@@ -488,7 +451,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            reservationService.reject(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -503,7 +466,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            reservationService.reject(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -518,7 +481,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            reservationService.reject(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -536,31 +499,13 @@ public class ReservationServiceTest {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.reject(reservation.getId(), "loquesea@email.com");
+            reservationService.reject(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(),
                     "Branch related to reservation with id " + reservation.getBranch().getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 73);
-        }
-    }
-
-    @Test
-    void shouldGetNoContentDueToMissingBusinessInRejectReservation() {
-        Reservation reservation = utils.createReservation(null);
-        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
-
-        try {
-            reservationService.reject(reservation.getId(), "loquesea@email.com");
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(),
-                    "Business related to user with email " + "loquesea@email.com" + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 74);
         }
     }
 
@@ -572,7 +517,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            reservationService.pay(reservation.getId(), reservationPaymentDTO);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
@@ -591,7 +536,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            reservationService.pay(reservation.getId(), reservationPaymentDTO);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -606,7 +551,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            reservationService.pay(reservation.getId(), reservationPaymentDTO);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -621,7 +566,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            reservationService.pay(reservation.getId(), reservationPaymentDTO);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -636,7 +581,7 @@ public class ReservationServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.pay(reservation.getId(), "loquesea@email.com", reservationPaymentDTO);
+            reservationService.pay(reservation.getId(), reservationPaymentDTO);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -659,7 +604,7 @@ public class ReservationServiceTest {
     // any(Long.class))).thenReturn(Optional.empty());
     //
     // try {
-    // reservationService.pay(reservation.getId(), "loquesea@email.com",
+    // reservationService.pay(reservation.getId(),
     // reservationPaymentDTO);
     // TestCase.fail();
     // } catch (Exception e) {
