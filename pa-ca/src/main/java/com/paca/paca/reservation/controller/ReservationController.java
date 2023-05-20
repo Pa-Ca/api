@@ -1,7 +1,6 @@
 package com.paca.paca.reservation.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
@@ -64,8 +62,7 @@ public class ReservationController {
     @Operation(summary = "Cancel a reservation", description = "Cancel a reservation given your id")
     @ValidateReservationOwner(isClientOwner = true)
     public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.cancel(id, auth.getName());
+        reservationService.cancel(id);
     }
 
     @PostMapping("/accept/{id}")
@@ -73,8 +70,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @Operation(summary = "Accept a reservation", description = "Accept a reservation given your id")
     public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.accept(id, auth.getName());
+        reservationService.accept(id);
     }
 
     @PostMapping("/reject/{id}")
@@ -82,8 +78,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @Operation(summary = "Reject a reservation", description = "Reject a reservation given your id")
     public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.reject(id, auth.getName());
+        reservationService.reject(id);
     }
 
     @PostMapping("/close/{id}")
@@ -91,8 +86,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @Operation(summary = "Reject a reservation", description = "Reject a reservation given your id")
     public void close(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        reservationService.close(id, auth.getName());
+        reservationService.close(id);
     }
 
     @PostMapping("/pay/{id}")
@@ -101,8 +95,7 @@ public class ReservationController {
     @Operation(summary = "Pay a reservation", description = "Send the payment details of a reservation")
     public void pay(@PathVariable("id") Long id, @RequestBody ReservationPaymentDTO dto)
             throws ForbiddenException, NoContentException, BadRequestException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        //reservationService.pay(id, auth.getName());
+        // reservationService.pay(id);
     }
 
     @PutMapping("/{id}")

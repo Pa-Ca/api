@@ -47,6 +47,10 @@ public class ReservationDTO {
             GuestRepository guestRepository,
             ClientGroupRepository clientGroupRepository,
             ClientRepository clientRepository) {
+        if (guestRepository == null || clientGroupRepository == null || clientRepository == null) {
+            return;
+        }
+
         if (this.guestId != null) {
             // Complete the reservation data with those that appear in the
             // associated guest
