@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "https://business.paca.app", maxAge = 3600)
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AuthenticationStatics.Endpoint.AUTH_PATH)
