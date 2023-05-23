@@ -285,6 +285,7 @@ public class BusinessIntegrationTest extends PacaTest {
                 .type("test type")
                 .hourIn(LocalTime.of(8, 0))
                 .hourOut(LocalTime.of(8, 0))
+                .deleted(false)
                 .build();
         mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
                 .header("Authorization", "Bearer " + token)

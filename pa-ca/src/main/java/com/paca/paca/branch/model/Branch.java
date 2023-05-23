@@ -74,4 +74,7 @@ public class Branch {
 
     @Column(name = "hour_out")
     private LocalTime hourOut;
+
+    @Column(name = "deleted")
+    private Boolean deleted;
 }

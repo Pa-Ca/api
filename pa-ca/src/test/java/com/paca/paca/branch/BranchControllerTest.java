@@ -208,7 +208,9 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hourIn",
                         CoreMatchers.is(dto.getHourIn().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hourOut",
-                        CoreMatchers.is(dto.getHourOut().toString())));
+                        CoreMatchers.is(dto.getHourOut().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted",
+                        CoreMatchers.is(dto.getDeleted())));
     }
 
   @Test
@@ -266,7 +268,9 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hourIn",
                         CoreMatchers.is(dto.getHourIn().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hourOut",
-                        CoreMatchers.is(dto.getHourOut().toString())));
+                        CoreMatchers.is(dto.getHourOut().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted",
+                        CoreMatchers.is(dto.getDeleted())));
     }
 
     @Test
@@ -372,7 +376,9 @@ public class BranchControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hourIn",
                         CoreMatchers.is(dto.getHourIn().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.hourOut",
-                        CoreMatchers.is(dto.getHourOut().toString())));
+                        CoreMatchers.is(dto.getHourOut().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted",
+                        CoreMatchers.is(dto.getDeleted())));
     }
 
     @Test
@@ -1207,21 +1213,23 @@ public class BranchControllerTest extends ControllerTest {
         // Branch branch = utils.createBranch(business);
         // ArrayList<ReservationDTO> reservationDTOList = new ArrayList<>();
         // reservationDTOList.add(utils.createReservationDTO(null));
-        // ReservationListDTO reservationListDTO = ReservationListDTO.builder().reservations(reservationDTOList).build();
+        // ReservationListDTO reservationListDTO =
+        // ReservationListDTO.builder().reservations(reservationDTOList).build();
 
         // when(branchService.getReservations(anyLong())).thenReturn(reservationListDTO);
         // when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        // when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
+        // when(branchRepository.existsByIdAndBusinessId(anyLong(),
+        // anyLong())).thenReturn(true);
 
         utils.setAuthorities("client");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("Unauthorized access for this operation")));
     }
-
 
     @Test
     public void shouldGetNoContentDueToMissingBranchInGetReservationsPage() throws Exception {
@@ -1271,14 +1279,16 @@ public class BranchControllerTest extends ControllerTest {
             dtoList.add(utils.createReservationDTO(null));
         }
 
-        ReservationListDTO reviewListDTO =  ReservationListDTO.builder().reservations(dtoList).build();
+        ReservationListDTO reviewListDTO = ReservationListDTO.builder().reservations(dtoList).build();
 
         utils.setAuthorities("business");
 
-        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenReturn(reviewListDTO);
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt()))
+                .thenReturn(reviewListDTO);
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservations", CoreMatchers.hasItems()));
     }

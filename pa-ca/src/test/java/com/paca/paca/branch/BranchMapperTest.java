@@ -52,6 +52,7 @@ public class BranchMapperTest {
         assertThat(response.getType()).isEqualTo(branch.getType());
         assertThat(response.getHourIn()).isEqualTo(branch.getHourIn());
         assertThat(response.getHourOut()).isEqualTo(branch.getHourOut());
+        assertThat(response.getDeleted()).isEqualTo(branch.getDeleted());
     }
 
     @Test
@@ -78,6 +79,7 @@ public class BranchMapperTest {
         assertThat(branch.getType()).isEqualTo(dto.getType());
         assertThat(branch.getHourIn()).isEqualTo(dto.getHourIn());
         assertThat(branch.getHourOut()).isEqualTo(dto.getHourOut());
+        assertThat(branch.getDeleted()).isEqualTo(dto.getDeleted());
     }
 
     @Test
@@ -211,6 +213,14 @@ public class BranchMapperTest {
         updatedBranch = branchMapper.updateModel(dto, branch);
         assertThat(updatedBranch).isNotNull();
         assertThat(updatedBranch.getHourOut()).isEqualTo(dto.getHourOut());
+
+        // Changing deleted
+        dto = BranchDTO.builder()
+                .deleted(!branch.getDeleted())
+                .build();
+        updatedBranch = branchMapper.updateModel(dto, branch);
+        assertThat(updatedBranch).isNotNull();
+        assertThat(updatedBranch.getDeleted()).isEqualTo(dto.getDeleted());
     }
 
     @Test

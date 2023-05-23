@@ -117,6 +117,7 @@ public class BranchRepositoryTest extends PacaTest {
                 .type("test type")
                 .hourIn(LocalTime.of(8, 0))
                 .hourOut(LocalTime.of(8, 0))
+                .deleted(false)
                 .build();
 
         Branch savedBranch = branchRepository.save(branch);
@@ -137,6 +138,7 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(savedBranch.getType()).isEqualTo(branch.getType());
         assertThat(savedBranch.getHourIn()).isEqualTo(branch.getHourIn());
         assertThat(savedBranch.getHourOut()).isEqualTo(branch.getHourOut());
+        assertThat(savedBranch.getDeleted()).isEqualTo(branch.getDeleted());
     }
 
     @Test
@@ -176,6 +178,7 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(expectedBranch.get().getType()).isEqualTo(branch.getType());
         assertThat(expectedBranch.get().getHourIn()).isEqualTo(branch.getHourIn());
         assertThat(expectedBranch.get().getHourOut()).isEqualTo(branch.getHourOut());
+        assertThat(expectedBranch.get().getDeleted()).isEqualTo(branch.getDeleted());
     }
 
     @Test

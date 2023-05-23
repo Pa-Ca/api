@@ -435,6 +435,7 @@ public class TestUtils {
                 .type("test type")
                 .hourIn(LocalTime.of(8, 5, 1))
                 .hourOut(LocalTime.of(8, 5, 1))
+                .deleted(false)
                 .build();
 
         if (branchRepository != null) {
@@ -492,6 +493,13 @@ public class TestUtils {
                     .capacity(capacities.get(i))
                     .reservationPrice(reservation_prices.get(i))
                     .reserveOff(false)
+                    .averageReserveTime(Duration.ofHours(2).plusMinutes(45))
+                    .visibility(true)
+                    .phoneNumber("test phone")
+                    .type("test type")
+                    .hourIn(LocalTime.of(8, 5, 1))
+                    .hourOut(LocalTime.of(8, 5, 1))
+                    .deleted(false)
                     .build();
 
             if (branchRepository != null) {
@@ -525,6 +533,7 @@ public class TestUtils {
                 .type(branch.getType())
                 .hourIn(branch.getHourIn())
                 .hourOut(branch.getHourOut())
+                .deleted(branch.getDeleted())
                 .build();
 
         return dto;

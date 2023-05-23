@@ -33,4 +33,5 @@ public class BranchDTO {
     private String type;
     private LocalTime hourIn;
     private LocalTime hourOut;
+    private Boolean deleted;
 }
