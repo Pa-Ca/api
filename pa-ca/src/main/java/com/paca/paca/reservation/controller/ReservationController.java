@@ -53,7 +53,7 @@ public class ReservationController {
 
     @PostMapping
     @Operation(summary = "Create new reservation", description = "Create a new reservation in the app")
-    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException {
+    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException, BadRequestException {
         return ResponseEntity.ok(reservationService.save(dto));
     }
 

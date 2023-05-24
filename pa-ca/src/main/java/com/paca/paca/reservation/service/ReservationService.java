@@ -76,7 +76,7 @@ public class ReservationService {
         return dto;
     }
 
-    public ReservationDTO save(ReservationDTO dto) throws NoContentException {
+    public ReservationDTO save(ReservationDTO dto) throws NoContentException, BadRequestException {
         Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
         if (branch.isEmpty()) {
             throw new NoContentException(
@@ -86,6 +86,12 @@ public class ReservationService {
 
         if (dto.getPrice() == null) {
             dto.setStatus(ReservationStatics.Status.paid);
+        }
+
+        if (dto.getByClient() && dto.getClientNumber() > branch.get().getCapacity()){
+            throw new BadRequestException(
+                    "Requested number of client surpass branch " + dto.getBranchId() + " capacity",
+                    20);
         }
 
         Reservation newReservation;
