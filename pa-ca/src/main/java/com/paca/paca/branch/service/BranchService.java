@@ -341,19 +341,19 @@ public class BranchService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44); // Listo en docs
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page size cannot be less than one",
+                    45); // Listo en docs
         }
 
         // Check if sorting_by is in BranchStatics.BranchSortingKeys
         if (!BranchStatics.BranchSortingKeys.contains(sorting_by)) {
             throw new UnprocessableException(
                     "Sorting key is not valid",
-                    42);
+                    46); // Listo en docs
         }
 
         // Create a Pageable object that specifies the page and size parameters as well
@@ -412,12 +412,12 @@ public class BranchService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page size cannot be less than one",
+                    45);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
@@ -464,12 +464,12 @@ public class BranchService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page size cannot be less than one",
+                    45);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);

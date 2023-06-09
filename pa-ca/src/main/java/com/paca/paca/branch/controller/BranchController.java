@@ -11,6 +11,8 @@ import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.sale.dto.SaleListDTO;
+import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -51,6 +53,8 @@ public class BranchController {
     private final BranchService branchService;
 
     private final AmenityService amenityService;
+
+    private final  SaleService saleService;
 
     @GetMapping
     @ValidateRoles({})
@@ -186,6 +190,8 @@ public class BranchController {
         return ResponseEntity.ok(branchService.getReviewsPage(id, page, size));
     }
 
+    // Example get http://yourdomain.com/1/reviews?page=2&size=5
+    // Example with all arguments get http://yourdomain.com/1/reviews?page=2&size=5&sorting_by=score&ascending=true&min_score=3&min_capacity=5
     @GetMapping("/branches")
     @Operation(summary = "Gets a page of branches", description = "Gets a page with the data of branches")
     public ResponseEntity<BranchListDTO> getBranchesPage(
@@ -218,5 +224,31 @@ public class BranchController {
             @RequestParam("size") int size
             ) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(branchService.getReservationsPage(id, reservation_date, page, size));
+    }
+
+    // Example get http://yourdomain.com/1/sales?page=2&size=5
+    // Example with all arguments get http://yourdomain.com/1/sales?page=2&size=5&sorting_by=start_time&ascending=true&status=1&end_date=2020-12-12&start_date=2020-12-12
+    @GetMapping("/{id}/sales")
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Gets a page of the sales of the branch", description = "Gets a page with the data of the sales from an specific branch")
+    public ResponseEntity<SaleListDTO> getSalesPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @PathVariable("id") Long branch_id,
+            @RequestParam("sorting_by") String sorting_by,
+            @RequestParam("ascending") boolean ascending,
+            @RequestParam("status") Integer status,
+            @RequestParam("end_date") Date end_date,
+            @RequestParam("start_date") Date start_date
+            ) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(saleService.getSalesPage(
+                 page,
+                 size,
+                 branch_id,
+                 sorting_by,
+                 ascending,
+                 start_date,
+                 end_date,
+                 status));
     }
 }

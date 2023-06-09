@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SaleProductRepository extends JpaRepository<SaleProduct, Long> {
 
-    List<SaleProduct> findAllbySaleId(long saleId);
+    List<SaleProduct> findAllBySaleId(long saleId);
 }

@@ -13,6 +13,6 @@ public class SaleProductDTO {
     private Long id;
     private Long saleId;
     private Long productId;
-    private Integer  ammount;
+    private Integer ammount;
     private BigDecimal price;
 }

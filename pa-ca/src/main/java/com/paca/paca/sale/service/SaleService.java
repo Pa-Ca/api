@@ -58,19 +58,19 @@ public class SaleService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page Page size cannot be less than one",
+                    45);
         }
 
         // Check if sorting_by is in BranchStatics.BranchSortingKeys
         if (!SaleStatics.SaleSortingKeys.contains(sorting_by)) {
             throw new UnprocessableException(
                     "Sorting key is not valid",
-                    42);
+                    46);
         }
 
         // Create a Pageable object that specifies the page and size parameters as well
@@ -124,7 +124,7 @@ public class SaleService {
         if (branch.isEmpty()) {
             throw new NoContentException(
                     "Branch with id " + dto.getBranchId() + " does not exists",
-                    20);
+                    21); // Lista en docs!
         }
 
         Sale newSale;
@@ -146,25 +146,26 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + id + " does not exists",
-                    27);
+                    42); // Lista en docs
         }
 
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " can't be canceled because it is already closed", 
-                    70);
+                    "Sale with id " + id + " can not be canceled because it is already closed", 43
+                    ); // Lista en docs
         }
-
-
 
         Long branchId = sale.get().getBranch().getId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException("Branch related to sale with id " + branchId + " does not exists", 73);
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    21); // Lista en docs!
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.canceled).build();
         Sale updatedSale = saleMapper.updateModel(dto, sale.get());
         saleRepository.save(updatedSale);
     }
+
 }
