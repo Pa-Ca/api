@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.repository.SaleRepository;
-
+import com.paca.paca.sale.dto.BranchSalesDTO;
 import com.paca.paca.sale.dto.SaleDTO;
 
 import com.paca.paca.sale.dto.SaleListDTO;
@@ -139,7 +139,6 @@ public class SaleService {
         return dtoResponse;
     }
     
-
     public void cancel(Long id) throws NoContentException, BadRequestException {
         Optional<Sale> sale = saleRepository.findById(id);
 
@@ -168,4 +167,107 @@ public class SaleService {
         saleRepository.save(updatedSale);
     }
 
+    public void close(Long id) throws NoContentException, BadRequestException {
+        Optional<Sale> sale = saleRepository.findById(id);
+
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + id + " does not exists",
+                    42); // Lista en docs
+        }
+
+        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+            throw new BadRequestException(
+                    "Sale with id " + id + " can not be closed because it is already closed", 43
+                    ); // Lista en docs
+        }
+
+        // add exception (user cannot close a canceled sale)
+
+        if (sale.get().getStatus().equals(SaleStatics.Status.canceled)){
+            throw new BadRequestException(
+                "Sale with id " + id + " can not be closed because it was canceled", 48
+            );
+        }
+
+        Long branchId = sale.get().getBranch().getId();
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    21); // Lista en docs!
+        }
+
+        SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.closed).build();
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get());
+        saleRepository.save(updatedSale);
+    }
+
+     public BranchSalesDTO getBranchSales(
+            int page,
+            int size,
+            Long branch_id
+            ) throws UnprocessableException, NoContentException {
+
+                Optional<Branch> branch = branchRepository.findById(branch_id);
+                if (branch.isEmpty()) {
+                    throw new NoContentException(
+                            "Branch with id " + branch_id + " does not exists",
+                            21); // Lista en docs!
+                }
+                if (page < 0) {
+                    throw new UnprocessableException(
+                            "Page number cannot be less than zero",
+                            44);
+                }
+                if (size < 1) {
+                    throw new UnprocessableException(
+                            "Page Page size cannot be less than one",
+                            45);
+                }
+                
+                Date start_time = new Date(0);
+                Date end_time = new Date(Long.MAX_VALUE);
+                
+
+                Pageable not_ongoing_sales_paging;
+                
+                not_ongoing_sales_paging = PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("start_time").descending());
+                
+
+                Page<Sale> historicSales = saleRepository.findAllByBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+                branch_id,
+                List.of(SaleStatics.Status.canceled, SaleStatics.Status.closed),
+                start_time,
+                end_time,
+                not_ongoing_sales_paging);
+
+                List<Sale> ongoingSales = saleRepository.findAllByBranchIdAndStatusOrderByStartTimeDesc(
+                    branch_id,
+                    SaleStatics.Status.ongoing
+                );
+                
+                List<SaleDTO> notOngoingSalesDTO = new ArrayList<>();
+                List<SaleDTO> ongoingSalesDTO = new ArrayList<>();
+
+                historicSales.forEach(sale -> {
+                    SaleDTO dto = saleMapper.toDTO(sale);
+                    notOngoingSalesDTO.add(dto);
+                });
+
+                ongoingSales.forEach(sale -> {
+                    SaleDTO dto = saleMapper.toDTO(sale);
+                    ongoingSalesDTO.add(dto);
+                });
+
+                BranchSalesDTO response = BranchSalesDTO.builder()
+                .ongoingSales(ongoingSalesDTO)
+                .historicSales(notOngoingSalesDTO)
+                .build();
+
+                return response;
+            }
 }

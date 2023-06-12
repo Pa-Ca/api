@@ -28,7 +28,6 @@ public interface SaleProductMapper {
     @Mapping(target = "price", ignore = true)
     @Mapping(target = "product", ignore = true)
     @Mapping(target = "sale", ignore = true)
-    @Mapping(target = "ammount", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     SaleProduct updateModel(SaleProductDTO dto, @MappingTarget SaleProduct saleProduct);
 

@@ -21,7 +21,7 @@ public interface SaleStatics {
     interface Status {
         Integer canceled = 0;
         Integer ongoing = 1;
-        Integer closed  = 2;    
+        Integer closed = 2;    
     }
 }
 

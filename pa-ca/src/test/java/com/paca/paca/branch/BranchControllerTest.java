@@ -24,6 +24,7 @@ import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.branch.controller.BranchController;
 import com.paca.paca.branch.controller.AmenityController;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -72,6 +73,9 @@ public class BranchControllerTest extends ControllerTest {
 
     @MockBean
     private AmenityService amenityService;
+
+    @MockBean
+    private SaleService saleService;
 
     private TestUtils utils = TestUtils.builder().build();
 

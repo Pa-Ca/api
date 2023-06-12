@@ -11,7 +11,7 @@ import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
-import com.paca.paca.sale.dto.SaleListDTO;
+import com.paca.paca.sale.dto.BranchSalesDTO;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
@@ -227,28 +227,20 @@ public class BranchController {
     }
 
     // Example get http://yourdomain.com/1/sales?page=2&size=5
-    // Example with all arguments get http://yourdomain.com/1/sales?page=2&size=5&sorting_by=start_time&ascending=true&status=1&end_date=2020-12-12&start_date=2020-12-12
     @GetMapping("/{id}/sales")
     @ValidateRoles({ "business" })
-    @Operation(summary = "Gets a page of the sales of the branch", description = "Gets a page with the data of the sales from an specific branch")
-    public ResponseEntity<SaleListDTO> getSalesPage(
+    @Operation(summary = "Gets all the ongoing sales and the historic sales", description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
+    public ResponseEntity<BranchSalesDTO> getBranchSalesPages(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @PathVariable("id") Long branch_id,
-            @RequestParam("sorting_by") String sorting_by,
-            @RequestParam("ascending") boolean ascending,
-            @RequestParam("status") Integer status,
-            @RequestParam("end_date") Date end_date,
-            @RequestParam("start_date") Date start_date
+            @PathVariable("id") Long branch_id
             ) throws NoContentException, UnprocessableException {
-        return ResponseEntity.ok(saleService.getSalesPage(
+        return ResponseEntity.ok(saleService.getBranchSales(
                  page,
                  size,
-                 branch_id,
-                 sorting_by,
-                 ascending,
-                 start_date,
-                 end_date,
-                 status));
+                 branch_id
+                 ));
     }
+
+
 }
