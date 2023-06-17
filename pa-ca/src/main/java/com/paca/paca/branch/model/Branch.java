@@ -20,7 +20,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "branch")
+@jakarta.persistence.Table(name = "branch")
 public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "branch_seq")
@@ -77,4 +77,7 @@ public class Branch {
 
     @Column(name = "deleted")
     private Boolean deleted;
+
+    @Column(name = "dollar_to_local_currency_exchange")
+    private BigDecimal dollarToLocalCurrencyExchange;
 }

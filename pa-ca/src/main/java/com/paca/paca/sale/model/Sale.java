@@ -1,12 +1,14 @@
 package com.paca.paca.sale.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
+
+import com.paca.paca.reservation.model.Reservation;
 
 import lombok.*;
 
 import jakarta.persistence.*;
 
-import com.paca.paca.branch.model.Branch;
 
 @Builder
 @Entity
@@ -23,8 +25,8 @@ public class Sale {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "branch_id")
-    private Branch branch;
+    @JoinColumn(name = "table_id")
+    private Table table;
 
     @Column(name = "client_quantity")
     private Integer clientQuantity;
@@ -40,6 +42,13 @@ public class Sale {
     @Column(name = "status")
     private Integer status;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "table_name")
+    private String table_name;
+
+    @Column(name = "dollar_to_local_currency_exchange")
+    private BigDecimal dollarToLocalCurrencyExchange;
+
+    @OneToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
 }

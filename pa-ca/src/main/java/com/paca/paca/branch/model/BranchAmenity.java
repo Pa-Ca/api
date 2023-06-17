@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "branch_amenity")
+@jakarta.persistence.Table(name = "branch_amenity")
 public class BranchAmenity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "branch_amenity_seq")

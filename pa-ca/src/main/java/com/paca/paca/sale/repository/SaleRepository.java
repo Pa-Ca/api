@@ -20,21 +20,21 @@ import io.micrometer.common.lang.Nullable;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
 
-    Page<Sale> findAllByBranchIdAndStatusAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+    Page<Sale> findAllByTableBranchIdAndStatusAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
             Long branchId,
             @Nullable Integer status,
             @Nullable Date startTime,
             @Nullable Date endTime,
             Pageable pageable);
     
-    Page<Sale> findAllByBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+    Page<Sale> findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
         Long branchId,
         Collection<Integer> status,
         @Nullable Date startTime,
         @Nullable Date endTime,
         Pageable pageable);
 
-    List<Sale> findAllByBranchIdAndStatusOrderByStartTimeDesc(Long branchId, Integer status);
+    List<Sale> findAllByTableBranchIdAndStatusOrderByStartTimeDesc(Long branchId, Integer status);
 
 }
 
