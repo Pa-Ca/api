@@ -9,14 +9,15 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import com.paca.paca.branch.model.Table;
 
 @Builder
-@Entity
+@jakarta.persistence.Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "sale")
+@jakarta.persistence.Table(name = "sale")
 public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sale_seq")
@@ -51,4 +52,7 @@ public class Sale {
     @OneToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
+
+    @Column(name = "note")
+    private String note;
 }

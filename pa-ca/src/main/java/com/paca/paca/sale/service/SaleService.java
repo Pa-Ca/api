@@ -27,7 +27,9 @@ import com.paca.paca.sale.statics.SaleStatics;
 
 import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
 // Import exceptions
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -43,6 +45,8 @@ public class SaleService {
     private final SaleMapper saleMapper;
 
     private final BranchRepository branchRepository;
+
+    private final TableRepository tableRepository;
 
     public SaleListDTO getSalesPage(int page,
             int size,
@@ -94,13 +98,11 @@ public class SaleService {
         }
         if (end_time == null) {
             end_time = new Date(Long.MAX_VALUE);
-        }
-
-        
+        }  
 
         // Lets apply the filters
         Page<Sale> pagedResult = saleRepository
-                .findAllByBranchIdAndStatusAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+                .findAllByTableBranchIdAndStatusAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
                         branch_id,
                         status,
                         start_time,
@@ -119,17 +121,17 @@ public class SaleService {
 
     public SaleDTO save(SaleDTO dto) throws NoContentException, BadRequestException {
         
-        Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
+        Optional<Table> table = tableRepository.findById(dto.getTableId());
         
-        if (branch.isEmpty()) {
+        if (table.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + dto.getBranchId() + " does not exists",
-                    21); // Lista en docs!
+                    "Table with id " + dto.getTableId() + " does not exists",49
+                    ); // !
         }
 
         Sale newSale;
         
-        newSale = saleMapper.toEntity(dto, branch.get());
+        newSale = saleMapper.toEntity(dto, table.get());
 
         newSale = saleRepository.save(newSale);
 
@@ -154,12 +156,12 @@ public class SaleService {
                     ); // Lista en docs
         }
 
-        Long branchId = sale.get().getBranch().getId();
-        Optional<Branch> branch = branchRepository.findById(branchId);
-        if (branch.isEmpty()) {
+        Long tableId = sale.get().getTable().getId();
+        Optional<Table> table = tableRepository.findById(tableId);
+        if (table.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + branchId + " does not exists",
-                    21); // Lista en docs!
+                    "Table with id " + tableId + " does not exists",
+                    49); // Lista en docs!
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.canceled).build();
@@ -190,12 +192,12 @@ public class SaleService {
             );
         }
 
-        Long branchId = sale.get().getBranch().getId();
-        Optional<Branch> branch = branchRepository.findById(branchId);
-        if (branch.isEmpty()) {
+        Long tableId = sale.get().getTable().getId();
+        Optional<Table> table = tableRepository.findById(tableId);
+        if (table.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + branchId + " does not exists",
-                    21); // Lista en docs!
+                    "Table with id " + tableId + " does not exists",49
+                    ); // Lista en docs!
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.closed).build();
@@ -238,14 +240,14 @@ public class SaleService {
                         Sort.by("start_time").descending());
                 
 
-                Page<Sale> historicSales = saleRepository.findAllByBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+                Page<Sale> historicSales = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
                 branch_id,
                 List.of(SaleStatics.Status.canceled, SaleStatics.Status.closed),
                 start_time,
                 end_time,
                 not_ongoing_sales_paging);
 
-                List<Sale> ongoingSales = saleRepository.findAllByBranchIdAndStatusOrderByStartTimeDesc(
+                List<Sale> ongoingSales = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
                     branch_id,
                     SaleStatics.Status.ongoing
                 );

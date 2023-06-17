@@ -17,6 +17,10 @@ public class DefaultTax {
     @Column(name = "id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     @Column(name = "name")
     private String name;
 
@@ -26,9 +30,7 @@ public class DefaultTax {
     @Column(name = "value")
     private Float value;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "branch_id")
-    private Branch branch;
+    
 
 };
 

@@ -436,6 +436,7 @@ public class TestUtils {
                 .hourIn(LocalTime.of(8, 5, 1))
                 .hourOut(LocalTime.of(8, 5, 1))
                 .deleted(false)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
                 .build();
 
         if (branchRepository != null) {
@@ -500,6 +501,7 @@ public class TestUtils {
                     .hourIn(LocalTime.of(8, 5, 1))
                     .hourOut(LocalTime.of(8, 5, 1))
                     .deleted(false)
+                    .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
                     .build();
 
             if (branchRepository != null) {
