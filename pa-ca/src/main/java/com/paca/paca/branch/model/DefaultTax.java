@@ -29,9 +29,6 @@ public class DefaultTax {
 
     @Column(name = "value")
     private Float value;
-
-    
-
 };
 
 

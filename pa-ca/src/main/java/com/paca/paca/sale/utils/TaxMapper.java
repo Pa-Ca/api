@@ -15,10 +15,10 @@ public interface TaxMapper {
     @Mapping(target = "sale", ignore = true)
     Tax toEntity(TaxDTO dto);
 
-    default Sale toEntity(TaxDTO dto, Sale sale) {
-        Tax saleProduct = toEntity(dto);
-        saleProduct.setSale(sale);
-        return sale;
+    default Tax toEntity(TaxDTO dto, Sale sale) {
+        Tax tax = toEntity(dto);
+        tax.setSale(sale);
+        return tax;
     }
 
     @Mapping(target = "id", ignore = true)

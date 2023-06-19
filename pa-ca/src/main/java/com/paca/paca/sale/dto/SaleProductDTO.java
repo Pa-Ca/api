@@ -11,6 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 public class SaleProductDTO {
     private Long id;
+    private String name;
     private Long saleId;
     private Long productId;
     private Integer ammount;

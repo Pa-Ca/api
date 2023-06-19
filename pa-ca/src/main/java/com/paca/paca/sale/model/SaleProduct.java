@@ -23,6 +23,9 @@ public class SaleProduct {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "sale_id")
     private Sale sale;
@@ -36,4 +39,5 @@ public class SaleProduct {
 
     @Column(name = "price")
     private BigDecimal price;
+  
 }

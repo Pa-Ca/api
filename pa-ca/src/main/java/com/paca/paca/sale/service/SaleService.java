@@ -215,7 +215,7 @@ public class SaleService {
                 if (branch.isEmpty()) {
                     throw new NoContentException(
                             "Branch with id " + branch_id + " does not exists",
-                            21); // Lista en docs!
+                            21);
                 }
                 if (page < 0) {
                     throw new UnprocessableException(
