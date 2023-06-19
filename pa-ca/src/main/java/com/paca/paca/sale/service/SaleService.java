@@ -205,7 +205,48 @@ public class SaleService {
         saleRepository.save(updatedSale);
     }
 
-     public BranchSalesDTO getBranchSales(
+    public SaleDTO update(SaleDTO dto) throws NoContentException, BadRequestException {
+        
+        // Check if the sale exists
+        Optional<Sale> sale = saleRepository.findById(dto.getId());
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + dto.getId() + " does not exists",
+                    42); // Lista en docs
+        }
+
+        // Check if the table exists
+        Optional<Table> table = tableRepository.findById(dto.getTableId());
+        if (table.isEmpty()) {
+            throw new NoContentException(
+                    "Table with id " + dto.getTableId() + " does not exists",
+                    49); // Lista en docs!
+        }
+
+        // Check if the sale is closed
+        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+            throw new BadRequestException(
+                    "Sale with id " + dto.getId() + " can not be updated because it is already closed", 43
+                    ); // Lista en docs
+        }
+
+        // Check if the sale is canceled
+        if (sale.get().getStatus().equals(SaleStatics.Status.canceled)) {
+            throw new BadRequestException(
+                    "Sale with id " + dto.getId() + " can not be updated because it was canceled", 48
+                    ); // Lista en docs
+        }
+
+        // Update the sale
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get());
+        updatedSale = saleRepository.save(updatedSale);
+        SaleDTO dtoResponse = saleMapper.toDTO(updatedSale);
+
+
+        return dtoResponse;
+    }
+
+    public BranchSalesDTO getBranchSales(
             int page,
             int size,
             Long branch_id
