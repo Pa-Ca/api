@@ -23,4 +23,7 @@ public class Table {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 }

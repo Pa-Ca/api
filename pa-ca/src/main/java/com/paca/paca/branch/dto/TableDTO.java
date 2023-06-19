@@ -15,4 +15,5 @@ public class TableDTO {
     private Long id;
     private String name;
     private Long branchId; 
+    private boolean deleted;
 }

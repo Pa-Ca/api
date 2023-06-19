@@ -4,6 +4,7 @@ CREATE TABLE "table"(
     id INT NOT NULL,
     branch_id INT NOT NULL,
     name VARCHAR(128) NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT table_pk PRIMARY KEY (id),
     CONSTRAINT table_branch_fk FOREIGN KEY (branch_id) REFERENCES branch (id)
 );
@@ -26,7 +27,8 @@ CREATE TABLE sale (
 CREATE TABLE sale_product (
     id INT NOT NULL,
     sale_id INT NOT NULL,
-    product_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    product_id INT NULL,
     ammount INT NOT NULL,
     price FLOAT,
     CONSTRAINT sale_product_pk PRIMARY KEY (id),
