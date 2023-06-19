@@ -1,0 +1,61 @@
+name: Backend Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  JAVA_VERSION: 1.17
+jobs:
+  build:
+    name: Build Image
+    runs-on: [self-hosted, paca]
+    outputs:
+      BUILD_NUMBER: ${{steps.build-number.outputs.BUILD_NUMBER}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEM }}
+
+      - name: Build Number
+        id: build-number
+        run: echo "BUILD_NUMBER=$(date '+%-d.%-m.%Y.%-H.%-M.%-S')" >> $GITHUB_OUTPUT
+
+      - name: Run maven package script
+        id: maven-build
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}} -t ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:${{steps.build-number.outputs.BUILD_NUMBER}}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest
+
+  cd:
+    name: Deployment into server
+    needs: build
+    runs-on: [self-hosted, paca]
+    steps:
+      - name: deploy new backend image
+        if: ${{ always() }}
+        run: |
+          docker rm -f paca-api; 
+          docker run -e DB_HOSTNAME=${{secrets.DATABASE_HOSTNAME}} \
+          -e GOOGLE_EMAIL_FROM=${{secrets.GOOGLE_EMAIL_FROM}} \
+          -e GOOGLE_EMAIL_PASSWORD=${{secrets.GOOGLE_EMAIL_PASSWORD}} \
+          -e AUTH_REFRESH_EXPIRATION=${{secrets.AUTH_REFRESH_EXPIRATION}} \
+          -e AUTH_RESET_PASSWORD_EXPIRATION=${{secrets.AUTH_RESET_PASSWORD_EXPIRATION}} \
+          -e AUTH_SECRET_KEY=${{secrets.AUTH_SECRET_KEY}} \
+          -e AUTH_TOKEN_EXPIRATION=${{secrets.AUTH_TOKEN_EXPIRATION}} \
+          -e AUTH_VERIFY_EMAIL_EXPIRATION=${{secrets.AUTH_VERIFY_EMAIL_EXPIRATION}} \
+          -e GOOGLE_CLIENT_ID=${{secrets.GOOGLE_CLIENT_ID}} \
+          -e SPRING_DATASOURCE_URL=${{secrets.SPRING_DATASOURCE_URL}} \
+          -e SPRING_DATASOURCE_USERNAME=${{secrets.SPRING_DATASOURCE_USERNAME}} \
+          -e SPRING_DATASOURCE_PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}} \
+          -d --network host --name paca-api ${{ secrets.DOCKERHUB_USERNAME }}/paca-api:latest

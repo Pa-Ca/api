@@ -1,20 +1,47 @@
 version: '3'
+
 services:
   postgres:
-    image: postgres:12
+    image: postgres:15
+    restart: always
     environment:
-      - POSTGRES_USER=postgress
-      - POSTGRES_PASSWORD=postgress
-      - POSTGRES_DB=paca_db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - default
+
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.local
     ports:
       - "8080:8080"
     depends_on:
       - postgres
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/paca_db
-      - SPRING_DATASOURCE_USERNAME=postgress
-      - SPRING_DATASOURCE_PASSWORD=postgress
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
+      - GOOGLE_EMAIL_FROM=${GOOGLE_EMAIL_FROM}
+      - GOOGLE_EMAIL_PASSWORD=${GOOGLE_EMAIL_PASSWORD}
+
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY}
+      - AUTH_TOKEN_EXPIRATION=${AUTH_TOKEN_EXPIRATION}
+      - AUTH_REFRESH_EXPIRATION=${AUTH_REFRESH_EXPIRATION}
+      - AUTH_VERIFY_EMAIL_EXPIRATION=${AUTH_VERIFY_EMAIL_EXPIRATION}
+      - AUTH_RESET_PASSWORD_EXPIRATION=${AUTH_RESET_PASSWORD_EXPIRATION}
+      
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge

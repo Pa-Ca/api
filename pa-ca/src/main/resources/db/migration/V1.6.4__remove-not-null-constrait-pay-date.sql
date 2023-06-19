@@ -1,0 +1,4 @@
+-- Date: 2023-05-18
+
+ALTER TABLE reservation
+ALTER COLUMN pay_date DROP NOT NULL;
