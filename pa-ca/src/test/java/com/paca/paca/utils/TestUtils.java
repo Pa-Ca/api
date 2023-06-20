@@ -19,6 +19,7 @@ import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.client.dto.ClientDTO;
@@ -32,6 +33,7 @@ import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.reservation.dto.GuestDTO;
@@ -41,6 +43,7 @@ import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
+import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
@@ -54,7 +57,9 @@ import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.branch.repository.TableRepository;
+import com.paca.paca.branch.statics.DefaultTaxStatics;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.reservation.dto.ReservationPaymentDTO;
@@ -71,10 +76,13 @@ import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.model.SaleProduct;
+import com.paca.paca.sale.model.Tax;
 import com.paca.paca.sale.dto.SaleProductDTO;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.sale.statics.SaleStatics;
+import com.paca.paca.sale.statics.TaxStatics;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
@@ -122,6 +130,8 @@ public class TestUtils {
     BusinessRepository businessRepository;
 
     TableRepository tableRepository;
+
+    DefaultTaxRepository defaultTaxRepository;
 
     SaleRepository saleRepository;
 
@@ -1003,6 +1013,46 @@ public class TestUtils {
         return reservations;
     }
 
+    // Create a new Tax
+    public Tax createTax(Sale sale){
+        
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        Tax tax = Tax.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .sale(sale)
+                .name("Tax")
+                .type(TaxStatics.Types.PERCENTAGE)
+                .value(50.f)
+                .build();
+
+        return tax;
+    }
+
+    // Create a new DefaultTax
+    public DefaultTax createDefaultTax(Branch branch){
+        
+        // If the branch is null, create a new one
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        DefaultTax defaultTax = DefaultTax.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .name("Default Tax")
+                .type(DefaultTaxStatics.Types.PERCENTAGE)
+                .build();
+
+        if (defaultTaxRepository != null) {
+            defaultTax = defaultTaxRepository.save(defaultTax);
+        }
+
+        return defaultTax;
+    }
+
     public Table createTable(Branch branch){
         if (branch == null) {
             branch = createBranch(null);
@@ -1124,7 +1174,7 @@ public class TestUtils {
         return dto;
     }
 
-    public TableDTO creTableDTO(Branch branch){
+    public TableDTO createTableDTO(Branch branch){
         if (branch == null) {
             branch = createBranch(null);
         }
@@ -1138,4 +1188,41 @@ public class TestUtils {
 
         return dto;
     }
+
+    public DefaultTaxDTO createDefaultTaxDTO(Branch branch){
+
+        // If the branch is null, create a new one
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        DefaultTaxDTO dto = DefaultTaxDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branchId(branch.getId())
+                .name("Default Tax")
+                .type(DefaultTaxStatics.Types.PERCENTAGE)
+                .value(5.0f)
+                .build();
+
+        return dto;
+    }
+
+    public TaxDTO createTaxDTO(Sale sale){
+
+        // If the branch is null, create a new one
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        TaxDTO dto = TaxDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .saleId(sale.getId())
+                .name("Tax")
+                .type(TaxStatics.Types.PERCENTAGE)
+                .value(5.0f)
+                .build();
+
+        return dto;
+    }
+
 }
