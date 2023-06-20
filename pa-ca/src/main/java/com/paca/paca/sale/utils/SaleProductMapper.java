@@ -2,6 +2,7 @@ package com.paca.paca.sale.utils;
 
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.model.SaleProduct;
+import com.paca.paca.product.model.Product;
 import com.paca.paca.sale.dto.SaleProductDTO;
 
 import org.mapstruct.*;
@@ -17,11 +18,12 @@ public interface SaleProductMapper {
     @Mapping(target = "product", ignore = true)
     SaleProduct toEntity(SaleProductDTO dto);
 
-    default Sale toEntity(SaleProductDTO dto, Sale sale) {
+    default SaleProduct toEntity(SaleProductDTO dto, Sale sale, Product product) {
         SaleProduct saleProduct = toEntity(dto);
         saleProduct.setSale(sale);
+        saleProduct.setProduct(product);
 
-        return sale;
+        return saleProduct;
     }
 
     @Mapping(target = "id", ignore = true)

@@ -131,12 +131,11 @@ public class SaleService {
 
         Sale newSale;
         
-        newSale = saleMapper.toEntity(dto, table.get());
+        newSale = saleMapper.toEntity(dto, table.get(), null);
 
         newSale = saleRepository.save(newSale);
 
         SaleDTO dtoResponse = saleMapper.toDTO(newSale);
-        // dtoResponse.completeData(guestRepository, clientGroupRepository, clientRepository);
 
         return dtoResponse;
     }
