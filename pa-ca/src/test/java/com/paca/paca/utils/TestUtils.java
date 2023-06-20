@@ -19,6 +19,7 @@ import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
@@ -40,6 +41,7 @@ import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
+import com.paca.paca.branch.model.Table;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.reservation.model.ClientGroup;
@@ -52,6 +54,7 @@ import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.reservation.dto.ReservationPaymentDTO;
@@ -65,6 +68,13 @@ import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.SaleDTO;
+import com.paca.paca.sale.model.SaleProduct;
+import com.paca.paca.sale.dto.SaleProductDTO;
+import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.product_sub_category.model.ProductSubCategory;
 import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
 import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
@@ -110,6 +120,12 @@ public class TestUtils {
     ProductRepository productRepository;
 
     BusinessRepository businessRepository;
+
+    TableRepository tableRepository;
+
+    SaleRepository saleRepository;
+
+    SaleProductRepository saleProductRepository;
 
     PromotionRepository promotionRepository;
 
@@ -985,5 +1001,141 @@ public class TestUtils {
         }
 
         return reservations;
+    }
+
+    public Table createTable(Branch branch){
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        Table table = Table.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .name("Table 1")
+                .deleted(false)
+                .build();
+
+        if (tableRepository != null) {
+            table = tableRepository.save(table);
+        }
+
+        return table;
+    }
+
+
+    public Sale createSale(Table table, Reservation reservation){
+        
+        // If the table is null, create a new one
+        if (table == null) {
+            table = createTable(null);
+        }
+
+        // If the reservation is null, create a new one
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        Sale sale = Sale.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .table(table)
+                .tableName(table.getName())
+                .startTime(new Date(System.currentTimeMillis()))
+                .endTime(null)
+                .status(SaleStatics.Status.ongoing)
+                .reservation(reservation)
+                .build();
+        
+        if (saleRepository != null) {
+            sale = saleRepository.save(sale);
+        }
+        return sale;
+    }
+
+    public SaleProduct createSaleProduct(Sale sale, Product product){
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        if (product == null) {
+            product = createProduct(null);
+        }
+
+
+        SaleProduct saleProduct = SaleProduct.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .sale(sale)
+                .name(product.getName())
+                .price(BigDecimal.valueOf(5.0f))
+                .ammount(5)
+                .product(product)
+                .build();
+
+        if (saleProductRepository != null) {
+            saleProduct = saleProductRepository.save(saleProduct);
+        }
+
+        return saleProduct;
+    }
+
+    public SaleDTO createSaleDTO(Table table, Reservation reservation){
+        
+        // If the table is null, create a new one
+        if (table == null) {
+            table = createTable(null);
+        }
+
+        // If the reservation is null, create a new one
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        SaleDTO dto = SaleDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .tableId(table.getId())
+                .tableName(table.getName())
+                .startTime(new Date(System.currentTimeMillis()))
+                .endTime(null)
+                .status(SaleStatics.Status.ongoing)
+                .reservationId(reservation.getId())
+                .build();
+        
+        return dto;
+    }
+
+    public SaleProductDTO createSaleProductDTO(Sale sale, Product product){
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        if (product == null) {
+            product = createProduct(null);
+        }
+
+        SaleProductDTO dto = SaleProductDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .saleId(sale.getId())
+                .name(product.getName())
+                .price(BigDecimal.valueOf(5.0f))
+                .ammount(5)
+                .productId(product.getId())
+                .build();
+        
+
+        return dto;
+    }
+
+    public TableDTO creTableDTO(Branch branch){
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        TableDTO dto = TableDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branchId(branch.getId())
+                .name("Table 1")
+                .deleted(false)
+                .build();
+
+        return dto;
     }
 }
