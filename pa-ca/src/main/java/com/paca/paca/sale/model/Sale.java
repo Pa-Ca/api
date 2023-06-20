@@ -44,7 +44,7 @@ public class Sale {
     private Integer status;
 
     @Column(name = "table_name")
-    private String table_name;
+    private String tableName;
 
     @Column(name = "dollar_to_local_currency_exchange")
     private BigDecimal dollarToLocalCurrencyExchange;
