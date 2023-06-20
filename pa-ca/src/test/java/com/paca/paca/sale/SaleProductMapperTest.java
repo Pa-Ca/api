@@ -5,7 +5,6 @@ import com.paca.paca.product.model.Product;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.model.SaleProduct;
-import com.paca.paca.sale.utils.SaleMapperImpl;
 import com.paca.paca.sale.utils.SaleProductMapperImpl;
 
 import org.mockito.InjectMocks;
