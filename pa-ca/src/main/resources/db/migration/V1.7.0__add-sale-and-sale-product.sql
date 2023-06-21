@@ -16,6 +16,8 @@ CREATE TABLE sale (
     table_id int NOT NULL,
     start_time timestamp NOT NULL,
     end_time timestamp DEFAULT NULL,
+    status INT NOT NULL,
+    table_name VARCHAR(128) NOT NULL,
     note VARCHAR(2048) DEFAULT NULL,
     reservation_id int DEFAULT NULL,
     dollar_to_local_currency_exchange DECIMAL(16, 4) NOT NULL DEFAULT 1.0,
@@ -55,7 +57,6 @@ CREATE TABLE default_tax(
     type int,
     -- 0: percentage, 1: fixed
     value DECIMAL(16, 4) NOT NULL,
-    sale_id INT NOT NULL,
     -- Preguntar por este id  
     branch_id INT NOT NULL,
     CONSTRAINT default_tax_pk PRIMARY KEY (id),
@@ -69,11 +70,11 @@ ADD
     COLUMN dollar_to_local_currency_exchange DECIMAL(16, 4) NOT NULL DEFAULT 1.0;
 
 -- We create the sequences 
-CREATE SEQUENCE IF NOT EXISTS tax MINVALUE 1 START WITH 1000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS tax_seq MINVALUE 1 START WITH 1000 INCREMENT BY 1;
 
-CREATE SEQUENCE IF NOT EXISTS default_tax MINVALUE 1 START WITH 1000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS default_tax_seq MINVALUE 1 START WITH 1000 INCREMENT BY 1;
 
-CREATE SEQUENCE IF NOT EXISTS "table" MINVALUE 1 START WITH 1000 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS table_seq MINVALUE 1 START WITH 1000 INCREMENT BY 1;
 
 CREATE SEQUENCE IF NOT EXISTS sale_seq MINVALUE 1 START WITH 1000 INCREMENT BY 1;
 

@@ -17,15 +17,25 @@ import org.springframework.stereotype.Service;
 
 
 import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.model.SaleProduct;
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.sale.dto.BranchSalesDTO;
+import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.dto.SaleDTO;
-
-import com.paca.paca.sale.dto.SaleListDTO;
-
+import com.paca.paca.sale.dto.SaleProductDTO;
+import com.paca.paca.sale.dto.SaleProductListDTO;
+import com.paca.paca.sale.dto.TaxDTO;
+import com.paca.paca.sale.dto.TaxListDTO;
 import com.paca.paca.sale.statics.SaleStatics;
 
+import com.paca.paca.sale.dto.SaleInfoDTO;
+
+
 import com.paca.paca.sale.utils.SaleMapper;
+import com.paca.paca.sale.utils.SaleProductMapper;
+import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.repository.BranchRepository;
@@ -43,80 +53,64 @@ public class SaleService {
 
     private final SaleRepository saleRepository;
     private final SaleMapper saleMapper;
+    private final TaxMapper taxMapper;
 
     private final BranchRepository branchRepository;
 
     private final TableRepository tableRepository;
 
-    public SaleListDTO getSalesPage(int page,
-            int size,
-            Long branch_id,
-            String sorting_by,
-            boolean ascending,
-            Date start_time,
-            Date end_time,
-            Integer status
-            ) throws UnprocessableException, NoContentException {
+    private final TaxRepository taxRepository;
 
-        // Now lets add the exeption handling
-        if (page < 0) {
-            throw new UnprocessableException(
-                    "Page number cannot be less than zero",
-                    44);
-        }
-        if (size < 1) {
-            throw new UnprocessableException(
-                    "Page Page size cannot be less than one",
-                    45);
-        }
+    private final SaleProductRepository saleProductRepository;
 
-        // Check if sorting_by is in BranchStatics.BranchSortingKeys
-        if (!SaleStatics.SaleSortingKeys.contains(sorting_by)) {
-            throw new UnprocessableException(
-                    "Sorting key is not valid",
-                    46);
-        }
+    private final SaleProductMapper saleProductMapper;
 
-        // Create a Pageable object that specifies the page and size parameters as well
-        // as a sort
-        // order for the results
-        Pageable paging;
-        if (ascending) {
-            paging = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by(sorting_by).ascending());
-        } else {
-            paging = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by(sorting_by).descending());
-        }
+    public TaxListDTO getTaxesBySaleId(Long saleId) {
+        // Check if the sale exists
+        Optional<Sale> sale = saleRepository.findById(saleId);
+        if (sale.isEmpty()) {
+                    throw new NoContentException(
+                            "Sale with id " + saleId + " does not exists",
+                            42);
+                }
+        
+        // Get the taxes
+        List<Tax> taxes = taxRepository.findAllBySaleId(saleId);
 
-        if (start_time == null) {
-            start_time = new Date(0);
-        }
-        if (end_time == null) {
-            end_time = new Date(Long.MAX_VALUE);
-        }  
+        // Map the taxes to DTOs
+        List<TaxDTO> response = new ArrayList<>();
 
-        // Lets apply the filters
-        Page<Sale> pagedResult = saleRepository
-                .findAllByTableBranchIdAndStatusAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
-                        branch_id,
-                        status,
-                        start_time,
-                        end_time,
-                        paging);
-
-        List<SaleDTO> response = new ArrayList<>();
-
-        pagedResult.forEach(sale -> {
-            SaleDTO dto = saleMapper.toDTO(sale);
+        for (Tax tax : taxes) {
+            TaxDTO dto = taxMapper.toDTO(tax);
             response.add(dto);
-        });
+        }
 
-        return SaleListDTO.builder().sales(response).build();
+        // Return the DTOs
+        return TaxListDTO.builder().taxes(response).build();
+    }
+
+    public SaleProductListDTO getSaleProductsbySaleId(long saleId)
+            throws BadRequestException{
+
+        // Check if the sale exists
+        Optional<Sale> sale = saleRepository.findById(saleId);
+        if (!sale.isPresent()) {
+            throw new BadRequestException("Sale with id " + saleId + " does not exist", 42);
+        }
+
+        // Get the products
+        List<SaleProduct> saleProducts = saleProductRepository.findAllBySaleId(saleId);
+
+        // Map the products to DTOs
+        List<SaleProductDTO> response = new ArrayList<>();
+        for (SaleProduct saleProduct : saleProducts) {
+            
+            SaleProductDTO dto = saleProductMapper.toDTO(saleProduct);
+            response.add(dto);
+        }
+
+        // Return the DTOs
+        return new SaleProductListDTO(response);
     }
 
     public SaleDTO save(SaleDTO dto) throws NoContentException, BadRequestException {
@@ -245,7 +239,7 @@ public class SaleService {
         return dtoResponse;
     }
 
-    public BranchSalesDTO getBranchSales(
+    public BranchSalesInfoDTO getBranchSales(
             int page,
             int size,
             Long branch_id
@@ -292,22 +286,41 @@ public class SaleService {
                     SaleStatics.Status.ongoing
                 );
                 
-                List<SaleDTO> notOngoingSalesDTO = new ArrayList<>();
-                List<SaleDTO> ongoingSalesDTO = new ArrayList<>();
+                List<SaleInfoDTO> notOngoingSalesInfoDTO = new ArrayList<>();
+                List<SaleInfoDTO> ongoingSalesInfoDTO = new ArrayList<>();
 
                 historicSales.forEach(sale -> {
-                    SaleDTO dto = saleMapper.toDTO(sale);
-                    notOngoingSalesDTO.add(dto);
+                    SaleDTO saleDTO = saleMapper.toDTO(sale);
+                    TaxListDTO taxListDTO = getTaxesBySaleId(sale.getId());
+                    SaleProductListDTO saleProductListDTO = getSaleProductsbySaleId(sale.getId());
+                    
+                    // Create a SaleInfo DTO
+                    SaleInfoDTO saleInfoDTO = SaleInfoDTO.builder()
+                                                        .sale(saleDTO)
+                                                        .taxes(taxListDTO)
+                                                        .products(saleProductListDTO)
+                                                        .build();
+
+                    notOngoingSalesInfoDTO.add(saleInfoDTO);
                 });
 
                 ongoingSales.forEach(sale -> {
-                    SaleDTO dto = saleMapper.toDTO(sale);
-                    ongoingSalesDTO.add(dto);
+                    SaleDTO saleDTO = saleMapper.toDTO(sale);
+                    TaxListDTO taxListDTO = getTaxesBySaleId(sale.getId());
+                    SaleProductListDTO saleProductListDTO = getSaleProductsbySaleId(sale.getId());
+                    
+                    // Create a SaleInfo DTO
+                    SaleInfoDTO saleInfoDTO = SaleInfoDTO.builder()
+                                                        .sale(saleDTO)
+                                                        .taxes(taxListDTO)
+                                                        .products(saleProductListDTO)
+                                                        .build();
+                    ongoingSalesInfoDTO.add(saleInfoDTO);
                 });
 
-                BranchSalesDTO response = BranchSalesDTO.builder()
-                .ongoingSales(ongoingSalesDTO)
-                .historicSales(notOngoingSalesDTO)
+                BranchSalesInfoDTO response = BranchSalesInfoDTO.builder()
+                .ongoingSalesInfo(ongoingSalesInfoDTO)
+                .historicSalesInfo(notOngoingSalesInfoDTO)
                 .build();
 
                 return response;

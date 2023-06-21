@@ -43,31 +43,6 @@ public class SaleProductService {
 
     private final ProductRepository productRepository;
 
-
-    public SaleProductListDTO getSaleProducts(long saleId)
-            throws BadRequestException{
-
-        // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(saleId);
-        if (!sale.isPresent()) {
-            throw new BadRequestException("Sale with id " + saleId + " does not exist", 42);
-        }
-
-        // Get the products
-        List<SaleProduct> saleProducts = saleProductRepository.findAllBySaleId(saleId);
-
-        // Map the products to DTOs
-        List<SaleProductDTO> response = new ArrayList<>();
-        for (SaleProduct saleProduct : saleProducts) {
-            
-            SaleProductDTO dto = saleProductMapper.toDTO(saleProduct);
-            response.add(dto);
-        }
-
-        // Return the DTOs
-        return new SaleProductListDTO(response);
-    }
-
     // Save a sale product
     public SaleProductDTO save(SaleProductDTO saleProductDTO) throws BadRequestException {
 

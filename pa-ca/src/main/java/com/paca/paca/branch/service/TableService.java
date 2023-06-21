@@ -20,12 +20,11 @@ import com.paca.paca.branch.repository.BranchRepository;
 @RequiredArgsConstructor
 public class TableService {
 
-    // Initialize the repository, mapper and repository
-    private final TableRepository tableRepository;
     private final TableMapper tableMapper;
+
+    private final TableRepository tableRepository;
     private final BranchRepository branchRepository;
 
-    // Create a method that saves a table (from the DTO)
     public TableDTO save(TableDTO tableDTO) throws NoContentException{
         // Check if the branch exists
         long branchId = tableDTO.getBranchId();
@@ -43,7 +42,6 @@ public class TableService {
         return tableMapper.toDTO(table);
     }
 
-    // Create a method that updates a table (from the DTO)
     public TableDTO update(TableDTO tableDTO) throws NoContentException{
         // Check if the table exists
         long tableId = tableDTO.getId();
@@ -71,8 +69,6 @@ public class TableService {
         return tableMapper.toDTO(tableToUpdate);
     }
 
-    // Create a method that deletes a table (from the id)
-    // As tables are not deleted, we just set the deleted attribute to true
     public void delete(Long id) throws NoContentException{
         // Check if the table exists
         Optional<Table> table = tableRepository.findById(id);
@@ -87,8 +83,5 @@ public class TableService {
         // Save the table
         tableToDelete = tableRepository.save(tableToDelete);
 
-    }
-
-
-    
+    }   
 }

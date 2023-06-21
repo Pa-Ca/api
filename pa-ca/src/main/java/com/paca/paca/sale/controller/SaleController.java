@@ -8,14 +8,11 @@ import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.exception.exceptions.UnprocessableException;
 
 //import BigDecimal
-import java.util.Date;
 
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,29 +38,7 @@ public class SaleController {
     private final SaleService saleService;
 
 
-    @GetMapping("/sales")
-    @ValidateRoles({ "business" })
-    @Operation(summary = "Gets a page of sales", description = "Gets a page with the data of the sales from an specific branch")
-    public ResponseEntity<SaleListDTO> getSalesPage(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("branch_id") Long branch_id,
-            @RequestParam("sorting_by") String sorting_by,
-            @RequestParam("ascending") boolean ascending,
-            @RequestParam("status") Integer status,
-            @RequestParam("end_date") Date end_date,
-            @RequestParam("start_date") Date start_date
-            ) throws NoContentException, UnprocessableException {
-        return ResponseEntity.ok(saleService.getSalesPage(
-                 page,
-                 size,
-                 branch_id,
-                 sorting_by,
-                 ascending,
-                 start_date,
-                 end_date,
-                 status));
-    }
+    
 
     // Post Methods
     @ValidateRoles({ "business" })

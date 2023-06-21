@@ -34,16 +34,6 @@ public class TaxService {
     private final TaxMapper TaxMapper;
     private final TaxRepository TaxRepository;
 
-    public List<Tax> getTaxesBySaleId(Long saleId) {
-        // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(saleId);
-        if (sale.isEmpty()) {
-                    throw new NoContentException(
-                            "Sale with id " + saleId + " does not exists",
-                            42);
-                }
-        return TaxRepository.findAllBySaleId(saleId);
-    }
 
     // Create a method that saves a  tax (from the DTO)
     public TaxDTO save(TaxDTO TaxDTO) throws NoContentException{
@@ -63,9 +53,7 @@ public class TaxService {
         return TaxMapper.toDTO(Tax);
     }
 
-
     // Create a method that updates a  tax (from the DTO)
-
     public TaxDTO update(TaxDTO TaxDTO) throws NoContentException, BadRequestException{
 
         // Check if the  tax exists

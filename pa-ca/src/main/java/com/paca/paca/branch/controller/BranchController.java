@@ -11,7 +11,7 @@ import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
-import com.paca.paca.sale.dto.BranchSalesDTO;
+import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
@@ -227,10 +227,12 @@ public class BranchController {
     }
 
     // Example get http://yourdomain.com/1/sales?page=2&size=5
-    @GetMapping("/{id}/sales")
+    @GetMapping("/{id}/sale")
     @ValidateRoles({ "business" })
-    @Operation(summary = "Gets all the ongoing sales and the historic sales", description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
-    public ResponseEntity<BranchSalesDTO> getBranchSalesPages(
+    @Operation(
+        summary = "Gets all the ongoing sales and the historic sales with its taxes and saleporducts", 
+        description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
+    public ResponseEntity<BranchSalesInfoDTO> getBranchSalesPages(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @PathVariable("id") Long branch_id

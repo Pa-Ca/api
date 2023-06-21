@@ -1,7 +1,5 @@
 package com.paca.paca.branch.service;
 
-
-import java.util.List;
 import java.util.Optional;
 
 
@@ -33,19 +31,6 @@ public class DefaultTaxService {
     private final DefaultTaxMapper defaultTaxMapper;
     private final DefaultTaxRepository defaultTaxRepository;
 
-    public List<DefaultTax> getDefaultTaxesByBranchId(Long branchId) {
-        // Check if the branch exists
-        Optional<Branch> branch = branchRepository.findById(branchId);
-        if (branch.isEmpty()) {
-                    throw new NoContentException(
-                            "Branch with id " + branchId + " does not exists",
-                            20);
-                }
-
-        return defaultTaxRepository.findAllByBranchId(branchId);
-    }
-
-    // Create a method that saves a default tax (from the DTO)
     public DefaultTaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NoContentException{
         // Check if the branch exists
         long branchId = defaultTaxDTO.getBranchId();
@@ -62,9 +47,6 @@ public class DefaultTaxService {
         // Return the default tax
         return defaultTaxMapper.toDTO(defaultTax);
     }
-
-
-    // Create a method that updates a default tax (from the DTO)
 
     public DefaultTaxDTO update(DefaultTaxDTO defaultTaxDTO) throws NoContentException, BadRequestException{
 
@@ -105,7 +87,6 @@ public class DefaultTaxService {
 
     }
 
-    // Create a method that deletes a default tax (from the id)
     public void delete(Long defaultTaxId) throws NoContentException{
         // Check if the default tax exists
         Optional<DefaultTax> defaultTax = defaultTaxRepository.findById(defaultTaxId);

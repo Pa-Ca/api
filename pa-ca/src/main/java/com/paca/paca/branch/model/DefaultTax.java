@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@jakarta.persistence.Table(name = "tax")
+@jakarta.persistence.Table(name = "default_tax")
 public class DefaultTax {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "default_tax_seq")

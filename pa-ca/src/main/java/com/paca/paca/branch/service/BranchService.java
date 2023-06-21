@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.branch.model.Table;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
@@ -22,7 +24,12 @@ import com.paca.paca.business.model.Business;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
+import com.paca.paca.branch.dto.DefaultTaxListDTO;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.utils.BranchMapper;
+import com.paca.paca.branch.utils.DefaultTaxMapper;
+import com.paca.paca.branch.utils.TableMapper;
 import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.product.dto.ProductListDTO;
@@ -35,6 +42,8 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
@@ -75,6 +84,10 @@ public class BranchService {
 
     private final ReservationMapper reservationMapper;
 
+    private final DefaultTaxMapper defaultTaxMapper;
+
+    private final TableMapper tableMapper;
+
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
     private final ClientMapper clientMapper;
@@ -104,6 +117,10 @@ public class BranchService {
     private final ProductCategoryRepository productCategoryRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
+
+    private final DefaultTaxRepository defaultTaxRepository;
+
+    private final TableRepository tableRepository;
 
     public BranchListDTO getAll() {
         List<BranchDTO> response = new ArrayList<>();
@@ -512,4 +529,49 @@ public class BranchService {
         // objects
         return ReservationListDTO.builder().reservations(result).build();
     }
+
+    public DefaultTaxListDTO getDefaultTaxesByBranchId(Long branchId) {
+        // Check if the branch exists
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+                    throw new NoContentException(
+                            "Branch with id " + branchId + " does not exists",
+                            20);
+                }
+        
+        // Get the default taxes
+        List<DefaultTax> defaultTaxes = defaultTaxRepository.findAllByBranchId(branchId);
+
+        List<DefaultTaxDTO> defaultTaxesDTO = new ArrayList<>();
+
+        for (DefaultTax defaultTax : defaultTaxes) {
+            defaultTaxesDTO.add(defaultTaxMapper.toDTO(defaultTax));
+        }
+         
+        return DefaultTaxListDTO.builder()
+                                .defaultTaxes(defaultTaxesDTO)
+                                .build();
+    }
+
+    public List<TableDTO> getTablesbyBranchId(Long branchId) {
+        // Check if the branch exists
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+                    throw new NoContentException(
+                            "Branch with id " + branchId + " does not exists",
+                            20);
+                }
+        
+        // Get the tables
+        List<Table> tables = tableRepository.findAllByBranchId(branchId);
+
+        List<TableDTO> tablesDTO = new ArrayList<>();
+
+        for (Table table : tables) {
+            tablesDTO.add(tableMapper.toDTO(table));
+        }
+         
+        return tablesDTO;
+    }
+
 }
