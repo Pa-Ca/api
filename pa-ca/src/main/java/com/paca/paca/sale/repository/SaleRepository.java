@@ -11,7 +11,7 @@ import java.util.List;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,6 +27,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             @Nullable Date endTime,
             Pageable pageable);
     
+    //@Query("SELECT s FROM Sale s WHERE s.table.branch.id = :branchId AND s.status IN :status AND s.startTime >= :startTime AND s.endTime <= :endTime")
     Page<Sale> findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
         Long branchId,
         Collection<Integer> status,

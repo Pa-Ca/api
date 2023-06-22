@@ -1225,4 +1225,229 @@ public class TestUtils {
         return dto;
     }
 
+    public List<Sale> createTestSales(Branch branchA, Branch branchB){
+
+
+        // Create three tables in branchA
+        Table tableAA = createTable(branchA);
+        Table tableAB = createTable(branchA);
+        Table tableAC = createTable(branchA);
+
+        // Create two tables in branchB
+        Table tableBA = createTable(branchB);
+        Table tableBB = createTable(branchB);
+
+        // For each table create a sale
+        // Have the sales vary status and time
+        // If the sales status is ongoing then the endTime is null
+        // If the sales status is closed then the endTime is not null
+        // If the sales status is cancelled then the endTime is not null
+
+        // TableAA
+        Sale saleAA1 = Sale.builder()
+                                .table(tableAA)
+                                .tableName(tableAA.getName())
+                                .note("Nota de prueba 1")
+                                .startTime(new Date(System.currentTimeMillis()))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                                .reservation(null)
+                                .status(SaleStatics.Status.ongoing)
+                                .tableName(tableAA.getName())
+                                .build();
+        Sale saleAA2 = Sale.builder()
+                                .table(tableAA)
+                                .tableName(tableAA.getName())
+                                .note("Nota de prueba 2")
+                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                                .endTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 2))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                                .status(SaleStatics.Status.cancelled)
+                                .reservation(null)
+                                .tableName(tableAA.getName())
+                                .build();           
+        
+        Sale saleAA3 = Sale.builder()
+                                .table(tableAA)
+                                .tableName(tableAA.getName())
+                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .note("Nota de prueba 3")
+                                .reservation(null)
+                                .clientQuantity(2)
+                                .status(SaleStatics.Status.closed)
+                                .tableName(tableAA.getName())
+                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                                .build();
+        
+        Sale saleAA4 = Sale.builder()
+                                .table(tableAA)
+                                .tableName(tableAA.getName())
+                                .startTime(new Date(System.currentTimeMillis() + 1300 * 60 * 60 * 24 * 2))
+                                .note("Nota de prueba 4")
+                                .reservation(null)
+                                .clientQuantity(2)
+                                .status(SaleStatics.Status.cancelled)
+                                .tableName(tableAA.getName())
+                                .endTime(new Date(System.currentTimeMillis() + 1400 * 60 * 60 * 24 * 2))
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                                .build();
+        // Now do the rest of the tables
+        // TableAB
+        Sale saleAB1 = Sale.builder()
+                                .table(tableAB)
+                                .tableName(tableAB.getName())
+                                .note("Nota de prueba 1")
+                                .startTime(new Date(System.currentTimeMillis()))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                                .reservation(null)
+                                .status(SaleStatics.Status.ongoing)
+                                .tableName(tableAB.getName())
+                                .build();
+        Sale saleAB2 = Sale.builder()
+                                .table(tableAB)
+                                .tableName(tableAB.getName())
+                                .note("Nota de prueba 2")
+                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                                .status(SaleStatics.Status.ongoing)
+                                .reservation(null)
+                                .tableName(tableAB.getName())
+                                .build();
+
+        Sale saleAB3 = Sale.builder()
+                                .table(tableAB)
+                                .tableName(tableAB.getName())
+                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .note("Nota de prueba 3")
+                                .reservation(null)
+                                .clientQuantity(2)
+                                .status(SaleStatics.Status.closed)
+                                .tableName(tableAB.getName())
+                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                                .build();
+        
+        // TableAC
+        Sale saleAC1 = Sale.builder()
+                                .table(tableAC)
+                                .tableName(tableAC.getName())
+                                .note("Nota de prueba 1")
+                                .startTime(new Date(System.currentTimeMillis()))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                                .reservation(null)
+                                .status(SaleStatics.Status.ongoing)
+                                .tableName(tableAC.getName())
+                                .build();
+        
+        Sale saleAC2 = Sale.builder()
+                                .table(tableAC)
+                                .tableName(tableAC.getName())
+                                .note("Nota de prueba 2")
+                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 12))
+                                .endTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                                .clientQuantity(3)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                                .status(SaleStatics.Status.closed)
+                                .reservation(null)
+                                .tableName(tableAC.getName())
+                                .build();
+
+        Sale saleAC3 = Sale.builder()
+                                .table(tableAC)
+                                .tableName(tableAC.getName())
+                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .note("Nota de prueba 3")
+                                .reservation(null)
+                                .clientQuantity(2)
+                                .status(SaleStatics.Status.closed)
+                                .tableName(tableAC.getName())
+                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                                .build();
+
+        // TableBA
+        Sale saleBA1 = Sale.builder()
+                                .table(tableBA)
+                                .tableName(tableBA.getName())
+                                .note("Nota de prueba 1")
+                                .startTime(new Date(System.currentTimeMillis()))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                                .reservation(null)
+                                .status(SaleStatics.Status.ongoing)
+                                .tableName(tableBA.getName())
+                                .build();
+        
+        Sale saleBA2 = Sale.builder()
+                                .table(tableBA)
+                                .tableName(tableBA.getName())
+                                .note("Nota de prueba 2")
+                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                                .endTime(new Date(System.currentTimeMillis() + 1001 * 60 * 60 * 24))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                                .status(SaleStatics.Status.cancelled)
+                                .reservation(null)
+                                .tableName(tableBA.getName())
+                                .build();
+        
+
+        Sale saleBA3 = Sale.builder()
+                                .table(tableBA)
+                                .tableName(tableBA.getName())
+                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .note("Nota de prueba 3")
+                                .reservation(null)
+                                .clientQuantity(2)
+                                .status(SaleStatics.Status.closed)
+                                .tableName(tableBA.getName())
+                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                                .build();
+        // TableBB
+
+        Sale saleBB1 = Sale.builder()
+                                .table(tableBB)
+                                .tableName(tableBB.getName())
+                                .note("Nota de prueba 1")
+                                .startTime(new Date(System.currentTimeMillis()))
+                                .clientQuantity(2)
+                                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                                .reservation(null)
+                                .status(SaleStatics.Status.ongoing)
+                                .tableName(tableBB.getName())
+                                .build();
+        
+
+        // Now create a list of sales
+        List<Sale> sales = new ArrayList<>();
+        sales.add(saleAA1);
+        sales.add(saleAA2);
+        sales.add(saleAA3);
+        sales.add(saleAA4);
+        sales.add(saleAB1);
+        sales.add(saleAB2);
+        sales.add(saleAB3);
+        sales.add(saleAC1);
+        sales.add(saleAC2);
+        sales.add(saleAC3);
+        sales.add(saleBA1);
+        sales.add(saleBA2);
+        sales.add(saleBA3);
+        sales.add(saleBB1);
+        
+
+        // Now save the sales
+        for (Sale sale : sales) {
+            saleRepository.save(sale);
+        }
+
+        return sales;
+    }
+
 }

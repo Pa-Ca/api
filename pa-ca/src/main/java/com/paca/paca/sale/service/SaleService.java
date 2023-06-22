@@ -157,7 +157,7 @@ public class SaleService {
                     49); // Lista en docs!
         }
 
-        SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.canceled).build();
+        SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.cancelled).build();
         Sale updatedSale = saleMapper.updateModel(dto, sale.get());
         saleRepository.save(updatedSale);
     }
@@ -179,7 +179,7 @@ public class SaleService {
 
         // add exception (user cannot close a canceled sale)
 
-        if (sale.get().getStatus().equals(SaleStatics.Status.canceled)){
+        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)){
             throw new BadRequestException(
                 "Sale with id " + id + " can not be closed because it was canceled", 48
             );
@@ -224,7 +224,7 @@ public class SaleService {
         }
 
         // Check if the sale is canceled
-        if (sale.get().getStatus().equals(SaleStatics.Status.canceled)) {
+        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
                     "Sale with id " + dto.getId() + " can not be updated because it was canceled", 48
                     ); // Lista en docs
@@ -276,7 +276,7 @@ public class SaleService {
 
                 Page<Sale> historicSales = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
                 branch_id,
-                List.of(SaleStatics.Status.canceled, SaleStatics.Status.closed),
+                List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
                 start_time,
                 end_time,
                 not_ongoing_sales_paging);
