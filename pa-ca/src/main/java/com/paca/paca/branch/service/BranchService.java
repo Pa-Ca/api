@@ -27,6 +27,7 @@ import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.branch.dto.DefaultTaxListDTO;
 import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.branch.utils.TableMapper;
@@ -553,7 +554,7 @@ public class BranchService {
                                 .build();
     }
 
-    public List<TableDTO> getTablesbyBranchId(Long branchId) {
+    public TableListDTO getTablesbyBranchId(Long branchId) {
         // Check if the branch exists
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
@@ -570,8 +571,11 @@ public class BranchService {
         for (Table table : tables) {
             tablesDTO.add(tableMapper.toDTO(table));
         }
+
+        return TableListDTO.builder()
+                            .tables(tablesDTO)
+                            .build();
          
-        return tablesDTO;
     }
 
 }
