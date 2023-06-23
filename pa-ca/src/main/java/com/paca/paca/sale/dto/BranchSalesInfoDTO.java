@@ -16,4 +16,6 @@ import lombok.AllArgsConstructor;
 public class BranchSalesInfoDTO {
     List<SaleInfoDTO> ongoingSalesInfo;
     List<SaleInfoDTO> historicSalesInfo; // Historic sales are sales that have already been closed or canceled
+    int currentHistoricPage;
+    int totalHistoricPages;
 }

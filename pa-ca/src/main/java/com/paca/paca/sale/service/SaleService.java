@@ -349,6 +349,8 @@ public class SaleService {
                 BranchSalesInfoDTO response = BranchSalesInfoDTO.builder()
                 .ongoingSalesInfo(ongoingSalesInfoDTO)
                 .historicSalesInfo(notOngoingSalesInfoDTO)
+                .currentHistoricPage(page)
+                .totalHistoricPages(historicSales.getTotalPages())
                 .build();
 
                 return response;
