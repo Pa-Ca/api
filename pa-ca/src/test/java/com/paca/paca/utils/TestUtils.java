@@ -1092,6 +1092,8 @@ public class TestUtils {
                 .tableName(table.getName())
                 .startTime(new Date(System.currentTimeMillis()))
                 .status(SaleStatics.Status.ongoing)
+                .clientQuantity(ThreadLocalRandom.current().nextInt(1, 10))
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(1, 10)))
                 .reservation(reservation)
                 .build();
         

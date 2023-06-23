@@ -239,6 +239,35 @@ public class SaleService {
         return dtoResponse;
     }
 
+    public void clearSale(long saleId){
+        // Deletes all the SaleProducts of a Sale given its id
+
+        // Check if the sale exists
+        Optional<Sale> sale = saleRepository.findById(saleId);
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + saleId + " does not exists",
+                    42); // Lista en docs
+        }
+
+        // Check if the sale is closed
+        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+            throw new BadRequestException(
+                    "Sale with id " + saleId + " can not be cleared because it is already closed", 505
+                    ); // No esta referenciado en docs
+        }
+
+        // Check if the sale is canceled
+        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
+            throw new BadRequestException(
+                    "Sale with id " + saleId + " can not be cleared because it was canceled", 505
+                    ); // No esta referenciado en docs
+        }
+
+        // Delete all the SaleProducts of the Sale
+        saleProductRepository.deleteAllBySaleId(saleId);
+    }
+
     public BranchSalesInfoDTO getBranchSales(
             int page,
             int size,
@@ -263,7 +292,6 @@ public class SaleService {
                 }
                 
                 Date start_time = new Date(0);
-                Date end_time = new Date(Long.MAX_VALUE);
                 
 
                 Pageable not_ongoing_sales_paging;
@@ -279,6 +307,7 @@ public class SaleService {
                 List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
                 start_time,
                 not_ongoing_sales_paging);
+
 
                 List<Sale> ongoingSales = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
                     branch_id,
