@@ -139,6 +139,28 @@ public class ReservationServiceTest {
     }
 
     @Test
+    void shouldGetBadRequestDueToClientNumberExceedsCapacityBranchInSaveReservation() {
+        Branch branch = utils.createBranch(null);
+        branch.setCapacity(1);
+
+        Reservation reservation = utils.createReservation(branch, null);
+        ReservationDTO dto = utils.createReservationDTO(reservation);
+        dto.setByClient(true);
+        dto.setClientNumber(2);
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+
+        try {
+            reservationService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals(e.getMessage(), "Requested number of client surpass branch " + dto.getBranchId() + " capacity");
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 20);
+        }
+    }
+
+    @Test
     void shouldSaveReservation() {
         Reservation reservation = utils.createReservation(null);
         ReservationDTO dto = utils.createReservationDTO(reservation);

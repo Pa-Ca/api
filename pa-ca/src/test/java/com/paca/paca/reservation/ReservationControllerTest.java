@@ -1,5 +1,6 @@
 package com.paca.paca.reservation;
 
+import com.paca.paca.exception.exceptions.BadRequestException;
 import org.hamcrest.CoreMatchers;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.auth.ControllerTest;
@@ -166,6 +167,22 @@ public class ReservationControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isConflict())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
+    public void shouldGetBadRequestInSaveReservation() throws Exception {
+        ReservationDTO dto = utils.createReservationDTO(null);
+
+        when(reservationService.save(any(ReservationDTO.class))).thenThrow(new BadRequestException("message", 0));
+
+        utils.setAuthorities("client");
+
+        mockMvc.perform(post(ReservationStatics.Endpoint.PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }

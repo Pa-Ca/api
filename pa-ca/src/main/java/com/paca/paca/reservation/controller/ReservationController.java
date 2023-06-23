@@ -53,7 +53,7 @@ public class ReservationController {
 
     @PostMapping
     @Operation(summary = "Create new reservation", description = "Create a new reservation in the app")
-    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException {
+    public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException, BadRequestException {
         return ResponseEntity.ok(reservationService.save(dto));
     }
 
@@ -65,14 +65,6 @@ public class ReservationController {
         reservationService.cancel(id);
     }
 
-    @PostMapping("/accept/{id}")
-    @ValidateRoles({ "business" })
-    @ValidateReservationOwner(isClientOwner = false)
-    @Operation(summary = "Accept a reservation", description = "Accept a reservation given your id")
-    public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-        reservationService.accept(id);
-    }
-
     @PostMapping("/reject/{id}")
     @ValidateRoles({ "business" })
     @ValidateReservationOwner(isClientOwner = false)
@@ -81,10 +73,34 @@ public class ReservationController {
         reservationService.reject(id);
     }
 
+    @PostMapping("/accept/{id}")
+    @ValidateRoles({ "business" })
+    @ValidateReservationOwner(isClientOwner = false)
+    @Operation(summary = "Accept a reservation", description = "Accept a reservation given your id")
+    public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        reservationService.accept(id);
+    }
+
+    @PostMapping("/retire/{id}")
+    @ValidateRoles({ "business" })
+    @ValidateReservationOwner(isClientOwner = false)
+    @Operation(summary = "Retire a reservation", description = "Retire a reservation given your id")
+    public void retire(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        reservationService.retire(id);
+    }
+
+    @PostMapping("/start/{id}")
+    @ValidateRoles({ "business" })
+    @ValidateReservationOwner(isClientOwner = false)
+    @Operation(summary = "Start a reservation", description = "Start a reservation given your id")
+    public void start(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+        reservationService.start(id);
+    }
+
     @PostMapping("/close/{id}")
     @ValidateRoles({ "business" })
     @ValidateReservationOwner(isClientOwner = false)
-    @Operation(summary = "Reject a reservation", description = "Reject a reservation given your id")
+    @Operation(summary = "Close a reservation", description = "Close a reservation given your id")
     public void close(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
         reservationService.close(id);
     }

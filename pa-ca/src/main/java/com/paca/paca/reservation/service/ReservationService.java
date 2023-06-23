@@ -76,7 +76,7 @@ public class ReservationService {
         return dto;
     }
 
-    public ReservationDTO save(ReservationDTO dto) throws NoContentException {
+    public ReservationDTO save(ReservationDTO dto) throws NoContentException, BadRequestException {
         Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
         if (branch.isEmpty()) {
             throw new NoContentException(
@@ -86,6 +86,12 @@ public class ReservationService {
 
         if (dto.getPrice() == null) {
             dto.setStatus(ReservationStatics.Status.paid);
+        }
+
+        if (dto.getByClient() && dto.getClientNumber() > branch.get().getCapacity()){
+            throw new BadRequestException(
+                    "Requested number of client surpass branch " + dto.getBranchId() + " capacity",
+                    20);
         }
 
         Reservation newReservation;
@@ -105,6 +111,16 @@ public class ReservationService {
         return dtoResponse;
     }
 
+    public void delete(Long id) throws NoContentException {
+        Optional<Reservation> current = reservationRepository.findById(id);
+        if (current.isEmpty()) {
+            throw new NoContentException(
+                    "Reservation with id " + id + " does not exists",
+                    27);
+        }
+        reservationRepository.deleteById(id);
+    }
+
     public ReservationDTO update(Long id, ReservationDTO dto) throws NoContentException {
         Optional<Reservation> current = reservationRepository.findById(id);
         if (current.isEmpty()) {
@@ -119,16 +135,6 @@ public class ReservationService {
         dtoResponse.completeData(guestRepository, clientGroupRepository, clientRepository);
 
         return dtoResponse;
-    }
-
-    public void delete(Long id) throws NoContentException {
-        Optional<Reservation> current = reservationRepository.findById(id);
-        if (current.isEmpty()) {
-            throw new NoContentException(
-                    "Reservation with id " + id + " does not exists",
-                    27);
-        }
-        reservationRepository.deleteById(id);
     }
 
     public void cancel(Long id) throws NoContentException, BadRequestException, ForbiddenException {
@@ -167,6 +173,39 @@ public class ReservationService {
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.canceled).build();
+        Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
+        reservationRepository.save(updatedReservation);
+    }
+
+    public void reject(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        if (reservation.isEmpty())
+            throw new NoContentException(
+                    "Reservation with id " + id + " does not exists", 27);
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)) {
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already returned", 69);
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)) {
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already closed", 70);
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)) {
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already rejected", 71);
+        }
+
+        Long branchId = reservation.get().getBranch().getId();
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException("Branch related to reservation with id " + branchId + " does not exists", 73);
+        }
+
+        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.rejected).build();
         Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
         reservationRepository.save(updatedReservation);
     }
@@ -244,7 +283,7 @@ public class ReservationService {
          */
     }
 
-    public void reject(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void start(Long id) throws NoContentException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
@@ -272,7 +311,40 @@ public class ReservationService {
             throw new NoContentException("Branch related to reservation with id " + branchId + " does not exists", 73);
         }
 
-        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.rejected).build();
+        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.started).build();
+        Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
+        reservationRepository.save(updatedReservation);
+    }
+
+    public void retire(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+
+        if (reservation.isEmpty())
+            throw new NoContentException(
+                    "Reservation with id " + id + " does not exists", 27);
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.returned)) {
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already returned", 69);
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.closed)) {
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already closed", 70);
+        }
+
+        if (reservation.get().getStatus().equals(ReservationStatics.Status.rejected)) {
+            throw new BadRequestException(
+                    "Reservation with id " + id + " can't be rejected because it is already rejected", 71);
+        }
+
+        Long branchId = reservation.get().getBranch().getId();
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException("Branch related to reservation with id " + branchId + " does not exists", 73);
+        }
+
+        ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.retired).build();
         Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
         reservationRepository.save(updatedReservation);
     }
