@@ -5,6 +5,7 @@ import java.util.Date;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -1090,7 +1091,6 @@ public class TestUtils {
                 .table(table)
                 .tableName(table.getName())
                 .startTime(new Date(System.currentTimeMillis()))
-                .endTime(null)
                 .status(SaleStatics.Status.ongoing)
                 .reservation(reservation)
                 .build();
@@ -1144,7 +1144,6 @@ public class TestUtils {
                 .tableId(table.getId())
                 .tableName(table.getName())
                 .startTime(new Date(System.currentTimeMillis()))
-                .endTime(null)
                 .status(SaleStatics.Status.ongoing)
                 .reservationId(reservation.getId())
                 .build();
@@ -1237,18 +1236,34 @@ public class TestUtils {
         Table tableBA = createTable(branchB);
         Table tableBB = createTable(branchB);
 
+        Calendar calendar = Calendar.getInstance();
+        // Get now
+        Date now = calendar.getTime();
+        // Get an hour after now
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        Date oneHourAfterNow = calendar.getTime();
+        // Get two hours after now
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        Date twoHoursAfterNow = calendar.getTime();
+        // Get three hours after now
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        Date threeHoursAfterNow = calendar.getTime();
+        // Get one hour before now
+        calendar.add(Calendar.HOUR_OF_DAY, -4);
+        Date oneHourBeforeNow = calendar.getTime();
+        // Get two hours before now
+        calendar.add(Calendar.HOUR_OF_DAY, -5);
+        Date twoHoursBeforeNow = calendar.getTime();
+
+
         // For each table create a sale
         // Have the sales vary status and time
-        // If the sales status is ongoing then the endTime is null
-        // If the sales status is closed then the endTime is not null
-        // If the sales status is cancelled then the endTime is not null
-
-        // TableAA
+        // If the sales status is ongoing then the endTime nowtus is closed then the endTime now status is cancelled then the endTime now     
         Sale saleAA1 = Sale.builder()
                                 .table(tableAA)
                                 .tableName(tableAA.getName())
                                 .note("Nota de prueba 1")
-                                .startTime(new Date(System.currentTimeMillis()))
+                                .startTime(twoHoursBeforeNow)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
                                 .reservation(null)
@@ -1259,8 +1274,8 @@ public class TestUtils {
                                 .table(tableAA)
                                 .tableName(tableAA.getName())
                                 .note("Nota de prueba 2")
-                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                                .endTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 2))
+                                .startTime(twoHoursBeforeNow)
+                                .endTime(now)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                                 .status(SaleStatics.Status.cancelled)
@@ -1271,26 +1286,26 @@ public class TestUtils {
         Sale saleAA3 = Sale.builder()
                                 .table(tableAA)
                                 .tableName(tableAA.getName())
-                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .startTime(twoHoursBeforeNow)
                                 .note("Nota de prueba 3")
                                 .reservation(null)
                                 .clientQuantity(2)
                                 .status(SaleStatics.Status.closed)
                                 .tableName(tableAA.getName())
-                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .endTime(oneHourAfterNow)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
                                 .build();
         
         Sale saleAA4 = Sale.builder()
                                 .table(tableAA)
                                 .tableName(tableAA.getName())
-                                .startTime(new Date(System.currentTimeMillis() + 1300 * 60 * 60 * 24 * 2))
+                                .startTime(twoHoursBeforeNow)
                                 .note("Nota de prueba 4")
                                 .reservation(null)
                                 .clientQuantity(2)
                                 .status(SaleStatics.Status.cancelled)
                                 .tableName(tableAA.getName())
-                                .endTime(new Date(System.currentTimeMillis() + 1400 * 60 * 60 * 24 * 2))
+                                .endTime(oneHourAfterNow)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
                                 .build();
         // Now do the rest of the tables
@@ -1299,7 +1314,7 @@ public class TestUtils {
                                 .table(tableAB)
                                 .tableName(tableAB.getName())
                                 .note("Nota de prueba 1")
-                                .startTime(new Date(System.currentTimeMillis()))
+                                .startTime(twoHoursBeforeNow)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
                                 .reservation(null)
@@ -1310,7 +1325,7 @@ public class TestUtils {
                                 .table(tableAB)
                                 .tableName(tableAB.getName())
                                 .note("Nota de prueba 2")
-                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                                .startTime(twoHoursBeforeNow)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                                 .status(SaleStatics.Status.ongoing)
@@ -1321,13 +1336,13 @@ public class TestUtils {
         Sale saleAB3 = Sale.builder()
                                 .table(tableAB)
                                 .tableName(tableAB.getName())
-                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .startTime(twoHoursBeforeNow)
                                 .note("Nota de prueba 3")
                                 .reservation(null)
                                 .clientQuantity(2)
                                 .status(SaleStatics.Status.closed)
                                 .tableName(tableAB.getName())
-                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .endTime(twoHoursAfterNow)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
                                 .build();
         
@@ -1336,7 +1351,7 @@ public class TestUtils {
                                 .table(tableAC)
                                 .tableName(tableAC.getName())
                                 .note("Nota de prueba 1")
-                                .startTime(new Date(System.currentTimeMillis()))
+                                .startTime(twoHoursBeforeNow)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
                                 .reservation(null)
@@ -1348,8 +1363,8 @@ public class TestUtils {
                                 .table(tableAC)
                                 .tableName(tableAC.getName())
                                 .note("Nota de prueba 2")
-                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 12))
-                                .endTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                                .startTime(twoHoursBeforeNow)
+                                .endTime(now)
                                 .clientQuantity(3)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                                 .status(SaleStatics.Status.closed)
@@ -1360,13 +1375,13 @@ public class TestUtils {
         Sale saleAC3 = Sale.builder()
                                 .table(tableAC)
                                 .tableName(tableAC.getName())
-                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .startTime(twoHoursBeforeNow)
                                 .note("Nota de prueba 3")
                                 .reservation(null)
                                 .clientQuantity(2)
                                 .status(SaleStatics.Status.closed)
                                 .tableName(tableAC.getName())
-                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .endTime(oneHourAfterNow)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
                                 .build();
 
@@ -1375,7 +1390,7 @@ public class TestUtils {
                                 .table(tableBA)
                                 .tableName(tableBA.getName())
                                 .note("Nota de prueba 1")
-                                .startTime(new Date(System.currentTimeMillis()))
+                                .startTime(twoHoursBeforeNow)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
                                 .reservation(null)
@@ -1387,8 +1402,8 @@ public class TestUtils {
                                 .table(tableBA)
                                 .tableName(tableBA.getName())
                                 .note("Nota de prueba 2")
-                                .startTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                                .endTime(new Date(System.currentTimeMillis() + 1001 * 60 * 60 * 24))
+                                .startTime(twoHoursBeforeNow)
+                                .endTime(now)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                                 .status(SaleStatics.Status.cancelled)
@@ -1400,13 +1415,13 @@ public class TestUtils {
         Sale saleBA3 = Sale.builder()
                                 .table(tableBA)
                                 .tableName(tableBA.getName())
-                                .startTime(new Date(System.currentTimeMillis() + 1100 * 60 * 60 * 24 * 2))
+                                .startTime(twoHoursBeforeNow)
                                 .note("Nota de prueba 3")
                                 .reservation(null)
                                 .clientQuantity(2)
                                 .status(SaleStatics.Status.closed)
                                 .tableName(tableBA.getName())
-                                .endTime(new Date(System.currentTimeMillis() + 1200 * 60 * 60 * 24 * 2))
+                                .endTime(now)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
                                 .build();
         // TableBB
@@ -1415,7 +1430,7 @@ public class TestUtils {
                                 .table(tableBB)
                                 .tableName(tableBB.getName())
                                 .note("Nota de prueba 1")
-                                .startTime(new Date(System.currentTimeMillis()))
+                                .startTime(twoHoursBeforeNow)
                                 .clientQuantity(2)
                                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
                                 .reservation(null)

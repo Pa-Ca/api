@@ -26,15 +26,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -203,20 +203,57 @@ public class SaleRepositoryTest extends PacaTest {
 
     @Test
     void shouldGetAllSalesByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(){
-        // This is to test the query findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual
+        // This is to test the query findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual
 
         // Create two branches
         Branch branchA = utils.createBranch(null);
         Branch branchB = utils.createBranch(null);
 
         List<Sale>  sales = utils.createTestSales(branchA, branchB);
+
+        // Get the times the will be used to test the method
+        Calendar calendar = Calendar.getInstance();
+        // Get now
+        // Date now = calendar.getTime();
+        // // Get an hour after now
+        // calendar.add(Calendar.HOUR_OF_DAY, 1);
+        // Date oneHourAfterNow = calendar.getTime();
+        // // Get two hours after now
+        // calendar.add(Calendar.HOUR_OF_DAY, 1);
+        // Date twoHoursAfterNow = calendar.getTime();
+        // // Get three hours after now
+        // calendar.add(Calendar.HOUR_OF_DAY, 1);
+        // Date threeHoursAfterNow = calendar.getTime();
+        // // Get one hour before now
+        // calendar.add(Calendar.HOUR_OF_DAY, -4);
+        // Date oneHourBeforeNow = calendar.getTime();
+        // // Get three hours before now
+        // calendar.add(Calendar.HOUR_OF_DAY, -5);
+        // Date twoHoursBeforeNow = calendar.getTime();
+        // // Get a year after now
+        // calendar.add(Calendar.YEAR, 1);
+        // Date oneYearAfterNow = calendar.getTime();
+        // Get a year before now
+        calendar.add(Calendar.YEAR, -2);
+        Date oneYearBeforeNow = calendar.getTime();
+
+        // We first have to create the page request to test the method
+        Pageable test_page;
+                
+        test_page = PageRequest.of(
+                0,
+                10,
+                Sort.by("startTime").descending());
+
         
         // Now create a list of sales from the branch A that are ongoing from now
         // You have to do it manually because the repository doesn't have a method for that 
         List<Sale> ongoingSalesFromBranchA = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getTable().getBranch().equals(branchA) && 
-                sale.getStatus().equals(SaleStatics.Status.ongoing)) 
+                sale.getStatus().equals(SaleStatics.Status.ongoing) && 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0)
+
             {
                 ongoingSalesFromBranchA.add(sale);
             }
@@ -227,7 +264,8 @@ public class SaleRepositoryTest extends PacaTest {
         List<Sale> closedSalesFromBranchA = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getTable().getBranch().equals(branchA) && 
-                sale.getStatus().equals(SaleStatics.Status.closed)) 
+                sale.getStatus().equals(SaleStatics.Status.closed)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
             {
                 closedSalesFromBranchA.add(sale);
             }
@@ -237,7 +275,8 @@ public class SaleRepositoryTest extends PacaTest {
         List<Sale> cancelledSalesFromBranchA = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getTable().getBranch().equals(branchA) && 
-                sale.getStatus().equals(SaleStatics.Status.cancelled)) 
+                sale.getStatus().equals(SaleStatics.Status.cancelled)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
             {
                 cancelledSalesFromBranchA.add(sale);
             }
@@ -247,7 +286,8 @@ public class SaleRepositoryTest extends PacaTest {
         List<Sale> ongoingSalesFromBranchB = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getTable().getBranch().equals(branchB) && 
-                sale.getStatus().equals(SaleStatics.Status.ongoing)) 
+                sale.getStatus().equals(SaleStatics.Status.ongoing)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
             {
                 ongoingSalesFromBranchB.add(sale);
             }
@@ -256,7 +296,8 @@ public class SaleRepositoryTest extends PacaTest {
         List<Sale> closedSalesFromBranchB = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getTable().getBranch().equals(branchB) && 
-                sale.getStatus().equals(SaleStatics.Status.closed)) 
+                sale.getStatus().equals(SaleStatics.Status.closed)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
             {
                 closedSalesFromBranchB.add(sale);
             }
@@ -266,74 +307,55 @@ public class SaleRepositoryTest extends PacaTest {
         List<Sale> cancelledSalesFromBranchB = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getTable().getBranch().equals(branchB) && 
-                sale.getStatus().equals(SaleStatics.Status.cancelled)) 
+                sale.getStatus().equals(SaleStatics.Status.cancelled)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
             {
                 cancelledSalesFromBranchB.add(sale);
             }
         }
-
-        // Now lets test the repository method 
-        // Page<Sale> findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual
-
-        // We first have to create the page request
-        Pageable test_page;
-                
-        test_page = PageRequest.of(
-                0,
-                10,
-                Sort.by("startTime").descending());
-
         // Now we can test the method
 
         // Get the ongoing sales from branch A
-        Page<Sale> ongoingSalesFromBranchAFromRepository = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+        List<Sale> ongoingSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchA.getId(),
                 List.of(SaleStatics.Status.ongoing),
-                new Date(0),
-                new Date(Integer.MAX_VALUE -1),
-                test_page);
-        // Get the list from the page
-        List<Sale> ongoingSalesFromBranchAFromRepositoryList = ongoingSalesFromBranchAFromRepository.getContent();
+                oneYearBeforeNow,
+                test_page).getContent();
+
 
         // Compare the lists lengths
         assertEquals(ongoingSalesFromBranchA.size(), ongoingSalesFromBranchAFromRepositoryList.size());
 
         // Now repeat the process with the closed sales from branch A
-        Page<Sale> closedSalesFromBranchAFromRepository = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+        List<Sale> closedSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchA.getId(),
                 List.of(SaleStatics.Status.closed),
-                new Date(0),
-                new Date(Long.MAX_VALUE),
-                test_page);
+                oneYearBeforeNow,
+                test_page).getContent();
         
-        List<Sale> closedSalesFromBranchAFromRepositoryList = closedSalesFromBranchAFromRepository.getContent();
 
         // Compare the lists lengths
         assertEquals(closedSalesFromBranchA.size(), closedSalesFromBranchAFromRepositoryList.size());
 
         // Now repeat the process with the cancelled sales from branch A
-        Page<Sale> cancelledSalesFromBranchAFromRepository = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+        List<Sale> cancelledSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchA.getId(),
                 List.of(SaleStatics.Status.cancelled),
-                new Date(0),
-                new Date(Long.MAX_VALUE),
-                test_page);
+                oneYearBeforeNow,
+                test_page).getContent();
         
-        List<Sale> cancelledSalesFromBranchAFromRepositoryList = cancelledSalesFromBranchAFromRepository.getContent();
 
         // Compare the lists lengths
         assertEquals(cancelledSalesFromBranchA.size(), cancelledSalesFromBranchAFromRepositoryList.size());
 
         // Now repeat the process with the ongoing sales from branch B
 
-        Page<Sale> ongoingSalesFromBranchBFromRepository = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+        List<Sale> ongoingSalesFromBranchBFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchB.getId(),
                 List.of(SaleStatics.Status.ongoing),
-                new Date(0),
-                new Date(Long.MAX_VALUE),
-                test_page);
+                oneYearBeforeNow,
+                test_page).getContent();
 
-        List<Sale> ongoingSalesFromBranchBFromRepositoryList = ongoingSalesFromBranchBFromRepository.getContent();
 
         // Compare the lists lengths
 
@@ -341,14 +363,12 @@ public class SaleRepositoryTest extends PacaTest {
 
         // Now repeat the process with the closed sales from branch B
 
-        Page<Sale> closedSalesFromBranchBFromRepository = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+        List<Sale> closedSalesFromBranchBFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchB.getId(),
                 List.of(SaleStatics.Status.closed),
-                new Date(0),
-                new Date(Long.MAX_VALUE),
-                test_page);
+                oneYearBeforeNow,
+                test_page).getContent();
 
-        List<Sale> closedSalesFromBranchBFromRepositoryList = closedSalesFromBranchBFromRepository.getContent();
 
         // Compare the lists lengths
 
@@ -356,19 +376,111 @@ public class SaleRepositoryTest extends PacaTest {
 
         // Now repeat the process with the cancelled sales from branch B
 
-        Page<Sale> cancelledSalesFromBranchBFromRepository = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+        List<Sale> cancelledSalesFromBranchBFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchB.getId(),
                 List.of(SaleStatics.Status.cancelled),
-                new Date(0),
-                new Date(Long.MAX_VALUE),
-                test_page);
+                oneYearBeforeNow,
+                test_page).getContent();
 
-        List<Sale> cancelledSalesFromBranchBFromRepositoryList = cancelledSalesFromBranchBFromRepository.getContent();
-
-        // Compare the lists lengths
 
         assertEquals(cancelledSalesFromBranchB.size(), cancelledSalesFromBranchBFromRepositoryList.size());
 
         
+    }
+
+
+    @Test
+    void shouldFindAllByTableBranchIdAndStatusOrderByStartTimeDesc(){
+        // Create the branch A and B
+        Branch branchA = utils.createBranch(null);
+        Branch branchB = utils.createBranch(null);
+        // Create the test sales
+        List<Sale> sales = utils.createTestSales(branchA, branchB);
+
+
+        // Maually create the lists of sales from branch A that are ongoing, and order them by start time descending
+        List<Sale> ongoingSalesFromBranchA = new ArrayList<>();
+
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) && 
+                sale.getStatus().equals(SaleStatics.Status.ongoing)) 
+            {
+                ongoingSalesFromBranchA.add(sale);
+            }
+        }
+
+        ongoingSalesFromBranchA.sort((o1, o2) -> o2.getStartTime().compareTo(o1.getStartTime()));
+
+        // Now query the repository for the same list
+        List<Sale> ongoingSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
+                branchA.getId(),
+                SaleStatics.Status.ongoing
+        );
+
+        // Comparte the lists lenghts
+        assertEquals(ongoingSalesFromBranchA.size(), ongoingSalesFromBranchAFromRepositoryList.size());
+        // Compare the lists elements
+        for (int i = 0; i < ongoingSalesFromBranchA.size(); i++) {
+            assertEquals(ongoingSalesFromBranchA.get(i), ongoingSalesFromBranchAFromRepositoryList.get(i));
+        }
+
+        // Do the same with the closed sales from branch A
+        List<Sale> closedSalesFromBranchA = new ArrayList<>();
+
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) && 
+                sale.getStatus().equals(SaleStatics.Status.closed)) 
+            {
+                closedSalesFromBranchA.add(sale);
+            }
+        }
+
+        closedSalesFromBranchA.sort((o1, o2) -> o2.getStartTime().compareTo(o1.getStartTime()));
+
+        // Now query the repository for the same list
+
+        List<Sale> closedSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
+                branchA.getId(),
+                SaleStatics.Status.closed
+        );
+
+        // Comparte the lists lenghts
+        assertEquals(closedSalesFromBranchA.size(), closedSalesFromBranchAFromRepositoryList.size());
+        // Compare the lists elements
+        for (int i = 0; i < closedSalesFromBranchA.size(); i++) {
+            assertEquals(closedSalesFromBranchA.get(i), closedSalesFromBranchAFromRepositoryList.get(i));
+        }
+
+        // Now do the same for the ongoing sales from branch B
+        List<Sale> ongoingSalesFromBranchB = new ArrayList<>();
+
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchB) && 
+                sale.getStatus().equals(SaleStatics.Status.ongoing)) 
+            {
+                ongoingSalesFromBranchB.add(sale);
+            }
+        }
+
+        ongoingSalesFromBranchB.sort((o1, o2) -> o2.getStartTime().compareTo(o1.getStartTime()));
+
+        // Now query the repository for the same list
+
+        List<Sale> ongoingSalesFromBranchBFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
+                branchB.getId(),
+                SaleStatics.Status.ongoing
+        );
+
+        // Comparte the lists lenghts
+
+        assertEquals(ongoingSalesFromBranchB.size(), ongoingSalesFromBranchBFromRepositoryList.size());
+
+        // Compare the lists elements
+
+        for (int i = 0; i < ongoingSalesFromBranchB.size(); i++) {
+            assertEquals(ongoingSalesFromBranchB.get(i), ongoingSalesFromBranchBFromRepositoryList.get(i));
+        }
+
+
     }
 }
