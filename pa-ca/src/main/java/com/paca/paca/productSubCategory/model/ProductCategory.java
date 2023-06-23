@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category.model;
+package com.paca.paca.productSubCategory.model;
 
 import jakarta.persistence.*;
 import lombok.*;

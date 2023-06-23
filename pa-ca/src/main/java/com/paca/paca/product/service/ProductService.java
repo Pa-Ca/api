@@ -12,8 +12,8 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 

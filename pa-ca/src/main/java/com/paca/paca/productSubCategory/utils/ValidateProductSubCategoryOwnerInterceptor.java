@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category.utils;
+package com.paca.paca.productSubCategory.utils;
 
 import java.util.Map;
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
