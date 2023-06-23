@@ -9,8 +9,8 @@ public interface SaleStatics {
     }
 
     interface SaleSortingKeys {
-        String ENDTIME = "end_time";
-        String STARTTIME = "start_time";
+        String ENDTIME = "endTime";
+        String STARTTIME = "startTime";
 
         static boolean contains(String sorting_key) {
             return sorting_key.equals(ENDTIME) ||
