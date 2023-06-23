@@ -259,6 +259,18 @@ public class SaleRepositoryTest extends PacaTest {
             }
         }
 
+        // Get the ongoing sales from branch A
+        List<Sale> ongoingSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                branchA.getId(),
+                List.of(SaleStatics.Status.ongoing),
+                oneYearBeforeNow,
+                test_page).getContent();
+
+
+        // Compare the lists lengths
+        assertEquals(ongoingSalesFromBranchA.size(), ongoingSalesFromBranchAFromRepositoryList.size());
+
+
         // Now create a list of sales from the branch A that are closed from now
         // You have to do it manually because the repository doesn't have a method for that
         List<Sale> closedSalesFromBranchA = new ArrayList<>();
@@ -271,61 +283,6 @@ public class SaleRepositoryTest extends PacaTest {
             }
         }
 
-        // Get the cancelled sales from branch A
-        List<Sale> cancelledSalesFromBranchA = new ArrayList<>();
-        for (Sale sale : sales) {
-            if (sale.getTable().getBranch().equals(branchA) && 
-                sale.getStatus().equals(SaleStatics.Status.cancelled)&& 
-                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
-            {
-                cancelledSalesFromBranchA.add(sale);
-            }
-        }
-
-        // Now do the same but with branch B
-        List<Sale> ongoingSalesFromBranchB = new ArrayList<>();
-        for (Sale sale : sales) {
-            if (sale.getTable().getBranch().equals(branchB) && 
-                sale.getStatus().equals(SaleStatics.Status.ongoing)&& 
-                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
-            {
-                ongoingSalesFromBranchB.add(sale);
-            }
-        }
-
-        List<Sale> closedSalesFromBranchB = new ArrayList<>();
-        for (Sale sale : sales) {
-            if (sale.getTable().getBranch().equals(branchB) && 
-                sale.getStatus().equals(SaleStatics.Status.closed)&& 
-                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
-            {
-                closedSalesFromBranchB.add(sale);
-            }
-        }
-
-        // Get the cancelled sales from branch B
-        List<Sale> cancelledSalesFromBranchB = new ArrayList<>();
-        for (Sale sale : sales) {
-            if (sale.getTable().getBranch().equals(branchB) && 
-                sale.getStatus().equals(SaleStatics.Status.cancelled)&& 
-                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
-            {
-                cancelledSalesFromBranchB.add(sale);
-            }
-        }
-        // Now we can test the method
-
-        // Get the ongoing sales from branch A
-        List<Sale> ongoingSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
-                branchA.getId(),
-                List.of(SaleStatics.Status.ongoing),
-                oneYearBeforeNow,
-                test_page).getContent();
-
-
-        // Compare the lists lengths
-        assertEquals(ongoingSalesFromBranchA.size(), ongoingSalesFromBranchAFromRepositoryList.size());
-
         // Now repeat the process with the closed sales from branch A
         List<Sale> closedSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchA.getId(),
@@ -337,6 +294,18 @@ public class SaleRepositoryTest extends PacaTest {
         // Compare the lists lengths
         assertEquals(closedSalesFromBranchA.size(), closedSalesFromBranchAFromRepositoryList.size());
 
+
+        // Get the cancelled sales from branch A
+        List<Sale> cancelledSalesFromBranchA = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) && 
+                sale.getStatus().equals(SaleStatics.Status.cancelled)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
+            {
+                cancelledSalesFromBranchA.add(sale);
+            }
+        }
+
         // Now repeat the process with the cancelled sales from branch A
         List<Sale> cancelledSalesFromBranchAFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 branchA.getId(),
@@ -347,6 +316,19 @@ public class SaleRepositoryTest extends PacaTest {
 
         // Compare the lists lengths
         assertEquals(cancelledSalesFromBranchA.size(), cancelledSalesFromBranchAFromRepositoryList.size());
+
+
+
+        // Now do the same but with branch B
+        List<Sale> ongoingSalesFromBranchB = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchB) && 
+                sale.getStatus().equals(SaleStatics.Status.ongoing)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
+            {
+                ongoingSalesFromBranchB.add(sale);
+            }
+        }
 
         // Now repeat the process with the ongoing sales from branch B
 
@@ -361,6 +343,17 @@ public class SaleRepositoryTest extends PacaTest {
 
         assertEquals(ongoingSalesFromBranchB.size(), ongoingSalesFromBranchBFromRepositoryList.size());
 
+
+        List<Sale> closedSalesFromBranchB = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchB) && 
+                sale.getStatus().equals(SaleStatics.Status.closed)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
+            {
+                closedSalesFromBranchB.add(sale);
+            }
+        }
+
         // Now repeat the process with the closed sales from branch B
 
         List<Sale> closedSalesFromBranchBFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
@@ -374,6 +367,19 @@ public class SaleRepositoryTest extends PacaTest {
 
         assertEquals(closedSalesFromBranchB.size(), closedSalesFromBranchBFromRepositoryList.size());
 
+
+
+        // Get the cancelled sales from branch B
+        List<Sale> cancelledSalesFromBranchB = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchB) && 
+                sale.getStatus().equals(SaleStatics.Status.cancelled)&& 
+                sale.getStartTime().compareTo(oneYearBeforeNow) >= 0) 
+            {
+                cancelledSalesFromBranchB.add(sale);
+            }
+        }
+        
         // Now repeat the process with the cancelled sales from branch B
 
         List<Sale> cancelledSalesFromBranchBFromRepositoryList = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
