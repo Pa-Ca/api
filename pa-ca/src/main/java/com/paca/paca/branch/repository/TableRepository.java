@@ -13,5 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface TableRepository extends JpaRepository<Table, Long> {
 
-    List<Table> findAllByBranchId(long branchId);
+    List<Table> findAllByBranchIdAndDeletedFalse(long branchId);
 }

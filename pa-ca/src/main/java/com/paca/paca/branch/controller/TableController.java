@@ -52,19 +52,17 @@ public class TableController {
     
 
     @PutMapping("/{id}")
-    @ValidateBranchOwner
     @ValidateRoles({ "business" })
     @Operation(summary = "Update table", description = "Updates the data of a table given its ID and DTO")
     public ResponseEntity<TableDTO> update(
             @PathVariable("id") Long id,
             @RequestBody TableDTO dto)
             throws NoContentException, BadRequestException {
-        return ResponseEntity.ok(tableService.update(dto));
+        return ResponseEntity.ok(tableService.update(id, dto));
     }
 
 
     @DeleteMapping("/{id}")
-    @ValidateBranchOwner
     @ValidateRoles({ "business" })
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {

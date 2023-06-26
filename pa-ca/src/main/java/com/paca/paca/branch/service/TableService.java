@@ -42,13 +42,12 @@ public class TableService {
         return tableMapper.toDTO(table);
     }
 
-    public TableDTO update(TableDTO tableDTO) throws NoContentException{
-        // Check if the table exists
-        long tableId = tableDTO.getId();
-        Optional<Table> table = tableRepository.findById(tableId);
+    public TableDTO update(long id, TableDTO tableDTO) throws NoContentException{
+
+        Optional<Table> table = tableRepository.findById(id);
         if (table.isEmpty()) {
                     throw new NoContentException(
-                            "Table with id " + tableId + " does not exists",
+                            "Table with id " + id + " does not exists",
                             49);
                 }
         // Check if the branch exists

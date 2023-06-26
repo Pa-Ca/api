@@ -68,9 +68,7 @@ public class SaleController {
     }
 
     // Clear sales
-
-    @DeleteMapping("/{id}")
-    @ValidateBranchOwner
+    @DeleteMapping("/{id}/clear")
     @ValidateRoles({ "business" })
     @Operation(summary = "Delete sale products form a sale", 
     description = "Deletes all the sales products of a sale givent the slae ID")

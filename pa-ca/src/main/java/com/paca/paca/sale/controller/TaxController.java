@@ -50,8 +50,7 @@ public class TaxController {
     }
     
 
-    @PutMapping("/{id}")
-    @ValidateBranchOwner
+    @PutMapping("/{id}") // Hacer otro interceptor para validar que el usuario sea el dueño del negocio
     @ValidateRoles({ "business" })
     @Operation(summary = "Update tax", description = "Updates the data of a tax given its ID and DTO")
     public ResponseEntity<TaxDTO> update(
@@ -63,7 +62,6 @@ public class TaxController {
 
 
     @DeleteMapping("/{id}")
-    @ValidateBranchOwner
     @ValidateRoles({ "business" })
     @Operation(summary = "Delete tax", description = "Delete the data of a tax given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
