@@ -299,7 +299,7 @@ public class SaleService {
                 not_ongoing_sales_paging = PageRequest.of(
                         page,
                         size,
-                        Sort.by("start_time").descending());
+                        Sort.by("startTime").descending());
                 
 
                 Page<Sale> historicSales = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
