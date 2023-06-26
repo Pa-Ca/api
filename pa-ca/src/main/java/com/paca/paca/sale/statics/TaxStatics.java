@@ -1,6 +1,14 @@
 package com.paca.paca.sale.statics;
 
 public interface TaxStatics {
+
+    interface Endpoint {
+        String PATH = "/api/v1/tax";
+
+        String SAVE = "";
+    }
+
+
     interface Types {
         Integer FIXED = 0;
         Integer PERCENTAGE = 1; 

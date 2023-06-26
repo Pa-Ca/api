@@ -3,10 +3,9 @@ package com.paca.paca.sale.controller;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.dto.SaleDTO;
-import com.paca.paca.sale.dto.SaleListDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor.ValidateBranchOwner;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 //import BigDecimal
@@ -14,9 +13,11 @@ import com.paca.paca.exception.exceptions.NoContentException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,23 +38,44 @@ public class SaleController {
 
     private final SaleService saleService;
 
-
+    @PostMapping
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Create new sale", description = "Create a new sale")
+    public ResponseEntity<SaleDTO> save(@RequestBody SaleDTO dto)
+            throws NoContentException, BadRequestException {
+        return ResponseEntity.ok(saleService.save(dto));
+    }
     
 
-    // Post Methods
+    @PutMapping("/{id}")
+    @ValidateBranchOwner
     @ValidateRoles({ "business" })
-    @PostMapping("/newSale")
-    @Operation(summary = "Create new sale", description = "Create a new sale in the app")
-    public ResponseEntity<SaleDTO> save(@RequestBody SaleDTO dto) throws NoContentException, BadRequestException {
-        return ResponseEntity.ok(saleService.save(dto));
+    @Operation(summary = "Update sale", description = "Updates the data of a sale given its ID and DTO")
+    public ResponseEntity<SaleDTO> update(
+            @PathVariable("id") Long id,
+            @RequestBody SaleDTO dto)
+            throws NoContentException, BadRequestException {
+        return ResponseEntity.ok(saleService.update(dto));
     }
 
 
+    // @DeleteMapping("/{id}")
+    // @ValidateBranchOwner
+    // @ValidateRoles({ "business" })
+    // @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
+    // public void delete(@PathVariable("id") Long id) throws NoContentException {
+    //     saleService.delete(;
+    // }
+
+    // Clear sales
+
+    @DeleteMapping("/{id}")
+    @ValidateBranchOwner
     @ValidateRoles({ "business" })
-    @PostMapping("/cancel")
-    @Operation(summary = "Cancel a sale", description = "Cancel a sale given its id")
-    public void cancel(@RequestParam("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
-        saleService.cancel(id);
+    @Operation(summary = "Delete sale products form a sale", 
+    description = "Deletes all the sales products of a sale givent the slae ID")
+    public void clearSaleProducts(@PathVariable("id") Long id) throws NoContentException, BadRequestException {
+        saleService.clearSale(id);
     }
 
 }

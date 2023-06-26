@@ -64,7 +64,7 @@ public class TaxService {
                             "Tax with id " + TaxId + " does not exists",
                             52);
                 }
-        // Check that the defautl tax type belongs to the enum from the statics
+        // Check that the tax type belongs to the enum from the statics
         Integer TaxType = TaxDTO.getType();
                 if (!TaxStatics.Types.isTypeValid(TaxType)) {
             throw new BadRequestException(
@@ -72,7 +72,7 @@ public class TaxService {
                     53);
         }
         
-        // Check if the branch exists (This may be redundant)
+        // Check if the sale exists (This may be redundant)
         long saleId = TaxDTO.getSaleId();
         Optional<Sale> sale = saleRepository.findById(saleId);
         if (sale.isEmpty()) {

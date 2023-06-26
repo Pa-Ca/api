@@ -239,7 +239,7 @@ public class SaleService {
         return dtoResponse;
     }
 
-    public void clearSale(long saleId){
+    public void clearSale(long saleId) throws NoContentException, BadRequestException{
         // Deletes all the SaleProducts of a Sale given its id
 
         // Check if the sale exists

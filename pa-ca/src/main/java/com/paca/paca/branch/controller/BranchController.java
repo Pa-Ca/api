@@ -8,7 +8,6 @@ import com.paca.paca.branch.dto.AmenityListDTO;
 import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
-import com.paca.paca.branch.service.TableService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
@@ -57,8 +56,6 @@ public class BranchController {
     private final AmenityService amenityService;
 
     private final  SaleService saleService;
-
-    private final TableService tableService;
 
     @GetMapping
     @ValidateRoles({})
