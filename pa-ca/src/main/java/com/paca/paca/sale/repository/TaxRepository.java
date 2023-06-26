@@ -14,4 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TaxRepository extends JpaRepository<Tax, Long> {
     
     List<Tax> findAllBySaleId(Long saleId);  
+
+    void deleteAllBySaleId(Long saleId); // Needs to be tested
 }

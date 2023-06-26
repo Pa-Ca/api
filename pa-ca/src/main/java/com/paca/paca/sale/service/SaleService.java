@@ -89,6 +89,18 @@ public class SaleService {
         return TaxListDTO.builder().taxes(response).build();
     }
 
+    public void delete(Long saleId) throws NoContentException{
+
+        Optional<Sale> sale = saleRepository.findById(saleId);
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + saleId + " does not exists",
+                    42); // Lista en docs
+        }
+
+        saleRepository.deleteById(saleId);
+    }
+
     public SaleProductListDTO getSaleProductsbySaleId(long saleId)
             throws BadRequestException{
 
@@ -239,7 +251,7 @@ public class SaleService {
         return dtoResponse;
     }
 
-    public void clearSale(long saleId) throws NoContentException, BadRequestException{
+    public void clearSaleProducts(long saleId) throws NoContentException, BadRequestException{
         // Deletes all the SaleProducts of a Sale given its id
 
         // Check if the sale exists
@@ -266,6 +278,35 @@ public class SaleService {
 
         // Delete all the SaleProducts of the Sale
         saleProductRepository.deleteAllBySaleId(saleId);
+    }
+
+    public void clearSaleTaxes(long saleId) throws NoContentException, BadRequestException{
+        // Deletes all the SaleProducts of a Sale given its id
+
+        // Check if the sale exists
+        Optional<Sale> sale = saleRepository.findById(saleId);
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + saleId + " does not exists",
+                    42); // Lista en docs
+        }
+
+        // Check if the sale is closed
+        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+            throw new BadRequestException(
+                    "Sale with id " + saleId + " can not be cleared because it is already closed", 505
+                    ); // No esta referenciado en docs
+        }
+
+        // Check if the sale is canceled
+        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
+            throw new BadRequestException(
+                    "Sale with id " + saleId + " can not be cleared because it was canceled", 505
+                    ); // No esta referenciado en docs
+        }
+
+        // Delete all the SaleProducts of the Sale
+        taxRepository.deleteAllBySaleId(saleId);
     }
 
     public BranchSalesInfoDTO getBranchSales(

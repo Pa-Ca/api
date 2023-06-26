@@ -59,13 +59,13 @@ public class SaleController {
     }
 
 
-    // @DeleteMapping("/{id}")
-    // @ValidateBranchOwner
-    // @ValidateRoles({ "business" })
-    // @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
-    // public void delete(@PathVariable("id") Long id) throws NoContentException {
-    //     saleService.delete(;
-    // }
+    @DeleteMapping("/{id}")
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
+    public void delete(@PathVariable("id") Long id) throws NoContentException {
+        saleService.delete(id);
+    }
 
     // Clear sales
 
@@ -75,7 +75,7 @@ public class SaleController {
     @Operation(summary = "Delete sale products form a sale", 
     description = "Deletes all the sales products of a sale givent the slae ID")
     public void clearSaleProducts(@PathVariable("id") Long id) throws NoContentException, BadRequestException {
-        saleService.clearSale(id);
+        saleService.clearSaleProducts(id);
     }
 
 }
