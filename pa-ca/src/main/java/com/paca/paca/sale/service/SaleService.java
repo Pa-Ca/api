@@ -25,9 +25,7 @@ import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.dto.SaleProductDTO;
-import com.paca.paca.sale.dto.SaleProductListDTO;
 import com.paca.paca.sale.dto.TaxDTO;
-import com.paca.paca.sale.dto.TaxListDTO;
 import com.paca.paca.sale.statics.SaleStatics;
 
 import com.paca.paca.sale.dto.SaleInfoDTO;
@@ -65,7 +63,7 @@ public class SaleService {
 
     private final SaleProductMapper saleProductMapper;
 
-    public TaxListDTO getTaxesBySaleId(Long saleId) {
+    public List<TaxDTO> getTaxesBySaleId(Long saleId) {
         // Check if the sale exists
         Optional<Sale> sale = saleRepository.findById(saleId);
         if (sale.isEmpty()) {
@@ -86,7 +84,7 @@ public class SaleService {
         }
 
         // Return the DTOs
-        return TaxListDTO.builder().taxes(response).build();
+        return response;
     }
 
     public void delete(Long saleId) throws NoContentException{
@@ -101,7 +99,7 @@ public class SaleService {
         saleRepository.deleteById(saleId);
     }
 
-    public SaleProductListDTO getSaleProductsbySaleId(long saleId)
+    public List<SaleProductDTO> getSaleProductsbySaleId(long saleId)
             throws BadRequestException{
 
         // Check if the sale exists
@@ -122,7 +120,7 @@ public class SaleService {
         }
 
         // Return the DTOs
-        return new SaleProductListDTO(response);
+        return response;
     }
 
     public SaleDTO save(SaleDTO dto) throws NoContentException, BadRequestException {
@@ -360,8 +358,8 @@ public class SaleService {
 
                 historicSales.forEach(sale -> {
                     SaleDTO saleDTO = saleMapper.toDTO(sale);
-                    TaxListDTO taxListDTO = getTaxesBySaleId(sale.getId());
-                    SaleProductListDTO saleProductListDTO = getSaleProductsbySaleId(sale.getId());
+                    List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
+                    List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
                     
                     // Create a SaleInfo DTO
                     SaleInfoDTO saleInfoDTO = SaleInfoDTO.builder()
@@ -375,8 +373,8 @@ public class SaleService {
 
                 ongoingSales.forEach(sale -> {
                     SaleDTO saleDTO = saleMapper.toDTO(sale);
-                    TaxListDTO taxListDTO = getTaxesBySaleId(sale.getId());
-                    SaleProductListDTO saleProductListDTO = getSaleProductsbySaleId(sale.getId());
+                    List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
+                    List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
                     
                     // Create a SaleInfo DTO
                     SaleInfoDTO saleInfoDTO = SaleInfoDTO.builder()

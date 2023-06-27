@@ -1,5 +1,7 @@
 package com.paca.paca.sale.dto;
 
+import java.util.List;
+
 import lombok.*;
 
 @Builder
@@ -9,6 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 public class SaleInfoDTO {
     SaleDTO sale;
-    TaxListDTO taxes;
-    SaleProductListDTO products;
+    List<TaxDTO> taxes;
+    List<SaleProductDTO> products;
 }
