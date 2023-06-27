@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category.controller;
+package com.paca.paca.productSubCategory.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.product_sub_category.dto.ProductCategoryListDTO;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
-import com.paca.paca.product_sub_category.service.ProductSubCategoryService;
-import com.paca.paca.product_sub_category.statics.ProductSubCategoryStatics;
-import com.paca.paca.product_sub_category.utils.ValidateProductSubCategoryOwnerInterceptor.ValidateProductSubCategoryOwner;
+import com.paca.paca.productSubCategory.service.ProductSubCategoryService;
+import com.paca.paca.productSubCategory.statics.ProductSubCategoryStatics;
+import com.paca.paca.productSubCategory.utils.ValidateProductSubCategoryOwnerInterceptor.ValidateProductSubCategoryOwner;
 
 import lombok.RequiredArgsConstructor;
 

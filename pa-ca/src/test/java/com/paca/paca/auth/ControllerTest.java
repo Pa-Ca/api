@@ -11,7 +11,7 @@ import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 public class ControllerTest {
 
@@ -24,13 +24,13 @@ public class ControllerTest {
     @MockBean
     protected ReviewRepository reviewRepository;
 
-    @MockBean 
+    @MockBean
     protected BranchRepository branchRepository;
 
-    @MockBean 
+    @MockBean
     protected ProductRepository productRepository;
-    
-    @MockBean 
+
+    @MockBean
     protected BusinessRepository businessRepository;
 
     @MockBean
@@ -42,6 +42,6 @@ public class ControllerTest {
     @MockBean
     protected ClientGroupRepository clientGroupRepository;
 
-    @MockBean 
+    @MockBean
     protected ProductSubCategoryRepository productSubCategoryRepository;
 }

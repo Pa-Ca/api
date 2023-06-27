@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category;
+package com.paca.paca.productSubCategory;
 
 import org.junit.Assert;
 import org.mockito.Mock;
@@ -16,16 +16,16 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.product_sub_category.model.ProductCategory;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.dto.ProductCategoryListDTO;
-import com.paca.paca.product_sub_category.utils.ProductCategoryMapper;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
-import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
-import com.paca.paca.product_sub_category.service.ProductSubCategoryService;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.model.ProductCategory;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
+import com.paca.paca.productSubCategory.utils.ProductCategoryMapper;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
+import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
+import com.paca.paca.productSubCategory.service.ProductSubCategoryService;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class ProductSubCategoryServiceTest {
     @Mock
     private BranchRepository branchRepository;
 
-    @Mock 
+    @Mock
     private ProductRepository productRepository;
 
     @Mock
@@ -60,7 +60,7 @@ public class ProductSubCategoryServiceTest {
     private ProductSubCategoryService productSubCategoryService;
 
     private TestUtils utils = TestUtils.builder().build();
-    
+
     @Test
     void shouldGetAllProductSubCategories() {
         List<ProductSubCategory> productSubCategories = TestUtils.castList(
@@ -104,7 +104,8 @@ public class ProductSubCategoryServiceTest {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(productSubCategory));
+        when(productSubCategoryRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(productSubCategory));
         when(productSubCategoryMapper.toDTO(any(ProductSubCategory.class))).thenReturn(dto);
 
         ProductSubCategoryDTO dtoResponse = productSubCategoryService.getById(productSubCategory.getId());
@@ -186,7 +187,8 @@ public class ProductSubCategoryServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Product sub-category with id " + productSubCategory.getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(),
+                    "Product sub-category with id " + productSubCategory.getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
         }
     }
@@ -238,11 +240,12 @@ public class ProductSubCategoryServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Product sub-category with id " + productSubCategory.getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(),
+                    "Product sub-category with id " + productSubCategory.getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
         }
     }
-    
+
     @Test
     void shouldGetAllProductsByProductCategory() {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
