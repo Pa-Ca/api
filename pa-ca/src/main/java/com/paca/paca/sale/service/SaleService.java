@@ -210,13 +210,13 @@ public class SaleService {
         saleRepository.save(updatedSale);
     }
 
-    public SaleDTO update(SaleDTO dto) throws NoContentException, BadRequestException {
+    public SaleDTO update(long id,SaleDTO dto) throws NoContentException, BadRequestException {
         
         // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(dto.getId());
+        Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
             throw new NoContentException(
-                    "Sale with id " + dto.getId() + " does not exists",
+                    "Sale with id " + id + " does not exists",
                     42); // Lista en docs
         }
 
@@ -231,14 +231,14 @@ public class SaleService {
         // Check if the sale is closed
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + dto.getId() + " can not be updated because it is already closed", 43
+                    "Sale with id " + id + " can not be updated because it is already closed", 43
                     ); // Lista en docs
         }
 
         // Check if the sale is canceled
         if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
-                    "Sale with id " + dto.getId() + " can not be updated because it was canceled", 48
+                    "Sale with id " + id + " can not be updated because it was canceled", 48
                     ); // Lista en docs
         }
 

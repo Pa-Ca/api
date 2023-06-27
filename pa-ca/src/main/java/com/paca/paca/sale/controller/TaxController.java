@@ -1,7 +1,6 @@
 package com.paca.paca.sale.controller;
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor.ValidateBranchOwner;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -57,7 +56,7 @@ public class TaxController {
             @PathVariable("id") Long id,
             @RequestBody TaxDTO dto)
             throws NoContentException, BadRequestException {
-        return ResponseEntity.ok(taxService.update(dto));
+        return ResponseEntity.ok(taxService.update(id, dto));
     }
 
 

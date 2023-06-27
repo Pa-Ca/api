@@ -4,7 +4,6 @@ import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor.ValidateBranchOwner;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -48,19 +47,17 @@ public class SaleController {
     
 
     @PutMapping("/{id}")
-    @ValidateBranchOwner
     @ValidateRoles({ "business" })
     @Operation(summary = "Update sale", description = "Updates the data of a sale given its ID and DTO")
     public ResponseEntity<SaleDTO> update(
             @PathVariable("id") Long id,
             @RequestBody SaleDTO dto)
             throws NoContentException, BadRequestException {
-        return ResponseEntity.ok(saleService.update(dto));
+        return ResponseEntity.ok(saleService.update(id, dto));
     }
 
 
     @DeleteMapping("/{id}")
-    @ValidateBranchOwner
     @ValidateRoles({ "business" })
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {

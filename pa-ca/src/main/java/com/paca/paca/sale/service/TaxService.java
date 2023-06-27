@@ -1,6 +1,5 @@
 package com.paca.paca.sale.service;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -54,14 +53,13 @@ public class TaxService {
     }
 
     // Create a method that updates a  tax (from the DTO)
-    public TaxDTO update(TaxDTO TaxDTO) throws NoContentException, BadRequestException{
+    public TaxDTO update(long id, TaxDTO TaxDTO) throws NoContentException, BadRequestException{
 
         // Check if the  tax exists
-        long TaxId = TaxDTO.getId();
-        Optional<Tax> Tax = TaxRepository.findById(TaxId);
+        Optional<Tax> Tax = TaxRepository.findById(id);
         if (Tax.isEmpty()) {
                     throw new NoContentException(
-                            "Tax with id " + TaxId + " does not exists",
+                            "Tax with id " + id + " does not exists",
                             52);
                 }
         // Check that the tax type belongs to the enum from the statics

@@ -1,9 +1,7 @@
 package com.paca.paca.sale.service;
 
 
-import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,6 @@ import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.sale.repository.SaleRepository;
 
 import com.paca.paca.sale.dto.SaleProductDTO;
-import com.paca.paca.sale.dto.SaleProductListDTO;
 import com.paca.paca.sale.statics.SaleStatics;
 
 
@@ -97,12 +94,12 @@ public class SaleProductService {
     }
 
     // Update a sale product
-    public SaleProductDTO update(SaleProductDTO saleProductDTO) throws BadRequestException, ForbiddenException {
+    public SaleProductDTO update(long id, SaleProductDTO saleProductDTO) throws BadRequestException, ForbiddenException {
 
         // Check if the sale product exists
-        Optional<SaleProduct> saleProduct = saleProductRepository.findById(saleProductDTO.getId());
+        Optional<SaleProduct> saleProduct = saleProductRepository.findById(id);
         if (!saleProduct.isPresent()) {
-            throw new BadRequestException("Sale product with id " + saleProductDTO.getId() + " does not exist", 42);
+            throw new BadRequestException("Sale product with id " + id + " does not exist", 42);
         }
 
         // Check the status of the sale 
