@@ -1,6 +1,8 @@
 package com.paca.paca.sale.controller;
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.sale.utils.ValidateSaleProductOwnerInterceptor.ValidateSaleProductOwner;
+
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -51,6 +53,7 @@ public class SaleProductController {
 
     @PutMapping("/{id}") // Hacer otro interceptor para validar que el usuario sea el dueño del negocio
     @ValidateRoles({ "business" })
+    @ValidateSaleProductOwner
     @Operation(summary = "Updates a sale product", description = "Updates the data of a SaleProduct given its ID and DTO")
     public ResponseEntity<SaleProductDTO> update(
             @PathVariable("id") Long id,
@@ -62,6 +65,7 @@ public class SaleProductController {
 
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @ValidateSaleProductOwner
     @Operation(summary = "Deletes a sale product", description = "Delete the data of a SaleProduct given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         saleProductService.delete(id);

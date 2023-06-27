@@ -16,4 +16,7 @@ public interface TaxRepository extends JpaRepository<Tax, Long> {
     List<Tax> findAllBySaleId(Long saleId);  
 
     void deleteAllBySaleId(Long saleId); // Needs to be tested
+
+    Boolean existsByIdAndSale_Table_Branch_Business_Id(Long id, Long businessId); // Needs to be tested
+
 }

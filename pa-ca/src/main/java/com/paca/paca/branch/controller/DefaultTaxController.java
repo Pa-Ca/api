@@ -2,8 +2,12 @@ package com.paca.paca.branch.controller;
 
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.branch.utils.ValidateDefaultTaxOwnerInterceptor.ValidateDefaultTaxOwner;
+
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
+
+
 
 import com.paca.paca.branch.statics.DefaultTaxStatics;
 import com.paca.paca.branch.service.DefaultTaxService;
@@ -52,6 +56,7 @@ public class DefaultTaxController {
 
     @PutMapping("/{id}") // Hacer otro interceptor para validar que el usuario sea el dueño del negocio
     @ValidateRoles({ "business" })
+    @ValidateDefaultTaxOwner
     @Operation(summary = "Update Defaulttax", description = "Updates the data of a Defaulttax given its ID and DTO")
     public ResponseEntity<DefaultTaxDTO> update(
             @PathVariable("id") Long id,
@@ -63,6 +68,7 @@ public class DefaultTaxController {
 
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @ValidateDefaultTaxOwner
     @Operation(summary = "Delete Defaulttax", description = "Delete the data of a Defaulttax given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         defaultTaxService.delete(id);

@@ -2,7 +2,7 @@ package com.paca.paca.branch.controller;
 
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor.ValidateBranchOwner;
+import com.paca.paca.branch.utils.ValidateTableOwnerInterceptor.ValidateTableOwner;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -53,6 +53,7 @@ public class TableController {
 
     @PutMapping("/{id}")
     @ValidateRoles({ "business" })
+    @ValidateTableOwner
     @Operation(summary = "Update table", description = "Updates the data of a table given its ID and DTO")
     public ResponseEntity<TableDTO> update(
             @PathVariable("id") Long id,
@@ -64,6 +65,7 @@ public class TableController {
 
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    //@ValidateTableOwner
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         tableService.delete(id);

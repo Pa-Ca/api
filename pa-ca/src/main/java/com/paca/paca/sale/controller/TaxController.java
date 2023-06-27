@@ -1,6 +1,9 @@
 package com.paca.paca.sale.controller;
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.sale.utils.ValidateTaxOwnerInterceptor.ValidateTaxOwner;
+
+
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -51,6 +54,7 @@ public class TaxController {
 
     @PutMapping("/{id}") // Hacer otro interceptor para validar que el usuario sea el dueño del negocio
     @ValidateRoles({ "business" })
+    @ValidateTaxOwner
     @Operation(summary = "Update tax", description = "Updates the data of a tax given its ID and DTO")
     public ResponseEntity<TaxDTO> update(
             @PathVariable("id") Long id,
@@ -62,6 +66,7 @@ public class TaxController {
 
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @ValidateTaxOwner
     @Operation(summary = "Delete tax", description = "Delete the data of a tax given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         taxService.delete(id);

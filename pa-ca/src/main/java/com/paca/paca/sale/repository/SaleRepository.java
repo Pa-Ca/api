@@ -27,5 +27,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     List<Sale> findAllByTableBranchIdAndStatusOrderByStartTimeDesc(Long branchId, Integer status);
 
+    Boolean existsByIdAndTable_Branch_Business_Id(Long id, Long businessId); // Needs to be tested
+
 }
 

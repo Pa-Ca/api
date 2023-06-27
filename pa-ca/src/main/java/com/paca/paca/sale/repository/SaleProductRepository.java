@@ -12,4 +12,6 @@ public interface SaleProductRepository extends JpaRepository<SaleProduct, Long> 
     List<SaleProduct> findAllBySaleId(long saleId);
 
     void deleteAllBySaleId(long saleId);
+
+    Boolean existsByIdAndSale_Table_Branch_Business_Id(Long id, Long businessId); // Needs to be tested
 }

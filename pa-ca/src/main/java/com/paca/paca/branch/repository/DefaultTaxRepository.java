@@ -14,4 +14,6 @@ public interface DefaultTaxRepository extends JpaRepository<DefaultTax, Long> {
     
     List<DefaultTax> findAllByBranchId(Long branchId);
 
+    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId); // Needs to be tested
+
 }
