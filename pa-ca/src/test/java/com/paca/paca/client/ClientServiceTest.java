@@ -664,7 +664,7 @@ public class ClientServiceTest {
 
         when(clientRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(client));
-        when(clientGroupRepository.findAllByClientIdAndReservationReservationDateGreaterThanEqual(
+        when(clientGroupRepository.findAllByClientIdAndReservationReservationDateInGreaterThanEqual(
                 any(Long.class),
                 any(Date.class))).thenReturn(clientGroups);
 

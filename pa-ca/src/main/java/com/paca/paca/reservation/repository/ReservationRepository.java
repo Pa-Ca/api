@@ -18,13 +18,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findAllByBranchId(Long id);
 
-    List<Reservation> findAllByBranchIdAndReservationDateGreaterThanEqual(
+    List<Reservation> findAllByBranchIdAndReservationDateInGreaterThanEqual(
             Long id,
-            Date reservationDate);
+            Date reservationDateIn);
     
-    Page<Reservation> findAllByBranchIdAndReservationDateGreaterThanEqual(
+    Page<Reservation> findAllByBranchIdAndReservationDateInGreaterThanEqual(
         Long id,
-        Date reservationDate,
+        Date reservationDateIn,
         Pageable pageable);
 
     Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);

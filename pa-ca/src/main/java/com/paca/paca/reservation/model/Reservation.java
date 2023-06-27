@@ -34,12 +34,19 @@ public class Reservation {
     @Temporal(TemporalType.TIMESTAMP)
     private Date requestDate;
 
-    @Column(name = "reservation_date")
+    @Column(name = "reservation_date_in")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date reservationDate;
+    private Date reservationDateIn;
+
+    @Column(name = "reservation_date_out")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date reservationDateOut;
 
     @Column(name = "client_number")
     private Integer clientNumber;
+
+    @Column(name = "table_number")
+    private Integer tableNumber;
 
     @Column(name = "payment")
     private String payment;

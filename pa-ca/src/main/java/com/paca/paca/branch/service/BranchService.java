@@ -253,7 +253,7 @@ public class BranchService {
             response.add(dto);
         });
         // Sort reservations by date
-        response.sort(Comparator.comparing(ReservationDTO::getReservationDate));
+        response.sort(Comparator.comparing(ReservationDTO::getReservationDateIn));
 
         // Complete reservations
         List<ReservationDTO> result = response.stream().map(reservation -> {
@@ -264,7 +264,7 @@ public class BranchService {
         return ReservationListDTO.builder().reservations(result).build();
     }
 
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
+    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
             throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
@@ -274,7 +274,7 @@ public class BranchService {
         }
 
         List<ReservationDTO> response = new ArrayList<>();
-        reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate)
+        reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id, reservationDateIn)
                 .forEach(reservation -> {
                     ReservationDTO dto = reservationMapper.toDTO(reservation);
                     response.add(dto);
@@ -456,7 +456,7 @@ public class BranchService {
     }
 
     // This method returns a page of reservations with pagination
-    public ReservationListDTO getReservationsPage(Long id, Date reservationDate, int page, int size)
+    public ReservationListDTO getReservationsPage(Long id, Date reservationDateIn, int page, int size)
             throws UnprocessableException, NoContentException {
 
         // Now lets add the exeption handling
@@ -486,12 +486,12 @@ public class BranchService {
                 page,
                 size,
                 // Sort by id descending
-                Sort.by("reservationDate").descending());
+                Sort.by("reservationDateIn").descending());
 
         // Query the database for the appropriate page of results using the findAll
         // method of the reservation repository
-        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id,
-                reservationDate, paging);// .findAll(paging);
+        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id,
+                reservationDateIn, paging);// .findAll(paging);
 
         // Map the results to a list of ReservationDTO objects using the
         // ReservationMapper

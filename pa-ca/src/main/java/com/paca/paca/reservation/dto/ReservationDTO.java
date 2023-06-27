@@ -29,8 +29,10 @@ public class ReservationDTO {
     private Long branchId;
     private Long guestId;
     private Date requestDate;
-    private Date reservationDate;
+    private Date reservationDateIn;
+    private Date reservationDateOut;
     private Integer clientNumber;
+    private Integer tableNumber;
     private String payment;
     private Integer status;
     private Date payDate;
@@ -42,6 +44,7 @@ public class ReservationDTO {
     private String surname;
     private String email;
     private String phoneNumber;
+    private String identityDocument;
 
     public void completeData(
             GuestRepository guestRepository,
@@ -59,6 +62,7 @@ public class ReservationDTO {
             this.surname = guest.getSurname();
             this.email = guest.getEmail();
             this.phoneNumber = guest.getPhoneNumber();
+            this.identityDocument = guest.getIdentityDocument();
             this.haveGuest = Boolean.TRUE;
         } else {
             // We complete the reservation data with the data of the client who

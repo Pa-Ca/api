@@ -448,7 +448,7 @@ public class BranchServiceTest {
                 Mockito.mock(List.class));
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(
+        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(
                 any(Long.class),
                 any(Date.class))).thenReturn(reservations);
 
@@ -1000,7 +1000,7 @@ public class BranchServiceTest {
         int end = Math.min((start + pageable.getPageSize()), reservations.size());
         Page<Reservation> pagedResult = new PageImpl<>(reservations.subList(start, end), pageable, reservations.size());
 
-        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(any(Long.class), any(Date.class),
+        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(any(Long.class), any(Date.class),
                 any(Pageable.class))).thenReturn(pagedResult);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(utils.createReservationDTO(null));
 
