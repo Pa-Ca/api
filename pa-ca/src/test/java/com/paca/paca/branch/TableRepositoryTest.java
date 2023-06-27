@@ -128,4 +128,64 @@ public class TableRepositoryTest extends PacaTest {
         assertThat(tables.get(1)).isEqualTo(table2);
         assertThat(tables.get(2)).isEqualTo(table3);
     }
+
+    void shouldFindAllByBranchIdAndDeletedFalse(){
+        // Create two branches
+        Branch branch1 = utils.createBranch(null);
+        Branch branch2 = utils.createBranch(null);
+
+        // Create three tables for branch1 and 2 for branch2
+        Table table1 = Table.builder()
+                                .branch(branch1)
+                                .name("Mesa 1")
+                                .build();
+        Table table2 = Table.builder()
+                                .branch(branch1)
+                                .name("Mesa 2")
+                                .deleted(true)
+                                .build();
+        
+        Table table3 = Table.builder()
+                                .branch(branch1)
+                                .name("Mesa 3")
+                                .build();
+        
+        Table table4 = Table.builder()
+                                .branch(branch2)
+                                .name("Mesa 4")
+                                .deleted(true)
+                                .build();
+        
+        Table table5 = Table.builder()
+                                .branch(branch2)
+                                .name("Mesa 5")
+                                .build();
+        
+        List<Table> tables = List.of(table1, table2, table3, table4, table5);
+
+        // Save all tables
+        tableRepository.saveAll(tables);
+
+        // Get all tables for branch1 that are not deleted
+        List<Table> tablesForBranch1 = tableRepository.findAllByBranchIdAndDeletedFalse(branch1.getId());
+
+        // Do the proccess manually
+        List<Table> expectedTablesForBranch1 = List.of(table1, table3);
+
+        // Assert
+        assertThat(tablesForBranch1).isNotNull();
+        assertThat(tablesForBranch1.size()).isEqualTo(2);
+        assertThat(tablesForBranch1).isEqualTo(expectedTablesForBranch1);
+
+        // Now get all tables for branch2 that are not deleted
+        List<Table> tablesForBranch2 = tableRepository.findAllByBranchIdAndDeletedFalse(branch2.getId());
+
+        // Do the proccess manually
+        List<Table> expectedTablesForBranch2 = List.of(table5);
+
+        // Assert
+        assertThat(tablesForBranch2).isNotNull();
+        assertThat(tablesForBranch2.size()).isEqualTo(1);
+        assertThat(tablesForBranch2).isEqualTo(expectedTablesForBranch2);       
+    }
 }

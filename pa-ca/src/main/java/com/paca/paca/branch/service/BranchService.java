@@ -564,7 +564,7 @@ public class BranchService {
                 }
         
         // Get the tables
-        List<Table> tables = tableRepository.findAllByBranchId(branchId);
+        List<Table> tables = tableRepository.findAllByBranchIdAndDeletedFalse(branchId);
 
         List<TableDTO> tablesDTO = new ArrayList<>();
 
