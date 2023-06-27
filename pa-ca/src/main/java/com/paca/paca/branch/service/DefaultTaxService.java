@@ -48,14 +48,13 @@ public class DefaultTaxService {
         return defaultTaxMapper.toDTO(defaultTax);
     }
 
-    public DefaultTaxDTO update(DefaultTaxDTO defaultTaxDTO) throws NoContentException, BadRequestException{
+    public DefaultTaxDTO update(long id, DefaultTaxDTO defaultTaxDTO) throws NoContentException, BadRequestException{
 
         // Check if the default tax exists
-        long defaultTaxId = defaultTaxDTO.getId();
-        Optional<DefaultTax> defaultTax = defaultTaxRepository.findById(defaultTaxId);
+        Optional<DefaultTax> defaultTax = defaultTaxRepository.findById(id);
         if (defaultTax.isEmpty()) {
                     throw new NoContentException(
-                            "Default tax with id " + defaultTaxId + " does not exists",
+                            "Default tax with id " + id + " does not exists",
                             50);
                 }
         // Check that the defautl tax type belongs to the enum from the statics
