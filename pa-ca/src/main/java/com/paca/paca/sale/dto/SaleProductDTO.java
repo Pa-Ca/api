@@ -14,6 +14,6 @@ public class SaleProductDTO {
     private String name;
     private Long saleId;
     private Long productId;
-    private Integer ammount;
+    private Integer amount;
     private BigDecimal price;
 }

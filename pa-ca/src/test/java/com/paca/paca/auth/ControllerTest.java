@@ -16,7 +16,7 @@ import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.sale.repository.TaxRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 public class ControllerTest {
 

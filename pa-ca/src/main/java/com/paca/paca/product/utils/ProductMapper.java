@@ -3,7 +3,7 @@ package com.paca.paca.product.utils;
 import org.mapstruct.*;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {

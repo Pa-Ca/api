@@ -1,9 +1,9 @@
-package com.paca.paca.product_sub_category.utils;
+package com.paca.paca.productSubCategory.utils;
 
 import org.mapstruct.*;
 
-import com.paca.paca.product_sub_category.model.ProductCategory;
-import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
+import com.paca.paca.productSubCategory.model.ProductCategory;
 
 @Mapper(componentModel = "spring")
 public interface ProductCategoryMapper {

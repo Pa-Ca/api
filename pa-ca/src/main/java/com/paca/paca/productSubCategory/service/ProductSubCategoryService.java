@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category.service;
+package com.paca.paca.productSubCategory.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,16 +14,16 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.product_sub_category.model.ProductCategory;
-import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.dto.ProductCategoryListDTO;
-import com.paca.paca.product_sub_category.utils.ProductCategoryMapper;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
-import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.model.ProductCategory;
+import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
+import com.paca.paca.productSubCategory.utils.ProductCategoryMapper;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
+import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -95,7 +95,7 @@ public class ProductSubCategoryService {
                 dto,
                 branch.get(),
                 category.get());
-        productSubCategoryRepository.save(subCategory);
+        subCategory = productSubCategoryRepository.save(subCategory);
 
         ProductSubCategoryDTO dtoResponse = productSubCategoryMapper.toDTO(subCategory);
 

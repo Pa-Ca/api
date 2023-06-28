@@ -7,12 +7,10 @@ import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor.ValidateSaleOwner;
 
-
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 //import BigDecimal
-
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-
+import jakarta.transaction.Transactional;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -48,7 +46,6 @@ public class SaleController {
             throws NoContentException, BadRequestException {
         return ResponseEntity.ok(saleService.save(dto));
     }
-    
 
     @PutMapping("/{id}")
     @ValidateRoles({ "business" })
@@ -61,7 +58,6 @@ public class SaleController {
         return ResponseEntity.ok(saleService.update(id, dto));
     }
 
-
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
     @ValidateSaleOwner
@@ -71,11 +67,11 @@ public class SaleController {
     }
 
     // Clear sales
+    @Transactional
     @DeleteMapping("/{id}/clear")
     @ValidateRoles({ "business" })
     @ValidateSaleOwner
-    @Operation(summary = "Delete sale products form a sale", 
-    description = "Deletes all the sales products of a sale givent the slae ID")
+    @Operation(summary = "Delete sale products form a sale", description = "Deletes all the sales products of a sale givent the slae ID")
     public void clearSaleProducts(@PathVariable("id") Long id) throws NoContentException, BadRequestException {
         saleService.clearSaleProducts(id);
     }

@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category.statics;
+package com.paca.paca.productSubCategory.statics;
 
 public interface ProductSubCategoryStatics {
 

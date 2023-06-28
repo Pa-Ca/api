@@ -34,10 +34,10 @@ public class SaleProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "ammount")
-    private Integer ammount;
+    @Column(name = "amount")
+    private Integer amount;
 
     @Column(name = "price")
     private BigDecimal price;
-  
+
 }

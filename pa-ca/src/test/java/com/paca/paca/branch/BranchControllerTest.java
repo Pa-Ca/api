@@ -30,8 +30,8 @@ import com.paca.paca.branch.controller.AmenityController;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -458,14 +458,14 @@ public class BranchControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
         Branch branch = utils.createBranch(business);
 
-        when(branchService.getProductSubCategories(anyLong(), anyLong()))
+        when(branchService.getProductSubCategories(anyLong()))
                 .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/product-category/1"))
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/product-sub-category"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
@@ -481,13 +481,13 @@ public class BranchControllerTest extends ControllerTest {
         ProductSubCategoryListDTO subCategoryListDTO = ProductSubCategoryListDTO.builder()
                 .productSubCategories(subCategoryDTOList).build();
 
-        when(branchService.getProductSubCategories(anyLong(), anyLong())).thenReturn(subCategoryListDTO);
+        when(branchService.getProductSubCategories(anyLong())).thenReturn(subCategoryListDTO);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
         when(branchRepository.existsByIdAndBusinessId(anyLong(), anyLong())).thenReturn(true);
 
         utils.setAuthorities("business");
 
-        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/product-category/1"))
+        mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/" + branch.getId() + "/product-sub-category"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.productSubCategories",
@@ -1228,7 +1228,8 @@ public class BranchControllerTest extends ControllerTest {
         utils.setAuthorities("client");
 
         mockMvc.perform(
-                get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                get(BranchStatics.Endpoint.PATH
+                        .concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
@@ -1291,7 +1292,8 @@ public class BranchControllerTest extends ControllerTest {
                 .thenReturn(reviewListDTO);
 
         mockMvc.perform(
-                get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
+                get(BranchStatics.Endpoint.PATH
+                        .concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.reservations", CoreMatchers.hasItems()));

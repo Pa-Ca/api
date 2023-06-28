@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category;
+package com.paca.paca.productSubCategory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -13,10 +13,10 @@ import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.product_sub_category.model.ProductCategory;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.model.ProductCategory;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,7 +35,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ProductSubCategoryRepositoryTest extends PacaTest {
-    
+
     @Autowired
     private BranchRepository branchRepository;
 
@@ -117,20 +117,17 @@ public class ProductSubCategoryRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldGetAllProductSubCategoriesByBranchIdAndCategoryId() {
+    void shouldGetAllProductSubCategoriesByBranchId() {
         int nProductSubCategories = 10;
         Branch branch = utils.createBranch(null);
-        ProductCategory category = utils.createProductCategory();
 
         for (int i = 0; i < nProductSubCategories; i++) {
-            utils.createProductSubCategory(branch, category);
             utils.createProductSubCategory(branch, null);
-            utils.createProductSubCategory(null, category);
             utils.createProductSubCategory(null, null);
         }
 
         List<ProductSubCategory> productSubCategories = productSubCategoryRepository
-                .findAllByBranchIdAndCategoryId(branch.getId(), category.getId());
+                .findAllByBranchId(branch.getId());
 
         assertThat(productSubCategories.size()).isEqualTo(nProductSubCategories);
     }
@@ -140,12 +137,15 @@ public class ProductSubCategoryRepositoryTest extends PacaTest {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
 
         boolean expected = productSubCategoryRepository.existsById(productSubCategory.getId());
-        Optional<ProductSubCategory> expectedProductSubCategory = productSubCategoryRepository.findById(productSubCategory.getId());
+        Optional<ProductSubCategory> expectedProductSubCategory = productSubCategoryRepository
+                .findById(productSubCategory.getId());
 
         assertThat(expected).isTrue();
         assertThat(expectedProductSubCategory.isPresent()).isTrue();
-        assertThat(expectedProductSubCategory.get().getBranch().getId()).isEqualTo(productSubCategory.getBranch().getId());
-        assertThat(expectedProductSubCategory.get().getCategory().getId()).isEqualTo(productSubCategory.getCategory().getId());
+        assertThat(expectedProductSubCategory.get().getBranch().getId())
+                .isEqualTo(productSubCategory.getBranch().getId());
+        assertThat(expectedProductSubCategory.get().getCategory().getId())
+                .isEqualTo(productSubCategory.getCategory().getId());
     }
 
     @Test

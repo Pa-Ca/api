@@ -1,9 +1,9 @@
-package com.paca.paca.product_sub_category.dto;
+package com.paca.paca.productSubCategory.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
@@ -14,4 +14,3 @@ import java.util.List;
 public class ProductCategoryListDTO {
     List<ProductCategoryDTO> productCategories;
 }
-
