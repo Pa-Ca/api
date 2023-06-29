@@ -51,7 +51,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getById(id));
     }
 
-    //Esto esta abierto a no usuarios?
     @PostMapping
     @Operation(summary = "Create new reservation", description = "Create a new reservation in the app")
     public ResponseEntity<ReservationDTO> save(@RequestBody ReservationDTO dto) throws NoContentException, BadRequestException {

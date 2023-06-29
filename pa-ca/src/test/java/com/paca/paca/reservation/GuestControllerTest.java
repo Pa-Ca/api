@@ -75,6 +75,33 @@ public class GuestControllerTest extends ControllerTest {
                         CoreMatchers.is("Unauthorized access for this operation")));
     }
 
+
+    @Test
+    public void shouldGetGuestByIdentityDocument() throws Exception {
+        GuestDTO dto = utils.createGuestDTO(null);
+
+        when(guestService.getByIdentityDocument(any(String.class)))
+                .thenReturn(dto);
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(get(ReservationStatics.Endpoint.GUEST_PATH.concat(
+                "/identity-document/" + dto.getIdentityDocument()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                        CoreMatchers.is(dto.getName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname",
+                        CoreMatchers.is(dto.getSurname())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                        CoreMatchers.is(dto.getEmail())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                        CoreMatchers.is(dto.getPhoneNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.identityDocument",
+                        CoreMatchers.is(dto.getIdentityDocument())))
+                ;
+    }
+
     @Test
     public void shouldGetGuestList() throws Exception {
         ArrayList<GuestDTO> dtoList = new ArrayList<>();

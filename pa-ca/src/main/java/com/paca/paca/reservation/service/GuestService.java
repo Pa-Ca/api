@@ -42,6 +42,16 @@ public class GuestService {
         return dto;
     }
 
+    public GuestDTO getByIdentityDocument(String identityDocument) throws NoContentException {
+        Guest guest = guestRepository.findByIdentityDocument(identityDocument)
+                .orElseThrow(() -> new NoContentException(
+                        "Guest with identityDocument " + identityDocument + " does not exists",
+                        40));
+
+        GuestDTO dto = guestMapper.toDTO(guest);
+        return dto;
+    }
+
     public GuestDTO save(GuestDTO dto) throws NoContentException {
         Guest newGuest = guestMapper.toEntity(dto);
         newGuest = guestRepository.save(newGuest);

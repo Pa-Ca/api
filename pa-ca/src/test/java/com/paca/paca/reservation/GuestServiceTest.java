@@ -79,6 +79,34 @@ public class GuestServiceTest {
     }
 
     @Test
+    void shouldGetNoContentDueToMissingGuestInGetGuestByIdentityDocument() {
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.empty());
+
+        try {
+            guestService.getByIdentityDocument("V69420616");
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Guest with identityDocument V69420616 does not exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 40);
+        }
+    }
+
+    @Test
+    void shouldGetGuestByIdentityDocument() {
+        Guest guest = utils.createGuest();
+        GuestDTO dto = utils.createGuestDTO(guest);
+
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
+        when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
+
+        GuestDTO dtoResponse = guestService.getByIdentityDocument(guest.getIdentityDocument());
+
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
+    }
+
+    @Test
     void shouldSaveGuest() {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
