@@ -16,17 +16,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.math.BigDecimal;
 
-
 @ExtendWith(SpringExtension.class)
 public class SaleProductMapperTest {
-    
+
     @InjectMocks
     private SaleProductMapperImpl saleProductMapper;
 
     private TestUtils utils = TestUtils.builder().build();
 
     @Test
-    void shouldMapSaleProductEntityToSaleProductDTO(){
+    void shouldMapSaleProductEntityToSaleProductDTO() {
 
         SaleProduct saleProduct = utils.createSaleProduct(null, null);
 
@@ -36,7 +35,7 @@ public class SaleProductMapperTest {
         assertThat(salePorductDTO).isNotNull();
         // Check all the attributes of the salePoructDTO
         assertThat(salePorductDTO.getId()).isEqualTo(saleProduct.getId());
-        assertThat(salePorductDTO.getAmmount()).isEqualTo(saleProduct.getAmmount());
+        assertThat(salePorductDTO.getAmount()).isEqualTo(saleProduct.getAmount());
         assertThat(salePorductDTO.getSaleId()).isEqualTo(saleProduct.getSale().getId());
         assertThat(salePorductDTO.getProductId()).isEqualTo(saleProduct.getProduct().getId());
         assertThat(salePorductDTO.getName()).isEqualTo(saleProduct.getName());
@@ -45,9 +44,9 @@ public class SaleProductMapperTest {
     }
 
     @Test
-    void shouldMapSaleProductDTOtoSaleProductEntity(){
+    void shouldMapSaleProductDTOtoSaleProductEntity() {
 
-        // Create a sale and a product 
+        // Create a sale and a product
         Sale sale = utils.createSale(null, null);
         Product product = utils.createProduct(null);
 
@@ -59,7 +58,7 @@ public class SaleProductMapperTest {
         assertThat(saleProduct).isNotNull();
         // Check all the attributes of the saleProduct
         assertThat(saleProduct.getId()).isEqualTo(saleProductDTO.getId());
-        assertThat(saleProduct.getAmmount()).isEqualTo(saleProductDTO.getAmmount());
+        assertThat(saleProduct.getAmount()).isEqualTo(saleProductDTO.getAmount());
         assertThat(saleProduct.getSale().getId()).isEqualTo(saleProductDTO.getSaleId());
         assertThat(saleProduct.getProduct().getId()).isEqualTo(saleProductDTO.getProductId());
         assertThat(saleProduct.getName()).isEqualTo(saleProductDTO.getName());
@@ -68,12 +67,12 @@ public class SaleProductMapperTest {
     }
 
     @Test
-    void shouldPartiallyMapSaleProductDTOtoSaleProductEntity(){
-        // This function should check that when an enetity is updated by a dto, all the fileds are
+    void shouldPartiallyMapSaleProductDTOtoSaleProductEntity() {
+        // This function should check that when an enetity is updated by a dto, all the
+        // fileds are
         // updated except for id, product, sale and price
 
-
-        // Create a sale and a product 
+        // Create a sale and a product
         Sale sale = utils.createSale(null, null);
         Product product = utils.createProduct(null);
 
@@ -85,7 +84,7 @@ public class SaleProductMapperTest {
         assertThat(saleProduct).isNotNull();
         // Check all the attributes of the saleProduct
         assertThat(saleProduct.getId()).isEqualTo(saleProductDTO.getId());
-        assertThat(saleProduct.getAmmount()).isEqualTo(saleProductDTO.getAmmount());
+        assertThat(saleProduct.getAmount()).isEqualTo(saleProductDTO.getAmount());
         assertThat(saleProduct.getSale().getId()).isEqualTo(saleProductDTO.getSaleId());
         assertThat(saleProduct.getProduct().getId()).isEqualTo(saleProductDTO.getProductId());
         assertThat(saleProduct.getName()).isEqualTo(saleProductDTO.getName());
@@ -96,11 +95,11 @@ public class SaleProductMapperTest {
         long random_id = (long) (Math.random() * 1000);
         BigDecimal random_price = BigDecimal.valueOf(Math.random() * 1000);
         saleProductDTO.setId(random_id);
-        saleProductDTO.setAmmount(10);
+        saleProductDTO.setAmount(10);
         saleProductDTO.setName("New name");
         saleProductDTO.setPrice(random_price);
-        saleProductDTO.setProductId(random_id+1);
-        saleProductDTO.setSaleId(random_id+2);
+        saleProductDTO.setProductId(random_id + 1);
+        saleProductDTO.setSaleId(random_id + 2);
 
         // Update the saleProduct entity
         saleProduct = saleProductMapper.updateModel(saleProductDTO, saleProduct);
@@ -112,12 +111,10 @@ public class SaleProductMapperTest {
         assertThat(saleProduct.getSale().getId()).isNotEqualTo(saleProductDTO.getSaleId());
         assertThat(saleProduct.getProduct().getId()).isNotEqualTo(saleProductDTO.getProductId());
         assertThat(saleProduct.getPrice()).isNotEqualTo(saleProductDTO.getPrice());
-        
-        // Check that only the updatable fields have been updated
-        assertThat(saleProduct.getAmmount()).isEqualTo(saleProductDTO.getAmmount());
-        assertThat(saleProduct.getName()).isEqualTo(saleProductDTO.getName());
-        
 
+        // Check that only the updatable fields have been updated
+        assertThat(saleProduct.getAmount()).isEqualTo(saleProductDTO.getAmount());
+        assertThat(saleProduct.getName()).isEqualTo(saleProductDTO.getName());
 
     }
 }

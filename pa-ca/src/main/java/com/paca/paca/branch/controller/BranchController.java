@@ -17,8 +17,8 @@ import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
 import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor.ValidateBranchOwner;
 
 import org.springframework.http.ResponseEntity;
@@ -97,12 +97,11 @@ public class BranchController {
         branchService.delete(id);
     }
 
-    @GetMapping("/{id}/product-category/{productCategoryId}")
-    @Operation(summary = "Get all product sub-categories of a branch", description = "Gets a list with the data of all the product sub-categories of a branch given its id")
+    @GetMapping("/{id}/product-sub-category")
+    @Operation(summary = "Get all product sub-categories of a branch", description = "Gets a list with the data of all the product sub-categories of a branch")
     public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
-            @PathVariable("id") Long id,
-            @PathVariable("productCategoryId") Long productCategoryId) throws NoContentException {
-        return ResponseEntity.ok(branchService.getProductSubCategories(id, productCategoryId));
+            @PathVariable("id") Long id) throws NoContentException {
+        return ResponseEntity.ok(branchService.getProductSubCategories(id));
     }
 
     @GetMapping("/{id}/product")
@@ -215,15 +214,15 @@ public class BranchController {
                 min_capacity));
     }
 
-    // Example get  http://yourdomain.com/1/reservations?reservation_date=2020-12-12&page=2&size=5
+    // Example get
+    // http://yourdomain.com/1/reservations?reservation_date=2020-12-12&page=2&size=5
     @GetMapping("/{id}/reservations")
     @ValidateRoles({ "business" })
     public ResponseEntity<ReservationListDTO> getReservationsPage(
             @PathVariable("id") Long id,
             @RequestParam("reservation_date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date reservation_date,
             @RequestParam("page") int page,
-            @RequestParam("size") int size
-            ) throws NoContentException, UnprocessableException {
+            @RequestParam("size") int size) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(branchService.getReservationsPage(id, reservation_date, page, size));
     }
 

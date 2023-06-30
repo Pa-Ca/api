@@ -7,8 +7,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 import com.paca.paca.user.utils.ValidateUserInterceptor;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor;
-import com.paca.paca.business.utils.ValidateBusinessInterceptor;
 import com.paca.paca.client.utils.ValidateClientInterceptor;
+import com.paca.paca.business.utils.ValidateBusinessInterceptor;
 import com.paca.paca.client.utils.ValidateReviewOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateDefaultTaxOwnerInterceptor;
@@ -19,8 +19,7 @@ import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor;
 import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor;
 import com.paca.paca.sale.utils.ValidateSaleProductOwnerInterceptor;
 import com.paca.paca.sale.utils.ValidateTaxOwnerInterceptor;
-import com.paca.paca.product_sub_category.utils.ValidateProductSubCategoryOwnerInterceptor;
-
+import com.paca.paca.productSubCategory.utils.ValidateProductSubCategoryOwnerInterceptor;
 
 @Configuration
 public class SpringMVCConfig implements WebMvcConfigurer {
@@ -45,7 +44,7 @@ public class SpringMVCConfig implements WebMvcConfigurer {
 
     @Autowired
     ValidateProductOwnerInterceptor validateProductOwnerInterceptor;
-    
+
     @Autowired
     ValidatePromotionOwnerInterceptor validatePromotionOwnerInterceptor;
 
@@ -70,9 +69,7 @@ public class SpringMVCConfig implements WebMvcConfigurer {
     @Autowired
     ValidateDefaultTaxOwnerInterceptor validateDefaultTaxOwnerInterceptor;
 
-
-
-    @Override 
+    @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(validateUserInterceptor);
         registry.addInterceptor(validateRolesInterceptor);

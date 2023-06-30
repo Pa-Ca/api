@@ -31,7 +31,7 @@ CREATE TABLE sale_product (
     sale_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     product_id INT NULL,
-    ammount INT NOT NULL,
+    amount INT NOT NULL,
     price FLOAT,
     CONSTRAINT sale_product_pk PRIMARY KEY (id),
     CONSTRAINT sale_product_sale_fk FOREIGN KEY (sale_id) REFERENCES sale (id),
