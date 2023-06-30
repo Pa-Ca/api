@@ -33,6 +33,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -154,8 +155,13 @@ public class SaleServiceTest {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         Sale sale = utils.createSale(null, null);
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
+        SaleProduct saleProduct = utils.createSaleProduct(sale, null);
+        
 
-        when(taxRepository.findAllBySaleId(any())).thenReturn(taxes);
+        List<SaleProduct> saleProducts = List.of(saleProduct); 
+        
+        when(saleProductRepository.findAllBySaleId(anyLong())).thenReturn(saleProducts);
+        when(taxRepository.findAllBySaleId(anyLong())).thenReturn(taxes);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
         when(saleRepository.save(any())).thenReturn(sale);
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
