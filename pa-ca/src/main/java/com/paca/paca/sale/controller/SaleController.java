@@ -3,16 +3,22 @@ package com.paca.paca.sale.controller;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.dto.SaleDTO;
-
+import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.branch.repository.TableRepository;
+import com.paca.paca.business.model.Business;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor.ValidateSaleOwner;
 
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 //import BigDecimal
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,23 +44,41 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class SaleController {
 
     private final SaleService saleService;
+    private final BusinessRepository businessRepository;
+    private final TableRepository tableRepository;
 
     @PostMapping
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new sale", description = "Create a new sale")
-    public ResponseEntity<SaleDTO> save(@RequestBody SaleDTO dto)
-            throws NoContentException, BadRequestException {
-        return ResponseEntity.ok(saleService.save(dto));
+    public ResponseEntity<SaleInfoDTO> save(@RequestBody SaleDTO dto)
+            throws NoContentException, BadRequestException, ForbiddenException {
+                
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            return ResponseEntity.ok(saleService.save(dto));
+        }
+        else{
+            Business business = businessRepository.findByUserEmail(auth.getName()).get();
+            Long tableId = dto.getTableId();
+
+            if (!tableRepository.existsByIdAndBranch_Business_Id(tableId, business.getId())) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }
+
+            return ResponseEntity.ok(saleService.save(dto));
+        }
+
     }
 
     @PutMapping("/{id}")
     @ValidateRoles({ "business" })
     @ValidateSaleOwner
     @Operation(summary = "Update sale", description = "Updates the data of a sale given its ID and DTO")
-    public ResponseEntity<SaleDTO> update(
+    public ResponseEntity<SaleInfoDTO> update(
             @PathVariable("id") Long id,
             @RequestBody SaleDTO dto)
             throws NoContentException, BadRequestException {
+                
         return ResponseEntity.ok(saleService.update(id, dto));
     }
 
