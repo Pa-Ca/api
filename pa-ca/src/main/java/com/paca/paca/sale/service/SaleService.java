@@ -54,7 +54,7 @@ public class SaleService {
 
     private final SaleProductMapper saleProductMapper;
 
-    public List<TaxDTO> getTaxesBySaleId(Long saleId) {
+    public List<TaxDTO> getTaxesBySaleId(Long saleId) throws NoContentException{
         // Check if the sale exists
         Optional<Sale> sale = saleRepository.findById(saleId);
         if (sale.isEmpty()) {
@@ -91,12 +91,12 @@ public class SaleService {
     }
 
     public List<SaleProductDTO> getSaleProductsbySaleId(long saleId)
-            throws BadRequestException {
+            throws NoContentException {
 
         // Check if the sale exists
         Optional<Sale> sale = saleRepository.findById(saleId);
         if (!sale.isPresent()) {
-            throw new BadRequestException("Sale with id " + saleId + " does not exist", 42);
+            throw new NoContentException("Sale with id " + saleId + " does not exists", 42);
         }
 
         // Get the products
@@ -114,7 +114,7 @@ public class SaleService {
         return response;
     }
 
-    public SaleDTO save(SaleDTO dto) throws NoContentException, BadRequestException {
+    public SaleInfoDTO save(SaleDTO dto) throws NoContentException {
 
         Optional<Table> table = tableRepository.findById(dto.getTableId());
 
@@ -129,11 +129,22 @@ public class SaleService {
 
         newSale = saleRepository.save(newSale);
 
-        SaleDTO dtoResponse = saleMapper.toDTO(newSale);
+        SaleDTO saleDTO = saleMapper.toDTO(newSale);
+
+        List<TaxDTO> taxListDTO = getTaxesBySaleId(newSale.getId());
+        List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(newSale.getId());
+
+        // Create a SaleInfo DTO
+        SaleInfoDTO dtoResponse = SaleInfoDTO.builder()
+                .sale(saleDTO)
+                .taxes(taxListDTO)
+                .products(saleProductListDTO)
+                .build();
 
         return dtoResponse;
     }
 
+    // Do not use this method (not tested)
     public void cancel(Long id) throws NoContentException, BadRequestException {
         Optional<Sale> sale = saleRepository.findById(id);
 
@@ -161,6 +172,7 @@ public class SaleService {
         saleRepository.save(updatedSale);
     }
 
+    // Do not use this method (not tested)
     public void close(Long id) throws NoContentException, BadRequestException {
         Optional<Sale> sale = saleRepository.findById(id);
 
@@ -194,7 +206,7 @@ public class SaleService {
         saleRepository.save(updatedSale);
     }
 
-    public SaleDTO update(long id, SaleDTO dto) throws NoContentException, BadRequestException {
+    public SaleInfoDTO update(long id, SaleDTO dto) throws NoContentException, BadRequestException {
 
         // Check if the sale exists
         Optional<Sale> sale = saleRepository.findById(id);
@@ -219,7 +231,17 @@ public class SaleService {
         // Update the sale
         Sale updatedSale = saleMapper.updateModel(dto, sale.get());
         updatedSale = saleRepository.save(updatedSale);
-        SaleDTO dtoResponse = saleMapper.toDTO(updatedSale);
+        SaleDTO updatedSaleDTO = saleMapper.toDTO(updatedSale);
+
+        List<TaxDTO> taxListDTO = getTaxesBySaleId(updatedSale.getId());
+        List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(updatedSale.getId());
+
+        // Create a SaleInfo DTO
+        SaleInfoDTO dtoResponse = SaleInfoDTO.builder()
+                .sale(updatedSaleDTO)
+                .taxes(taxListDTO)
+                .products(saleProductListDTO)
+                .build();
 
         return dtoResponse;
     }
