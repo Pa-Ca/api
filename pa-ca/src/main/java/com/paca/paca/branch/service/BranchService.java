@@ -46,19 +46,17 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
-import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
+import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
 @Service
@@ -100,8 +98,6 @@ public class BranchService {
     private final ClientGroupRepository clientGroupRepository;
 
     private final FavoriteBranchRepository favoriteBranchRepository;
-
-    private final ProductCategoryRepository productCategoryRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
 
@@ -178,24 +174,16 @@ public class BranchService {
         branchRepository.deleteById(id);
     }
 
-    public ProductSubCategoryListDTO getProductSubCategories(
-            Long branchId,
-            Long productCategoryId) throws NoContentException {
+    public ProductSubCategoryListDTO getProductSubCategories(Long branchId) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
-        Optional<ProductCategory> category = productCategoryRepository.findById(productCategoryId);
-        if (category.isEmpty()) {
-            throw new NoContentException(
-                    "Product category with id " + productCategoryId + " does not exists",
-                    24);
-        }
 
         List<ProductSubCategoryDTO> response = new ArrayList<>();
-        productSubCategoryRepository.findAllByBranchIdAndCategoryId(branchId, productCategoryId)
+        productSubCategoryRepository.findAllByBranchId(branchId)
                 .forEach(subCategory -> {
                     ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(subCategory);
                     response.add(dto);
@@ -253,7 +241,7 @@ public class BranchService {
             response.add(dto);
         });
         // Sort reservations by date
-        response.sort(Comparator.comparing(ReservationDTO::getReservationDate));
+        response.sort(Comparator.comparing(ReservationDTO::getReservationDateIn));
 
         // Complete reservations
         List<ReservationDTO> result = response.stream().map(reservation -> {
@@ -264,7 +252,7 @@ public class BranchService {
         return ReservationListDTO.builder().reservations(result).build();
     }
 
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
+    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
             throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
@@ -274,7 +262,7 @@ public class BranchService {
         }
 
         List<ReservationDTO> response = new ArrayList<>();
-        reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate)
+        reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id, reservationDateIn)
                 .forEach(reservation -> {
                     ReservationDTO dto = reservationMapper.toDTO(reservation);
                     response.add(dto);
@@ -456,7 +444,7 @@ public class BranchService {
     }
 
     // This method returns a page of reservations with pagination
-    public ReservationListDTO getReservationsPage(Long id, Date reservationDate, int page, int size)
+    public ReservationListDTO getReservationsPage(Long id, Date reservationDateIn, int page, int size)
             throws UnprocessableException, NoContentException {
 
         // Now lets add the exeption handling
@@ -486,12 +474,12 @@ public class BranchService {
                 page,
                 size,
                 // Sort by id descending
-                Sort.by("reservationDate").descending());
+                Sort.by("reservationDateIn").descending());
 
         // Query the database for the appropriate page of results using the findAll
         // method of the reservation repository
-        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id,
-                reservationDate, paging);// .findAll(paging);
+        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id,
+                reservationDateIn, paging);// .findAll(paging);
 
         // Map the results to a list of ReservationDTO objects using the
         // ReservationMapper

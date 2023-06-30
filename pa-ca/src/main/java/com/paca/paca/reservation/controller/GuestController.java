@@ -47,6 +47,13 @@ public class GuestController {
         return ResponseEntity.ok(guestService.getById(id));
     }
 
+    @GetMapping("/identity-document/{identityDocument}")
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Get user guest by identity document", description = "Gets the data of a user guest given its identity document")
+    public ResponseEntity<GuestDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument) throws NoContentException {
+        return ResponseEntity.ok(guestService.getByIdentityDocument(identityDocument));
+    }
+
     @PostMapping
     @ValidateRoles({})
     @Operation(summary = "Create new user guest", description = "Create a new user guest in the app")

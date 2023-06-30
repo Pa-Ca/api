@@ -1,4 +1,4 @@
-package com.paca.paca.product_sub_category.dto;
+package com.paca.paca.productSubCategory.dto;
 
 import lombok.Builder;
 import lombok.Getter;

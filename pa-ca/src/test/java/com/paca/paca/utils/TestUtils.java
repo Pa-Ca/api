@@ -58,27 +58,27 @@ import com.paca.paca.reservation.dto.ReservationPaymentDTO;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
+import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.product_sub_category.model.ProductCategory;
-import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -770,6 +770,7 @@ public class TestUtils {
                 .surname("surname_test")
                 .email("email_test")
                 .phoneNumber("phone_number_test")
+                .identityDocument("iden_doc_test")
                 .build();
 
         if (guestRepository != null) {
@@ -789,6 +790,7 @@ public class TestUtils {
                 .surname(guest.getSurname())
                 .email(guest.getEmail())
                 .phoneNumber(guest.getPhoneNumber())
+                .identityDocument(guest.getIdentityDocument())
                 .build();
 
         return dto;
@@ -807,8 +809,10 @@ public class TestUtils {
                 .branch(branch)
                 .guest(guest)
                 .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDate(new Date(System.currentTimeMillis()))
+                .reservationDateIn(new Date(System.currentTimeMillis()))
+                .reservationDateOut(new Date(System.currentTimeMillis()))
                 .clientNumber(5)
+                .tableNumber(2)
                 .payment("payment_test")
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
@@ -834,8 +838,10 @@ public class TestUtils {
                 .branch(branch)
                 .guest(null)
                 .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDate(new Date(System.currentTimeMillis()))
+                .reservationDateIn(new Date(System.currentTimeMillis()))
+                .reservationDateOut(new Date(System.currentTimeMillis()))
                 .clientNumber(5)
+                .tableNumber(2)
                 .payment("payment_test")
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
@@ -861,8 +867,10 @@ public class TestUtils {
                 .branchId(reservation.getBranch().getId())
                 .guestId(reservation.getGuest() == null ? null : reservation.getGuest().getId())
                 .requestDate(reservation.getRequestDate())
-                .reservationDate(reservation.getReservationDate())
+                .reservationDateIn(reservation.getReservationDateIn())
+                .reservationDateOut(reservation.getReservationDateOut())
                 .clientNumber(reservation.getClientNumber())
+                .tableNumber(reservation.getTableNumber())
                 .payment(reservation.getPayment())
                 .status(reservation.getStatus())
                 .payDate(reservation.getPayDate())
@@ -965,8 +973,10 @@ public class TestUtils {
                     .branch(branch)
                     .guest(null)
                     .requestDate(new Date(System.currentTimeMillis()))
-                    .reservationDate(date)
+                    .reservationDateIn(date)
+                    .reservationDateOut(date)
                     .clientNumber(5)
+                    .tableNumber(2)
                     .payment("payment_test")
                     .status(0)
                     .payDate(new Date(System.currentTimeMillis()))

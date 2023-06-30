@@ -108,8 +108,10 @@ class ReservationRepositoryTest extends PacaTest {
                 .branch(branch)
                 .guest(guest)
                 .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDate(new Date(System.currentTimeMillis()))
-                .clientNumber(1)
+                .reservationDateIn(new Date(System.currentTimeMillis()))
+                .reservationDateOut(new Date(System.currentTimeMillis()))
+                .clientNumber(4)
+                .tableNumber(1)
                 .payment("69")
                 .status(1)
                 .payDate(new Date(System.currentTimeMillis()))
@@ -124,9 +126,12 @@ class ReservationRepositoryTest extends PacaTest {
         assertThat(savedReservation.getBranch().getId()).isEqualTo(reservation.getBranch().getId());
         assertThat(savedReservation.getGuest().getId()).isEqualTo(reservation.getGuest().getId());
         assertThat(new Date(savedReservation.getRequestDate().getTime())).isEqualTo(reservation.getRequestDate());
-        assertThat(new Date(savedReservation.getReservationDate().getTime()))
-                .isEqualTo(reservation.getReservationDate());
+        assertThat(new Date(savedReservation.getReservationDateIn().getTime()))
+                .isEqualTo(reservation.getReservationDateIn());
+        assertThat(new Date(savedReservation.getReservationDateOut().getTime()))
+                .isEqualTo(reservation.getReservationDateOut());
         assertThat(savedReservation.getClientNumber()).isEqualTo(reservation.getClientNumber());
+        assertThat(savedReservation.getTableNumber()).isEqualTo(reservation.getTableNumber());
         assertThat(savedReservation.getPayment()).isEqualTo(reservation.getPayment());
         assertThat(savedReservation.getStatus()).isEqualTo(reservation.getStatus());
         assertThat(new Date(savedReservation.getPayDate().getTime())).isEqualTo(reservation.getPayDate());
@@ -160,8 +165,10 @@ class ReservationRepositoryTest extends PacaTest {
         assertThat(expectedReservation.get().getBranch().getId()).isEqualTo(reservation.getBranch().getId());
         assertThat(expectedReservation.get().getGuest().getId()).isEqualTo(reservation.getGuest().getId());
         assertThat(expectedReservation.get().getRequestDate()).isEqualTo(reservation.getRequestDate());
-        assertThat(expectedReservation.get().getReservationDate()).isEqualTo(reservation.getReservationDate());
+        assertThat(expectedReservation.get().getReservationDateIn()).isEqualTo(reservation.getReservationDateIn());
+        assertThat(expectedReservation.get().getReservationDateOut()).isEqualTo(reservation.getReservationDateOut());
         assertThat(expectedReservation.get().getClientNumber()).isEqualTo(reservation.getClientNumber());
+        assertThat(expectedReservation.get().getTableNumber()).isEqualTo(reservation.getTableNumber());
         assertThat(expectedReservation.get().getPayment()).isEqualTo(reservation.getPayment());
         assertThat(expectedReservation.get().getStatus()).isEqualTo(reservation.getStatus());
         assertThat(expectedReservation.get().getPayDate()).isEqualTo(reservation.getPayDate());
@@ -210,11 +217,11 @@ class ReservationRepositoryTest extends PacaTest {
 
         List<Reservation> filtered_reservations = test_reservations.stream()
                 .filter(reservation -> reservation.getBranch().getId().equals(branch_1.getId()))
-                .filter(reservation -> reservation.getReservationDate().compareTo(date_1) == 0)
+                .filter(reservation -> reservation.getReservationDateIn().compareTo(date_1) == 0)
                 .collect(Collectors.toList());
 
         // Order the filtered_reservations by reservation_date in descending order
-        filtered_reservations.sort((r1, r2) -> r2.getReservationDate().compareTo(r1.getReservationDate()));
+        filtered_reservations.sort((r1, r2) -> r2.getReservationDateIn().compareTo(r1.getReservationDateIn()));
 
         // Create the page
         Page<Reservation> reservations_page = new PageImpl<>(filtered_reservations);
@@ -222,9 +229,9 @@ class ReservationRepositoryTest extends PacaTest {
         Pageable paging = PageRequest.of(
                 0,
                 20,
-                Sort.by("reservationDate").descending());
+                Sort.by("reservationDateIn").descending());
 
-        Page<Reservation> reservations = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(
+        Page<Reservation> reservations = reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(
                 branch_1.getId(),
                 date_1,
                 paging);
