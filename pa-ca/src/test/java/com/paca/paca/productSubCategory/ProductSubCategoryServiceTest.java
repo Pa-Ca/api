@@ -15,6 +15,7 @@ import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
@@ -151,6 +152,27 @@ public class ProductSubCategoryServiceTest {
     }
 
     @Test
+    void shouldGetConflictDueToNameRepeatedInSaveProductSubCategory() {
+        Branch branch = utils.createBranch(null);
+        ProductCategory productCategory = utils.createProductCategory();
+        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(null);
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
+        when(productCategoryRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(productCategory));
+        when(productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(anyLong(), anyLong(), any(String.class)))
+                .thenReturn(true);
+
+        try {
+            productSubCategoryService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(), "Product sub-category with name " + dto.getName() + " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 56);
+        }
+    }
+
+    @Test
     void shouldSaveProductSubCategory() {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
@@ -166,6 +188,8 @@ public class ProductSubCategoryServiceTest {
                 any(ProductCategory.class)))
                 .thenReturn(productSubCategory);
         when(productSubCategoryMapper.toDTO(any(ProductSubCategory.class))).thenReturn(dto);
+        when(productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(anyLong(), anyLong(), any(String.class)))
+                .thenReturn(false);
 
         ProductSubCategoryDTO dtoResponse = productSubCategoryService.save(dto);
 
@@ -194,6 +218,26 @@ public class ProductSubCategoryServiceTest {
     }
 
     @Test
+    void shouldGetConflictDueToNameRepeatedInUpdateSubCategory() {
+        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+
+        when(productSubCategoryRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(productSubCategory));
+        when(productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(anyLong(), anyLong(), any(String.class)))
+                .thenReturn(true);
+
+        try {
+            productSubCategoryService.update(productSubCategory.getId(), dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(), "Product sub-category with name " + dto.getName() + " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 56);
+        }
+    }
+
+    @Test
     void shouldUpdateProductSubCategory() {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
@@ -204,6 +248,8 @@ public class ProductSubCategoryServiceTest {
         when(productSubCategoryMapper.updateModel(any(ProductSubCategoryDTO.class), any(ProductSubCategory.class)))
                 .thenReturn(productSubCategory);
         when(productSubCategoryMapper.toDTO(any(ProductSubCategory.class))).thenReturn(dto);
+        when(productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(anyLong(), anyLong(), any(String.class)))
+                .thenReturn(false);
 
         ProductSubCategoryDTO dtoResponse = productSubCategoryService.update(productSubCategory.getId(), dto);
 

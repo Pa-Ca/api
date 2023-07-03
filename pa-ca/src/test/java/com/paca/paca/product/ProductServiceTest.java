@@ -111,6 +111,25 @@ public class ProductServiceTest {
     }
 
     @Test
+    void shouldGetConflictDueToNameRepeatedInSave() {
+        Product product = utils.createProduct(null);
+        ProductDTO dto = utils.createProductDTO(product);
+
+        when(productSubCategoryRepository.findById(any(Long.class)))
+                .thenReturn(Optional.ofNullable(product.getSubCategory()));
+        when(productRepository.existsBySubCategoryIdAndName(any(Long.class), any(String.class))).thenReturn(true);
+
+        try {
+            productService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Product with name " + dto.getName() + " already exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 57);
+        }
+    }
+
+    @Test
     void shouldSaveProduct() {
         Product product = utils.createProduct(null);
         ProductDTO dto = utils.createProductDTO(product);
@@ -145,6 +164,24 @@ public class ProductServiceTest {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(), "Product with id: " + dto.getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 25);
+        }
+    }
+
+    @Test
+    void shouldGetConflictDueToNameRepeatedInUpdate() {
+        Product product = utils.createProduct(null);
+        ProductDTO dto = utils.createProductDTO(product);
+
+        when(productRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(product));
+        when(productRepository.existsBySubCategoryIdAndName(any(Long.class), any(String.class))).thenReturn(true);
+
+        try {
+            productService.update(product.getId(), dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals(e.getMessage(), "Product with name " + dto.getName() + " already exists");
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 57);
         }
     }
 

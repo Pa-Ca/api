@@ -15,6 +15,7 @@ import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.product.utils.ValidateProductOwnerInterceptor.ValidateProductOwner;
@@ -45,7 +46,8 @@ public class ProductController {
     @PostMapping
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new product", description = "Create a new product in the app")
-    public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto) throws NoContentException {
+    public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto)
+            throws NoContentException, ConflictException {
         return ResponseEntity.ok(productService.save(dto));
     }
 
@@ -62,7 +64,7 @@ public class ProductController {
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductDTO dto)
-            throws NoContentException {
+            throws NoContentException, ConflictException {
         return ResponseEntity.ok(productService.update(id, dto));
     }
 

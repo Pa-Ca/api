@@ -60,7 +60,7 @@ public class GuestServiceTest {
         } catch (Exception e){
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(), "Guest with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
         }
     }
 
@@ -106,7 +106,7 @@ public class GuestServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(), "Guest with id " + guest.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
         }
     }
 
@@ -138,7 +138,7 @@ public class GuestServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals(e.getMessage(), "Guest with id " + guest.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
         }
     }
 

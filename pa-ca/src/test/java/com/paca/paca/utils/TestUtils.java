@@ -2,6 +2,7 @@ package com.paca.paca.utils;
 
 import java.util.List;
 import java.util.Date;
+import java.util.UUID;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -9,34 +10,43 @@ import java.util.Calendar;
 import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.business.model.Tier;
 import com.paca.paca.auth.dto.LogoutDTO;
+import com.paca.paca.branch.model.Table;
+import com.paca.paca.business.model.Tier;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
-import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.product.model.Product;
+import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.product.dto.ProductDTO;
+import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.dto.UserRequestDTO;
+import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.sale.statics.TaxStatics;
+import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.business.dto.BusinessDTO;
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.dto.UserResponseDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
@@ -44,8 +54,6 @@ import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
-import com.paca.paca.branch.model.DefaultTax;
-import com.paca.paca.branch.model.Table;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.reservation.model.ClientGroup;
@@ -53,17 +61,19 @@ import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.branch.statics.DefaultTaxStatics;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.branch.statics.DefaultTaxStatics;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -76,18 +86,6 @@ import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.sale.model.Sale;
-import com.paca.paca.sale.dto.SaleDTO;
-import com.paca.paca.sale.model.SaleProduct;
-import com.paca.paca.sale.model.Tax;
-import com.paca.paca.sale.dto.SaleProductDTO;
-import com.paca.paca.sale.dto.TaxDTO;
-import com.paca.paca.sale.repository.SaleProductRepository;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.sale.statics.SaleStatics;
-import com.paca.paca.sale.statics.TaxStatics;
-import com.paca.paca.productSubCategory.model.ProductSubCategory;
-import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
 import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
@@ -452,7 +450,7 @@ public class TestUtils {
                 .business(business)
                 .location("location test")
                 .mapsLink("mapsLink test")
-                .name("name test")
+                .name("name_test_" + UUID.randomUUID().toString())
                 .overview("overview test")
                 .score(4.0F)
                 .capacity(42)
@@ -645,7 +643,7 @@ public class TestUtils {
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .subCategory(subCategory)
                 .disabled(false)
-                .name("test name")
+                .name("test_name_" + UUID.randomUUID().toString())
                 .price(BigDecimal.valueOf(10.0f))
                 .description("test description")
                 .build();
@@ -711,7 +709,7 @@ public class TestUtils {
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch)
                 .category(category)
-                .name("test")
+                .name("test_" + UUID.randomUUID().toString())
                 .build();
 
         if (productSubCategoryRepository != null) {
@@ -1064,7 +1062,7 @@ public class TestUtils {
         Table table = Table.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch)
-                .name("Table 1")
+                .name("Table_" + UUID.randomUUID().toString())
                 .deleted(false)
                 .build();
 
@@ -1245,12 +1243,6 @@ public class TestUtils {
         // Get two hours after now
         calendar.add(Calendar.HOUR_OF_DAY, 1);
         Date twoHoursAfterNow = calendar.getTime();
-        // Get three hours after now
-        calendar.add(Calendar.HOUR_OF_DAY, 1);
-        Date threeHoursAfterNow = calendar.getTime();
-        // Get one hour before now
-        calendar.add(Calendar.HOUR_OF_DAY, -4);
-        Date oneHourBeforeNow = calendar.getTime();
         // Get two hours before now
         calendar.add(Calendar.HOUR_OF_DAY, -5);
         Date twoHoursBeforeNow = calendar.getTime();

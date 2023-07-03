@@ -8,8 +8,8 @@ import org.junit.jupiter.api.TestInstance;
 
 import com.paca.paca.PacaTest;
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.Table;
+import com.paca.paca.branch.model.Branch;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class TableRepositoryTest extends PacaTest {
-    
+
     @Autowired
     private BranchRepository branchRepository;
 
@@ -65,7 +65,7 @@ public class TableRepositoryTest extends PacaTest {
     void restoreBranchDB() {
         branchRepository.deleteAll();
         tableRepository.deleteAll();
-        
+
     }
 
     @AfterEach
@@ -75,7 +75,7 @@ public class TableRepositoryTest extends PacaTest {
         userRepository.deleteAll();
         businessRepository.deleteAll();
         branchRepository.deleteAll();
-        
+
     }
 
     @Test
@@ -83,11 +83,10 @@ public class TableRepositoryTest extends PacaTest {
         // Arrange
         Branch branch = utils.createBranch(null);
         Table table = Table.builder()
-                                .name("Mesa que mas aplaude")
-                                .branch(branch)
-                                .build();
+                .name("Mesa que mas aplaude")
+                .branch(branch)
+                .build();
 
-            
         // Act
         Table savedTable = tableRepository.save(table);
 
@@ -98,22 +97,22 @@ public class TableRepositoryTest extends PacaTest {
         assertThat(savedTable.getName()).isEqualTo("Mesa que mas aplaude");
     }
 
-    @Test 
-    void shouldGetAllTables(){
+    @Test
+    void shouldGetAllTables() {
         // Arrange
         Branch branch = utils.createBranch(null);
         Table table1 = Table.builder()
-                                .branch(branch)
-                                .name("Mesa 1")
-                                .build();
+                .branch(branch)
+                .name("Mesa 1")
+                .build();
         Table table2 = Table.builder()
-                                .branch(branch)
-                                .name("Mesa 2")
-                                .build();
+                .branch(branch)
+                .name("Mesa 2")
+                .build();
         Table table3 = Table.builder()
-                                .branch(branch)
-                                .name("Mesa 3")
-                                .build();
+                .branch(branch)
+                .name("Mesa 3")
+                .build();
         tableRepository.save(table1);
         tableRepository.save(table2);
         tableRepository.save(table3);
@@ -129,38 +128,39 @@ public class TableRepositoryTest extends PacaTest {
         assertThat(tables.get(2)).isEqualTo(table3);
     }
 
-    void shouldFindAllByBranchIdAndDeletedFalse(){
+    @Test
+    void shouldFindAllByBranchIdAndDeletedFalse() {
         // Create two branches
         Branch branch1 = utils.createBranch(null);
         Branch branch2 = utils.createBranch(null);
 
         // Create three tables for branch1 and 2 for branch2
         Table table1 = Table.builder()
-                                .branch(branch1)
-                                .name("Mesa 1")
-                                .build();
+                .branch(branch1)
+                .name("Mesa 1")
+                .build();
         Table table2 = Table.builder()
-                                .branch(branch1)
-                                .name("Mesa 2")
-                                .deleted(true)
-                                .build();
-        
+                .branch(branch1)
+                .name("Mesa 2")
+                .deleted(true)
+                .build();
+
         Table table3 = Table.builder()
-                                .branch(branch1)
-                                .name("Mesa 3")
-                                .build();
-        
+                .branch(branch1)
+                .name("Mesa 3")
+                .build();
+
         Table table4 = Table.builder()
-                                .branch(branch2)
-                                .name("Mesa 4")
-                                .deleted(true)
-                                .build();
-        
+                .branch(branch2)
+                .name("Mesa 4")
+                .deleted(true)
+                .build();
+
         Table table5 = Table.builder()
-                                .branch(branch2)
-                                .name("Mesa 5")
-                                .build();
-        
+                .branch(branch2)
+                .name("Mesa 5")
+                .build();
+
         List<Table> tables = List.of(table1, table2, table3, table4, table5);
 
         // Save all tables
@@ -186,6 +186,26 @@ public class TableRepositoryTest extends PacaTest {
         // Assert
         assertThat(tablesForBranch2).isNotNull();
         assertThat(tablesForBranch2.size()).isEqualTo(1);
-        assertThat(tablesForBranch2).isEqualTo(expectedTablesForBranch2);       
+        assertThat(tablesForBranch2).isEqualTo(expectedTablesForBranch2);
+    }
+
+    @Test
+    void shouldVerifyIfExistsByBranchIdAndName() {
+        // Create a branch
+        Branch branch = utils.createBranch(null);
+
+        // Create a table
+        Table table = Table.builder()
+                .branch(branch)
+                .name("Mesa 1")
+                .build();
+
+        // Save table
+        tableRepository.save(table);
+
+        // Assert
+        assertThat(tableRepository.existsByBranchIdAndName(branch.getId(), "Mesa 1")).isTrue();
+        assertThat(tableRepository.existsByBranchIdAndName(branch.getId(), "Mesa 2")).isFalse();
+        assertThat(tableRepository.existsByBranchIdAndName(branch.getId() + 1, "Mesa 1")).isFalse();
     }
 }

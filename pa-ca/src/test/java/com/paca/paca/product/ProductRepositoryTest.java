@@ -208,4 +208,21 @@ public class ProductRepositoryTest extends PacaTest {
         assertThat(retrievedProduct.isPresent()).isFalse();
     }
 
+    @Test
+    void shouldVerifyIfExistsBySubCategoryIdAndName() {
+        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+        Product product = utils.createProduct(productSubCategory);
+
+        boolean expected1 = productRepository.existsBySubCategoryIdAndName(
+                productSubCategory.getId(), product.getName());
+        boolean expected2 = productRepository.existsBySubCategoryIdAndName(
+                productSubCategory.getId(), product.getName() + "1");
+        boolean expected3 = productRepository.existsBySubCategoryIdAndName(
+                productSubCategory.getId() + 1, product.getName());
+
+        assertThat(expected1).isTrue();
+        assertThat(expected2).isFalse();
+        assertThat(expected3).isFalse();
+    }
+
 }

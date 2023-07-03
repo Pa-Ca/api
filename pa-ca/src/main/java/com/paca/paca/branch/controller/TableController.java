@@ -1,32 +1,24 @@
 package com.paca.paca.branch.controller;
 
-
+import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.branch.service.TableService;
+import com.paca.paca.branch.statics.TableStatics;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.utils.ValidateTableOwnerInterceptor.ValidateTableOwner;
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.NoContentException;
-
-import com.paca.paca.branch.statics.TableStatics;
-import com.paca.paca.branch.service.TableService;
-import com.paca.paca.branch.dto.TableDTO;
-
-
-
-//import BigDecimal
-
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +38,9 @@ public class TableController {
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new table", description = "Create a new table")
     public ResponseEntity<TableDTO> save(@RequestBody TableDTO dto)
-            throws NoContentException {
+            throws NoContentException, ConflictException {
         return ResponseEntity.ok(tableService.save(dto));
     }
-    
 
     @PutMapping("/{id}")
     @ValidateRoles({ "business" })
@@ -58,14 +49,13 @@ public class TableController {
     public ResponseEntity<TableDTO> update(
             @PathVariable("id") Long id,
             @RequestBody TableDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NoContentException, ConflictException {
         return ResponseEntity.ok(tableService.update(id, dto));
     }
 
-
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
-    //@ValidateTableOwner
+    // @ValidateTableOwner
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         tableService.delete(id);
