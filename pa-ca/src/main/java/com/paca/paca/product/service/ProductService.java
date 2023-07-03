@@ -57,7 +57,7 @@ public class ProductService {
                     23);
         }
         if (productRepository.existsBySubCategoryIdAndName(dto.getSubCategoryId(), dto.getName())) {
-            throw new NoContentException(
+            throw new ConflictException(
                     "Product with name " + dto.getName() + " already exists",
                     57);
         }
@@ -79,7 +79,7 @@ public class ProductService {
         }
         if (dto.getName() != null
                 && productRepository.existsBySubCategoryIdAndName(dto.getSubCategoryId(), dto.getName())) {
-            throw new NoContentException(
+            throw new ConflictException(
                     "Product with name " + dto.getName() + " already exists",
                     57);
         }

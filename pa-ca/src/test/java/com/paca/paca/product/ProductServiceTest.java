@@ -9,6 +9,7 @@ import com.paca.paca.product.service.ProductService;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
@@ -123,9 +124,9 @@ public class ProductServiceTest {
             productService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof ConflictException);
             Assert.assertEquals(e.getMessage(), "Product with name " + dto.getName() + " already exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 57);
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 57);
         }
     }
 
@@ -179,9 +180,9 @@ public class ProductServiceTest {
             productService.update(product.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof ConflictException);
             Assert.assertEquals(e.getMessage(), "Product with name " + dto.getName() + " already exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 57);
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 57);
         }
     }
 
