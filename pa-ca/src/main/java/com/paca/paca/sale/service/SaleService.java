@@ -219,13 +219,13 @@ public class SaleService {
         // Check if the sale is closed
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " can not be updated because it is already closed", 43); // Lista en docs
+                    "Sale with id " + id + " is closed", 43); // Lista en docs
         }
 
         // Check if the sale is canceled
         if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " can not be updated because it was canceled", 48); // Lista en docs
+                    "Sale with id " + id + " is canceled", 48); // Lista en docs
         }
 
         // Update the sale
@@ -260,15 +260,15 @@ public class SaleService {
         // Check if the sale is closed
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " can not be cleared because it is already closed",
-                    505); // No esta referenciado en docs
+                    "Sale with id " + saleId + " is closed",
+                    43); // No esta referenciado en docs
         }
 
         // Check if the sale is canceled
         if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " can not be cleared because it was canceled",
-                    505); // No esta referenciado en docs
+                    "Sale with id " + saleId + " is canceled",
+                    48); // No esta referenciado en docs
         }
 
         // Delete all the SaleProducts of the Sale
@@ -289,17 +289,13 @@ public class SaleService {
         // Check if the sale is closed
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " can not be cleared because it is already closed", 505); // No esta
-                                                                                                         // referenciado
-                                                                                                         // en docs
+                    "Sale with id " + saleId + " is closed", 43); //
         }
 
         // Check if the sale is canceled
         if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " can not be cleared because it was canceled", 505); // No esta
-                                                                                                    // referenciado en
-                                                                                                    // docs
+                    "Sale with id " + saleId + " is canceled", 48); 
         }
 
         // Delete all the SaleProducts of the Sale
@@ -324,7 +320,7 @@ public class SaleService {
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Page Page size cannot be less than one",
+                    "Page size cannot be less than one",
                     45);
         }
 
