@@ -36,7 +36,7 @@ public class GuestService {
         Guest guest = guestRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
                         "Guest with id " + id + " does not exists",
-                        40));
+                        54));
 
         GuestDTO dto = guestMapper.toDTO(guest);
         return dto;
@@ -66,7 +66,7 @@ public class GuestService {
         if (current.isEmpty()) {
             throw new NoContentException(
                     "Guest with id " + id + " does not exists",
-                    40);
+                    54);
         }
 
         Guest newGuest = guestMapper.updateModel(dto, current.get());
@@ -81,7 +81,7 @@ public class GuestService {
         if (current.isEmpty()) {
             throw new NoContentException(
                     "Guest with id " + id + " does not exists",
-                    40);
+                    54);
         }
         guestRepository.deleteById(id);
     }

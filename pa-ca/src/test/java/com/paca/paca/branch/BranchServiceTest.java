@@ -731,7 +731,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -750,8 +750,8 @@ public class BranchServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 
@@ -820,7 +820,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -842,8 +842,8 @@ public class BranchServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 
@@ -865,7 +865,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Sorting key is not valid");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 42);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 46);
         }
     }
 
@@ -928,7 +928,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -945,8 +945,8 @@ public class BranchServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 

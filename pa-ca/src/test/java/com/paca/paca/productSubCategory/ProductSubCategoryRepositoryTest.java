@@ -200,4 +200,32 @@ public class ProductSubCategoryRepositoryTest extends PacaTest {
         assertThat(productCategories.size()).isEqualTo(nProductCategories);
     }
 
+    @Test
+    void shouldVerifyIfExistsByBranchIdAndCategoryIdAndName() {
+        Branch branch = utils.createBranch(null);
+        ProductCategory productCategory = utils.createProductCategory();
+        ProductSubCategory productSubCategory = utils.createProductSubCategory(branch, productCategory);
+
+        boolean expected1 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                productSubCategory.getBranch().getId(),
+                productSubCategory.getCategory().getId(),
+                productSubCategory.getName());
+        boolean expected2 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                productSubCategory.getBranch().getId(),
+                productSubCategory.getCategory().getId(),
+                productSubCategory.getName() + "1");
+        boolean expected3 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                productSubCategory.getBranch().getId(),
+                productSubCategory.getCategory().getId() + 1,
+                productSubCategory.getName());
+        boolean expected4 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                productSubCategory.getBranch().getId() + 1,
+                productSubCategory.getCategory().getId(),
+                productSubCategory.getName());
+
+        assertThat(expected1).isTrue();
+        assertThat(expected2).isFalse();
+        assertThat(expected3).isFalse();
+        assertThat(expected4).isFalse();
+    }
 }

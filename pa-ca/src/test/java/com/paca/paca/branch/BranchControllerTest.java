@@ -24,6 +24,7 @@ import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.branch.controller.BranchController;
 import com.paca.paca.branch.controller.AmenityController;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -72,6 +73,9 @@ public class BranchControllerTest extends ControllerTest {
 
     @MockBean
     private AmenityService amenityService;
+
+    @MockBean
+    private SaleService saleService;
 
     private TestUtils utils = TestUtils.builder().build();
 
@@ -1079,24 +1083,24 @@ public class BranchControllerTest extends ControllerTest {
 
   @Test
     public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetReviewsPage() throws Exception{
-        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 44));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=-1&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(40)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(44)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
     }
 
   @Test
     public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetReviewsPage() throws Exception{
-        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+        when(branchService.getReviewsPage(anyLong(), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page size cannot be less than one", 45));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reviews?page=1&size=0"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(41)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(45)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page size cannot be less than one")));
     }
 
     @Test
@@ -1129,12 +1133,12 @@ public class BranchControllerTest extends ControllerTest {
                 any(BigDecimal.class),
                 anyFloat(),
                 anyInt()
-        )).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+        )).thenThrow(new UnprocessableException("Page number cannot be less than zero", 44));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=-1&size=10&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(40)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(44)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
     }
 
@@ -1150,13 +1154,13 @@ public class BranchControllerTest extends ControllerTest {
                 any(BigDecimal.class),
                 anyFloat(),
                 anyInt()
-        )).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+        )).thenThrow(new UnprocessableException("Page size cannot be less than one", 45));
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/branches?page=0&size=0&sorting_by=name&ascending=true&min_reservation_price=0&max_reservation_price=1000&min_score=0&min_capacity=0"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(41)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(45)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page size cannot be less than one")));
     }
 
   @Test
@@ -1248,28 +1252,28 @@ public class BranchControllerTest extends ControllerTest {
 
     @Test
     public void shouldGetUnprocessableExceptionToPageLessThanZeroInGetReservationsPage() throws Exception{
-        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 40));
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page number cannot be less than zero", 44));
 
         utils.setAuthorities("business");
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=-1&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(40)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(44)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page number cannot be less than zero")));
     }
 
     @Test
     public void shouldGetUnprocessableDueToPageSizeLessThanOneInGetReservationsPage() throws Exception{
-        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new UnprocessableException("Size cannot be less than one", 41));
+        when(branchService.getReservationsPage(anyLong(), any(Date.class), anyInt(), anyInt())).thenThrow(new UnprocessableException("Page size cannot be less than one", 45));
 
         utils.setAuthorities("business");
 
         mockMvc.perform(get(BranchStatics.Endpoint.PATH.concat("/1/reservations?reservation_date=2020-12-12&page=2&size=5"))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(41)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Size cannot be less than one")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(45)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Page size cannot be less than one")));
     }
 
     @Test

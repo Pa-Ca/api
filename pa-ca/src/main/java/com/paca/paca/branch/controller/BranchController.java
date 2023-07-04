@@ -5,12 +5,15 @@ import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.sale.dto.BranchSalesInfoDTO;
+import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -51,6 +54,8 @@ public class BranchController {
     private final BranchService branchService;
 
     private final AmenityService amenityService;
+
+    private final  SaleService saleService;
 
     @GetMapping
     @ValidateRoles({})
@@ -185,6 +190,8 @@ public class BranchController {
         return ResponseEntity.ok(branchService.getReviewsPage(id, page, size));
     }
 
+    // Example get http://yourdomain.com/1/reviews?page=2&size=5
+    // Example with all arguments get http://yourdomain.com/1/reviews?page=2&size=5&sorting_by=score&ascending=true&min_score=3&min_capacity=5
     @GetMapping("/branches")
     @Operation(summary = "Gets a page of branches", description = "Gets a page with the data of branches")
     public ResponseEntity<BranchListDTO> getBranchesPage(
@@ -218,4 +225,32 @@ public class BranchController {
             @RequestParam("size") int size) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(branchService.getReservationsPage(id, reservation_date, page, size));
     }
+
+    // Example get http://yourdomain.com/1/sales?page=2&size=5
+    @GetMapping("/{id}/sale")
+    @ValidateRoles({ "business" })
+    @Operation(
+        summary = "Gets all the ongoing sales and the historic sales with its taxes and saleporducts", 
+        description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
+    public ResponseEntity<BranchSalesInfoDTO> getBranchSalesPages(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @PathVariable("id") Long branch_id
+            ) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(saleService.getBranchSales(
+                 page,
+                 size,
+                 branch_id
+                 ));
+    }
+
+    @GetMapping("/{id}/table")
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Gets all the tables of a branch", description = "Gets all the tables of a branch given its id")
+    public ResponseEntity<TableListDTO> getTablesByBranchId(@PathVariable("id") Long id)
+            throws NoContentException {
+        return ResponseEntity.ok(branchService.getTablesbyBranchId(id));
+    }
+
+
 }

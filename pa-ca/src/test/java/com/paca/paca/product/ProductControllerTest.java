@@ -154,13 +154,17 @@ public class ProductControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId",
                         CoreMatchers.is(dto.getSubCategoryId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled",
+                        CoreMatchers.is(dto.getDisabled())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.price", CoreMatchers.is(dto.getPrice().doubleValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.is(dto.getDescription())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price",
+                        CoreMatchers.is(dto.getPrice().doubleValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description",
+                        CoreMatchers.is(dto.getDescription())));
     }
 
     @Test
@@ -187,13 +191,17 @@ public class ProductControllerTest extends ControllerTest {
         mockMvc.perform(get(ProductStatics.Endpoint.PATH.concat("/" + dto.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId",
                         CoreMatchers.is(dto.getSubCategoryId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled",
+                        CoreMatchers.is(dto.getDisabled())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.price", CoreMatchers.is(dto.getPrice().doubleValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.is(dto.getDescription())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price",
+                        CoreMatchers.is(dto.getPrice().doubleValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description",
+                        CoreMatchers.is(dto.getDescription())));
     }
 
     @Test
@@ -219,7 +227,8 @@ public class ProductControllerTest extends ControllerTest {
 
         when(productService.update(anyLong(), any(ProductDTO.class))).thenReturn(dto);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(false);
 
         utils.setAuthorities("business");
 
@@ -237,9 +246,11 @@ public class ProductControllerTest extends ControllerTest {
         ProductDTO dto = utils.createProductDTO(product);
         Business business = utils.createBusiness(null);
 
-        when(productService.update(anyLong(), any(ProductDTO.class))).thenThrow(new NoContentException("message", 0));
+        when(productService.update(anyLong(), any(ProductDTO.class)))
+                .thenThrow(new NoContentException("message", 0));
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(true);
 
         utils.setAuthorities("business");
 
@@ -252,6 +263,28 @@ public class ProductControllerTest extends ControllerTest {
     }
 
     @Test
+    public void shouldGetConflictInUpdateProduct() throws Exception {
+        Product product = utils.createProduct(null);
+        ProductDTO dto = utils.createProductDTO(product);
+        Business business = utils.createBusiness(null);
+
+        when(productService.update(anyLong(), any(ProductDTO.class)))
+                .thenThrow(new ConflictException("message", 0));
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(true);
+
+        utils.setAuthorities("business");
+
+        mockMvc.perform(put(ProductStatics.Endpoint.PATH.concat("/" + dto.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(MockMvcResultMatchers.status().isConflict())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+    }
+
+    @Test
     public void shouldUpdateProductById() throws Exception {
         Product product = utils.createProduct(null);
         ProductDTO dto = utils.createProductDTO(product);
@@ -259,7 +292,8 @@ public class ProductControllerTest extends ControllerTest {
 
         when(productService.update(anyLong(), any(ProductDTO.class))).thenReturn(dto);
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(true);
 
         utils.setAuthorities("business");
 
@@ -267,13 +301,17 @@ public class ProductControllerTest extends ControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                        CoreMatchers.is(dto.getId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.subCategoryId",
                         CoreMatchers.is(dto.getSubCategoryId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled",
+                        CoreMatchers.is(dto.getDisabled())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.price", CoreMatchers.is(dto.getPrice().doubleValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.is(dto.getDescription())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price",
+                        CoreMatchers.is(dto.getPrice().doubleValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description",
+                        CoreMatchers.is(dto.getDescription())));
     }
 
     @Test
@@ -282,7 +320,8 @@ public class ProductControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(true);
 
         utils.setAuthorities("client");
 
@@ -299,7 +338,8 @@ public class ProductControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(false);
 
         utils.setAuthorities("business");
 
@@ -316,7 +356,8 @@ public class ProductControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(true);
         doThrow(new NoContentException("message", 0)).when(productService).delete(anyLong());
 
         utils.setAuthorities("business");
@@ -334,7 +375,8 @@ public class ProductControllerTest extends ControllerTest {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+        when(productRepository.existsByIdAndSubCategory_Branch_Business_Id(anyLong(), anyLong()))
+                .thenReturn(true);
         doNothing().when(productService).delete(anyLong());
 
         utils.setAuthorities("business");

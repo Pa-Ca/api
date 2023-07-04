@@ -11,9 +11,14 @@ import com.paca.paca.client.utils.ValidateClientInterceptor;
 import com.paca.paca.business.utils.ValidateBusinessInterceptor;
 import com.paca.paca.client.utils.ValidateReviewOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor;
+import com.paca.paca.branch.utils.ValidateDefaultTaxOwnerInterceptor;
+import com.paca.paca.branch.utils.ValidateTableOwnerInterceptor;
 import com.paca.paca.product.utils.ValidateProductOwnerInterceptor;
 import com.paca.paca.promotion.utils.ValidatePromotionOwnerInterceptor;
 import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor;
+import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor;
+import com.paca.paca.sale.utils.ValidateSaleProductOwnerInterceptor;
+import com.paca.paca.sale.utils.ValidateTaxOwnerInterceptor;
 import com.paca.paca.productSubCategory.utils.ValidateProductSubCategoryOwnerInterceptor;
 
 @Configuration
@@ -49,6 +54,21 @@ public class SpringMVCConfig implements WebMvcConfigurer {
     @Autowired
     ValidateProductSubCategoryOwnerInterceptor validateProductSubCategoryOwnerInterceptor;
 
+    @Autowired
+    ValidateSaleOwnerInterceptor validateSaleOwnerInterceptor;
+
+    @Autowired
+    ValidateSaleProductOwnerInterceptor validateSaleProductOwnerInterceptor;
+
+    @Autowired
+    ValidateTaxOwnerInterceptor validateTaxOwnerInterceptor;
+
+    @Autowired
+    ValidateTableOwnerInterceptor validateTableOwnerInterceptor;
+
+    @Autowired
+    ValidateDefaultTaxOwnerInterceptor validateDefaultTaxOwnerInterceptor;
+
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(validateUserInterceptor);
@@ -61,5 +81,10 @@ public class SpringMVCConfig implements WebMvcConfigurer {
         registry.addInterceptor(validatePromotionOwnerInterceptor);
         registry.addInterceptor(validateReservationOwnerInterceptor);
         registry.addInterceptor(validateProductSubCategoryOwnerInterceptor);
+        registry.addInterceptor(validateSaleOwnerInterceptor);
+        registry.addInterceptor(validateSaleProductOwnerInterceptor);
+        registry.addInterceptor(validateTaxOwnerInterceptor);
+        registry.addInterceptor(validateTableOwnerInterceptor);
+        registry.addInterceptor(validateDefaultTaxOwnerInterceptor);
     }
 }

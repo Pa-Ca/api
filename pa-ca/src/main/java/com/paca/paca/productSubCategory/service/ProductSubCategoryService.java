@@ -14,6 +14,7 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
@@ -76,7 +77,7 @@ public class ProductSubCategoryService {
     }
 
     public ProductSubCategoryDTO save(ProductSubCategoryDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NoContentException, BadRequestException, ConflictException {
         Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
         if (branch.isEmpty()) {
             throw new NoContentException(
@@ -89,6 +90,14 @@ public class ProductSubCategoryService {
             throw new NoContentException(
                     "Product category with id " + dto.getCategoryId() + " does not exists",
                     24);
+        }
+        if (productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                dto.getBranchId(),
+                dto.getCategoryId(),
+                dto.getName())) {
+            throw new ConflictException(
+                    "Product sub-category with name " + dto.getName() + " already exists",
+                    56);
         }
 
         ProductSubCategory subCategory = productSubCategoryMapper.toEntity(
@@ -103,12 +112,21 @@ public class ProductSubCategoryService {
     }
 
     public ProductSubCategoryDTO update(Long id, ProductSubCategoryDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NoContentException, BadRequestException, ConflictException {
         Optional<ProductSubCategory> current = productSubCategoryRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
                     "Product sub-category with id " + id + " does not exists",
                     23);
+        }
+        if (dto.getName() != null &&
+                productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                        dto.getBranchId(),
+                        dto.getCategoryId(),
+                        dto.getName())) {
+            throw new ConflictException(
+                    "Product sub-category with name " + dto.getName() + " already exists",
+                    56);
         }
 
         ProductSubCategory newProductSubCategory = productSubCategoryMapper.updateModel(

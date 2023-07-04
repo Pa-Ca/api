@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
@@ -56,7 +57,7 @@ public class ProductSubCategoryController {
     @Operation(summary = "Create new product sub-category", description = "Create a new product sub-category in the app")
     public ResponseEntity<ProductSubCategoryDTO> save(
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
-            throws NoContentException, BadRequestException {
+            throws NoContentException, BadRequestException, ConflictException {
         return ResponseEntity.ok(productSubCategoryService.save(productSubCategoryDTO));
     }
 
@@ -74,7 +75,7 @@ public class ProductSubCategoryController {
     public ResponseEntity<ProductSubCategoryDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
-            throws NoContentException, BadRequestException {
+            throws NoContentException, BadRequestException, ConflictException {
         return ResponseEntity.ok(productSubCategoryService.update(id, productSubCategoryDTO));
     }
 
