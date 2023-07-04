@@ -1,3 +1,4 @@
+--Date: 2023-07-04
 ALTER TABLE reservation
     ALTER COLUMN reservation_date DROP NOT NULL;
 ALTER TABLE reservation DROP COLUMN reservation_date;
