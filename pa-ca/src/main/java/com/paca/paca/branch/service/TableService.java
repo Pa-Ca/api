@@ -33,7 +33,7 @@ public class TableService {
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
-        if (tableRepository.existsByBranchIdAndName(branchId, tableDTO.getName())) {
+        if (tableRepository.existsByBranchIdAndNameAndDeletedFalse(branchId, tableDTO.getName())) {
             throw new ConflictException(
                     "Table with name " + tableDTO.getName() + " already exists",
                     55);
@@ -63,7 +63,7 @@ public class TableService {
                     20);
         }
         if (tableDTO.getName() != null &&
-                tableRepository.existsByBranchIdAndName(branchId, tableDTO.getName())) {
+                tableRepository.existsByBranchIdAndNameAndDeletedFalse(branchId, tableDTO.getName())) {
             throw new ConflictException(
                     "Table with name " + tableDTO.getName() + " already exists",
                     55);

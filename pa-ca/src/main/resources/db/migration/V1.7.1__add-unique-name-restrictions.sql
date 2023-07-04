@@ -5,11 +5,9 @@ ALTER TABLE product_sub_category
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE;
 
-ALTER TABLE "table"
-    ADD CONSTRAINT table_unique_name 
-    UNIQUE (branch_id, name) 
-    NOT DEFERRABLE  
-    INITIALLY IMMEDIATE;
+CREATE UNIQUE INDEX table_unique_name
+    ON "table" (branch_id, name)
+    WHERE deleted = FALSE;
 
 ALTER TABLE product 
     ADD CONSTRAINT product_unique_name 

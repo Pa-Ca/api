@@ -14,5 +14,5 @@ public interface TableRepository extends JpaRepository<Table, Long> {
 
     Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId); // Needs to be tested
 
-    Boolean existsByBranchIdAndName(long branchId, String name);
+    Boolean existsByBranchIdAndNameAndDeletedFalse(long branchId, String name);
 }

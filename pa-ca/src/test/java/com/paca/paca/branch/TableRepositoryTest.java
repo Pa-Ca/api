@@ -204,8 +204,9 @@ public class TableRepositoryTest extends PacaTest {
         tableRepository.save(table);
 
         // Assert
-        assertThat(tableRepository.existsByBranchIdAndName(branch.getId(), "Mesa 1")).isTrue();
-        assertThat(tableRepository.existsByBranchIdAndName(branch.getId(), "Mesa 2")).isFalse();
-        assertThat(tableRepository.existsByBranchIdAndName(branch.getId() + 1, "Mesa 1")).isFalse();
+        assertThat(tableRepository.existsByBranchIdAndNameAndDeletedFalse(branch.getId(), "Mesa 1")).isTrue();
+        assertThat(tableRepository.existsByBranchIdAndNameAndDeletedFalse(branch.getId(), "Mesa 2")).isFalse();
+        assertThat(tableRepository.existsByBranchIdAndNameAndDeletedFalse(branch.getId() + 1, "Mesa 1"))
+                .isFalse();
     }
 }
