@@ -9,6 +9,8 @@ import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.dto.GuestListDTO;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,9 @@ public class GuestService {
     private final GuestMapper guestMapper;
 
     private final GuestRepository guestRepository;
+
+    private final ReservationRepository reservationRepository;
+
 
     public GuestListDTO getAll() {
         List<GuestDTO> response = new ArrayList<>();
@@ -42,12 +47,20 @@ public class GuestService {
         return dto;
     }
 
-    public GuestDTO getByIdentityDocument(String identityDocument) throws NoContentException {
+    public GuestDTO getByIdentityDocument(Long businessId, String identityDocument) 
+            throws NoContentException, ForbiddenException {
+        
         Guest guest = guestRepository.findByIdentityDocument(identityDocument)
-                .orElseThrow(() -> new NoContentException(
-                        "Guest with identityDocument " + identityDocument + " does not exists",
-                        40));
-
+        .orElseThrow(() -> new NoContentException(
+            "Guest with identityDocument " + identityDocument + " does not exists",
+            40));
+            
+        if (!reservationRepository.existsByBranchBusinessIdAndGuestId(businessId, guest.getId())) {
+            throw new ForbiddenException(
+            "Guest with identityDocument " + identityDocument + 
+            " does not have a past reservation with this business",
+            40);
+        }
         GuestDTO dto = guestMapper.toDTO(guest);
         return dto;
     }

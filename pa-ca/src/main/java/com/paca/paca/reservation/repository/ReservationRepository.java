@@ -30,4 +30,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
 
     Boolean existsByIdAndBranchId(Long id, Long businessId);
+
+    Boolean existsByBranchBusinessIdAndGuestId(Long businessId, Long guestId);
 }

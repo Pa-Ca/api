@@ -2,11 +2,14 @@ package com.paca.paca.reservation;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.dto.GuestListDTO;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 import junit.framework.TestCase;
@@ -28,6 +31,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class GuestServiceTest {
+
+    @Mock
+    private ReservationRepository reservationRepository;
 
     @Mock
     private GuestRepository guestRepository;
@@ -83,12 +89,28 @@ public class GuestServiceTest {
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.empty());
 
         try {
-            guestService.getByIdentityDocument("V69420616");
+            guestService.getByIdentityDocument(1L, "iden_doc_test");
             TestCase.fail();
         } catch (Exception e){
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Guest with identityDocument V69420616 does not exists");
+            Assert.assertEquals(e.getMessage(), "Guest with identityDocument iden_doc_test does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 40);
+        }
+    }
+
+    @Test
+    void shouldGetForbiddenDueToMissingReservationWithBusinessInGetGuestByIdentityDocument() {
+        Guest guest = utils.createGuest();
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
+        when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class),any(Long.class))).thenReturn(false);
+
+        try {
+            guestService.getByIdentityDocument(1L, "iden_doc_test");
+            TestCase.fail();
+        } catch (Exception e){
+            Assert.assertTrue(e instanceof ForbiddenException);
+            Assert.assertEquals(e.getMessage(), "Guest with identityDocument iden_doc_test does not have a past reservation with this business");
+            Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 40);
         }
     }
 
@@ -96,11 +118,13 @@ public class GuestServiceTest {
     void shouldGetGuestByIdentityDocument() {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
-
+        Reservation reservation = utils.createReservation(null, guest);
+        
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
+        when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class),any(Long.class))).thenReturn(true);
 
-        GuestDTO dtoResponse = guestService.getByIdentityDocument(guest.getIdentityDocument());
+        GuestDTO dtoResponse = guestService.getByIdentityDocument(reservation.getBranch().getBusiness().getId(), guest.getIdentityDocument());
 
         assertThat(dtoResponse).isNotNull();
         assertThat(dtoResponse.getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
