@@ -202,6 +202,32 @@ public class ReservationServiceTest {
         assertThat(dtoResponse.getGuestId()).isEqualTo(reservation.getGuest().getId());
     }
 
+     @Test
+     void shouldSaveReservationWithGuestThatAlreadyExist() {
+        Guest guest = utils.createGuest();
+        Reservation reservation = utils.createReservation(null, guest);
+        ReservationDTO dto = utils.createReservationDTO(reservation);
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
+        when(guestMapper.updateModel(any(GuestDTO.class), any(Guest.class))).thenReturn(reservation.getGuest());
+        when(guestRepository.save(any(Guest.class))).thenReturn(reservation.getGuest());
+        when(reservationMapper.toEntity(
+                any(ReservationDTO.class),
+                any(Branch.class),
+                any(Guest.class)))
+                .thenReturn(reservation);
+        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(dto);
+
+        ReservationDTO dtoResponse = reservationService.save(dto);
+
+        assertThat(dtoResponse).isNotNull();
+        assertThat(dtoResponse.getId()).isEqualTo(reservation.getId());
+        assertThat(dtoResponse.getBranchId()).isEqualTo(reservation.getBranch().getId());
+        assertThat(dtoResponse.getGuestId()).isEqualTo(reservation.getGuest().getId());
+     }
+
     @Test
     void shouldGetNoContentDueToMissingReservationInUpdateReservation() {
         Reservation reservation = utils.createReservation(null);
