@@ -13,6 +13,7 @@ import com.paca.paca.client.utils.ValidateReviewOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateBranchOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateDefaultTaxOwnerInterceptor;
 import com.paca.paca.branch.utils.ValidateTableOwnerInterceptor;
+import com.paca.paca.branch.utils.ValidatePaymentOptionOwnerInterceptor;
 import com.paca.paca.product.utils.ValidateProductOwnerInterceptor;
 import com.paca.paca.promotion.utils.ValidatePromotionOwnerInterceptor;
 import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor;
@@ -69,6 +70,9 @@ public class SpringMVCConfig implements WebMvcConfigurer {
     @Autowired
     ValidateDefaultTaxOwnerInterceptor validateDefaultTaxOwnerInterceptor;
 
+    @Autowired
+    ValidatePaymentOptionOwnerInterceptor validatePaymentOptionOwnerInterceptor;
+
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(validateUserInterceptor);
@@ -86,5 +90,6 @@ public class SpringMVCConfig implements WebMvcConfigurer {
         registry.addInterceptor(validateTaxOwnerInterceptor);
         registry.addInterceptor(validateTableOwnerInterceptor);
         registry.addInterceptor(validateDefaultTaxOwnerInterceptor);
+        registry.addInterceptor(validatePaymentOptionOwnerInterceptor);
     }
 }

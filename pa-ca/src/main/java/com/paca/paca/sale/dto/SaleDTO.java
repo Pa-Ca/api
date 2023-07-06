@@ -21,4 +21,5 @@ public class SaleDTO {
     private String note;
     private BigDecimal dollarToLocalCurrencyExchange;
     private Long reservationId;
+    private Long paymentOptionId;
 }

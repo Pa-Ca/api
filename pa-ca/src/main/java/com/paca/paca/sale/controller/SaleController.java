@@ -5,14 +5,15 @@ import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.business.model.Business;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor.ValidateSaleOwner;
 
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.reservation.repository.ReservationRepository;
 
 //import BigDecimal
 
@@ -46,6 +47,9 @@ public class SaleController {
     private final SaleService saleService;
     private final BusinessRepository businessRepository;
     private final TableRepository tableRepository;
+    private final PaymentOptionRepository paymentOptionRepsository;
+    private final ReservationRepository reservationRepository;
+
 
     @PostMapping
     @ValidateRoles({ "business" })
@@ -58,13 +62,30 @@ public class SaleController {
             return ResponseEntity.ok(saleService.save(dto));
         }
         else{
-            Business business = businessRepository.findByUserEmail(auth.getName()).get();
+            Long businessId = businessRepository.findByUserEmail(auth.getName()).get().getId();
             Long tableId = dto.getTableId();
+            Long reservationId = dto.getReservationId();
+            Long paymentOptionId = dto.getPaymentOptionId();
 
-            if (!tableRepository.existsByIdAndBranch_Business_Id(tableId, business.getId())) {
+            if (!tableRepository.existsByIdAndBranch_Business_Id(tableId, businessId)) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
 
+            // Ig the reservation is not null, check if it is from the same branch
+            if (reservationId != null) {
+                // Check if the reservation is from the same branch
+                if (!reservationRepository.existsByIdAndBranch_Business_Id(reservationId, businessId)) {
+                    throw new ForbiddenException("Unauthorized access for this operation");
+                }
+            }
+
+            if (paymentOptionId != null) {
+                // Check if the payment option is from the same branch
+                if (!paymentOptionRepsository.existsByIdAndBranch_Business_Id(paymentOptionId, businessId)) {
+                    throw new ForbiddenException("Unauthorized access for this operation");
+                }
+            }
+            
             return ResponseEntity.ok(saleService.save(dto));
         }
 

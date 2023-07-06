@@ -1,6 +1,7 @@
 package com.paca.paca.sale;
 
 import com.paca.paca.utils.TestUtils;
+import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.dto.SaleDTO;
@@ -31,7 +32,7 @@ public class SaleMapperTest {
     @Test
     void shouldMapSaleEntityToSaleDTO(){
 
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
 
         SaleDTO saleDTO = saleMapper.toDTO(sale);
 
@@ -59,7 +60,7 @@ public class SaleMapperTest {
 
             SaleDTO saleDTO = utils.createSaleDTO(table, reservation);
     
-            Sale sale = saleMapper.toEntity(saleDTO, table, reservation);
+            Sale sale = saleMapper.toEntity(saleDTO, table, reservation, null);
     
             // Check if the sale is not null
             assertThat(sale).isNotNull();
@@ -84,14 +85,16 @@ public class SaleMapperTest {
 
         SaleDTO saleDTO = utils.createSaleDTO(table, reservation);
         SaleDTO saleDTOTest = utils.createSaleDTO(table, reservation);
+        // Create a paymentOption to be used in the Sale
+        PaymentOption paymentOption = utils.createPaymentOption(null);
 
-        Sale sale = saleMapper.toEntity(saleDTO, table, reservation);
+        Sale sale = saleMapper.toEntity(saleDTO, table, reservation, paymentOption);
 
         // Change the table on the saleDTO and update the sale
         saleDTOTest.setTableId(2L);
         // Change the reservation on the saleDTO and update the sale
         saleDTOTest.setReservationId(2L);
-        saleMapper.updateModel(saleDTOTest, sale);
+        saleMapper.updateModel(saleDTOTest, sale, paymentOption);
 
         // Assert that saleDTO is equal to sale after the update (reservation and table should not be updated)
         assertThat(sale.getId()).isEqualTo(saleDTO.getId());
@@ -104,6 +107,7 @@ public class SaleMapperTest {
         assertThat(sale.getNote()).isEqualTo(saleDTO.getNote());
         assertThat(sale.getDollarToLocalCurrencyExchange()).isEqualTo(saleDTO.getDollarToLocalCurrencyExchange());
         assertThat(sale.getReservation().getId()).isEqualTo(saleDTO.getReservationId());
+        assertThat(sale.getPaymentOption().getId()).isEqualTo(paymentOption.getId());
 
         // Check that the table and reservation are not updated
         assertThat(sale.getTable().getId()).isNotEqualTo(saleDTOTest.getTableId());
@@ -124,7 +128,7 @@ public class SaleMapperTest {
         // Change the dollarToLocalCurrencyExchange on the saleDTO and update the sale
         saleDTO.setDollarToLocalCurrencyExchange(BigDecimal.valueOf(2.5));
 
-        saleMapper.updateModel(saleDTO, sale);
+        saleMapper.updateModel(saleDTO, sale, paymentOption);
 
         // Assert that saleDTO is equal to sale after the update (reservation and table should not be updated)
         assertThat(sale.getId()).isEqualTo(saleDTO.getId());

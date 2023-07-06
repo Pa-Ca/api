@@ -2,6 +2,7 @@ package com.paca.paca.branch.controller;
 
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.branch.dto.PaymentOptionListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
@@ -250,6 +251,15 @@ public class BranchController {
     public ResponseEntity<TableListDTO> getTablesByBranchId(@PathVariable("id") Long id)
             throws NoContentException {
         return ResponseEntity.ok(branchService.getTablesbyBranchId(id));
+    }
+
+
+    @GetMapping("/{id}/payment-option")
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Gets all the payment options of a branch", description = "Gets all the payment options of a branch given its id")
+    public ResponseEntity<PaymentOptionListDTO> getPaymentOptionsByBranchId(@PathVariable("id") Long id)
+            throws NoContentException {
+        return ResponseEntity.ok(branchService.getPaymentOptionsByBranchId(id));
     }
 
 

@@ -2,8 +2,10 @@ package com.paca.paca.sale;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.dto.SaleDTO;
@@ -24,6 +26,8 @@ import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
+import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.repository.ReservationRepository;
 
 import org.junit.Assert;
 import org.mockito.Mock;
@@ -75,9 +79,16 @@ public class SaleServiceTest {
     @Mock
     private SaleProductMapper saleProductMapper;
 
+    @Mock
+    private PaymentOptionRepository paymentOptionRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
+
     
     @InjectMocks
     private SaleService saleService;
+    
 
     private TestUtils utils = TestUtils.builder().build();
     
@@ -86,7 +97,7 @@ public class SaleServiceTest {
     void shouldGetTaxesBySaleId() {
         
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
 
         when(taxRepository.findAllBySaleId(any())).thenReturn(taxes);
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
@@ -112,7 +123,7 @@ public class SaleServiceTest {
     @Test
     void shouldDeleteSalebyId(){
 
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
@@ -135,7 +146,7 @@ public class SaleServiceTest {
 
     @Test
     void shouldGetSaleProductsbySaleId(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
 
         List<SaleProduct> saleProducts = TestUtils.castList(SaleProduct.class, Mockito.mock(List.class));
 
@@ -164,7 +175,7 @@ public class SaleServiceTest {
     @Test
     void shouldUpdate(){
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
         SaleProduct saleProduct = utils.createSaleProduct(sale, null);
         
@@ -176,7 +187,9 @@ public class SaleServiceTest {
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
         when(saleRepository.save(any())).thenReturn(sale);
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
-        when(saleMapper.updateModel(any(), any())).thenReturn(sale);
+        when(saleMapper.updateModel(any(), any(), any())).thenReturn(sale);
+
+        when(paymentOptionRepository.findById(any())).thenReturn(Optional.of(new PaymentOption()));
 
 
         SaleInfoDTO saleProductDTO = saleService.update(1L, saleDTO);
@@ -203,7 +216,7 @@ public class SaleServiceTest {
     void shouldGetBadRequestExceptionDueToSaleBeingClosed(){
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         // Create a closed sale
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.closed);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
 
@@ -221,7 +234,7 @@ public class SaleServiceTest {
     void shouldGetBadRequestExceptionDueToSaleBeingCanceled(){
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         // Create a closed sale
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.canceled);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
 
@@ -239,7 +252,7 @@ public class SaleServiceTest {
     void shouldSave(){
         
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
         SaleProduct saleProduct = utils.createSaleProduct(sale, null);
         
@@ -250,6 +263,8 @@ public class SaleServiceTest {
         when(tableRepository.findById(anyLong())).thenReturn(Optional.of(new Table()));
         when(taxRepository.findAllBySaleId(anyLong())).thenReturn(taxes);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
+        when(reservationRepository.findById(any())).thenReturn(Optional.of(new Reservation()));
+        when(paymentOptionRepository.findById(any())).thenReturn(Optional.of(new PaymentOption()));
         when(saleRepository.save(any())).thenReturn(sale);
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
 
@@ -289,7 +304,7 @@ public class SaleServiceTest {
 
     @Test
     void shouldGetBadRequestExceptionDueToSaleBeingClosedInClearSaleProducts(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.closed);
         when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
@@ -305,7 +320,7 @@ public class SaleServiceTest {
 
     @Test 
     void shouldGetBadRequestExceptionDueToSaleBeingCanceledInClearSaleProducts(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.canceled);
         when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
@@ -321,7 +336,7 @@ public class SaleServiceTest {
 
     @Test
     void shouldClearSaleProducts(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
         saleService.clearSaleProducts(sale.getId());
@@ -345,7 +360,7 @@ public class SaleServiceTest {
 
     @Test
     void shouldGetBadRequestExceptionDueToSaleBeingClosedInClearSaleTaxes(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.closed);
         when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
@@ -361,7 +376,7 @@ public class SaleServiceTest {
 
     @Test 
     void shouldGetBadRequestExceptionDueToSaleBeingCanceledInClearSaleTaxes(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.canceled);
         when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
@@ -377,7 +392,7 @@ public class SaleServiceTest {
 
     @Test
     void shouldClearSaleTaxes(){
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
         saleService.clearSaleTaxes(sale.getId());
