@@ -1,22 +1,25 @@
 package com.paca.paca.sale.controller;
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.sale.utils.ValidateTaxOwnerInterceptor.ValidateTaxOwner;
 
 
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 import com.paca.paca.sale.statics.TaxStatics;
 import com.paca.paca.sale.service.TaxService;
 import com.paca.paca.sale.dto.TaxDTO;
-
-
+import com.paca.paca.sale.repository.SaleRepository;
 
 //import BigDecimal
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -42,13 +45,28 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class TaxController {
 
     private final TaxService taxService;
+    private final BusinessRepository businessRepository;
+    private final SaleRepository saleRepository;
 
     @PostMapping
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new tax", description = "Create a new tax")
     public ResponseEntity<TaxDTO> save(@RequestBody TaxDTO dto)
             throws NoContentException {
-        return ResponseEntity.ok(taxService.save(dto));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            return ResponseEntity.ok(taxService.save(dto));
+        }
+        else{
+            Long businessId = businessRepository.findByUserEmail(auth.getName()).get().getId();
+            Long saleId = dto.getSaleId();
+            // Check if the payment option is from the same branch
+            if (!saleRepository.existsByIdAndTable_Branch_Business_Id(saleId, businessId)) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }             
+            return ResponseEntity.ok(taxService.save(dto));
+        }
     }
     
 

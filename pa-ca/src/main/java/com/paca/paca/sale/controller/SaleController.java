@@ -99,8 +99,23 @@ public class SaleController {
             @PathVariable("id") Long id,
             @RequestBody SaleDTO dto)
             throws NoContentException, BadRequestException {
-                
-        return ResponseEntity.ok(saleService.update(id, dto));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            return ResponseEntity.ok(saleService.update(id, dto));
+        }
+        else{
+            Long businessId = businessRepository.findByUserEmail(auth.getName()).get().getId();
+            Long paymentOptionId = dto.getPaymentOptionId();
+
+            if (paymentOptionId != null) {
+                // Check if the payment option is from the same branch
+                if (!paymentOptionRepsository.existsByIdAndBranch_Business_Id(paymentOptionId, businessId)) {
+                    throw new ForbiddenException("Unauthorized access for this operation");
+                }
+            }                
+            return ResponseEntity.ok(saleService.update(id, dto));
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -3,7 +3,8 @@ package com.paca.paca.branch.controller;
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.utils.ValidatePaymentOptionOwnerInterceptor.ValidatePaymentOptionOwner;
-
+import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 
@@ -11,13 +12,14 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.branch.statics.PaymentOptionStatics;
 import com.paca.paca.branch.service.PaymentOptionService;
 import com.paca.paca.branch.dto.PaymentOptionDTO;
-
-
+import com.paca.paca.branch.repository.BranchRepository;
 
 //import BigDecimal
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,14 +45,27 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class PaymentOptionController {
 
     private final PaymentOptionService paymentOptionService;
+    private final BusinessRepository businessRepository;
+    private final BranchRepository branchRepository;
 
     @PostMapping
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new payment option", description = "Create a new payment option")
     public ResponseEntity<PaymentOptionDTO> save(@RequestBody PaymentOptionDTO dto)
             throws NoContentException {
-        // TODO: Validation
-        return ResponseEntity.ok(paymentOptionService.save(dto));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            return ResponseEntity.ok(paymentOptionService.save(dto));
+        }
+        else{
+            Long businessId = businessRepository.findByUserEmail(auth.getName()).get().getId();
+            Long branchId = dto.getBranchId();
+            // Check if the payment option is from the same branch
+            if (!branchRepository.existsByIdAndBusinessId(branchId, businessId)) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }             
+            return ResponseEntity.ok(paymentOptionService.save(dto));
+        }
     }
     
 

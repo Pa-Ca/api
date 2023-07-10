@@ -3,8 +3,9 @@ package com.paca.paca.branch.controller;
 
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.utils.ValidateDefaultTaxOwnerInterceptor.ValidateDefaultTaxOwner;
-
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 
@@ -12,13 +13,14 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.branch.statics.DefaultTaxStatics;
 import com.paca.paca.branch.service.DefaultTaxService;
 import com.paca.paca.branch.dto.DefaultTaxDTO;
-
-
+import com.paca.paca.branch.repository.BranchRepository;
 
 //import BigDecimal
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -44,13 +46,28 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class DefaultTaxController {
 
     private final DefaultTaxService defaultTaxService;
+    private final BusinessRepository businessRepository;
+    private final BranchRepository branchRepository;
 
     @PostMapping
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new Defaulttax", description = "Create a new Defaulttax")
     public ResponseEntity<DefaultTaxDTO> save(@RequestBody DefaultTaxDTO dto)
             throws NoContentException {
-        return ResponseEntity.ok(defaultTaxService.save(dto));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            return ResponseEntity.ok(defaultTaxService.save(dto));
+        }
+        else{
+            Long businessId = businessRepository.findByUserEmail(auth.getName()).get().getId();
+            Long branchId = dto.getBranchId();
+            // Check if the payment option is from the same branch
+            if (!branchRepository.existsByIdAndBusinessId(branchId, businessId)) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }             
+            return ResponseEntity.ok(defaultTaxService.save(dto));
+        }
     }
     
 
