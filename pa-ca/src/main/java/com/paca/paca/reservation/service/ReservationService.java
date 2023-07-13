@@ -12,6 +12,7 @@ import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.dto.ReservationDTO;
+import com.paca.paca.client.model.Client;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.dto.ReservationListDTO;
@@ -96,7 +97,16 @@ public class ReservationService {
 
         Reservation newReservation;
         if (dto.getHaveGuest()) {
-            Guest guest = guestMapper.toEntity(GuestDTO.fromReservationDTO(dto));
+            GuestDTO guestDTO = GuestDTO.fromReservationDTO(dto);
+            Optional<Guest> guestDB = guestRepository.findByIdentityDocument(
+                guestDTO.getIdentityDocument());
+            Guest guest;
+            if (guestDB.isPresent()) {
+                guest = guestMapper.updateModel(guestDTO, guestDB.get());
+            }
+            else{
+                guest = guestMapper.toEntity(guestDTO);
+            }
             guest = guestRepository.save(guest);
             newReservation = reservationMapper.toEntity(dto, branch.get(), guest);
         } else {

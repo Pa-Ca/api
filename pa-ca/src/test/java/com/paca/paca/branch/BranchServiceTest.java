@@ -20,6 +20,7 @@ import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
+import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.branch.dto.AmenityListDTO;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.promotion.model.Promotion;
@@ -35,28 +36,25 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
-import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.client.repository.ReviewLikeRepository;
-import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.reservation.utils.ReservationMapper;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
-
-import com.paca.paca.client.utils.ReviewMapper;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.exception.exceptions.UnprocessableException;
+import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -288,12 +286,11 @@ public class BranchServiceTest {
     @Test
     void shouldGetNoContentDueToMissingBranchInProductSubCategories() {
         Branch branch = utils.createBranch(null);
-        ProductCategory category = utils.createProductCategory();
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            branchService.getProductSubCategories(branch.getId(), category.getId());
+            branchService.getProductSubCategories(branch.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
@@ -303,38 +300,16 @@ public class BranchServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductCategoryInProductSubCategories() {
-        Branch branch = utils.createBranch(null);
-        ProductCategory category = utils.createProductCategory();
-
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        when(productCategoryRepository.findById(any(Long.class))).thenReturn(Optional.empty());
-
-        try {
-            branchService.getProductSubCategories(branch.getId(), category.getId());
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Product category with id " + category.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 24);
-        }
-    }
-
-    @Test
     void shouldGetProductSubCategories() {
         Branch branch = utils.createBranch(null);
-        ProductCategory category = utils.createProductCategory();
         List<ProductSubCategory> subCategories = TestUtils.castList(
                 ProductSubCategory.class,
                 Mockito.mock(List.class));
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        when(productCategoryRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(category));
-        when(productSubCategoryRepository.findAllByBranchIdAndCategoryId(
-                any(Long.class),
-                any(Long.class))).thenReturn(subCategories);
+        when(productSubCategoryRepository.findAllByBranchId(any(Long.class))).thenReturn(subCategories);
 
-        ProductSubCategoryListDTO dtoResponse = branchService.getProductSubCategories(branch.getId(), category.getId());
+        ProductSubCategoryListDTO dtoResponse = branchService.getProductSubCategories(branch.getId());
 
         assertThat(dtoResponse).isNotNull();
     }
@@ -448,7 +423,7 @@ public class BranchServiceTest {
                 Mockito.mock(List.class));
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(
+        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(
                 any(Long.class),
                 any(Date.class))).thenReturn(reservations);
 
@@ -756,7 +731,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -775,8 +750,8 @@ public class BranchServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 
@@ -845,7 +820,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -867,8 +842,8 @@ public class BranchServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 
@@ -890,7 +865,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Sorting key is not valid");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 42);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 46);
         }
     }
 
@@ -953,7 +928,7 @@ public class BranchServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -970,8 +945,8 @@ public class BranchServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 41);
+            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 
@@ -1000,7 +975,7 @@ public class BranchServiceTest {
         int end = Math.min((start + pageable.getPageSize()), reservations.size());
         Page<Reservation> pagedResult = new PageImpl<>(reservations.subList(start, end), pageable, reservations.size());
 
-        when(reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(any(Long.class), any(Date.class),
+        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(any(Long.class), any(Date.class),
                 any(Pageable.class))).thenReturn(pagedResult);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(utils.createReservationDTO(null));
 

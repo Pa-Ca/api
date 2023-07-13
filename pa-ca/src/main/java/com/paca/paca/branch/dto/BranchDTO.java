@@ -34,4 +34,6 @@ public class BranchDTO {
     private LocalTime hourIn;
     private LocalTime hourOut;
     private Boolean deleted;
+    private BigDecimal dollarToLocalCurrencyExchange;
+
 }

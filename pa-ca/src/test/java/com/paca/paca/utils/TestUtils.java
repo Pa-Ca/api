@@ -2,21 +2,29 @@ package com.paca.paca.utils;
 
 import java.util.List;
 import java.util.Date;
+import java.util.UUID;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.business.model.Tier;
 import com.paca.paca.auth.dto.LogoutDTO;
+import com.paca.paca.branch.model.Table;
+import com.paca.paca.business.model.Tier;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
@@ -25,14 +33,20 @@ import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.product.model.Product;
+import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.product.dto.ProductDTO;
+import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.dto.UserRequestDTO;
+import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.sale.statics.TaxStatics;
+import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.dto.UserResponseDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
@@ -47,6 +61,9 @@ import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.branch.statics.DefaultTaxStatics;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
@@ -55,30 +72,32 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
+import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.product_sub_category.model.ProductCategory;
-import com.paca.paca.product_sub_category.dto.ProductCategoryDTO;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -110,6 +129,14 @@ public class TestUtils {
     ProductRepository productRepository;
 
     BusinessRepository businessRepository;
+
+    TableRepository tableRepository;
+
+    DefaultTaxRepository defaultTaxRepository;
+
+    SaleRepository saleRepository;
+
+    SaleProductRepository saleProductRepository;
 
     PromotionRepository promotionRepository;
 
@@ -423,7 +450,7 @@ public class TestUtils {
                 .business(business)
                 .location("location test")
                 .mapsLink("mapsLink test")
-                .name("name test")
+                .name("name_test_" + UUID.randomUUID().toString())
                 .overview("overview test")
                 .score(4.0F)
                 .capacity(42)
@@ -436,6 +463,7 @@ public class TestUtils {
                 .hourIn(LocalTime.of(8, 5, 1))
                 .hourOut(LocalTime.of(8, 5, 1))
                 .deleted(false)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
                 .build();
 
         if (branchRepository != null) {
@@ -500,6 +528,7 @@ public class TestUtils {
                     .hourIn(LocalTime.of(8, 5, 1))
                     .hourOut(LocalTime.of(8, 5, 1))
                     .deleted(false)
+                    .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
                     .build();
 
             if (branchRepository != null) {
@@ -614,7 +643,7 @@ public class TestUtils {
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .subCategory(subCategory)
                 .disabled(false)
-                .name("test name")
+                .name("test_name_" + UUID.randomUUID().toString())
                 .price(BigDecimal.valueOf(10.0f))
                 .description("test description")
                 .build();
@@ -680,7 +709,7 @@ public class TestUtils {
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch)
                 .category(category)
-                .name("test")
+                .name("test_" + UUID.randomUUID().toString())
                 .build();
 
         if (productSubCategoryRepository != null) {
@@ -770,6 +799,7 @@ public class TestUtils {
                 .surname("surname_test")
                 .email("email_test")
                 .phoneNumber("phone_number_test")
+                .identityDocument("iden_doc_test")
                 .build();
 
         if (guestRepository != null) {
@@ -789,6 +819,7 @@ public class TestUtils {
                 .surname(guest.getSurname())
                 .email(guest.getEmail())
                 .phoneNumber(guest.getPhoneNumber())
+                .identityDocument(guest.getIdentityDocument())
                 .build();
 
         return dto;
@@ -807,8 +838,10 @@ public class TestUtils {
                 .branch(branch)
                 .guest(guest)
                 .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDate(new Date(System.currentTimeMillis()))
+                .reservationDateIn(new Date(System.currentTimeMillis()))
+                .reservationDateOut(new Date(System.currentTimeMillis()))
                 .clientNumber(5)
+                .tableNumber(2)
                 .payment("payment_test")
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
@@ -834,8 +867,10 @@ public class TestUtils {
                 .branch(branch)
                 .guest(null)
                 .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDate(new Date(System.currentTimeMillis()))
+                .reservationDateIn(new Date(System.currentTimeMillis()))
+                .reservationDateOut(new Date(System.currentTimeMillis()))
                 .clientNumber(5)
+                .tableNumber(2)
                 .payment("payment_test")
                 .status(0)
                 .payDate(new Date(System.currentTimeMillis()))
@@ -861,8 +896,10 @@ public class TestUtils {
                 .branchId(reservation.getBranch().getId())
                 .guestId(reservation.getGuest() == null ? null : reservation.getGuest().getId())
                 .requestDate(reservation.getRequestDate())
-                .reservationDate(reservation.getReservationDate())
+                .reservationDateIn(reservation.getReservationDateIn())
+                .reservationDateOut(reservation.getReservationDateOut())
                 .clientNumber(reservation.getClientNumber())
+                .tableNumber(reservation.getTableNumber())
                 .payment(reservation.getPayment())
                 .status(reservation.getStatus())
                 .payDate(reservation.getPayDate())
@@ -870,6 +907,11 @@ public class TestUtils {
                 .occasion(reservation.getOccasion())
                 .byClient(reservation.getByClient())
                 .haveGuest(reservation.getGuest() != null)
+                .name(reservation.getGuest() == null ? null : reservation.getGuest().getName())
+                .surname(reservation.getGuest() == null ? null : reservation.getGuest().getSurname())
+                .email(reservation.getGuest() == null ? null : reservation.getGuest().getEmail())
+                .phoneNumber(reservation.getGuest() == null ? null : reservation.getGuest().getPhoneNumber())
+                .identityDocument(reservation.getGuest() == null ? null : reservation.getGuest().getIdentityDocument())
                 .build();
 
         return dto;
@@ -965,8 +1007,10 @@ public class TestUtils {
                     .branch(branch)
                     .guest(null)
                     .requestDate(new Date(System.currentTimeMillis()))
-                    .reservationDate(date)
+                    .reservationDateIn(date)
+                    .reservationDateOut(date)
                     .clientNumber(5)
+                    .tableNumber(2)
                     .payment("payment_test")
                     .status(0)
                     .payDate(new Date(System.currentTimeMillis()))
@@ -984,4 +1028,445 @@ public class TestUtils {
 
         return reservations;
     }
+
+    // Create a new Tax
+    public Tax createTax(Sale sale) {
+
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        Tax tax = Tax.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .sale(sale)
+                .name("Tax")
+                .type(TaxStatics.Types.PERCENTAGE)
+                .value(50.f)
+                .build();
+
+        return tax;
+    }
+
+    // Create a new DefaultTax
+    public DefaultTax createDefaultTax(Branch branch) {
+
+        // If the branch is null, create a new one
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        DefaultTax defaultTax = DefaultTax.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .name("Default Tax")
+                .type(DefaultTaxStatics.Types.PERCENTAGE)
+                .build();
+
+        if (defaultTaxRepository != null) {
+            defaultTax = defaultTaxRepository.save(defaultTax);
+        }
+
+        return defaultTax;
+    }
+
+    public Table createTable(Branch branch) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        Table table = Table.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .name("Table_" + UUID.randomUUID().toString())
+                .deleted(false)
+                .build();
+
+        if (tableRepository != null) {
+            table = tableRepository.save(table);
+        }
+
+        return table;
+    }
+
+    public Sale createSale(Table table, Reservation reservation) {
+
+        // If the table is null, create a new one
+        if (table == null) {
+            table = createTable(null);
+        }
+
+        // If the reservation is null, create a new one
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        Sale sale = Sale.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .table(table)
+                .tableName(table.getName())
+                .startTime(new Date(System.currentTimeMillis()))
+                .status(SaleStatics.Status.ongoing)
+                .clientQuantity(ThreadLocalRandom.current().nextInt(1, 10))
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(1, 10)))
+                .reservation(reservation)
+                .build();
+
+        if (saleRepository != null) {
+            sale = saleRepository.save(sale);
+        }
+        return sale;
+    }
+
+    public SaleProduct createSaleProduct(Sale sale, Product product) {
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        if (product == null) {
+            product = createProduct(null);
+        }
+
+        SaleProduct saleProduct = SaleProduct.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .sale(sale)
+                .name(product.getName())
+                .price(BigDecimal.valueOf(5.0f))
+                .amount(5)
+                .product(product)
+                .build();
+
+        if (saleProductRepository != null) {
+            saleProduct = saleProductRepository.save(saleProduct);
+        }
+
+        return saleProduct;
+    }
+
+    public SaleDTO createSaleDTO(Table table, Reservation reservation) {
+
+        // If the table is null, create a new one
+        if (table == null) {
+            table = createTable(null);
+        }
+
+        // If the reservation is null, create a new one
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        SaleDTO dto = SaleDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .tableId(table.getId())
+                .tableName(table.getName())
+                .startTime(new Date(System.currentTimeMillis()))
+                .status(SaleStatics.Status.ongoing)
+                .reservationId(reservation.getId())
+                .build();
+
+        return dto;
+    }
+
+    public SaleProductDTO createSaleProductDTO(Sale sale, Product product) {
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        if (product == null) {
+            product = createProduct(null);
+        }
+
+        SaleProductDTO dto = SaleProductDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .saleId(sale.getId())
+                .name(product.getName())
+                .price(BigDecimal.valueOf(5.0f))
+                .amount(5)
+                .productId(product.getId())
+                .build();
+
+        return dto;
+    }
+
+    public TableDTO createTableDTO(Branch branch) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        TableDTO dto = TableDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branchId(branch.getId())
+                .name("Table 1")
+                .deleted(false)
+                .build();
+
+        return dto;
+    }
+
+    public DefaultTaxDTO createDefaultTaxDTO(Branch branch) {
+
+        // If the branch is null, create a new one
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        DefaultTaxDTO dto = DefaultTaxDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branchId(branch.getId())
+                .name("Default Tax")
+                .type(DefaultTaxStatics.Types.PERCENTAGE)
+                .value(5.0f)
+                .build();
+
+        return dto;
+    }
+
+    public TaxDTO createTaxDTO(Sale sale) {
+
+        // If the branch is null, create a new one
+        if (sale == null) {
+            sale = createSale(null, null);
+        }
+
+        TaxDTO dto = TaxDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .saleId(sale.getId())
+                .name("Tax")
+                .type(TaxStatics.Types.PERCENTAGE)
+                .value(5.0f)
+                .build();
+
+        return dto;
+    }
+
+    public List<Sale> createTestSales(Branch branchA, Branch branchB) {
+
+        // Create three tables in branchA
+        Table tableAA = createTable(branchA);
+        Table tableAB = createTable(branchA);
+        Table tableAC = createTable(branchA);
+
+        // Create two tables in branchB
+        Table tableBA = createTable(branchB);
+        Table tableBB = createTable(branchB);
+
+        Calendar calendar = Calendar.getInstance();
+        // Get now
+        Date now = calendar.getTime();
+        // Get an hour after now
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        Date oneHourAfterNow = calendar.getTime();
+        // Get two hours after now
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        Date twoHoursAfterNow = calendar.getTime();
+        // Get two hours before now
+        calendar.add(Calendar.HOUR_OF_DAY, -5);
+        Date twoHoursBeforeNow = calendar.getTime();
+
+        // For each table create a sale
+        // Have the sales vary status and time
+        // If the sales status is ongoing then the endTime nowtus is closed then the
+        // endTime now status is cancelled then the endTime now
+        Sale saleAA1 = Sale.builder()
+                .table(tableAA)
+                .tableName(tableAA.getName())
+                .note("Nota de prueba 1")
+                .startTime(twoHoursBeforeNow)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                .reservation(null)
+                .status(SaleStatics.Status.ongoing)
+                .tableName(tableAA.getName())
+                .build();
+        Sale saleAA2 = Sale.builder()
+                .table(tableAA)
+                .tableName(tableAA.getName())
+                .note("Nota de prueba 2")
+                .startTime(twoHoursBeforeNow)
+                .endTime(now)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                .status(SaleStatics.Status.cancelled)
+                .reservation(null)
+                .tableName(tableAA.getName())
+                .build();
+
+        Sale saleAA3 = Sale.builder()
+                .table(tableAA)
+                .tableName(tableAA.getName())
+                .startTime(twoHoursBeforeNow)
+                .note("Nota de prueba 3")
+                .reservation(null)
+                .clientQuantity(2)
+                .status(SaleStatics.Status.closed)
+                .tableName(tableAA.getName())
+                .endTime(oneHourAfterNow)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                .build();
+
+        Sale saleAA4 = Sale.builder()
+                .table(tableAA)
+                .tableName(tableAA.getName())
+                .startTime(twoHoursBeforeNow)
+                .note("Nota de prueba 4")
+                .reservation(null)
+                .clientQuantity(2)
+                .status(SaleStatics.Status.cancelled)
+                .tableName(tableAA.getName())
+                .endTime(oneHourAfterNow)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                .build();
+        // Now do the rest of the tables
+        // TableAB
+        Sale saleAB1 = Sale.builder()
+                .table(tableAB)
+                .tableName(tableAB.getName())
+                .note("Nota de prueba 1")
+                .startTime(twoHoursBeforeNow)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                .reservation(null)
+                .status(SaleStatics.Status.ongoing)
+                .tableName(tableAB.getName())
+                .build();
+        Sale saleAB2 = Sale.builder()
+                .table(tableAB)
+                .tableName(tableAB.getName())
+                .note("Nota de prueba 2")
+                .startTime(twoHoursBeforeNow)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                .status(SaleStatics.Status.ongoing)
+                .reservation(null)
+                .tableName(tableAB.getName())
+                .build();
+
+        Sale saleAB3 = Sale.builder()
+                .table(tableAB)
+                .tableName(tableAB.getName())
+                .startTime(twoHoursBeforeNow)
+                .note("Nota de prueba 3")
+                .reservation(null)
+                .clientQuantity(2)
+                .status(SaleStatics.Status.closed)
+                .tableName(tableAB.getName())
+                .endTime(twoHoursAfterNow)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                .build();
+
+        // TableAC
+        Sale saleAC1 = Sale.builder()
+                .table(tableAC)
+                .tableName(tableAC.getName())
+                .note("Nota de prueba 1")
+                .startTime(twoHoursBeforeNow)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                .reservation(null)
+                .status(SaleStatics.Status.ongoing)
+                .tableName(tableAC.getName())
+                .build();
+
+        Sale saleAC2 = Sale.builder()
+                .table(tableAC)
+                .tableName(tableAC.getName())
+                .note("Nota de prueba 2")
+                .startTime(twoHoursBeforeNow)
+                .endTime(now)
+                .clientQuantity(3)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                .status(SaleStatics.Status.closed)
+                .reservation(null)
+                .tableName(tableAC.getName())
+                .build();
+
+        Sale saleAC3 = Sale.builder()
+                .table(tableAC)
+                .tableName(tableAC.getName())
+                .startTime(twoHoursBeforeNow)
+                .note("Nota de prueba 3")
+                .reservation(null)
+                .clientQuantity(2)
+                .status(SaleStatics.Status.closed)
+                .tableName(tableAC.getName())
+                .endTime(oneHourAfterNow)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                .build();
+
+        // TableBA
+        Sale saleBA1 = Sale.builder()
+                .table(tableBA)
+                .tableName(tableBA.getName())
+                .note("Nota de prueba 1")
+                .startTime(twoHoursBeforeNow)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                .reservation(null)
+                .status(SaleStatics.Status.ongoing)
+                .tableName(tableBA.getName())
+                .build();
+
+        Sale saleBA2 = Sale.builder()
+                .table(tableBA)
+                .tableName(tableBA.getName())
+                .note("Nota de prueba 2")
+                .startTime(twoHoursBeforeNow)
+                .endTime(now)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
+                .status(SaleStatics.Status.cancelled)
+                .reservation(null)
+                .tableName(tableBA.getName())
+                .build();
+
+        Sale saleBA3 = Sale.builder()
+                .table(tableBA)
+                .tableName(tableBA.getName())
+                .startTime(twoHoursBeforeNow)
+                .note("Nota de prueba 3")
+                .reservation(null)
+                .clientQuantity(2)
+                .status(SaleStatics.Status.closed)
+                .tableName(tableBA.getName())
+                .endTime(now)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
+                .build();
+        // TableBB
+
+        Sale saleBB1 = Sale.builder()
+                .table(tableBB)
+                .tableName(tableBB.getName())
+                .note("Nota de prueba 1")
+                .startTime(twoHoursBeforeNow)
+                .clientQuantity(2)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
+                .reservation(null)
+                .status(SaleStatics.Status.ongoing)
+                .tableName(tableBB.getName())
+                .build();
+
+        // Now create a list of sales
+        List<Sale> sales = new ArrayList<>();
+        sales.add(saleAA1);
+        sales.add(saleAA2);
+        sales.add(saleAA3);
+        sales.add(saleAA4);
+        sales.add(saleAB1);
+        sales.add(saleAB2);
+        sales.add(saleAB3);
+        sales.add(saleAC1);
+        sales.add(saleAC2);
+        sales.add(saleAC3);
+        sales.add(saleBA1);
+        sales.add(saleBA2);
+        sales.add(saleBA3);
+        sales.add(saleBB1);
+
+        // Now save the sales
+        for (Sale sale : sales) {
+            saleRepository.save(sale);
+        }
+
+        return sales;
+    }
+
 }

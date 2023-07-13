@@ -118,6 +118,7 @@ public class BranchRepositoryTest extends PacaTest {
                 .hourIn(LocalTime.of(8, 0))
                 .hourOut(LocalTime.of(8, 0))
                 .deleted(false)
+                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
                 .build();
 
         Branch savedBranch = branchRepository.save(branch);
@@ -139,6 +140,7 @@ public class BranchRepositoryTest extends PacaTest {
         assertThat(savedBranch.getHourIn()).isEqualTo(branch.getHourIn());
         assertThat(savedBranch.getHourOut()).isEqualTo(branch.getHourOut());
         assertThat(savedBranch.getDeleted()).isEqualTo(branch.getDeleted());
+        assertThat(savedBranch.getDollarToLocalCurrencyExchange()).isEqualTo(branch.getDollarToLocalCurrencyExchange());
     }
 
     @Test

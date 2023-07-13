@@ -317,7 +317,7 @@ public class ClientService {
         return ReservationListDTO.builder().reservations(response).build();
     }
 
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
+    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
             throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
@@ -327,7 +327,7 @@ public class ClientService {
         }
 
         List<ReservationDTO> response = new ArrayList<>();
-        clientGroupRepository.findAllByClientIdAndReservationReservationDateGreaterThanEqual(id, reservationDate)
+        clientGroupRepository.findAllByClientIdAndReservationReservationDateInGreaterThanEqual(id, reservationDateIn)
                 .forEach(group -> {
                     ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
                     response.add(dto);

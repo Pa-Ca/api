@@ -28,4 +28,7 @@ public class Guest {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "identity_document")
+    private String identityDocument;
 }

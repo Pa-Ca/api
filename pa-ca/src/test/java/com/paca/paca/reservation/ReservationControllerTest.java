@@ -122,10 +122,14 @@ public class ReservationControllerTest extends ControllerTest {
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.requestDate",
                         CoreMatchers.is(dto.getRequestDate().toInstant().toString().replace("Z", "+00:00"))))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDate",
-                        CoreMatchers.is(dto.getReservationDate().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDateIn",
+                        CoreMatchers.is(dto.getReservationDateIn().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDateOut",
+                        CoreMatchers.is(dto.getReservationDateOut().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientNumber",
                         CoreMatchers.is(dto.getClientNumber().intValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tableNumber",
+                        CoreMatchers.is(dto.getTableNumber().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.payment",
                         CoreMatchers.is(dto.getPayment())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status",
@@ -206,10 +210,14 @@ public class ReservationControllerTest extends ControllerTest {
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.requestDate",
                         CoreMatchers.is(dto.getRequestDate().toInstant().toString().replace("Z", "+00:00"))))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDate",
-                        CoreMatchers.is(dto.getReservationDate().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDateIn",
+                        CoreMatchers.is(dto.getReservationDateIn().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDateOut",
+                        CoreMatchers.is(dto.getReservationDateOut().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientNumber",
                         CoreMatchers.is(dto.getClientNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tableNumber",
+                        CoreMatchers.is(dto.getTableNumber())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.payment",
                         CoreMatchers.is(dto.getPayment())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status",
@@ -272,10 +280,14 @@ public class ReservationControllerTest extends ControllerTest {
                         CoreMatchers.is(dto.getBranchId().intValue())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.requestDate",
                         CoreMatchers.is(dto.getRequestDate().toInstant().toString().replace("Z", "+00:00"))))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDate",
-                        CoreMatchers.is(dto.getReservationDate().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDateIn",
+                        CoreMatchers.is(dto.getReservationDateIn().toInstant().toString().replace("Z", "+00:00"))))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.reservationDateOut",
+                        CoreMatchers.is(dto.getReservationDateOut().toInstant().toString().replace("Z", "+00:00"))))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.clientNumber",
                         CoreMatchers.is(dto.getClientNumber())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tableNumber",
+                        CoreMatchers.is(dto.getTableNumber())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.payment",
                         CoreMatchers.is(dto.getPayment())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status",
