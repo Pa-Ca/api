@@ -87,6 +87,7 @@ public class PaymentOptionService {
                 }
         // Delete the payment option
         
+        paymentOptionRepository.deleteById(paymentOptionId);
     }
         
 }

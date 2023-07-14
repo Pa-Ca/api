@@ -35,6 +35,7 @@ public interface SaleMapper {
     @Mapping(target = "table", ignore = true)
     @Mapping(target = "startTime", ignore = true)
     @Mapping(target = "reservation", ignore = true)
+    @Mapping(target = "tableName", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Sale updateModel(SaleDTO dto, @MappingTarget Sale sale, PaymentOption paymentOption);
 
