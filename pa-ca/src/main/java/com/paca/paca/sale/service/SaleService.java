@@ -32,6 +32,7 @@ import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -41,7 +42,9 @@ import com.paca.paca.exception.exceptions.UnprocessableException;
 public class SaleService {
 
     private final SaleRepository saleRepository;
+
     private final SaleMapper saleMapper;
+
     private final TaxMapper taxMapper;
 
     private final BranchRepository branchRepository;
@@ -54,7 +57,9 @@ public class SaleService {
 
     private final SaleProductMapper saleProductMapper;
 
-    public List<TaxDTO> getTaxesBySaleId(Long saleId) throws NoContentException{
+    private final DefaultTaxRepository defaultTaxRepository;
+
+    public List<TaxDTO> getTaxesBySaleId(Long saleId) throws NoContentException {
         // Check if the sale exists
         Optional<Sale> sale = saleRepository.findById(saleId);
         if (sale.isEmpty()) {
@@ -122,14 +127,20 @@ public class SaleService {
             throw new NoContentException(
                     "Table with id " + dto.getTableId() + " does not exists", 49); // !
         }
-
-        Sale newSale;
-
-        newSale = saleMapper.toEntity(dto, table.get(), null);
-
-        newSale = saleRepository.save(newSale);
-
+        Sale newSale_ = saleMapper.toEntity(dto, table.get(), null);
+        final Sale newSale = saleRepository.save(newSale_);
         SaleDTO saleDTO = saleMapper.toDTO(newSale);
+
+        // Create taxes
+        defaultTaxRepository.findAllByBranchId(table.get().getBranch().getId()).forEach(tax -> {
+            Tax newTax = Tax.builder()
+                    .sale(newSale)
+                    .name(tax.getName())
+                    .type(tax.getType())
+                    .value(tax.getValue())
+                    .build();
+            taxRepository.save(newTax);
+        });
 
         List<TaxDTO> taxListDTO = getTaxesBySaleId(newSale.getId());
         List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(newSale.getId());
@@ -295,7 +306,7 @@ public class SaleService {
         // Check if the sale is canceled
         if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " is canceled", 48); 
+                    "Sale with id " + saleId + " is canceled", 48);
         }
 
         // Delete all the SaleProducts of the Sale

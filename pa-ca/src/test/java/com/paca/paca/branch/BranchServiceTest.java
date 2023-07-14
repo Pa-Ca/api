@@ -29,6 +29,7 @@ import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.branch.service.BranchService;
+import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.promotion.dto.PromotionListDTO;
@@ -38,6 +39,7 @@ import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -91,6 +93,9 @@ public class BranchServiceTest {
     private PromotionRepository promotionRepository;
 
     @Mock
+    private DefaultTaxRepository defaultTaxRepository;
+
+    @Mock
     private ReservationRepository reservationRepository;
 
     @Mock
@@ -113,6 +118,9 @@ public class BranchServiceTest {
 
     @Mock
     private ReviewMapper reviewMapper;
+
+    @Mock
+    private DefaultTaxMapper defaultTaxMapper;
 
     @Mock
     private ReservationMapper reservationMapper;
@@ -975,7 +983,8 @@ public class BranchServiceTest {
         int end = Math.min((start + pageable.getPageSize()), reservations.size());
         Page<Reservation> pagedResult = new PageImpl<>(reservations.subList(start, end), pageable, reservations.size());
 
-        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(any(Long.class), any(Date.class),
+        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(any(Long.class),
+                any(Date.class),
                 any(Pageable.class))).thenReturn(pagedResult);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(utils.createReservationDTO(null));
 
