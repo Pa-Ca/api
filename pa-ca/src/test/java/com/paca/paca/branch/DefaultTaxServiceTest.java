@@ -75,9 +75,7 @@ public class DefaultTaxServiceTest {
     void shouldUpdate(){
         DefaultTaxDTO  defaultTaxDTO = utils.createDefaultTaxDTO(null);
         DefaultTax defaultTax = utils.createDefaultTax(null);
-        Branch branch = utils.createBranch(null);
 
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(defaultTaxRepository.findById(anyLong())).thenReturn(Optional.of(defaultTax));
         when(defaultTaxRepository.save(any())).thenReturn(defaultTax);
         when(defaultTaxMapper.toDTO(any())).thenReturn(defaultTaxDTO);

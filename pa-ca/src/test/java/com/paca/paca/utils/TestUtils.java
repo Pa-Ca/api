@@ -912,6 +912,11 @@ public class TestUtils {
                 .occasion(reservation.getOccasion())
                 .byClient(reservation.getByClient())
                 .haveGuest(reservation.getGuest() != null)
+                .name(reservation.getGuest() == null ? null : reservation.getGuest().getName())
+                .surname(reservation.getGuest() == null ? null : reservation.getGuest().getSurname())
+                .email(reservation.getGuest() == null ? null : reservation.getGuest().getEmail())
+                .phoneNumber(reservation.getGuest() == null ? null : reservation.getGuest().getPhoneNumber())
+                .identityDocument(reservation.getGuest() == null ? null : reservation.getGuest().getIdentityDocument())
                 .build();
 
         return dto;

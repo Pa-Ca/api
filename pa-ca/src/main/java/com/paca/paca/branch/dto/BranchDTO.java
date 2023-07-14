@@ -17,23 +17,23 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class BranchDTO {
 
-    private Long id;
-    private Long businessId;
-    private String location;
-    private String mapsLink;
-    private String name;
-    private String overview;
-    private Float score;
-    private Integer capacity;
-    private BigDecimal reservationPrice;
-    private Boolean reserveOff;
-    private Duration averageReserveTime;
-    private Boolean visibility;
-    private String phoneNumber;
-    private String type;
-    private LocalTime hourIn;
-    private LocalTime hourOut;
-    private Boolean deleted;
-    private BigDecimal dollarToLocalCurrencyExchange;
+    protected Long id;
+    protected Long businessId;
+    protected String location;
+    protected String mapsLink;
+    protected String name;
+    protected String overview;
+    protected Float score;
+    protected Integer capacity;
+    protected BigDecimal reservationPrice;
+    protected Boolean reserveOff;
+    protected Duration averageReserveTime;
+    protected Boolean visibility;
+    protected String phoneNumber;
+    protected String type;
+    protected LocalTime hourIn;
+    protected LocalTime hourOut;
+    protected Boolean deleted;
+    protected BigDecimal dollarToLocalCurrencyExchange;
 
 }

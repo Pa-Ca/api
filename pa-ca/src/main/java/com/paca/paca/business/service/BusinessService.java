@@ -3,32 +3,37 @@ package com.paca.paca.business.service;
 import com.paca.paca.user.model.User;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.business.model.Business;
-import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.branch.dto.BranchInfoDTO;
 import com.paca.paca.business.dto.BusinessDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.branch.utils.BranchMapper;
+import com.paca.paca.branch.dto.BranchInfoListDTO;
 import com.paca.paca.business.dto.BusinessListDTO;
+import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
-import com.paca.paca.user.statics.UserStatics;
 import lombok.RequiredArgsConstructor;
+import com.paca.paca.user.statics.UserStatics;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
 public class BusinessService {
+
+    private final DefaultTaxRepository defaultTaxRepository;
 
     private final BusinessRepository businessRepository;
 
@@ -41,6 +46,8 @@ public class BusinessService {
     private final BusinessMapper businessMapper;
 
     private final UserRepository userRepository;
+
+    private final DefaultTaxMapper defaultTaxMapper;
 
     private void validateTier(String tier) throws BadRequestException {
         if (tier.isEmpty())
@@ -163,13 +170,23 @@ public class BusinessService {
         return dto;
     }
 
-    public BranchListDTO getAllBranchesById(Long id) {
-        List<BranchDTO> response = new ArrayList<>();
+    public BranchInfoListDTO getAllBranchesById(Long id) {
+        List<BranchInfoDTO> response = new ArrayList<>();
         branchRepository.findAllByBusinessId(id).forEach(branch -> {
-            BranchDTO dto = branchMapper.toDTO(branch);
+            // Get branch info
+            BranchInfoDTO dto = new BranchInfoDTO(branchMapper.toDTO(branch));
+
+            // Get default taxes info
+            List<DefaultTaxDTO> defaultTaxes = new ArrayList<>();
+            defaultTaxRepository.findAllByBranchId(branch.getId()).forEach(defaultTax -> {
+                DefaultTaxDTO defaultTaxDTO = defaultTaxMapper.toDTO(defaultTax);
+                defaultTaxes.add(defaultTaxDTO);
+            });
+            dto.setDefaultTaxes(defaultTaxes);
+
             response.add(dto);
         });
 
-        return BranchListDTO.builder().branches(response).build();
+        return BranchInfoListDTO.builder().branches(response).build();
     }
 }

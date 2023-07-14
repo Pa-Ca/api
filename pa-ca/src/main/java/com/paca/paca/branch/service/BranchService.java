@@ -532,11 +532,11 @@ public class BranchService {
         // Check if the branch exists
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-                    throw new NoContentException(
-                            "Branch with id " + branchId + " does not exists",
-                            20);
-                }
-        
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    20);
+        }
+
         // Get the default taxes
         List<DefaultTax> defaultTaxes = defaultTaxRepository.findAllByBranchId(branchId);
 
@@ -545,21 +545,21 @@ public class BranchService {
         for (DefaultTax defaultTax : defaultTaxes) {
             defaultTaxesDTO.add(defaultTaxMapper.toDTO(defaultTax));
         }
-         
+
         return DefaultTaxListDTO.builder()
-                                .defaultTaxes(defaultTaxesDTO)
-                                .build();
+                .defaultTaxes(defaultTaxesDTO)
+                .build();
     }
 
     public TableListDTO getTablesbyBranchId(Long branchId) {
         // Check if the branch exists
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-                    throw new NoContentException(
-                            "Branch with id " + branchId + " does not exists",
-                            20);
-                }
-        
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    20);
+        }
+
         // Get the tables
         List<Table> tables = tableRepository.findAllByBranchIdAndDeletedFalse(branchId);
 
@@ -570,9 +570,9 @@ public class BranchService {
         }
 
         return TableListDTO.builder()
-                            .tables(tablesDTO)
-                            .build();
-         
+                .tables(tablesDTO)
+                .build();
+
     }
 
 

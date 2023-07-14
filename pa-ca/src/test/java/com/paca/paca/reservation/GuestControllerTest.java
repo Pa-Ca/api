@@ -79,8 +79,10 @@ public class GuestControllerTest extends ControllerTest {
     @Test
     public void shouldGetGuestByIdentityDocument() throws Exception {
         GuestDTO dto = utils.createGuestDTO(null);
+        Business business = utils.createBusiness(null);
 
-        when(guestService.getByIdentityDocument(any(String.class)))
+        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+        when(guestService.getByIdentityDocument(any(Long.class),any(String.class)))
                 .thenReturn(dto);
 
         utils.setAuthorities("business");

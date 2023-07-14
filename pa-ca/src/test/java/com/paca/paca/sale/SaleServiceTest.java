@@ -3,9 +3,11 @@ package com.paca.paca.sale;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.PaymentOption;
+import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.dto.SaleDTO;
@@ -51,16 +53,15 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-
 @ExtendWith(MockitoExtension.class)
 public class SaleServiceTest {
 
     @Mock
     private SaleRepository saleRepository;
-    
+
     @Mock
     private SaleMapper saleMapper;
-    
+
     @Mock
     private TaxMapper taxMapper;
 
@@ -85,24 +86,25 @@ public class SaleServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
 
-    
+    @Mock
+    private DefaultTaxRepository defaultTaxRepository;
+
     @InjectMocks
     private SaleService saleService;
     
 
     private TestUtils utils = TestUtils.builder().build();
-    
 
     @Test
     void shouldGetTaxesBySaleId() {
-        
+
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
         Sale sale = utils.createSale(null, null, null);
 
         when(taxRepository.findAllBySaleId(any())).thenReturn(taxes);
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
-        List<TaxDTO> responseDTO = saleService.getTaxesBySaleId( 1L);
+        List<TaxDTO> responseDTO = saleService.getTaxesBySaleId(1L);
 
         assertThat(responseDTO).isNotNull();
     }
@@ -121,14 +123,14 @@ public class SaleServiceTest {
     }
 
     @Test
-    void shouldDeleteSalebyId(){
+    void shouldDeleteSalebyId() {
 
         Sale sale = utils.createSale(null, null, null);
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
         saleService.delete(1L);
-        
+
     }
 
     @Test
@@ -142,7 +144,7 @@ public class SaleServiceTest {
             Assert.assertEquals("Sale with id " + 1L + " does not exists", e.getMessage());
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
         }
-    } 
+    }
 
     @Test
     void shouldGetSaleProductsbySaleId(){
@@ -152,7 +154,6 @@ public class SaleServiceTest {
 
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(saleProductRepository.findAllBySaleId(1L)).thenReturn(saleProducts);
-        
 
         List<SaleProductDTO> saleProductList = saleService.getSaleProductsbySaleId(1L);
 
@@ -173,15 +174,14 @@ public class SaleServiceTest {
     }
 
     @Test
-    void shouldUpdate(){
+    void shouldUpdate() {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         Sale sale = utils.createSale(null, null, null);
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
         SaleProduct saleProduct = utils.createSaleProduct(sale, null);
-        
 
-        List<SaleProduct> saleProducts = List.of(saleProduct); 
-        
+        List<SaleProduct> saleProducts = List.of(saleProduct);
+
         when(saleProductRepository.findAllBySaleId(anyLong())).thenReturn(saleProducts);
         when(taxRepository.findAllBySaleId(anyLong())).thenReturn(taxes);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
@@ -198,7 +198,7 @@ public class SaleServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToSaleNotExistingInUpdate(){
+    void shouldGetNoContentExceptionDueToSaleNotExistingInUpdate() {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
 
         when(saleRepository.findById(any())).thenReturn(Optional.empty());
@@ -213,13 +213,12 @@ public class SaleServiceTest {
     }
 
     @Test
-    void shouldGetBadRequestExceptionDueToSaleBeingClosed(){
+    void shouldGetBadRequestExceptionDueToSaleBeingClosed() {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         // Create a closed sale
         Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.closed);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
-
 
         try {
             saleService.update(1L, saleDTO);
@@ -229,15 +228,14 @@ public class SaleServiceTest {
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 43);
         }
     }
-    
+
     @Test
-    void shouldGetBadRequestExceptionDueToSaleBeingCanceled(){
+    void shouldGetBadRequestExceptionDueToSaleBeingCanceled() {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         // Create a closed sale
         Sale sale = utils.createSale(null, null, null);
         sale.setStatus(SaleStatics.Status.canceled);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
-
 
         try {
             saleService.update(1L, saleDTO);
@@ -248,19 +246,19 @@ public class SaleServiceTest {
         }
     }
 
-    @Test 
-    void shouldSave(){
-        
+    @Test
+    void shouldSave() {
+        Table table = utils.createTable(null);
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         Sale sale = utils.createSale(null, null, null);
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
+        List<DefaultTax> defaultTaxes = TestUtils.castList(DefaultTax.class, Mockito.mock(List.class));
         SaleProduct saleProduct = utils.createSaleProduct(sale, null);
-        
+        List<SaleProduct> saleProducts = List.of(saleProduct);
 
-        List<SaleProduct> saleProducts = List.of(saleProduct); 
-        
+        when(defaultTaxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
         when(saleProductRepository.findAllBySaleId(anyLong())).thenReturn(saleProducts);
-        when(tableRepository.findById(anyLong())).thenReturn(Optional.of(new Table()));
+        when(tableRepository.findById(anyLong())).thenReturn(Optional.of(table));
         when(taxRepository.findAllBySaleId(anyLong())).thenReturn(taxes);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
         when(reservationRepository.findById(any())).thenReturn(Optional.of(new Reservation()));
@@ -274,7 +272,7 @@ public class SaleServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToTableNotExistingInSave(){
+    void shouldGetNoContentExceptionDueToTableNotExistingInSave() {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
 
         when(tableRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -440,26 +438,24 @@ public class SaleServiceTest {
     }
 
     @Test
-    void shouldGetBranchSales(){
+    void shouldGetBranchSales() {
 
         Branch branch = utils.createBranch(null);
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
 
         Page<Sale> salePage = new PageImpl<>(new ArrayList<>());
         List<Sale> currentSales = new ArrayList<>();
-        
+
         when(saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
                 anyLong(), anyList(), any(), any())).thenReturn(salePage);
-            
+
         when(saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
                 anyLong(), any())).thenReturn(currentSales);
-            
-  
 
         BranchSalesInfoDTO branchSales = saleService.getBranchSales(1, 10, branch.getId());
 
         // Check that the branchSales are not null
         Assert.assertNotNull(branchSales);
-        
+
     }
 }
