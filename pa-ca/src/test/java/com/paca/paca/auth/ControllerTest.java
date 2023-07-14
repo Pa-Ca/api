@@ -5,6 +5,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.ReviewRepository;
@@ -64,5 +65,8 @@ public class ControllerTest {
 
     @MockBean
     protected DefaultTaxRepository defaultTaxRepository;
+
+    @MockBean
+    protected PaymentOptionRepository paymentOptionRepository; 
 
 }

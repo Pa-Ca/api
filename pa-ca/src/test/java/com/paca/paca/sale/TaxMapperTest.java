@@ -47,7 +47,7 @@ public class TaxMapperTest {
     void shouldMapTaxDTOtoTaxEntity(){
             
         // Create a sale
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
 
         TaxDTO TaxDTO = utils.createTaxDTO(sale);
 
@@ -68,7 +68,7 @@ public class TaxMapperTest {
     void shouldPartiallyMapTaxDTOtoTaxEntity(){
 
         // Create a sale
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
 
         // Create a TaxDTO
         TaxDTO TaxDTO = utils.createTaxDTO(sale);

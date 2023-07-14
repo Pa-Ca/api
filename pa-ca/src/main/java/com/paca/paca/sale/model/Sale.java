@@ -9,6 +9,7 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.branch.model.Table;
 
 @Builder
@@ -52,6 +53,10 @@ public class Sale {
     @OneToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "payment_option_id")
+    private PaymentOption paymentOption;
 
     @Column(name = "note")
     private String note;

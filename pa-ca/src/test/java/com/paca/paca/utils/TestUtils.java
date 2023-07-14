@@ -41,12 +41,14 @@ import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.dto.UserRequestDTO;
 import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.sale.statics.TaxStatics;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.dto.UserResponseDTO;
 import com.paca.paca.branch.dto.DefaultTaxDTO;
+import com.paca.paca.branch.dto.PaymentOptionDTO;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
@@ -74,6 +76,7 @@ import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.reservation.dto.ReservationPaymentDTO;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -153,6 +156,8 @@ public class TestUtils {
     ProductCategoryRepository productCategoryRepository;
 
     ProductSubCategoryRepository productSubCategoryRepository;
+
+    PaymentOptionRepository paymentOptionRepository;
 
     public static <T> List<T> castList(Class<? extends T> clazz, List<?> rawCollection) {
         List<T> result = new ArrayList<>(rawCollection.size());
@@ -1033,7 +1038,7 @@ public class TestUtils {
     public Tax createTax(Sale sale) {
 
         if (sale == null) {
-            sale = createSale(null, null);
+            sale = createSale(null, null, null);
         }
 
         Tax tax = Tax.builder()
@@ -1088,7 +1093,25 @@ public class TestUtils {
         return table;
     }
 
-    public Sale createSale(Table table, Reservation reservation) {
+    public PaymentOption createPaymentOption(Branch branch){
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        PaymentOption paymentOption = PaymentOption.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .name("PaymentOption_" + UUID.randomUUID().toString())
+                .build();
+        
+        if (paymentOptionRepository != null) {
+            paymentOption = paymentOptionRepository.save(paymentOption);
+        }
+
+        return paymentOption;
+    }
+
+    public Sale createSale(Table table, Reservation reservation, PaymentOption paymentOption) {
 
         // If the table is null, create a new one
         if (table == null) {
@@ -1098,6 +1121,10 @@ public class TestUtils {
         // If the reservation is null, create a new one
         if (reservation == null) {
             reservation = createReservation(null);
+        }
+
+        if (paymentOption == null) {
+            paymentOption = createPaymentOption(null);
         }
 
         Sale sale = Sale.builder()
@@ -1119,7 +1146,7 @@ public class TestUtils {
 
     public SaleProduct createSaleProduct(Sale sale, Product product) {
         if (sale == null) {
-            sale = createSale(null, null);
+            sale = createSale(null, null, null);
         }
 
         if (product == null) {
@@ -1168,7 +1195,7 @@ public class TestUtils {
 
     public SaleProductDTO createSaleProductDTO(Sale sale, Product product) {
         if (sale == null) {
-            sale = createSale(null, null);
+            sale = createSale(null, null, null);
         }
 
         if (product == null) {
@@ -1202,6 +1229,20 @@ public class TestUtils {
         return dto;
     }
 
+    public PaymentOptionDTO createPaymentOptionDTO(Branch branch){
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        PaymentOptionDTO dto = PaymentOptionDTO.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branchId(branch.getId())
+                .name("PaymentOption 1")
+                .build();
+
+        return dto;
+    }
+
     public DefaultTaxDTO createDefaultTaxDTO(Branch branch) {
 
         // If the branch is null, create a new one
@@ -1224,7 +1265,7 @@ public class TestUtils {
 
         // If the branch is null, create a new one
         if (sale == null) {
-            sale = createSale(null, null);
+            sale = createSale(null, null, null);
         }
 
         TaxDTO dto = TaxDTO.builder()
