@@ -1,6 +1,7 @@
 package com.paca.paca.reservation.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,13 +11,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.dto.GuestListDTO;
 import com.paca.paca.reservation.service.GuestService;
+import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.business.model.Business;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class GuestController {
 
     private final GuestService guestService;
+    private final BusinessRepository businessRepository;
 
     @GetMapping
     @ValidateRoles({})
@@ -45,6 +50,15 @@ public class GuestController {
     @Operation(summary = "Get user guest by ID", description = "Gets the data of a user guest given its ID")
     public ResponseEntity<GuestDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(guestService.getById(id));
+    }
+
+    @GetMapping("/identity-document/{identityDocument}")
+    @ValidateRoles({ "business" })
+    @Operation(summary = "Get user guest by identity document", description = "Gets the data of a user guest given its identity document")
+    public ResponseEntity<GuestDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument) throws NoContentException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Business business = businessRepository.findByUserEmail(auth.getName()).get();
+        return ResponseEntity.ok(guestService.getByIdentityDocument(business.getId(),identityDocument));
     }
 
     @PostMapping

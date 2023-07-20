@@ -34,8 +34,10 @@ public class ReservationMapperTest {
                 assertThat(response.getBranchId()).isEqualTo(reservation.getBranch().getId());
                 assertThat(response.getGuestId()).isEqualTo(reservation.getGuest().getId());
                 assertThat(response.getRequestDate()).isEqualTo(reservation.getRequestDate());
-                assertThat(response.getReservationDate()).isEqualTo(reservation.getReservationDate());
+                assertThat(response.getReservationDateIn()).isEqualTo(reservation.getReservationDateIn());
+                assertThat(response.getReservationDateOut()).isEqualTo(reservation.getReservationDateOut());
                 assertThat(response.getClientNumber()).isEqualTo(reservation.getClientNumber());
+                assertThat(response.getTableNumber()).isEqualTo(reservation.getTableNumber());
                 assertThat(response.getPayment()).isEqualTo(reservation.getPayment());
                 assertThat(response.getStatus()).isEqualTo(reservation.getStatus());
                 assertThat(response.getPayDate()).isEqualTo(reservation.getPayDate());
@@ -63,8 +65,10 @@ public class ReservationMapperTest {
                 assertThat(entity.getBranch().getId()).isEqualTo(dto.getBranchId());
                 assertThat(entity.getGuest().getId()).isEqualTo(dto.getGuestId());
                 assertThat(entity.getRequestDate()).isEqualTo(dto.getRequestDate());
-                assertThat(entity.getReservationDate()).isEqualTo(dto.getReservationDate());
+                assertThat(entity.getReservationDateIn()).isEqualTo(dto.getReservationDateIn());
+                assertThat(entity.getReservationDateOut()).isEqualTo(dto.getReservationDateOut());
                 assertThat(entity.getClientNumber()).isEqualTo(dto.getClientNumber());
+                assertThat(entity.getTableNumber()).isEqualTo(dto.getTableNumber());
                 assertThat(entity.getPayment()).isEqualTo(dto.getPayment());
                 assertThat(entity.getStatus()).isEqualTo(dto.getStatus());
                 assertThat(entity.getPayDate()).isEqualTo(dto.getPayDate());
@@ -117,13 +121,22 @@ public class ReservationMapperTest {
                 assertThat(updatedReservation).isNotNull();
                 assertThat(updatedReservation.getRequestDate()).isEqualTo(dto.getRequestDate());
 
-                // Changing ReservationDate
+                // Changing ReservationDateIn
                 dto = ReservationDTO.builder()
-                                .reservationDate(new Date(System.currentTimeMillis()))
+                                .reservationDateIn(new Date(System.currentTimeMillis()))
                                 .build();
                 updatedReservation = reservationMapper.updateModel(dto, reservation);
                 assertThat(updatedReservation).isNotNull();
-                assertThat(updatedReservation.getReservationDate()).isEqualTo(dto.getReservationDate());
+                assertThat(updatedReservation.getReservationDateIn()).isEqualTo(dto.getReservationDateIn());
+
+                // Changing ReservationDateOut
+                dto = ReservationDTO.builder()
+                                .reservationDateOut(new Date(System.currentTimeMillis()))
+                                .build();
+                updatedReservation = reservationMapper.updateModel(dto, reservation);
+                assertThat(updatedReservation).isNotNull();
+                assertThat(updatedReservation.getReservationDateIn()).isEqualTo(dto.getReservationDateOut());
+
 
                 // Changing clientNumber
                 dto = ReservationDTO.builder()
@@ -132,6 +145,14 @@ public class ReservationMapperTest {
                 updatedReservation = reservationMapper.updateModel(dto, reservation);
                 assertThat(updatedReservation).isNotNull();
                 assertThat(updatedReservation.getClientNumber()).isEqualTo(dto.getClientNumber());
+
+                // Changing tableNumber
+                dto = ReservationDTO.builder()
+                                .tableNumber(69)
+                                .build();
+                updatedReservation = reservationMapper.updateModel(dto, reservation);
+                assertThat(updatedReservation).isNotNull();
+                assertThat(updatedReservation.getTableNumber()).isEqualTo(dto.getTableNumber());
 
                 // Changing payment
                 dto = ReservationDTO.builder()

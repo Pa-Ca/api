@@ -88,6 +88,7 @@ class GuestRepositoryTest extends PacaTest {
                 .surname("surname_test")
                 .email("email_test")
                 .phoneNumber("phone_number_test")
+                .identityDocument("iden_doc_test")
                 .build();
 
         Guest savedGuest = guestRepository.save(guest);
@@ -97,6 +98,7 @@ class GuestRepositoryTest extends PacaTest {
         assertThat(savedGuest.getSurname()).isEqualTo(guest.getSurname());
         assertThat(savedGuest.getEmail()).isEqualTo(guest.getEmail());
         assertThat(savedGuest.getPhoneNumber()).isEqualTo(guest.getPhoneNumber());
+        assertThat(savedGuest.getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
     }
 
     @Test
@@ -125,6 +127,7 @@ class GuestRepositoryTest extends PacaTest {
         assertThat(expectedGuest.get().getSurname()).isEqualTo(guest.getSurname());
         assertThat(expectedGuest.get().getEmail()).isEqualTo(guest.getEmail());
         assertThat(expectedGuest.get().getPhoneNumber()).isEqualTo(guest.getPhoneNumber());
+        assertThat(expectedGuest.get().getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
     }
 
     @Test

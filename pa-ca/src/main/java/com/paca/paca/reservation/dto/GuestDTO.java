@@ -18,6 +18,8 @@ public class GuestDTO {
     private String surname;
     private String email;
     private String phoneNumber;
+    private String identityDocument;
+
 
     public static GuestDTO fromReservationDTO(ReservationDTO dto) {
         return GuestDTO.builder()
@@ -25,6 +27,7 @@ public class GuestDTO {
                 .surname(dto.getSurname())
                 .email(dto.getEmail())
                 .phoneNumber(dto.getPhoneNumber())
+                .identityDocument(dto.getIdentityDocument())
                 .build();
     }
 }

@@ -18,4 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllBySubCategory_Branch_Id(Long id);
 
     Boolean existsByIdAndSubCategory_Branch_Business_Id(Long id, Long businessId);
+
+    Boolean existsBySubCategoryIdAndName(Long subCategoryId, String name);
 }

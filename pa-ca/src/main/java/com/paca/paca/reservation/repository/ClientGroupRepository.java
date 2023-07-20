@@ -18,9 +18,9 @@ public interface ClientGroupRepository extends JpaRepository<ClientGroup, Long> 
 
     List<ClientGroup> findAllByReservationId(Long id);
 
-    List<ClientGroup> findAllByClientIdAndReservationReservationDateGreaterThanEqual(
+    List<ClientGroup> findAllByClientIdAndReservationReservationDateInGreaterThanEqual(
             Long id,
-            Date reservationDate);
+            Date reservationDateIn);
 
     Optional<ClientGroup> findByClientIdAndReservationId(Long clientId, Long reservationId);
 

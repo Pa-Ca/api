@@ -2,7 +2,7 @@ package com.paca.paca.product.model;
 
 import java.math.BigDecimal;
 
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
 
 import lombok.*;
 

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.branch.model.PaymentOption;
+import com.paca.paca.branch.model.Table;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
@@ -22,7 +25,16 @@ import com.paca.paca.business.model.Business;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
+import com.paca.paca.branch.dto.DefaultTaxListDTO;
+import com.paca.paca.branch.dto.PaymentOptionDTO;
+import com.paca.paca.branch.dto.PaymentOptionListDTO;
+import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.branch.utils.BranchMapper;
+import com.paca.paca.branch.utils.DefaultTaxMapper;
+import com.paca.paca.branch.utils.PaymentOptionMapper;
+import com.paca.paca.branch.utils.TableMapper;
 import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.product.dto.ProductListDTO;
@@ -35,6 +47,9 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
@@ -46,19 +61,17 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.product_sub_category.model.ProductCategory;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryDTO;
-import com.paca.paca.product_sub_category.dto.ProductSubCategoryListDTO;
-import com.paca.paca.product_sub_category.utils.ProductSubCategoryMapper;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
+import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
+import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
 @Service
@@ -74,6 +87,12 @@ public class BranchService {
     private final PromotionMapper promotionMapper;
 
     private final ReservationMapper reservationMapper;
+
+    private final DefaultTaxMapper defaultTaxMapper;
+
+    private final TableMapper tableMapper;
+
+    private final PaymentOptionMapper paymentOptionMapper;
 
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
@@ -101,9 +120,13 @@ public class BranchService {
 
     private final FavoriteBranchRepository favoriteBranchRepository;
 
-    private final ProductCategoryRepository productCategoryRepository;
-
     private final ProductSubCategoryRepository productSubCategoryRepository;
+
+    private final DefaultTaxRepository defaultTaxRepository;
+
+    private final TableRepository tableRepository;
+
+    private final PaymentOptionRepository paymentOptionRepository;
 
     public BranchListDTO getAll() {
         List<BranchDTO> response = new ArrayList<>();
@@ -178,24 +201,16 @@ public class BranchService {
         branchRepository.deleteById(id);
     }
 
-    public ProductSubCategoryListDTO getProductSubCategories(
-            Long branchId,
-            Long productCategoryId) throws NoContentException {
+    public ProductSubCategoryListDTO getProductSubCategories(Long branchId) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
-        Optional<ProductCategory> category = productCategoryRepository.findById(productCategoryId);
-        if (category.isEmpty()) {
-            throw new NoContentException(
-                    "Product category with id " + productCategoryId + " does not exists",
-                    24);
-        }
 
         List<ProductSubCategoryDTO> response = new ArrayList<>();
-        productSubCategoryRepository.findAllByBranchIdAndCategoryId(branchId, productCategoryId)
+        productSubCategoryRepository.findAllByBranchId(branchId)
                 .forEach(subCategory -> {
                     ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(subCategory);
                     response.add(dto);
@@ -253,7 +268,7 @@ public class BranchService {
             response.add(dto);
         });
         // Sort reservations by date
-        response.sort(Comparator.comparing(ReservationDTO::getReservationDate));
+        response.sort(Comparator.comparing(ReservationDTO::getReservationDateIn));
 
         // Complete reservations
         List<ReservationDTO> result = response.stream().map(reservation -> {
@@ -264,7 +279,7 @@ public class BranchService {
         return ReservationListDTO.builder().reservations(result).build();
     }
 
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDate)
+    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
             throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
@@ -274,7 +289,7 @@ public class BranchService {
         }
 
         List<ReservationDTO> response = new ArrayList<>();
-        reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id, reservationDate)
+        reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id, reservationDateIn)
                 .forEach(reservation -> {
                     ReservationDTO dto = reservationMapper.toDTO(reservation);
                     response.add(dto);
@@ -341,19 +356,19 @@ public class BranchService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44); // Listo en docs
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page size cannot be less than one",
+                    45); // Listo en docs
         }
 
         // Check if sorting_by is in BranchStatics.BranchSortingKeys
         if (!BranchStatics.BranchSortingKeys.contains(sorting_by)) {
             throw new UnprocessableException(
                     "Sorting key is not valid",
-                    42);
+                    46); // Listo en docs
         }
 
         // Create a Pageable object that specifies the page and size parameters as well
@@ -412,12 +427,12 @@ public class BranchService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page size cannot be less than one",
+                    45);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
@@ -456,7 +471,7 @@ public class BranchService {
     }
 
     // This method returns a page of reservations with pagination
-    public ReservationListDTO getReservationsPage(Long id, Date reservationDate, int page, int size)
+    public ReservationListDTO getReservationsPage(Long id, Date reservationDateIn, int page, int size)
             throws UnprocessableException, NoContentException {
 
         // Now lets add the exeption handling
@@ -464,12 +479,12 @@ public class BranchService {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
-                    40);
+                    44);
         }
         if (size < 1) {
             throw new UnprocessableException(
-                    "Size cannot be less than one",
-                    41);
+                    "Page size cannot be less than one",
+                    45);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
@@ -486,12 +501,12 @@ public class BranchService {
                 page,
                 size,
                 // Sort by id descending
-                Sort.by("reservationDate").descending());
+                Sort.by("reservationDateIn").descending());
 
         // Query the database for the appropriate page of results using the findAll
         // method of the reservation repository
-        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateGreaterThanEqual(id,
-                reservationDate, paging);// .findAll(paging);
+        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id,
+                reservationDateIn, paging);// .findAll(paging);
 
         // Map the results to a list of ReservationDTO objects using the
         // ReservationMapper
@@ -512,4 +527,76 @@ public class BranchService {
         // objects
         return ReservationListDTO.builder().reservations(result).build();
     }
+
+    public DefaultTaxListDTO getDefaultTaxesByBranchId(Long branchId) {
+        // Check if the branch exists
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    20);
+        }
+
+        // Get the default taxes
+        List<DefaultTax> defaultTaxes = defaultTaxRepository.findAllByBranchId(branchId);
+
+        List<DefaultTaxDTO> defaultTaxesDTO = new ArrayList<>();
+
+        for (DefaultTax defaultTax : defaultTaxes) {
+            defaultTaxesDTO.add(defaultTaxMapper.toDTO(defaultTax));
+        }
+
+        return DefaultTaxListDTO.builder()
+                .defaultTaxes(defaultTaxesDTO)
+                .build();
+    }
+
+    public TableListDTO getTablesbyBranchId(Long branchId) {
+        // Check if the branch exists
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    20);
+        }
+
+        // Get the tables
+        List<Table> tables = tableRepository.findAllByBranchIdAndDeletedFalse(branchId);
+
+        List<TableDTO> tablesDTO = new ArrayList<>();
+
+        for (Table table : tables) {
+            tablesDTO.add(tableMapper.toDTO(table));
+        }
+
+        return TableListDTO.builder()
+                .tables(tablesDTO)
+                .build();
+
+    }
+
+
+    public PaymentOptionListDTO getPaymentOptionsByBranchId(Long branchId){
+        // Check if the branch exists
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+                    throw new NoContentException(
+                            "Branch with id " + branchId + " does not exists",
+                            20);
+                }
+        
+        // Get the tables
+        List<PaymentOption> paymentOptions = paymentOptionRepository.findAllByBranchId(branchId);
+
+        List<PaymentOptionDTO> paymentOptionsDTO = new ArrayList<>();
+
+        for (PaymentOption paymentOption : paymentOptions) {
+            paymentOptionsDTO.add(paymentOptionMapper.toDTO(paymentOption));
+        }
+
+        return PaymentOptionListDTO.builder()
+                            .paymentOptions(paymentOptionsDTO)
+                            .build();
+    }
+
 }

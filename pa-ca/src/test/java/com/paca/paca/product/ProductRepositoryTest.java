@@ -10,9 +10,9 @@ import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.product_sub_category.model.ProductSubCategory;
-import com.paca.paca.product_sub_category.repository.ProductCategoryRepository;
-import com.paca.paca.product_sub_category.repository.ProductSubCategoryRepository;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
+import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
+import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,8 +22,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.List;
 import java.util.Optional;
@@ -206,6 +206,23 @@ public class ProductRepositoryTest extends PacaTest {
 
         assertThat(expected).isFalse();
         assertThat(retrievedProduct.isPresent()).isFalse();
+    }
+
+    @Test
+    void shouldVerifyIfExistsBySubCategoryIdAndName() {
+        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+        Product product = utils.createProduct(productSubCategory);
+
+        boolean expected1 = productRepository.existsBySubCategoryIdAndName(
+                productSubCategory.getId(), product.getName());
+        boolean expected2 = productRepository.existsBySubCategoryIdAndName(
+                productSubCategory.getId(), product.getName() + "1");
+        boolean expected3 = productRepository.existsBySubCategoryIdAndName(
+                productSubCategory.getId() + 1, product.getName());
+
+        assertThat(expected1).isTrue();
+        assertThat(expected2).isFalse();
+        assertThat(expected3).isFalse();
     }
 
 }
