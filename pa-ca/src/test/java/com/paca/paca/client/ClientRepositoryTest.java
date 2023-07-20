@@ -117,6 +117,7 @@ public class ClientRepositoryTest extends PacaTest {
                 .phoneNumber("+580000000")
                 .address("Test address")
                 .dateOfBirth(new Date(System.currentTimeMillis()))
+                .identityDocument("V0")
                 .build();
 
         Client savedClient = clientRepository.save(client);
@@ -129,6 +130,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(savedClient.getPhoneNumber()).isEqualTo(client.getPhoneNumber());
         assertThat(savedClient.getAddress()).isEqualTo(client.getAddress());
         assertThat(savedClient.getDateOfBirth()).isEqualTo(client.getDateOfBirth());
+        assertThat(savedClient.getIdentityDocument()).isEqualTo(client.getIdentityDocument());
     }
 
     @Test
@@ -160,6 +162,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedClient.get().getPhoneNumber()).isEqualTo(client.getPhoneNumber());
         assertThat(expectedClient.get().getAddress()).isEqualTo(client.getAddress());
         assertThat(expectedClient.get().getDateOfBirth()).isEqualTo(client.getDateOfBirth());
+        assertThat(expectedClient.get().getIdentityDocument()).isEqualTo(client.getIdentityDocument());
     }
 
     @Test
@@ -188,6 +191,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedClient.get().getPhoneNumber()).isEqualTo(client.getPhoneNumber());
         assertThat(expectedClient.get().getAddress()).isEqualTo(client.getAddress());
         assertThat(expectedClient.get().getDateOfBirth()).isEqualTo(client.getDateOfBirth());
+        assertThat(expectedClient.get().getIdentityDocument()).isEqualTo(client.getIdentityDocument());
     }
 
     @Test
@@ -219,6 +223,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedClient.get().getPhoneNumber()).isEqualTo(client.getPhoneNumber());
         assertThat(expectedClient.get().getAddress()).isEqualTo(client.getAddress());
         assertThat(expectedClient.get().getDateOfBirth()).isEqualTo(client.getDateOfBirth());
+        assertThat(expectedClient.get().getIdentityDocument()).isEqualTo(client.getIdentityDocument());
     }
 
     @Test
@@ -236,14 +241,14 @@ public class ClientRepositoryTest extends PacaTest {
     @Test
     void shouldDeleteClient() {
         Client client = utils.createClient(null);
-        
+
         clientRepository.delete(client);
 
         List<Client> clients = clientRepository.findAll();
         assertThat(clients.size()).isEqualTo(0);
     }
 
-    @Test 
+    @Test
     void shouldCheckThatFriendRequestExistsById() {
         Friend request = utils.createFriendRequest(null, null, false, false);
 
@@ -262,7 +267,7 @@ public class ClientRepositoryTest extends PacaTest {
     @Test
     void shouldCheckThatFriendRequestDoesNotExistsById() {
         Friend request = utils.createFriendRequest(null, null, false, false);
-        
+
         boolean expected = friendRepository.existsById(request.getId() + 1);
         Optional<Friend> expectedRequest = friendRepository.findById(request.getId() + 1);
 
@@ -270,7 +275,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedRequest.isEmpty()).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldCheckThatFriendRequestExistsByRequesterIdAndAddresserId() {
         Friend request = utils.createFriendRequest(null, null, false, false);
 
@@ -290,7 +295,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedRequest.get().getRejected()).isEqualTo(request.getRejected());
     }
 
-    @Test 
+    @Test
     void shouldCheckThatFriendRequestDoesNotExistsByRequesterIdAndAddresserId() {
         Client requester = utils.createClient(null);
         Client addresser = utils.createClient(null);
@@ -327,7 +332,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedRequest.isEmpty()).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFriendRequestsByRequesterIdAndAcceptedTrue() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, true, false);
@@ -346,7 +351,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.contains(request2)).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFriendRequestsByAddresserIdAndAcceptedTrue() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, true, false);
@@ -365,7 +370,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.contains(request2)).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFriendRequestsByRequesterIdAndRejectedTrue() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, false, true);
@@ -384,7 +389,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.contains(request2)).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFriendRequestsByAddresserIdAndRejectedTrue() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, false, true);
@@ -403,7 +408,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.contains(request2)).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFriendRequestsByRequesterIdAndAcceptedFalseAndRejectedFalse() {
         Client requester1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(requester1, null, false, false);
@@ -424,7 +429,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(requests.contains(request2)).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFriendRequestsByAddresserIdAndAcceptedFalseAndRejectedFalse() {
         Client addresser1 = utils.createClient(null);
         Friend request1 = utils.createFriendRequest(null, addresser1, false, false);
@@ -469,9 +474,8 @@ public class ClientRepositoryTest extends PacaTest {
 
         boolean expected = favoriteBranchRepository.existsByClientIdAndBranchId(client.getId(), branch.getId());
         Optional<FavoriteBranch> expectedFavoriteBranch = favoriteBranchRepository.findByClientIdAndBranchId(
-            client.getId(), 
-            branch.getId()
-        );
+                client.getId(),
+                branch.getId());
 
         assertThat(expected).isTrue();
         assertThat(expectedFavoriteBranch).isNotEmpty();
@@ -489,7 +493,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expected).isFalse();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFavoriteBranchByClientId() {
         Client client = utils.createClient(null);
         FavoriteBranch fav1 = utils.createFavoriteBranch(client, null);
@@ -504,7 +508,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(favoriteBranches.contains(fav2)).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllFavoriteBranchByBranchId() {
         Branch branch = utils.createBranch(null);
         FavoriteBranch fav1 = utils.createFavoriteBranch(null, branch);
@@ -600,9 +604,8 @@ public class ClientRepositoryTest extends PacaTest {
         Review review = utils.createReview(client, branch);
 
         Optional<Review> expectedReview = reviewRepository.findByClientIdAndBranchId(
-            client.getId(), 
-            branch.getId()
-        );
+                client.getId(),
+                branch.getId());
 
         assertThat(expectedReview).isNotEmpty();
         assertThat(expectedReview.get().getClient().getId()).isEqualTo(review.getClient().getId());
@@ -621,7 +624,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedReview).isEmpty();
     }
 
-    @Test 
+    @Test
     void shouldGetAllReviewByBranchId() {
         Branch branch = utils.createBranch(null);
         Review review1 = utils.createReview(null, branch);
@@ -692,7 +695,8 @@ public class ClientRepositoryTest extends PacaTest {
         ReviewLike like = utils.createReviewLike(client, review);
 
         boolean expected = reviewLikeRepository.existsByClientIdAndReviewId(client.getId(), review.getId());
-        Optional<ReviewLike> expectedLike = reviewLikeRepository.findByClientIdAndReviewId(client.getId(), review.getId());
+        Optional<ReviewLike> expectedLike = reviewLikeRepository.findByClientIdAndReviewId(client.getId(),
+                review.getId());
 
         assertThat(expected).isTrue();
         assertThat(expectedLike.isPresent()).isTrue();
@@ -710,7 +714,7 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(expectedLike.isEmpty()).isTrue();
     }
 
-    @Test 
+    @Test
     void shouldGetAllReviewLikeByReviewId() {
         Review review = utils.createReview(null, null);
         ReviewLike like1 = utils.createReviewLike(null, review);

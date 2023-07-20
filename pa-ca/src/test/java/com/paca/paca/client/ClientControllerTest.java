@@ -183,6 +183,8 @@ public class ClientControllerTest extends ControllerTest {
                         CoreMatchers.is(dto.getAddress())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
                         CoreMatchers.is(dto.getDateOfBirth().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.identityDocument",
+                        CoreMatchers.is(dto.getIdentityDocument().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(dto.getStripeCustomerId())));
     }
@@ -225,6 +227,8 @@ public class ClientControllerTest extends ControllerTest {
                         CoreMatchers.is(clientDTO.getAddress())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
                         CoreMatchers.is(clientDTO.getDateOfBirth().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.identityDocument",
+                        CoreMatchers.is(clientDTO.getIdentityDocument().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(clientDTO.getStripeCustomerId())));
     }
@@ -309,6 +313,8 @@ public class ClientControllerTest extends ControllerTest {
                         CoreMatchers.is(clientDTO.getAddress())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
                         CoreMatchers.is(clientDTO.getDateOfBirth().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.identityDocument",
+                        CoreMatchers.is(clientDTO.getIdentityDocument().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(clientDTO.getStripeCustomerId())));
     }
@@ -410,6 +416,8 @@ public class ClientControllerTest extends ControllerTest {
                         CoreMatchers.is(clientDTO.getAddress())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth",
                         CoreMatchers.is(clientDTO.getDateOfBirth().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.identityDocument",
+                        CoreMatchers.is(clientDTO.getIdentityDocument().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stripeCustomerId",
                         CoreMatchers.is(clientDTO.getStripeCustomerId())));
     }

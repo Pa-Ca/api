@@ -24,4 +24,5 @@ public class ClientDTO {
     private String phoneNumber;
     private String address;
     private Date dateOfBirth;
+    private String identityDocument;
 }

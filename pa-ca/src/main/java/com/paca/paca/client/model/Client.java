@@ -48,4 +48,7 @@ public class Client {
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
     private Date dateOfBirth;
+
+    @Column(name = "identity_document")
+    private String identityDocument;
 }

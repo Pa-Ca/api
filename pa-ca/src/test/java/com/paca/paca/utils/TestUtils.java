@@ -297,6 +297,7 @@ public class TestUtils {
                 .phoneNumber("+580000000")
                 .address("Test address")
                 .dateOfBirth(new java.sql.Date(System.currentTimeMillis()))
+                .identityDocument("V" + ThreadLocalRandom.current().nextLong(99999999))
                 .build();
         if (clientRepository != null) {
             client = clientRepository.save(client);
@@ -318,6 +319,7 @@ public class TestUtils {
                 .phoneNumber(client.getPhoneNumber())
                 .address(client.getAddress())
                 .dateOfBirth(client.getDateOfBirth())
+                .identityDocument(client.getIdentityDocument())
                 .build();
 
         return dto;
