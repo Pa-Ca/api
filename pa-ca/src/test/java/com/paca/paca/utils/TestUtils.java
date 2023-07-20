@@ -964,6 +964,7 @@ public class TestUtils {
                 .client(client)
                 .reservation(reservation)
                 .name("Community")
+                .isOwner(true)
                 .build();
 
         if (clientGroupRepository != null) {
@@ -1241,6 +1242,9 @@ public class TestUtils {
     }
 
     public List<Sale> createTestSales(Branch branchA, Branch branchB) {
+        // Create reservations
+        Reservation reservationA1 = createReservation(branchA, null);
+        Reservation reservationA2 = createReservation(branchA);
 
         // Create three tables in branchA
         Table tableAA = createTable(branchA);
@@ -1261,8 +1265,11 @@ public class TestUtils {
         calendar.add(Calendar.HOUR_OF_DAY, 1);
         Date twoHoursAfterNow = calendar.getTime();
         // Get two hours before now
-        calendar.add(Calendar.HOUR_OF_DAY, -5);
+        calendar.add(Calendar.HOUR_OF_DAY, -4);
         Date twoHoursBeforeNow = calendar.getTime();
+        // Get four hours before now
+        calendar.add(Calendar.HOUR_OF_DAY, -2);
+        Date fourHoursBeforeNow = calendar.getTime();
 
         // For each table create a sale
         // Have the sales vary status and time
@@ -1272,10 +1279,10 @@ public class TestUtils {
                 .table(tableAA)
                 .tableName(tableAA.getName())
                 .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
+                .startTime(fourHoursBeforeNow)
                 .clientQuantity(2)
                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
+                .reservation(reservationA1)
                 .status(SaleStatics.Status.ongoing)
                 .tableName(tableAA.getName())
                 .build();
@@ -1288,7 +1295,7 @@ public class TestUtils {
                 .clientQuantity(2)
                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                 .status(SaleStatics.Status.cancelled)
-                .reservation(null)
+                .reservation(reservationA2)
                 .tableName(tableAA.getName())
                 .build();
 
@@ -1297,7 +1304,7 @@ public class TestUtils {
                 .tableName(tableAA.getName())
                 .startTime(twoHoursBeforeNow)
                 .note("Nota de prueba 3")
-                .reservation(null)
+                .reservation(reservationA1)
                 .clientQuantity(2)
                 .status(SaleStatics.Status.closed)
                 .tableName(tableAA.getName())
@@ -1308,7 +1315,7 @@ public class TestUtils {
         Sale saleAA4 = Sale.builder()
                 .table(tableAA)
                 .tableName(tableAA.getName())
-                .startTime(twoHoursBeforeNow)
+                .startTime(fourHoursBeforeNow)
                 .note("Nota de prueba 4")
                 .reservation(null)
                 .clientQuantity(2)
@@ -1334,7 +1341,7 @@ public class TestUtils {
                 .table(tableAB)
                 .tableName(tableAB.getName())
                 .note("Nota de prueba 2")
-                .startTime(twoHoursBeforeNow)
+                .startTime(fourHoursBeforeNow)
                 .clientQuantity(2)
                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                 .status(SaleStatics.Status.ongoing)
@@ -1347,7 +1354,7 @@ public class TestUtils {
                 .tableName(tableAB.getName())
                 .startTime(twoHoursBeforeNow)
                 .note("Nota de prueba 3")
-                .reservation(null)
+                .reservation(reservationA1)
                 .clientQuantity(2)
                 .status(SaleStatics.Status.closed)
                 .tableName(tableAB.getName())
@@ -1363,7 +1370,7 @@ public class TestUtils {
                 .startTime(twoHoursBeforeNow)
                 .clientQuantity(2)
                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
+                .reservation(reservationA2)
                 .status(SaleStatics.Status.ongoing)
                 .tableName(tableAC.getName())
                 .build();
@@ -1377,7 +1384,7 @@ public class TestUtils {
                 .clientQuantity(3)
                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
                 .status(SaleStatics.Status.closed)
-                .reservation(null)
+                .reservation(reservationA1)
                 .tableName(tableAC.getName())
                 .build();
 
@@ -1386,7 +1393,7 @@ public class TestUtils {
                 .tableName(tableAC.getName())
                 .startTime(twoHoursBeforeNow)
                 .note("Nota de prueba 3")
-                .reservation(null)
+                .reservation(reservationA2)
                 .clientQuantity(2)
                 .status(SaleStatics.Status.closed)
                 .tableName(tableAC.getName())
@@ -1411,7 +1418,7 @@ public class TestUtils {
                 .table(tableBA)
                 .tableName(tableBA.getName())
                 .note("Nota de prueba 2")
-                .startTime(twoHoursBeforeNow)
+                .startTime(fourHoursBeforeNow)
                 .endTime(now)
                 .clientQuantity(2)
                 .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))

@@ -430,8 +430,8 @@ public class SaleServiceTest {
         Page<Sale> salePage = new PageImpl<>(new ArrayList<>());
         List<Sale> currentSales = new ArrayList<>();
 
-        when(saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
-                anyLong(), anyList(), any(), any())).thenReturn(salePage);
+        when(saleRepository.findAllByTableBranchIdAndFilters(
+                anyLong(), anyList(), any(), any(), any(), any(), any(), any())).thenReturn(salePage);
 
         when(saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
                 anyLong(), any())).thenReturn(currentSales);

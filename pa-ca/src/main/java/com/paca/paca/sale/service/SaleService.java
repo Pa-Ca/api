@@ -344,10 +344,14 @@ public class SaleService {
                 size,
                 Sort.by("startTime").descending());
 
-        Page<Sale> historicSales = saleRepository.findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+        Page<Sale> historicSales = saleRepository.findAllByTableBranchIdAndFilters(
                 branch_id,
                 List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
                 start_time,
+                null,
+                null,
+                null,
+                null,
                 not_ongoing_sales_paging);
 
         List<Sale> ongoingSales = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(

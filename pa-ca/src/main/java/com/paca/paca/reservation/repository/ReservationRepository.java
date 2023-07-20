@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.paca.paca.reservation.model.Reservation;
@@ -21,11 +21,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAllByBranchIdAndReservationDateInGreaterThanEqual(
             Long id,
             Date reservationDateIn);
-    
+
     Page<Reservation> findAllByBranchIdAndReservationDateInGreaterThanEqual(
-        Long id,
-        Date reservationDateIn,
-        Pageable pageable);
+            Long id,
+            Date reservationDateIn,
+            Pageable pageable);
 
     Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
 

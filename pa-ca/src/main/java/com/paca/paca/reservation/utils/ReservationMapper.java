@@ -14,6 +14,7 @@ public interface ReservationMapper {
     @Mapping(target = "surname", ignore = true)
     @Mapping(target = "haveGuest", ignore = true)
     @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "identityDocument", ignore = true)
     @Mapping(source = "guest.id", target = "guestId")
     @Mapping(source = "branch.id", target = "branchId")
     ReservationDTO toDTO(Reservation reservation);

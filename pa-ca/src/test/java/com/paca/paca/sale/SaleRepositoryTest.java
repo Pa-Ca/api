@@ -8,33 +8,36 @@ import org.junit.jupiter.api.TestInstance;
 
 import com.paca.paca.PacaTest;
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.branch.model.Branch;
+import com.paca.paca.sale.model.Sale;
 import com.paca.paca.branch.model.Table;
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.sale.statics.SaleStatics;
+import com.paca.paca.reservation.model.ClientGroup;
+import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.TableRepository;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.repository.ReservationRepository;
-import com.paca.paca.sale.model.Sale;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.sale.statics.SaleStatics;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.ArrayList;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,6 +68,9 @@ public class SaleRepositoryTest extends PacaTest {
     private RoleRepository roleRepository;
 
     @Autowired
+    private GuestRepository guestRepository;
+
+    @Autowired
     private ReservationRepository reservationRepository;
 
     private TestUtils utils;
@@ -79,11 +85,13 @@ public class SaleRepositoryTest extends PacaTest {
                 .branchRepository(branchRepository)
                 .tableRepository(tableRepository)
                 .saleRepository(saleRepository)
+                .guestRepository(guestRepository)
                 .build();
     }
 
     @BeforeEach
     void restoreBranchDB() {
+        guestRepository.deleteAll();
         saleRepository.deleteAll();
         tableRepository.deleteAll();
         reservationRepository.deleteAll();
@@ -92,6 +100,7 @@ public class SaleRepositoryTest extends PacaTest {
 
     @AfterEach
     void restoreTest() {
+        guestRepository.deleteAll();
         reservationRepository.deleteAll();
         saleRepository.deleteAll();
         tableRepository.deleteAll();
@@ -200,9 +209,9 @@ public class SaleRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldGetAllSalesByTableBranchIdAndStatusInAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual() {
+    void shouldGetAllSalesByTableBranchIdAndFilters() {
         // This is to test the query
-        // findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual
+        // findAllByTableBranchIdAndFilters
 
         // Create two branches
         Branch branchA = utils.createBranch(null);
@@ -259,11 +268,16 @@ public class SaleRepositoryTest extends PacaTest {
         }
 
         // Get the ongoing sales from branch A
+        List<Integer> status = Arrays.asList(SaleStatics.Status.ongoing);
         List<Sale> ongoingSalesFromBranchAFromRepositoryList = saleRepository
-                .findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                .findAllByTableBranchIdAndFilters(
                         branchA.getId(),
-                        List.of(SaleStatics.Status.ongoing),
+                        status,
                         oneYearBeforeNow,
+                        null,
+                        null,
+                        null,
+                        null,
                         test_page)
                 .getContent();
 
@@ -283,11 +297,16 @@ public class SaleRepositoryTest extends PacaTest {
         }
 
         // Now repeat the process with the closed sales from branch A
+        status = Arrays.asList(SaleStatics.Status.closed);
         List<Sale> closedSalesFromBranchAFromRepositoryList = saleRepository
-                .findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                .findAllByTableBranchIdAndFilters(
                         branchA.getId(),
-                        List.of(SaleStatics.Status.closed),
+                        status,
                         oneYearBeforeNow,
+                        null,
+                        null,
+                        null,
+                        null,
                         test_page)
                 .getContent();
 
@@ -305,11 +324,16 @@ public class SaleRepositoryTest extends PacaTest {
         }
 
         // Now repeat the process with the cancelled sales from branch A
+        status = Arrays.asList(SaleStatics.Status.cancelled);
         List<Sale> cancelledSalesFromBranchAFromRepositoryList = saleRepository
-                .findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                .findAllByTableBranchIdAndFilters(
                         branchA.getId(),
-                        List.of(SaleStatics.Status.cancelled),
+                        status,
                         oneYearBeforeNow,
+                        null,
+                        null,
+                        null,
+                        null,
                         test_page)
                 .getContent();
 
@@ -327,12 +351,16 @@ public class SaleRepositoryTest extends PacaTest {
         }
 
         // Now repeat the process with the ongoing sales from branch B
-
+        status = Arrays.asList(SaleStatics.Status.ongoing);
         List<Sale> ongoingSalesFromBranchBFromRepositoryList = saleRepository
-                .findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                .findAllByTableBranchIdAndFilters(
                         branchB.getId(),
-                        List.of(SaleStatics.Status.ongoing),
+                        status,
                         oneYearBeforeNow,
+                        null,
+                        null,
+                        null,
+                        null,
                         test_page)
                 .getContent();
 
@@ -350,12 +378,16 @@ public class SaleRepositoryTest extends PacaTest {
         }
 
         // Now repeat the process with the closed sales from branch B
-
+        status = Arrays.asList(SaleStatics.Status.closed);
         List<Sale> closedSalesFromBranchBFromRepositoryList = saleRepository
-                .findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                .findAllByTableBranchIdAndFilters(
                         branchB.getId(),
-                        List.of(SaleStatics.Status.closed),
+                        status,
                         oneYearBeforeNow,
+                        null,
+                        null,
+                        null,
+                        null,
                         test_page)
                 .getContent();
 
@@ -374,17 +406,224 @@ public class SaleRepositoryTest extends PacaTest {
         }
 
         // Now repeat the process with the cancelled sales from branch B
-
+        status = Arrays.asList(SaleStatics.Status.cancelled);
         List<Sale> cancelledSalesFromBranchBFromRepositoryList = saleRepository
-                .findAllByTableBranchIdAndStatusInAndStartTimeGreaterThanEqual(
+                .findAllByTableBranchIdAndFilters(
                         branchB.getId(),
-                        List.of(SaleStatics.Status.cancelled),
+                        status,
                         oneYearBeforeNow,
+                        null,
+                        null,
+                        null,
+                        null,
                         test_page)
                 .getContent();
 
         assertEquals(cancelledSalesFromBranchB.size(), cancelledSalesFromBranchBFromRepositoryList.size());
 
+        // Get sales with start time before two hours before now
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.add(Calendar.HOUR_OF_DAY, -2);
+        calendar2.add(Calendar.MINUTE, +1);
+        Date twoHoursBeforeNow = calendar2.getTime();
+        List<Sale> salesWithStartTimeBeforeTwoHoursBeforeNow = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA)
+                    && sale.getStartTime().compareTo(twoHoursBeforeNow) < 0) {
+                salesWithStartTimeBeforeTwoHoursBeforeNow.add(sale);
+            }
+        }
+
+        List<Sale> salesWithStartTimeBeforeTwoHoursBeforeNowFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        twoHoursBeforeNow,
+                        null,
+                        null,
+                        null,
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithStartTimeBeforeTwoHoursBeforeNow.size(),
+                salesWithStartTimeBeforeTwoHoursBeforeNowFromRepositoryList.size());
+
+        // Get the first reservation with guest
+        Reservation reservation1 = null;
+        for (Sale sale : sales) {
+            if (sale.getReservation() != null && sale.getReservation().getGuest() != null) {
+                reservation1 = sale.getReservation();
+                break;
+            }
+        }
+
+        // Get sales with the reservation name
+        List<Sale> salesWithReservationName = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) &&
+                    sale.getReservation() != null &&
+                    sale.getReservation().getGuest() != null &&
+                    sale.getReservation().getGuest().getName().equals(reservation1.getGuest().getName())) {
+                salesWithReservationName.add(sale);
+            }
+        }
+
+        List<Sale> salesWithReservationNameFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        null,
+                        reservation1.getGuest().getName(),
+                        null,
+                        null,
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithReservationName.size(), salesWithReservationNameFromRepositoryList.size());
+
+        // Get sales with the reservation surname
+        List<Sale> salesWithReservationSurname = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) &&
+                    sale.getReservation() != null &&
+                    sale.getReservation().getGuest() != null &&
+                    sale.getReservation().getGuest().getSurname().equals(reservation1.getGuest().getSurname())) {
+                salesWithReservationSurname.add(sale);
+            }
+        }
+
+        List<Sale> salesWithReservationSurnameFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        reservation1.getGuest().getSurname(),
+                        null,
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithReservationSurname.size(), salesWithReservationSurnameFromRepositoryList.size());
+
+        // Get sales with the reservation identity document
+        List<Sale> salesWithReservationIdentityDocument = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) &&
+                    sale.getReservation() != null &&
+                    sale.getReservation().getGuest() != null &&
+                    sale.getReservation().getGuest().getIdentityDocument().equals(
+                            reservation1.getGuest().getIdentityDocument())) {
+                salesWithReservationIdentityDocument.add(sale);
+            }
+        }
+
+        List<Sale> salesWithReservationIdentityDocumentFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        reservation1.getGuest().getIdentityDocument(),
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithReservationIdentityDocument.size(),
+                salesWithReservationIdentityDocumentFromRepositoryList.size());
+
+        // Get the first reservation without guest
+        Reservation reservation2 = null;
+        for (Sale sale : sales) {
+            if (sale.getReservation() != null && sale.getReservation().getGuest() == null) {
+                reservation2 = sale.getReservation();
+                break;
+            }
+        }
+
+        // Create client group for reservation
+        ClientGroup group = utils.createClientGroup(null, reservation2);
+
+        // Get sales with the reservation name
+        salesWithReservationName = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) &&
+                    sale.getReservation() != null &&
+                    sale.getReservation().getGuest() != null &&
+                    sale.getReservation().getGuest().getName().equals(group.getClient().getName())) {
+                salesWithReservationName.add(sale);
+            }
+        }
+
+        salesWithReservationNameFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        null,
+                        group.getClient().getName(),
+                        null,
+                        null,
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithReservationName.size(), salesWithReservationNameFromRepositoryList.size());
+
+        // Get sales with the reservation surname
+        salesWithReservationSurname = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) &&
+                    sale.getReservation() != null &&
+                    sale.getReservation().getGuest() != null &&
+                    sale.getReservation().getGuest().getSurname().equals(group.getClient().getSurname())) {
+                salesWithReservationSurname.add(sale);
+            }
+        }
+
+        salesWithReservationSurnameFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        group.getClient().getSurname(),
+                        null,
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithReservationSurname.size(), salesWithReservationSurnameFromRepositoryList.size());
+
+        // Get sales with the reservation identity document
+        salesWithReservationIdentityDocument = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getTable().getBranch().equals(branchA) &&
+                    sale.getReservation() != null &&
+                    sale.getReservation().getGuest() != null &&
+                    sale.getReservation().getGuest().getIdentityDocument().equals(
+                            group.getClient().getIdentityDocument())) {
+                salesWithReservationIdentityDocument.add(sale);
+            }
+        }
+
+        salesWithReservationIdentityDocumentFromRepositoryList = saleRepository
+                .findAllByTableBranchIdAndFilters(
+                        branchA.getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        group.getClient().getIdentityDocument(),
+                        test_page)
+                .getContent();
+
+        assertEquals(salesWithReservationIdentityDocument.size(),
+                salesWithReservationIdentityDocumentFromRepositoryList.size());
     }
 
     @Test
