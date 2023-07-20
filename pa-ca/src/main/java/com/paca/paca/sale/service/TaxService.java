@@ -78,8 +78,8 @@ public class TaxService {
         Optional<Tax> Tax = TaxRepository.findById(TaxId);
         if (Tax.isEmpty()) {
             throw new NoContentException(
-                    " tax with id " + TaxId + " does not exists",
-                    50);
+                    "Tax with id " + TaxId + " does not exists",
+                    52);
         }
         // Delete the tax
         TaxRepository.deleteById(TaxId);
