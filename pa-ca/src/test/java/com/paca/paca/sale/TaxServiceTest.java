@@ -1,6 +1,5 @@
 package com.paca.paca.sale;
 
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
@@ -8,12 +7,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Assert;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
