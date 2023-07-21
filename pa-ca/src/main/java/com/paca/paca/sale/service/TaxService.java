@@ -25,7 +25,7 @@ public class TaxService {
     private final TaxRepository TaxRepository;
 
     // Create a method that saves a tax (from the DTO)
-    public TaxDTO save(TaxDTO TaxDTO) throws NoContentException {
+    public TaxDTO save(TaxDTO TaxDTO) throws NoContentException, BadRequestException{
         // Check if the branch exists
         long saleId = TaxDTO.getSaleId();
         Optional<Sale> sale = saleRepository.findById(saleId);
@@ -33,6 +33,12 @@ public class TaxService {
             throw new NoContentException(
                     "Sale with id " + saleId + " does not exists",
                     42);
+        }
+        Integer TaxType = TaxDTO.getType();
+        if (TaxType != null && !TaxStatics.Types.isTypeValid(TaxType)) {
+            throw new BadRequestException(
+                    "Invalid tax type:" + TaxType,
+                    53);
         }
         // Create a tax
         Tax Tax = TaxMapper.toEntity(TaxDTO, sale.get());
