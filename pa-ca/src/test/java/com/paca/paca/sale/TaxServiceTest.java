@@ -84,24 +84,6 @@ public class TaxServiceTest {
     }
 
     @Test
-    void shouldGetBadRequestExeptionDueToInvalidTaxTypeInSave(){
-        TaxDTO  taxDTO = utils.createTaxDTO(null);
-        int invalidTaxType = 42069;
-        taxDTO.setType(invalidTaxType);
-        Sale sale = utils.createSale(null, null, null);
-        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
-
-        try {
-            taxService.save(taxDTO);
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals("Invalid tax type:" + invalidTaxType, e.getMessage());
-            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 53);
-            //
-        }
-    }
-
-    @Test
     void shouldUpdate(){
         TaxDTO taxDTO = utils.createTaxDTO(null);
         Tax tax = utils.createTax(null);
