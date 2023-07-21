@@ -29,7 +29,8 @@ public class DefaultTaxService {
     private final DefaultTaxMapper defaultTaxMapper;
     private final DefaultTaxRepository defaultTaxRepository;
 
-    public DefaultTaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NoContentException {
+    public DefaultTaxDTO save(DefaultTaxDTO defaultTaxDTO) 
+        throws NoContentException, BadRequestException{
         // Check if the branch exists
         long branchId = defaultTaxDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
@@ -38,6 +39,14 @@ public class DefaultTaxService {
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
+
+        Integer defaultTaxType = defaultTaxDTO.getType();
+        if (defaultTaxType != null && !DefaultTaxStatics.Types.isTypeValid(defaultTaxType)) {
+            throw new BadRequestException(
+                    "Invalid default tax type:" + defaultTaxType,
+                    51);
+        }
+
         // Create a default tax
         DefaultTax defaultTax = defaultTaxMapper.toEntity(defaultTaxDTO, branch.get());
         // Save the default tax

@@ -27,6 +27,7 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.branch.service.DefaultTaxService;
 import com.paca.paca.branch.utils.DefaultTaxMapper;
+import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.dto.SaleInfoDTO;
@@ -68,6 +69,20 @@ public class DefaultTaxServiceTest {
         DefaultTaxDTO  response = defaultTaxService.save(defaultTaxDTO);
 
         assertThat(response).isNotNull();
+    }
+
+    @Test
+    void shouldGetNoContentExceptionDueToBranchNotExistingInSave(){
+        DefaultTaxDTO  defaultTaxDTO = utils.createDefaultTaxDTO(null);   
+        when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
+        try {
+            defaultTaxService.save(defaultTaxDTO);
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals("Branch with id " + defaultTaxDTO.getBranchId() + " does not exists", e.getMessage());
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+        }
+
     }
 
 
