@@ -32,6 +32,7 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.dto.SaleInfoDTO;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.sale.model.Tax;
@@ -118,6 +119,38 @@ public class DefaultTaxServiceTest {
     }
 
     @Test
+    void shouldGetNoContentExceptionDueToDefaultTaxNotExistingInUpdate() {
+        DefaultTaxDTO defaultTaxDTO = utils.createDefaultTaxDTO(null);
+        
+        when(defaultTaxRepository.findById(anyLong())).thenReturn(Optional.empty());
+        try {
+            defaultTaxService.update(1L, defaultTaxDTO);
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals("Default tax with id " + 1L + " does not exists", e.getMessage());
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 50);
+        }
+    }
+
+    @Test
+    void shouldGetBadRequestExceptionDueToDefaultInvalidTaxTypeInUpdate() {
+        DefaultTaxDTO defaultTaxDTO = utils.createDefaultTaxDTO(null);
+        DefaultTax defaultTax = utils.createDefaultTax(null);
+        // Set the type of the tax to 1
+        int invalidTaxType = 696969;
+        defaultTaxDTO.setType(invalidTaxType);
+
+        when(defaultTaxRepository.findById(anyLong())).thenReturn(Optional.of(defaultTax));
+        try {
+            defaultTaxService.update(1L, defaultTaxDTO);
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals("Invalid default tax type:" + invalidTaxType, e.getMessage());
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 51);
+        }
+    }
+
+    @Test
     void shouldDelete(){
         DefaultTax defaultTax = utils.createDefaultTax(null);
 
@@ -126,6 +159,19 @@ public class DefaultTaxServiceTest {
         defaultTaxService.delete(1L);
 
         verify(defaultTaxRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void shouldGetNoContentExcepetionDueToDefaultTaxNotExistingInDelete(){
+        
+        when(defaultTaxRepository.findById(anyLong())).thenReturn(Optional.empty());
+        try {
+            defaultTaxService.delete(1L);
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertEquals("Default tax with id " + 1L + " does not exists", e.getMessage());
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 50);
+        }
     }
 
 }
