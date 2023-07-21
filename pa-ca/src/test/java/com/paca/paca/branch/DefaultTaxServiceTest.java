@@ -27,6 +27,7 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.branch.service.DefaultTaxService;
 import com.paca.paca.branch.utils.DefaultTaxMapper;
+import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.dto.SaleDTO;
@@ -85,6 +86,21 @@ public class DefaultTaxServiceTest {
 
     }
 
+    @Test 
+    void shouldGetBadRequestExceptionDueToInvalidTaxType() {
+        DefaultTaxDTO defaultTaxDTO = utils.createDefaultTaxDTO(null);
+        int invalidTaxType = 9856897;
+        defaultTaxDTO.setType(invalidTaxType);
+        Branch branch = utils.createBranch(null);
+        when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
+        try{
+            defaultTaxService.save(defaultTaxDTO);
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BadRequestException);
+            Assert.assertEquals("Invalid default tax type:" + invalidTaxType, e.getMessage());
+            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 51);
+        }
+    }
 
     @Test
     void shouldUpdate(){
