@@ -1,30 +1,30 @@
 package com.paca.paca.sale;
 
+import com.paca.paca.sale.model.Tax;
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.model.DefaultTax;
-import com.paca.paca.branch.model.Table;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.sale.dto.BranchSalesInfoDTO;
-import com.paca.paca.sale.dto.SaleDTO;
-import com.paca.paca.sale.dto.SaleInfoDTO;
-import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.SaleDTO;
+import com.paca.paca.branch.model.Table;
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.sale.utils.TaxMapper;
+import com.paca.paca.sale.dto.SaleInfoDTO;
+import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.SaleProduct;
-import com.paca.paca.sale.model.Tax;
-import com.paca.paca.sale.repository.SaleProductRepository;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.sale.dto.SaleProductDTO;
+import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.statics.SaleStatics;
-import com.paca.paca.sale.utils.SaleMapper;
+import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.utils.SaleProductMapper;
-import com.paca.paca.sale.utils.TaxMapper;
-import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.branch.repository.TableRepository;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
 import org.junit.Assert;
@@ -34,16 +34,14 @@ import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -387,7 +385,7 @@ public class SaleServiceTest {
         when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
-            saleService.getBranchSales(1, 10, 1L);
+            saleService.getBranchSales(1, 10, 1L, null, null, null, null);
         } catch (NoContentException e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals("Branch with id " + 1L + " does not exists", e.getMessage());
@@ -400,7 +398,7 @@ public class SaleServiceTest {
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(new Branch()));
 
         try {
-            saleService.getBranchSales(-1, 10, 1L);
+            saleService.getBranchSales(-1, 10, 1L, null, null, null, null);
         } catch (UnprocessableException e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals("Page number cannot be less than zero", e.getMessage());
@@ -413,7 +411,7 @@ public class SaleServiceTest {
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(new Branch()));
 
         try {
-            saleService.getBranchSales(1, 0, 1L);
+            saleService.getBranchSales(1, 0, 1L, null, null, null, null);
         } catch (UnprocessableException e) {
             Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals("Page size cannot be less than one", e.getMessage());
@@ -427,16 +425,15 @@ public class SaleServiceTest {
         Branch branch = utils.createBranch(null);
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
 
-        Page<Sale> salePage = new PageImpl<>(new ArrayList<>());
         List<Sale> currentSales = new ArrayList<>();
 
         when(saleRepository.findAllByTableBranchIdAndFilters(
-                anyLong(), anyList(), any(), any(), any(), any(), any(), any())).thenReturn(salePage);
+                anyLong(), anyList(), any(), any(), any(), any(), any())).thenReturn(currentSales);
 
         when(saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
                 anyLong(), any())).thenReturn(currentSales);
 
-        BranchSalesInfoDTO branchSales = saleService.getBranchSales(1, 10, branch.getId());
+        BranchSalesInfoDTO branchSales = saleService.getBranchSales(1, 10, branch.getId(), null, null, null, null);
 
         // Check that the branchSales are not null
         Assert.assertNotNull(branchSales);

@@ -1,7 +1,9 @@
 package com.paca.paca.sale.service;
 
+import java.util.Set;
 import java.util.List;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ArrayList;
 
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
@@ -316,12 +319,15 @@ public class SaleService {
     public BranchSalesInfoDTO getBranchSales(
             int page,
             int size,
-            Long branch_id) throws UnprocessableException, NoContentException {
-
-        Optional<Branch> branch = branchRepository.findById(branch_id);
+            Long branchId,
+            Date startTime,
+            Date endTime,
+            String fullname,
+            String identityDocument) throws UnprocessableException, NoContentException {
+        Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + branch_id + " does not exists",
+                    "Branch with id " + branchId + " does not exists",
                     21);
         }
         if (page < 0) {
@@ -335,33 +341,43 @@ public class SaleService {
                     45);
         }
 
-        Date start_time = new Date(0);
+        // Apply filters to the historic sales
+        Set<Sale> historicSalesConcat = new HashSet<>();
+        if (fullname == null) {
+            fullname = "";
+        }
+        // Separate the fullname in tokens to apply the filters dynamically
+        for (String word : fullname.toLowerCase().split(" ")) {
+            List<Sale> historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
+                    branchId,
+                    List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                    startTime,
+                    endTime,
+                    word,
+                    word,
+                    identityDocument);
+            historicSalesConcat.retainAll(historicSalesByWord);
+        }
+        List<Sale> historicSales = new ArrayList<>(historicSalesConcat);
 
-        Pageable not_ongoing_sales_paging;
-
-        not_ongoing_sales_paging = PageRequest.of(
+        // Create a Pageable object for the historic sales
+        Pageable paging = PageRequest.of(
                 page,
                 size,
                 Sort.by("startTime").descending());
-
-        Page<Sale> historicSales = saleRepository.findAllByTableBranchIdAndFilters(
-                branch_id,
-                List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
-                start_time,
-                null,
-                null,
-                null,
-                null,
-                not_ongoing_sales_paging);
+        Page<Sale> historicSalesPage = new PageImpl<>(
+                historicSales,
+                paging,
+                size);
 
         List<Sale> ongoingSales = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
-                branch_id,
+                branchId,
                 SaleStatics.Status.ongoing);
 
         List<SaleInfoDTO> notOngoingSalesInfoDTO = new ArrayList<>();
         List<SaleInfoDTO> ongoingSalesInfoDTO = new ArrayList<>();
 
-        historicSales.forEach(sale -> {
+        historicSalesPage.forEach(sale -> {
             SaleDTO saleDTO = saleMapper.toDTO(sale);
             List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
             List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
@@ -394,7 +410,7 @@ public class SaleService {
                 .ongoingSalesInfo(ongoingSalesInfoDTO)
                 .historicSalesInfo(notOngoingSalesInfoDTO)
                 .currentHistoricPage(page)
-                .totalHistoricPages(historicSales.getTotalPages())
+                .totalHistoricPages(historicSalesPage.getTotalPages())
                 .build();
 
         return response;

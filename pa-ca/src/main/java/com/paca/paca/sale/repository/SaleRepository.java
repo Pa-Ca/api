@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
 
-    @Query(value = "SELECT s " +
+    @Query("SELECT s " +
             "FROM Sale s " +
             "WHERE s.table.branch.id = :branchId " +
             "    AND (COALESCE(:status) IS NULL OR (s.status IN :status)) " +
@@ -33,10 +31,9 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "            FROM Reservation r, Guest g " +
             "            WHERE r.id = s.reservation.id " +
             "            AND g.id = s.reservation.guest.id " +
-            "            AND (:name IS NULL OR LOWER(s.reservation.guest.name) LIKE %:name%) "
-            +
-            "            AND (:surname IS NULL OR LOWER(s.reservation.guest.surname) LIKE %:surname%) " +
-            "            AND (:identityDocument IS NULL OR LOWER(s.reservation.guest.identityDocument) LIKE %:identityDocument%)) "
+            "            AND (:name IS NULL OR LOWER(g.name) LIKE %:name%) " +
+            "            AND (:surname IS NULL OR LOWER(g.surname) LIKE %:surname%) " +
+            "            AND (:identityDocument IS NULL OR LOWER(g.identityDocument) LIKE %:identityDocument%)) "
             +
             "        OR EXISTS ( " +
             "            SELECT g " +
@@ -46,15 +43,14 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "                AND (:name IS NULL OR LOWER(g.client.name) LIKE %:name%) " +
             "                AND (:surname IS NULL OR LOWER(g.client.surname) LIKE %:surname%) " +
             "                AND (:identityDocument IS NULL OR LOWER(g.client.identityDocument) LIKE %:identityDocument%)))")
-    Page<Sale> findAllByTableBranchIdAndFilters(
+    List<Sale> findAllByTableBranchIdAndFilters(
             @Param("branchId") Long branchId,
             @Param("status") List<Integer> status,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
             @Param("name") String name,
             @Param("surname") String surname,
-            @Param("identityDocument") String identityDocument,
-            Pageable pageable);
+            @Param("identityDocument") String identityDocument);
 
     List<Sale> findAllByTableBranchIdAndStatusOrderByStartTimeDesc(Long branchId, Integer status);
 

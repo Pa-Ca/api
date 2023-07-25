@@ -23,9 +23,6 @@ import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -245,14 +242,6 @@ public class SaleRepositoryTest extends PacaTest {
         calendar.add(Calendar.YEAR, -2);
         Date oneYearBeforeNow = calendar.getTime();
 
-        // We first have to create the page request to test the method
-        Pageable test_page;
-
-        test_page = PageRequest.of(
-                0,
-                10,
-                Sort.by("startTime").descending());
-
         // Now create a list of sales from the branch A that are ongoing from now
         // You have to do it manually because the repository doesn't have a method for
         // that
@@ -277,9 +266,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         // Compare the lists lengths
         assertEquals(ongoingSalesFromBranchA.size(), ongoingSalesFromBranchAFromRepositoryList.size());
@@ -306,9 +293,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         // Compare the lists lengths
         assertEquals(closedSalesFromBranchA.size(), closedSalesFromBranchAFromRepositoryList.size());
@@ -333,9 +318,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         // Compare the lists lengths
         assertEquals(cancelledSalesFromBranchA.size(), cancelledSalesFromBranchAFromRepositoryList.size());
@@ -360,9 +343,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         // Compare the lists lengths
 
@@ -387,9 +368,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         // Compare the lists lengths
 
@@ -415,9 +394,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         assertEquals(cancelledSalesFromBranchB.size(), cancelledSalesFromBranchBFromRepositoryList.size());
 
@@ -443,9 +420,7 @@ public class SaleRepositoryTest extends PacaTest {
                         twoHoursBeforeNow,
                         null,
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         assertEquals(salesWithStartTimeBeforeTwoHoursBeforeNow.size(),
                 salesWithStartTimeBeforeTwoHoursBeforeNowFromRepositoryList.size());
@@ -478,9 +453,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         reservation1.getGuest().getName(),
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         assertEquals(salesWithReservationName.size(), salesWithReservationNameFromRepositoryList.size());
 
@@ -503,9 +476,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         reservation1.getGuest().getSurname(),
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         assertEquals(salesWithReservationSurname.size(), salesWithReservationSurnameFromRepositoryList.size());
 
@@ -529,9 +500,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        reservation1.getGuest().getIdentityDocument(),
-                        test_page)
-                .getContent();
+                        reservation1.getGuest().getIdentityDocument());
 
         assertEquals(salesWithReservationIdentityDocument.size(),
                 salesWithReservationIdentityDocumentFromRepositoryList.size());
@@ -567,9 +536,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         group.getClient().getName(),
                         null,
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         assertEquals(salesWithReservationName.size(), salesWithReservationNameFromRepositoryList.size());
 
@@ -592,9 +559,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         group.getClient().getSurname(),
-                        null,
-                        test_page)
-                .getContent();
+                        null);
 
         assertEquals(salesWithReservationSurname.size(), salesWithReservationSurnameFromRepositoryList.size());
 
@@ -618,9 +583,7 @@ public class SaleRepositoryTest extends PacaTest {
                         null,
                         null,
                         null,
-                        group.getClient().getIdentityDocument(),
-                        test_page)
-                .getContent();
+                        group.getClient().getIdentityDocument());
 
         assertEquals(salesWithReservationIdentityDocument.size(),
                 salesWithReservationIdentityDocumentFromRepositoryList.size());
