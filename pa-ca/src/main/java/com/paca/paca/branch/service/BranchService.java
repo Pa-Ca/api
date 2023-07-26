@@ -1,7 +1,6 @@
 package com.paca.paca.branch.service;
 
 import java.util.List;
-import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,42 +12,41 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.client.model.Review;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.product.dto.ProductDTO;
+import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.business.model.Business;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.dto.DefaultTaxDTO;
-import com.paca.paca.branch.dto.DefaultTaxListDTO;
-import com.paca.paca.branch.dto.TableDTO;
-import com.paca.paca.branch.dto.TableListDTO;
-import com.paca.paca.branch.utils.BranchMapper;
-import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.branch.utils.TableMapper;
+import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.product.utils.ProductMapper;
+import com.paca.paca.branch.dto.DefaultTaxListDTO;
 import com.paca.paca.branch.statics.BranchStatics;
-import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
@@ -270,31 +268,6 @@ public class BranchService {
         return ReservationListDTO.builder().reservations(result).build();
     }
 
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
-            throws NoContentException {
-        Optional<Branch> branch = branchRepository.findById(id);
-        if (branch.isEmpty()) {
-            throw new NoContentException(
-                    "Branch with id " + id + " does not exists",
-                    20);
-        }
-
-        List<ReservationDTO> response = new ArrayList<>();
-        reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id, reservationDateIn)
-                .forEach(reservation -> {
-                    ReservationDTO dto = reservationMapper.toDTO(reservation);
-                    response.add(dto);
-                });
-
-        // Complete reservations
-        List<ReservationDTO> result = response.stream().map(reservation -> {
-            reservation.completeData(guestRepository, clientGroupRepository, clientRepository);
-            return reservation;
-        }).collect(Collectors.toList());
-
-        return ReservationListDTO.builder().reservations(result).build();
-    }
-
     public ClientListDTO getFavoriteClients(Long id) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
@@ -333,8 +306,8 @@ public class BranchService {
 
     // Nows lets make the pagination of branches
     // This method returns a list of branches with pagination
-
-    public BranchListDTO getBranchesPage(int page,
+    public BranchListDTO getBranchesPage(
+            int page,
             int size,
             String sorting_by,
             boolean ascending,
@@ -412,9 +385,6 @@ public class BranchService {
 
     // This method returns a list of reviews with pagination
     public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NoContentException {
-
-        // Now lets add the exeption handling
-        // TODO: Add the corresponding codes to the exceptions
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
@@ -459,64 +429,6 @@ public class BranchService {
 
         // Return a ReviewListDTO object that contains the list of ReviewDTO objects
         return ReviewListDTO.builder().reviews(response).build();
-    }
-
-    // This method returns a page of reservations with pagination
-    public ReservationListDTO getReservationsPage(Long id, Date reservationDateIn, int page, int size)
-            throws UnprocessableException, NoContentException {
-
-        // Now lets add the exeption handling
-        // TODO: Add the corresponding codes to the exceptions
-        if (page < 0) {
-            throw new UnprocessableException(
-                    "Page number cannot be less than zero",
-                    44);
-        }
-        if (size < 1) {
-            throw new UnprocessableException(
-                    "Page size cannot be less than one",
-                    45);
-        }
-
-        Optional<Branch> branch = branchRepository.findById(id);
-        if (branch.isEmpty()) {
-            throw new NoContentException(
-                    "Branch with id " + id + " does not exists",
-                    20);
-        }
-
-        // Create a Pageable object that specifies the page and size parameters as well
-        // as a sort
-        // order for the results
-        Pageable paging = PageRequest.of(
-                page,
-                size,
-                // Sort by id descending
-                Sort.by("reservationDateIn").descending());
-
-        // Query the database for the appropriate page of results using the findAll
-        // method of the reservation repository
-        Page<Reservation> pagedResult = reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(id,
-                reservationDateIn, paging);// .findAll(paging);
-
-        // Map the results to a list of ReservationDTO objects using the
-        // ReservationMapper
-        List<ReservationDTO> response = new ArrayList<>();
-
-        pagedResult.forEach(reservation -> {
-            ReservationDTO dto = reservationMapper.toDTO(reservation);
-            response.add(dto);
-        });
-
-        // Complete reservations
-        List<ReservationDTO> result = response.stream().map(reservation -> {
-            reservation.completeData(guestRepository, clientGroupRepository, clientRepository);
-            return reservation;
-        }).collect(Collectors.toList());
-
-        // Return a ReservationListDTO object that contains the list of ReservationDTO
-        // objects
-        return ReservationListDTO.builder().reservations(result).build();
     }
 
     public DefaultTaxListDTO getDefaultTaxesByBranchId(Long branchId) {

@@ -58,7 +58,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
@@ -421,25 +420,6 @@ public class BranchServiceTest {
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
         }
-    }
-
-    @Test
-    void shouldGetReservationsByDate() {
-        Branch branch = utils.createBranch(null);
-        List<Reservation> reservations = TestUtils.castList(
-                Reservation.class,
-                Mockito.mock(List.class));
-
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(
-                any(Long.class),
-                any(Date.class))).thenReturn(reservations);
-
-        ReservationListDTO dtoResponse = branchService.getReservationsByDate(
-                branch.getId(),
-                new Date(System.currentTimeMillis()));
-
-        assertThat(dtoResponse).isNotNull();
     }
 
     @Test 
@@ -903,99 +883,4 @@ public class BranchServiceTest {
         assertThat(pageResponse.getBranches().size()).isEqualTo(branches.size());
 
     }
-
-    @Test
-    // We are going to test test the exception when the requested page is from a non existing branch
-    void shouldGetNoContentDueToMissingBranchInGetReservationsPage() {
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
-
-        Date date = new Date();
-        Long branchId = 1L;
-        try {
-            branchService.getReservationsPage(branchId, date, 0, 10);
-            TestCase.fail();
-        } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
-        }
-    }
-
-    // Test for getPage method
-    // Lets test the exception when the page is less than 0
-    @Test
-    void shouldGetUnprocessableDueToPageLessThanZeroInGetReservationsPage() {
-        // Create a branch
-        Branch branch = utils.createBranch(null);
-        Long branchId = branch.getId();
-        Date date = new Date();
-
-        try {
-            branchService.getReservationsPage(branchId, date, -1, 10);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
-        }
-    }
-
-    // Lets test the exception when the size is less than 1
-    @Test
-    void shouldGetUnprocessableDueToSizeLessThanOneInGetReservationsPage() {
-        // Create a branch
-        Branch branch = utils.createBranch(null);
-        Long branchId = branch.getId();
-        Date date = new Date();
-
-        try {
-            branchService.getReservationsPage(branchId, date, 1, 0);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof UnprocessableException);
-            Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
-            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
-        }
-    }
-
-    // Now lets test the that the getPageReservationsPAge method works as expected
-    // First lets create 20 reservations
-    // Then lets get the first page with 10 reservations
-    // Then lets get the second page with 10 reservations
-    // Check if the first page has 10 reservations
-    // Check if the second page has 10 reservations
-    @Test
-    void shouldGetPageInGetReservationsPage() {
-        // Create a branch
-        Branch branch = utils.createBranch(null);
-        // Mock the branch repository
-        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        // Get that branch id
-        Long branchId = branch.getId();
-        Pageable pageable = Mockito.mock(Pageable.class);
-        when(pageable.getPageSize()).thenReturn(10);
-        // Create 20 reservations manually
-        List<Reservation> reservations = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            reservations.add(utils.createReservation(null, null));
-        }
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), reservations.size());
-        Page<Reservation> pagedResult = new PageImpl<>(reservations.subList(start, end), pageable, reservations.size());
-
-        when(reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(any(Long.class),
-                any(Date.class),
-                any(Pageable.class))).thenReturn(pagedResult);
-        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(utils.createReservationDTO(null));
-
-        Date date = new Date();
-        ReservationListDTO pageResponse = branchService.getReservationsPage(branchId, date, 0, 10);
-        ReservationListDTO pageResponse2 = branchService.getReservationsPage(branchId, date, 1, 10);
-
-        assertThat(pageResponse).isNotNull();
-        assertThat(pageResponse2).isNotNull();
-        assertThat(pageResponse.getReservations().size()).isEqualTo(10);
-        assertThat(pageResponse2.getReservations().size()).isEqualTo(10);
-    }
-
 }

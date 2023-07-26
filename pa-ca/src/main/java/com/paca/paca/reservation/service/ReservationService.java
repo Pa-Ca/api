@@ -1,6 +1,9 @@
 package com.paca.paca.reservation.service;
 
+import java.util.Set;
 import java.util.List;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -23,11 +26,19 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.repository.InvoiceRepository;
+import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -143,6 +154,143 @@ public class ReservationService {
         dtoResponse.completeData(guestRepository, clientGroupRepository, clientRepository);
 
         return dtoResponse;
+    }
+
+    // This method returns a page of reservations with pagination
+    public BranchReservationsInfoDTO getBranchReservations(
+            int page,
+            int size,
+            Long branchId,
+            List<Integer> status,
+            Date startTime,
+            Date endTime,
+            String fullname,
+            String identityDocument)
+            throws UnprocessableException, NoContentException {
+        Optional<Branch> branch = branchRepository.findById(branchId);
+        if (branch.isEmpty()) {
+            throw new NoContentException(
+                    "Branch with id " + branchId + " does not exists",
+                    20);
+        }
+        if (page < 0) {
+            throw new UnprocessableException(
+                    "Page number cannot be less than zero",
+                    44);
+        }
+        if (size < 1) {
+            throw new UnprocessableException(
+                    "Page size cannot be less than one",
+                    45);
+        }
+
+        if (status == null) {
+            status = List.of(
+                    ReservationStatics.Status.rejected,
+                    ReservationStatics.Status.closed,
+                    ReservationStatics.Status.paid,
+                    ReservationStatics.Status.returned);
+        }
+
+        // Apply filter to the historical reservations
+        Set<Reservation> historicReservationsConcat = new HashSet<>();
+        // Separate the fullname in tokens to apply the filters dynamically
+        for (String word : fullname.toLowerCase().split(" ")) {
+            List<Reservation> historicReservationsByWord = reservationRepository.findAllByBranchIdAndFilters(
+                    branchId,
+                    status,
+                    startTime,
+                    endTime,
+                    word,
+                    word,
+                    identityDocument);
+            historicReservationsConcat.retainAll(historicReservationsByWord);
+        }
+        List<Reservation> historicReservations = new ArrayList<>(historicReservationsConcat);
+
+        // Create a Pageable object for the historic reservations
+        Pageable paging = PageRequest.of(
+                page,
+                size,
+                Sort.by("reservationDateIn").descending());
+        Page<Reservation> historicReservationsPage = new PageImpl<>(
+                historicReservations,
+                paging,
+                size);
+
+        // Map the results to a list of ReservationDTO objects using the
+        // ReservationMapper
+        List<ReservationDTO> historicReservationsDTO = new ArrayList<>();
+        historicReservationsPage.forEach(reservation -> {
+            ReservationDTO dto = reservationMapper.toDTO(reservation);
+            dto.completeData(guestRepository, clientGroupRepository, clientRepository);
+            historicReservationsDTO.add(dto);
+        });
+
+        // Get started reservations
+        List<Reservation> startedReservations = reservationRepository.findAllByBranchIdAndFilters(
+                branchId,
+                List.of(ReservationStatics.Status.started),
+                null,
+                null,
+                null,
+                null,
+                null);
+        // Map the results to a list of ReservationDTO objects using the
+        // ReservationMapper
+        List<ReservationDTO> startedReservationsDTO = new ArrayList<>();
+        startedReservations.forEach(reservation -> {
+            ReservationDTO dto = reservationMapper.toDTO(reservation);
+            dto.completeData(guestRepository, clientGroupRepository, clientRepository);
+            startedReservationsDTO.add(dto);
+        });
+
+        // Get accepted reservations
+        List<Reservation> acceptedReservations = reservationRepository.findAllByBranchIdAndFilters(
+                branchId,
+                List.of(ReservationStatics.Status.accepted),
+                null,
+                null,
+                null,
+                null,
+                null);
+        // Map the results to a list of ReservationDTO objects using the
+        // ReservationMapper
+        List<ReservationDTO> acceptedReservationsDTO = new ArrayList<>();
+        acceptedReservations.forEach(reservation -> {
+            ReservationDTO dto = reservationMapper.toDTO(reservation);
+            dto.completeData(guestRepository, clientGroupRepository, clientRepository);
+            acceptedReservationsDTO.add(dto);
+        });
+
+        // Get pending reservations
+        List<Reservation> pendingReservations = reservationRepository.findAllByBranchIdAndFilters(
+                branchId,
+                List.of(ReservationStatics.Status.pending),
+                null,
+                null,
+                null,
+                null,
+                null);
+        // Map the results to a list of ReservationDTO objects using the
+        // ReservationMapper
+        List<ReservationDTO> pendingReservationsDTO = new ArrayList<>();
+        pendingReservations.forEach(reservation -> {
+            ReservationDTO dto = reservationMapper.toDTO(reservation);
+            dto.completeData(guestRepository, clientGroupRepository, clientRepository);
+            pendingReservationsDTO.add(dto);
+        });
+
+        // Return a ReservationListDTO object that contains the list of ReservationDTO
+        // objects
+        return BranchReservationsInfoDTO.builder()
+                .startedReservations(startedReservationsDTO)
+                .acceptedReservations(acceptedReservationsDTO)
+                .pendingReservations(pendingReservationsDTO)
+                .historicReservations(historicReservationsDTO)
+                .currentHistoricPage(page)
+                .totalHistoricPages(historicReservationsPage.getTotalPages())
+                .build();
     }
 
     public void cancel(Long id) throws NoContentException, BadRequestException, ForbiddenException {

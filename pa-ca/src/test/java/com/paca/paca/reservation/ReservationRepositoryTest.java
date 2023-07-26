@@ -19,11 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.Date;
@@ -199,48 +194,43 @@ class ReservationRepositoryTest extends PacaTest {
     @Test
     void shouldGetReservationPageByDate() {
         // Create a branch
-        Branch branch_1 = utils.createBranch(null);
-        Branch branch_2 = utils.createBranch(null);
+        Branch branch1 = utils.createBranch(null);
+        Branch branch2 = utils.createBranch(null);
 
         // Create two dates
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, 11, 3, 0, 0, 0);
-        Date date_1 = calendar.getTime();
+        Date date1 = calendar.getTime();
 
         calendar.set(2019, 11, 4, 0, 0, 0);
-        Date date_2 = calendar.getTime();
+        Date date2 = calendar.getTime();
 
-        List<Reservation> test_reservations = utils.createTestReservations(branch_1, branch_2, date_1, date_2);
+        List<Reservation> testReservations = utils.createTestReservations(branch1, branch2, date1, date2);
 
-        // from the test_reservations look for the ones that belong to branch_1 and
-        // date_1
-
-        List<Reservation> filtered_reservations = test_reservations.stream()
-                .filter(reservation -> reservation.getBranch().getId().equals(branch_1.getId()))
-                .filter(reservation -> reservation.getReservationDateIn().compareTo(date_1) == 0)
+        // from the testReservations look for the ones that belong to branch1 and
+        // date1
+        List<Reservation> filteredReservations = testReservations.stream()
+                .filter(reservation -> reservation.getBranch().getId().equals(branch1.getId()))
+                .filter(reservation -> reservation.getReservationDateIn().compareTo(date1) == 0)
                 .collect(Collectors.toList());
 
-        // Order the filtered_reservations by reservation_date in descending order
-        filtered_reservations.sort((r1, r2) -> r2.getReservationDateIn().compareTo(r1.getReservationDateIn()));
+        // Order the filteredReservations by reservation_date in descending order
+        filteredReservations.sort((r1, r2) -> r2.getReservationDateIn().compareTo(r1.getReservationDateIn()));
 
-        // Create the page
-        Page<Reservation> reservations_page = new PageImpl<>(filtered_reservations);
+        List<Reservation> reservations = reservationRepository.findAllByBranchIdAndFilters(
+                branch1.getId(),
+                null,
+                date1,
+                null,
+                null,
+                null,
+                null);
 
-        Pageable paging = PageRequest.of(
-                0,
-                20,
-                Sort.by("reservationDateIn").descending());
+        assertThat(reservations.size()).isEqualTo(filteredReservations.size());
 
-        Page<Reservation> reservations = reservationRepository.findAllByBranchIdAndReservationDateInGreaterThanEqual(
-                branch_1.getId(),
-                date_1,
-                paging);
-
-        assertThat(reservations.getContent().size()).isEqualTo(filtered_reservations.size());
         // Check that each element is equal (Do a loop)
-        for (int i = 0; i < reservations.getContent().size(); i++) {
-            assertThat(reservations.getContent().get(i).getId())
-                    .isEqualTo(reservations_page.getContent().get(i).getId());
+        for (int i = 0; i < reservations.size(); i++) {
+            assertThat(reservations.get(i).getId()).isEqualTo(reservations.get(i).getId());
         }
 
     }

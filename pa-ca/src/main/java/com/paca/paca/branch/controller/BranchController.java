@@ -1,21 +1,23 @@
 package com.paca.paca.branch.controller;
 
 import com.paca.paca.branch.dto.BranchDTO;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
+import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.branch.dto.AmenityListDTO;
-import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.product.dto.ProductListDTO;
+import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.statics.BranchStatics;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.reservation.dto.ReservationListDTO;
-import com.paca.paca.sale.dto.BranchSalesInfoDTO;
-import com.paca.paca.sale.service.SaleService;
+import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.List;
 import java.math.BigDecimal;
 
 import lombok.RequiredArgsConstructor;
@@ -51,11 +54,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @Tag(name = "05. Branch", description = "Branch Management Controller")
 public class BranchController {
 
+    private final SaleService saleService;
+
     private final BranchService branchService;
 
     private final AmenityService amenityService;
 
-    private final  SaleService saleService;
+    private final ReservationService reservationService;
 
     @GetMapping
     @ValidateRoles({})
@@ -129,17 +134,6 @@ public class BranchController {
 
     @ValidateBranchOwner
     @ValidateRoles({ "business" })
-    @GetMapping("/{id}/reservation/{date}")
-    @Operation(summary = "Get all reservations created after a specific date of a branch", description = "Obtains a list with the data of all the reservations created after a specific date of a branch given its id")
-    public ResponseEntity<ReservationListDTO> getReservationsByDate(
-            @PathVariable("id") Long id,
-            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date)
-            throws NoContentException {
-        return ResponseEntity.ok(branchService.getReservationsByDate(id, date));
-    }
-
-    @ValidateBranchOwner
-    @ValidateRoles({ "business" })
     @GetMapping("/{id}/favorite-clients")
     @Operation(summary = "Gets all clients that have bookmarked this branch", description = "Gets a list with the data of all the users who have marked the branch as favorites given its id")
     public ResponseEntity<ClientListDTO> getFavoriteClients(@PathVariable("id") Long id)
@@ -190,58 +184,75 @@ public class BranchController {
         return ResponseEntity.ok(branchService.getReviewsPage(id, page, size));
     }
 
-    // Example get http://yourdomain.com/1/reviews?page=2&size=5
-    // Example with all arguments get http://yourdomain.com/1/reviews?page=2&size=5&sorting_by=score&ascending=true&min_score=3&min_capacity=5
+    // Example with all arguments get
+    // http://yourdomain.com/branches?page=2&size=5&sortingBy=reservationPrice&ascending=true&minReservationPrice=100&maxReservationPrice=200&minScore=3&minCapacity=2
     @GetMapping("/branches")
     @Operation(summary = "Gets a page of branches", description = "Gets a page with the data of branches")
     public ResponseEntity<BranchListDTO> getBranchesPage(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam("sorting_by") String sorting_by,
+            @RequestParam("sortingBy") String sortingBy,
             @RequestParam("ascending") boolean ascending,
-            @RequestParam("min_reservation_price") BigDecimal min_reservation_price,
-            @RequestParam("max_reservation_price") BigDecimal max_reservation_price,
-            @RequestParam("min_score") Float min_score,
-            @RequestParam("min_capacity") int min_capacity) throws NoContentException, UnprocessableException {
+            @RequestParam("minReservationPrice") BigDecimal minReservationPrice,
+            @RequestParam("maxReservationPrice") BigDecimal maxReservationPrice,
+            @RequestParam("minScore") Float minScore,
+            @RequestParam("minCapacity") int minCapacity) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(branchService.getBranchesPage(
                 page,
                 size,
-                sorting_by,
+                sortingBy,
                 ascending,
-                min_reservation_price,
-                max_reservation_price,
-                min_score,
-                min_capacity));
+                minReservationPrice,
+                maxReservationPrice,
+                minScore,
+                minCapacity));
+    }
+
+    // Example get with status
+    // http://yourdomain.com/1/reservations?page=2&size=5&status=1,2,3
+    @GetMapping("/{id}/reservations")
+    @ValidateRoles({ "business" })
+    public ResponseEntity<BranchReservationsInfoDTO> getBranchReservationsPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("status") List<Integer> status,
+            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startTime,
+            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
+            @RequestParam("fullname") String fullname,
+            @RequestParam("identitiyDocument") String identitiyDocument,
+            @PathVariable("id") Long branchId) throws NoContentException, UnprocessableException {
+        return ResponseEntity.ok(reservationService.getBranchReservations(
+                page,
+                size,
+                branchId,
+                status,
+                startTime,
+                endTime,
+                fullname,
+                identitiyDocument));
     }
 
     // Example get
-    // http://yourdomain.com/1/reservations?reservation_date=2020-12-12&page=2&size=5
-    @GetMapping("/{id}/reservations")
-    @ValidateRoles({ "business" })
-    public ResponseEntity<ReservationListDTO> getReservationsPage(
-            @PathVariable("id") Long id,
-            @RequestParam("reservation_date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date reservation_date,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size) throws NoContentException, UnprocessableException {
-        return ResponseEntity.ok(branchService.getReservationsPage(id, reservation_date, page, size));
-    }
-
-    // Example get http://yourdomain.com/1/sales?page=2&size=5
+    // http://yourdomain.com/1/sales?start_time=2020-12-12&end_time=2020-12-12&page=2&size=5
     @GetMapping("/{id}/sale")
     @ValidateRoles({ "business" })
-    @Operation(
-        summary = "Gets all the ongoing sales and the historic sales with its taxes and saleporducts", 
-        description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
+    @Operation(summary = "Gets all the ongoing sales and the historic sales with its taxes and saleporducts", description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
     public ResponseEntity<BranchSalesInfoDTO> getBranchSalesPages(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @PathVariable("id") Long branch_id
-            ) throws NoContentException, UnprocessableException {
+            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startTime,
+            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
+            @RequestParam("fullname") String fullname,
+            @RequestParam("identitiyDocument") String identitiyDocument,
+            @PathVariable("id") Long branchId) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(saleService.getBranchSales(
-                 page,
-                 size,
-                 branch_id
-                 ));
+                page,
+                size,
+                branchId,
+                startTime,
+                endTime,
+                fullname,
+                identitiyDocument));
     }
 
     @GetMapping("/{id}/table")
@@ -251,6 +262,5 @@ public class BranchController {
             throws NoContentException {
         return ResponseEntity.ok(branchService.getTablesbyBranchId(id));
     }
-
 
 }
