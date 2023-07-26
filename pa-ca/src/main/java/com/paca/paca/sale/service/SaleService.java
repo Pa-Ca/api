@@ -22,6 +22,7 @@ import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.sale.utils.SaleMapper;
@@ -34,11 +35,14 @@ import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
+import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.repository.ReservationRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +57,10 @@ public class SaleService {
     private final BranchRepository branchRepository;
 
     private final TableRepository tableRepository;
+
+    private final PaymentOptionRepository paymentOptionRepository;
+
+    private final ReservationRepository reservationRepository;
 
     private final TaxRepository taxRepository;
 
@@ -130,8 +138,19 @@ public class SaleService {
             throw new NoContentException(
                     "Table with id " + dto.getTableId() + " does not exists", 49); // !
         }
-        Sale newSale_ = saleMapper.toEntity(dto, table.get(), null);
+
+
+        // // Get the payment option from the paymento option id in the dto
+        // Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId());
+        Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId());
+        // // Get the reservation from the reservation id in the dto
+        Optional<Reservation> reservation = reservationRepository.findById(dto.getReservationId());
+
+
+        Sale newSale_ = saleMapper.toEntity(dto, table.get(), reservation.get(), paymentOption.get());
+
         final Sale newSale = saleRepository.save(newSale_);
+
         SaleDTO saleDTO = saleMapper.toDTO(newSale);
 
         // Create taxes
@@ -182,7 +201,7 @@ public class SaleService {
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.cancelled).build();
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get());
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), null);
         saleRepository.save(updatedSale);
     }
 
@@ -216,7 +235,7 @@ public class SaleService {
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.closed).build();
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get());
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), null);
         saleRepository.save(updatedSale);
     }
 
@@ -241,9 +260,10 @@ public class SaleService {
             throw new BadRequestException(
                     "Sale with id " + id + " is canceled", 48); // Lista en docs
         }
-
+        // Get the payment option from the paymento option id in the dto
+        Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId());
         // Update the sale
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get());
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), paymentOption.get());
         updatedSale = saleRepository.save(updatedSale);
         SaleDTO updatedSaleDTO = saleMapper.toDTO(updatedSale);
 

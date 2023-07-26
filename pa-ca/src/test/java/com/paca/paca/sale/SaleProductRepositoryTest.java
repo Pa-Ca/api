@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 
 import com.paca.paca.PacaTest;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.product.model.Product;
@@ -46,6 +47,9 @@ public class SaleProductRepositoryTest extends PacaTest {
 
     @Autowired
     private TableRepository tableRepository;
+
+    @Autowired
+    private PaymentOptionRepository paymentOptionRepository;
 
     @Autowired
     private SaleRepository saleRepository;
@@ -85,6 +89,7 @@ public class SaleProductRepositoryTest extends PacaTest {
                 .businessRepository(businessRepository)
                 .branchRepository(branchRepository)
                 .tableRepository(tableRepository)
+                .paymentOptionRepository(paymentOptionRepository)
                 .saleRepository(saleRepository)
                 .productRepository(productRepository)
                 .productCategoryRepository(productCategoryRepository)
@@ -99,6 +104,7 @@ public class SaleProductRepositoryTest extends PacaTest {
         saleRepository.deleteAll();
         tableRepository.deleteAll();
         reservationRepository.deleteAll();
+        paymentOptionRepository.deleteAll();
         branchRepository.deleteAll();
 
     }
@@ -106,6 +112,7 @@ public class SaleProductRepositoryTest extends PacaTest {
     @AfterEach
     void restoreTest() {
         reservationRepository.deleteAll();
+        paymentOptionRepository.deleteAll();
         saleProductRepository.deleteAll();
         saleRepository.deleteAll();
         tableRepository.deleteAll();
@@ -118,7 +125,7 @@ public class SaleProductRepositoryTest extends PacaTest {
     @Test
     void shouldCreateSaleProduct() {
         // Create a sale using the utils
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         // Create a product using the utils
         Product product = utils.createProduct(null);
 
@@ -177,8 +184,8 @@ public class SaleProductRepositoryTest extends PacaTest {
     @Test
     void shouldFindAllBySaleId() {
         // Create two sales using the utils
-        Sale sale1 = utils.createSale(null, null);
-        Sale sale2 = utils.createSale(null, null);
+        Sale sale1 = utils.createSale(null, null, null);
+        Sale sale2 = utils.createSale(null, null, null);
 
         // Create a list of 7 sale products using the utils for each sale
         List<SaleProduct> saleProducts1 = new ArrayList<>();
@@ -204,8 +211,8 @@ public class SaleProductRepositoryTest extends PacaTest {
     @Test
     void shouldDeleteAllbySaleId() {
         // Create two sales using the utils
-        Sale sale1 = utils.createSale(null, null);
-        Sale sale2 = utils.createSale(null, null);
+        Sale sale1 = utils.createSale(null, null, null);
+        Sale sale2 = utils.createSale(null, null, null);
 
         // Create a list of 7 sale products using the utils for each sale
         List<SaleProduct> saleProducts1 = new ArrayList<>();

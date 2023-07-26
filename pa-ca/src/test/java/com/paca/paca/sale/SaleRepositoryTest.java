@@ -17,6 +17,8 @@ import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
@@ -70,6 +72,9 @@ public class SaleRepositoryTest extends PacaTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentOptionRepository paymentOptionRepository;
+
     private TestUtils utils;
 
     @BeforeAll
@@ -80,6 +85,7 @@ public class SaleRepositoryTest extends PacaTest {
                 .reservationRepository(reservationRepository)
                 .businessRepository(businessRepository)
                 .branchRepository(branchRepository)
+                .paymentOptionRepository(paymentOptionRepository)
                 .tableRepository(tableRepository)
                 .saleRepository(saleRepository)
                 .guestRepository(guestRepository)
@@ -91,8 +97,10 @@ public class SaleRepositoryTest extends PacaTest {
         guestRepository.deleteAll();
         saleRepository.deleteAll();
         tableRepository.deleteAll();
+        paymentOptionRepository.deleteAll();
         reservationRepository.deleteAll();
         branchRepository.deleteAll();
+
     }
 
     @AfterEach
@@ -101,6 +109,7 @@ public class SaleRepositoryTest extends PacaTest {
         reservationRepository.deleteAll();
         saleRepository.deleteAll();
         tableRepository.deleteAll();
+        paymentOptionRepository.deleteAll();
         roleRepository.deleteAll();
         userRepository.deleteAll();
         businessRepository.deleteAll();

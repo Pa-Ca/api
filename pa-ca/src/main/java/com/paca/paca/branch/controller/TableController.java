@@ -1,14 +1,19 @@
 package com.paca.paca.branch.controller;
 
 import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.service.TableService;
 import com.paca.paca.branch.statics.TableStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.utils.ValidateTableOwnerInterceptor.ValidateTableOwner;
+import com.paca.paca.business.repository.BusinessRepository;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,13 +38,27 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class TableController {
 
     private final TableService tableService;
+    private final BusinessRepository businessRepository;
+    private final BranchRepository branchRepository;
 
     @PostMapping
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new table", description = "Create a new table")
     public ResponseEntity<TableDTO> save(@RequestBody TableDTO dto)
             throws NoContentException, ConflictException {
-        return ResponseEntity.ok(tableService.save(dto));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
+            return ResponseEntity.ok(tableService.save(dto));
+        }
+        else{
+            Long businessId = businessRepository.findByUserEmail(auth.getName()).get().getId();
+            Long branchId = dto.getBranchId();
+            // Check if the payment option is from the same branch
+            if (!branchRepository.existsByIdAndBusinessId(branchId, businessId)) {
+                throw new ForbiddenException("Unauthorized access for this operation");
+            }             
+            return ResponseEntity.ok(tableService.save(dto));
+        }
     }
 
     @PutMapping("/{id}")

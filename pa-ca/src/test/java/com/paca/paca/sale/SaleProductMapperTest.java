@@ -47,7 +47,7 @@ public class SaleProductMapperTest {
     void shouldMapSaleProductDTOtoSaleProductEntity() {
 
         // Create a sale and a product
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         Product product = utils.createProduct(null);
 
         SaleProductDTO saleProductDTO = utils.createSaleProductDTO(sale, product);
@@ -73,7 +73,7 @@ public class SaleProductMapperTest {
         // updated except for id, product, sale and price
 
         // Create a sale and a product
-        Sale sale = utils.createSale(null, null);
+        Sale sale = utils.createSale(null, null, null);
         Product product = utils.createProduct(null);
 
         SaleProductDTO saleProductDTO = utils.createSaleProductDTO(sale, product);
