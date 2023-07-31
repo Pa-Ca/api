@@ -2,33 +2,32 @@ package com.paca.paca.sale;
 
 import com.paca.paca.sale.model.Tax;
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.model.PaymentOption;
-import com.paca.paca.branch.model.DefaultTax;
-import com.paca.paca.branch.model.Table;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.sale.dto.BranchSalesInfoDTO;
-import com.paca.paca.sale.dto.SaleDTO;
-import com.paca.paca.sale.dto.SaleInfoDTO;
-import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.SaleProduct;
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.branch.model.Table;
+import com.paca.paca.sale.dto.BranchSalesInfoDTO;
+import com.paca.paca.sale.dto.SaleDTO;
+import com.paca.paca.sale.dto.SaleInfoDTO;
+import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.sale.utils.SaleProductMapper;
 import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
 import org.junit.Assert;
@@ -188,8 +187,6 @@ public class SaleServiceTest {
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
         when(saleMapper.updateModel(any(), any(), any())).thenReturn(sale);
 
-        when(paymentOptionRepository.findById(any())).thenReturn(Optional.of(new PaymentOption()));
-
         SaleInfoDTO saleProductDTO = saleService.update(1L, saleDTO);
 
         assertThat(saleProductDTO).isNotNull();
@@ -260,7 +257,6 @@ public class SaleServiceTest {
         when(taxRepository.findAllBySaleId(anyLong())).thenReturn(taxes);
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
         when(reservationRepository.findById(any())).thenReturn(Optional.of(new Reservation()));
-        when(paymentOptionRepository.findById(any())).thenReturn(Optional.of(new PaymentOption()));
         when(saleRepository.save(any())).thenReturn(sale);
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
 
