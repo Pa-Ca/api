@@ -18,4 +18,5 @@ public class BranchReservationsInfoDTO {
     List<ReservationDTO> historicReservations;
     int currentHistoricPage;
     int totalHistoricPages;
+    int totalHistoricElements;
 }

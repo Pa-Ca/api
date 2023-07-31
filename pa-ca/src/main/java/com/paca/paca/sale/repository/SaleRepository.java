@@ -42,7 +42,9 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "                AND g.isOwner = TRUE " +
             "                AND (:name IS NULL OR LOWER(g.client.name) LIKE %:name%) " +
             "                AND (:surname IS NULL OR LOWER(g.client.surname) LIKE %:surname%) " +
-            "                AND (:identityDocument IS NULL OR LOWER(g.client.identityDocument) LIKE %:identityDocument%)))")
+            "                AND (:identityDocument IS NULL OR LOWER(g.client.identityDocument) LIKE %:identityDocument%)))"
+            +
+            "ORDER BY s.startTime DESC")
     List<Sale> findAllByTableBranchIdAndFilters(
             @Param("branchId") Long branchId,
             @Param("status") List<Integer> status,

@@ -45,7 +45,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "                AND cg.isOwner = TRUE " +
             "                AND (:name IS NULL OR LOWER(cg.client.name) LIKE %:name%) " +
             "                AND (:surname IS NULL OR LOWER(cg.client.surname) LIKE %:surname%) " +
-            "                AND (:identityDocument IS NULL OR LOWER(cg.client.identityDocument) LIKE %:identityDocument%)))")
+            "                AND (:identityDocument IS NULL OR LOWER(cg.client.identityDocument) LIKE %:identityDocument%)))"
+            +
+            "ORDER BY r.reservationDateIn DESC")
     List<Reservation> findAllByBranchIdAndFilters(
             @Param("branchId") Long branchId,
             @Param("status") List<Integer> status,

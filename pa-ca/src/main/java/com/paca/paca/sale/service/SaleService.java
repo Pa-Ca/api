@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,26 +21,26 @@ import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.statics.SaleStatics;
+import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.utils.SaleProductMapper;
 import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
 @Service
@@ -100,7 +99,7 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + saleId + " does not exists",
-                    42); // Lista en docs
+                    42);
         }
 
         saleRepository.deleteById(saleId);
@@ -131,7 +130,6 @@ public class SaleService {
     }
 
     public SaleInfoDTO save(SaleDTO dto) throws NoContentException {
-
         Optional<Table> table = tableRepository.findById(dto.getTableId());
 
         if (table.isEmpty()) {
@@ -139,15 +137,27 @@ public class SaleService {
                     "Table with id " + dto.getTableId() + " does not exists", 49); // !
         }
 
+        // Get the payment option from the paymento option id in the dto
+        PaymentOption paymentOption;
+        if (dto.getPaymentOptionId() == null) {
+            paymentOption = null;
+        } else {
+            paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId()).orElseThrow(
+                    () -> new NoContentException(
+                            "Payment option with id " + dto.getPaymentOptionId() + " does not exists", 58));
+        }
 
-        // // Get the payment option from the paymento option id in the dto
-        // Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId());
-        Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId());
-        // // Get the reservation from the reservation id in the dto
-        Optional<Reservation> reservation = reservationRepository.findById(dto.getReservationId());
+        // Get the reservation from the reservation id in the dto
+        Reservation reservation;
+        if (dto.getReservationId() == null) {
+            reservation = null;
+        } else {
+            reservation = reservationRepository.findById(dto.getReservationId()).orElseThrow(
+                    () -> new NoContentException(
+                            "Reservation with id " + dto.getReservationId() + " does not exists", 27));
+        }
 
-
-        Sale newSale_ = saleMapper.toEntity(dto, table.get(), reservation.get(), paymentOption.get());
+        Sale newSale_ = saleMapper.toEntity(dto, table.get(), reservation, paymentOption);
 
         final Sale newSale = saleRepository.save(newSale_);
 
@@ -184,12 +194,12 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + id + " does not exists",
-                    42); // Lista en docs
+                    42);
         }
 
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " can not be canceled because it is already closed", 43); // Lista en docs
+                    "Sale with id " + id + " can not be canceled because it is already closed", 43);
         }
 
         Long tableId = sale.get().getTable().getId();
@@ -197,7 +207,7 @@ public class SaleService {
         if (table.isEmpty()) {
             throw new NoContentException(
                     "Table with id " + tableId + " does not exists",
-                    49); // Lista en docs!
+                    49);
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.cancelled).build();
@@ -212,12 +222,12 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + id + " does not exists",
-                    42); // Lista en docs
+                    42);
         }
 
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " can not be closed because it is already closed", 43); // Lista en docs
+                    "Sale with id " + id + " can not be closed because it is already closed", 43);
         }
 
         // add exception (user cannot close a canceled sale)
@@ -231,7 +241,7 @@ public class SaleService {
         Optional<Table> table = tableRepository.findById(tableId);
         if (table.isEmpty()) {
             throw new NoContentException(
-                    "Table with id " + tableId + " does not exists", 49); // Lista en docs!
+                    "Table with id " + tableId + " does not exists", 49);
         }
 
         SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.closed).build();
@@ -246,24 +256,33 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + id + " does not exists",
-                    42); // Lista en docs
+                    42);
         }
 
         // Check if the sale is closed
         if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " is closed", 43); // Lista en docs
+                    "Sale with id " + id + " is closed", 43);
         }
 
         // Check if the sale is canceled
         if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " is canceled", 48); // Lista en docs
+                    "Sale with id " + id + " is canceled", 48);
         }
+
         // Get the payment option from the paymento option id in the dto
-        Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId());
+        PaymentOption paymentOption;
+        if (dto.getPaymentOptionId() == null) {
+            paymentOption = null;
+        } else {
+            paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId()).orElseThrow(
+                    () -> new NoContentException(
+                            "Payment option with id " + dto.getPaymentOptionId() + " does not exists", 58));
+        }
+
         // Update the sale
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), paymentOption.get());
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), paymentOption);
         updatedSale = saleRepository.save(updatedSale);
         SaleDTO updatedSaleDTO = saleMapper.toDTO(updatedSale);
 
@@ -288,7 +307,7 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + saleId + " does not exists",
-                    42); // Lista en docs
+                    42);
         }
 
         // Check if the sale is closed
@@ -317,7 +336,7 @@ public class SaleService {
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + saleId + " does not exists",
-                    42); // Lista en docs
+                    42);
         }
 
         // Check if the sale is closed
@@ -363,28 +382,37 @@ public class SaleService {
 
         // Apply filters to the historic sales
         Set<Sale> historicSalesConcat = new HashSet<>();
-        if (fullname == null) {
-            fullname = "";
+        List<Sale> historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
+                branchId,
+                List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                startTime,
+                endTime,
+                null,
+                null,
+                identityDocument);
+        // Add the sales to the set
+        historicSalesConcat.addAll(historicSalesByWord);
+        if (fullname != null) {
+            // Separate the fullname in tokens to apply the filters dynamically
+            for (String word : fullname.toLowerCase().split(" ")) {
+                historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
+                        branchId,
+                        List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                        startTime,
+                        endTime,
+                        word,
+                        word,
+                        identityDocument);
+                historicSalesConcat.retainAll(historicSalesByWord);
+            }
         }
-        // Separate the fullname in tokens to apply the filters dynamically
-        for (String word : fullname.toLowerCase().split(" ")) {
-            List<Sale> historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
-                    branchId,
-                    List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
-                    startTime,
-                    endTime,
-                    word,
-                    word,
-                    identityDocument);
-            historicSalesConcat.retainAll(historicSalesByWord);
-        }
+        // Create list from set
         List<Sale> historicSales = new ArrayList<>(historicSalesConcat);
+        // Sort the list
+        historicSales.sort((s1, s2) -> s2.getStartTime().compareTo(s1.getStartTime()));
 
         // Create a Pageable object for the historic sales
-        Pageable paging = PageRequest.of(
-                page,
-                size,
-                Sort.by("startTime").descending());
+        Pageable paging = PageRequest.of(page, size);
         Page<Sale> historicSalesPage = new PageImpl<>(
                 historicSales,
                 paging,

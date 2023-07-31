@@ -216,11 +216,11 @@ public class BranchController {
     public ResponseEntity<BranchReservationsInfoDTO> getBranchReservationsPage(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam("status") List<Integer> status,
-            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startTime,
-            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
-            @RequestParam("fullname") String fullname,
-            @RequestParam("identitiyDocument") String identitiyDocument,
+            @RequestParam(value = "status", required = false) List<Integer> status,
+            @RequestParam(value = "startTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startTime,
+            @RequestParam(value = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
+            @RequestParam(value = "fullname", required = false) String fullname,
+            @RequestParam(value = "identityDocument", required = false) String identitiyDocument,
             @PathVariable("id") Long branchId) throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(reservationService.getBranchReservations(
                 page,
@@ -233,19 +233,20 @@ public class BranchController {
                 identitiyDocument));
     }
 
-    // Example get
-    // http://yourdomain.com/1/sales?start_time=2020-12-12&end_time=2020-12-12&page=2&size=5
+    // Example get full arguments
+    // http://yourdomain.com/1/sale?page=2&size=5&startTime=2021-05-01&endTime=2021-05-31&fullname=Juan&identitiyDocument=12345678
     @GetMapping("/{id}/sale")
     @ValidateRoles({ "business" })
     @Operation(summary = "Gets all the ongoing sales and the historic sales with its taxes and saleporducts", description = "Gets all the ongoing sales and the historic sales; the size and the page are for the historic sales")
     public ResponseEntity<BranchSalesInfoDTO> getBranchSalesPages(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startTime,
-            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
-            @RequestParam("fullname") String fullname,
-            @RequestParam("identitiyDocument") String identitiyDocument,
-            @PathVariable("id") Long branchId) throws NoContentException, UnprocessableException {
+            @RequestParam(value = "startTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startTime,
+            @RequestParam(value = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
+            @RequestParam(value = "fullname", required = false) String fullname,
+            @RequestParam(value = "identityDocument", required = false) String identitiyDocument,
+            @PathVariable(value = "id", required = false) Long branchId)
+            throws NoContentException, UnprocessableException {
         return ResponseEntity.ok(saleService.getBranchSales(
                 page,
                 size,

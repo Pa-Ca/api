@@ -17,12 +17,11 @@ import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
 import org.testcontainers.junit.jupiter.Testcontainers;

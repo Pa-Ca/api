@@ -34,7 +34,6 @@ import com.paca.paca.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -194,29 +193,42 @@ public class ReservationService {
 
         // Apply filter to the historical reservations
         Set<Reservation> historicReservationsConcat = new HashSet<>();
-        // Separate the fullname in tokens to apply the filters dynamically
-        for (String word : fullname.toLowerCase().split(" ")) {
-            List<Reservation> historicReservationsByWord = reservationRepository.findAllByBranchIdAndFilters(
-                    branchId,
-                    status,
-                    startTime,
-                    endTime,
-                    word,
-                    word,
-                    identityDocument);
-            historicReservationsConcat.retainAll(historicReservationsByWord);
+        List<Reservation> historicReservationsByWord = reservationRepository.findAllByBranchIdAndFilters(
+                branchId,
+                status,
+                startTime,
+                endTime,
+                null,
+                null,
+                identityDocument);
+        // Add the reservations to the set
+        historicReservationsConcat.addAll(historicReservationsByWord);
+        if (fullname != null) {
+            // Separate the fullname in tokens to apply the filters dynamically
+            for (String word : fullname.toLowerCase().split(" ")) {
+                historicReservationsByWord = reservationRepository.findAllByBranchIdAndFilters(
+                        branchId,
+                        status,
+                        startTime,
+                        endTime,
+                        word,
+                        word,
+                        identityDocument);
+                historicReservationsConcat.retainAll(historicReservationsByWord);
+            }
+
         }
+        // Create list from set
         List<Reservation> historicReservations = new ArrayList<>(historicReservationsConcat);
+        // Sort the list
+        historicReservations.sort((s1, s2) -> s2.getReservationDateIn().compareTo(s1.getReservationDateIn()));
 
         // Create a Pageable object for the historic reservations
-        Pageable paging = PageRequest.of(
-                page,
-                size,
-                Sort.by("reservationDateIn").descending());
+        Pageable paging = PageRequest.of(page, size);
         Page<Reservation> historicReservationsPage = new PageImpl<>(
                 historicReservations,
                 paging,
-                size);
+                historicReservations.size());
 
         // Map the results to a list of ReservationDTO objects using the
         // ReservationMapper
@@ -290,6 +302,7 @@ public class ReservationService {
                 .historicReservations(historicReservationsDTO)
                 .currentHistoricPage(page)
                 .totalHistoricPages(historicReservationsPage.getTotalPages())
+                .totalHistoricElements(historicReservations.size())
                 .build();
     }
 
