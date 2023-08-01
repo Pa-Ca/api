@@ -52,7 +52,7 @@ public class TaxController {
     @ValidateRoles({ "business" })
     @Operation(summary = "Create new tax", description = "Create a new tax")
     public ResponseEntity<TaxDTO> save(@RequestBody TaxDTO dto)
-            throws NoContentException {
+            throws NoContentException, ForbiddenException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {

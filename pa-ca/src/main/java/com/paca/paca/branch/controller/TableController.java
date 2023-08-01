@@ -74,7 +74,7 @@ public class TableController {
 
     @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
-    // @ValidateTableOwner
+    @ValidateTableOwner
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         tableService.delete(id);
