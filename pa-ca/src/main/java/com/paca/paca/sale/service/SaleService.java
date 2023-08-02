@@ -9,11 +9,8 @@ import java.util.ArrayList;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.support.PagedListHolder;
 
 import com.paca.paca.sale.model.Tax;
 import com.paca.paca.sale.model.Sale;
@@ -419,12 +416,10 @@ public class SaleService {
         // Sort the list
         historicSales.sort((s1, s2) -> s2.getStartTime().compareTo(s1.getStartTime()));
 
-        // Create a Pageable object for the historic sales
-        Pageable paging = PageRequest.of(page, size);
-        Page<Sale> historicSalesPage = new PageImpl<>(
-                historicSales,
-                paging,
-                size);
+        // Create a Pageable object for the historic sales=
+        PagedListHolder<Sale> historicSalesPage = new PagedListHolder<Sale>(historicSales);
+        historicSalesPage.setPageSize(size);
+        historicSalesPage.setPage(page);
 
         List<Sale> ongoingSales = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
                 branchId,
@@ -433,7 +428,7 @@ public class SaleService {
         List<SaleInfoDTO> notOngoingSalesInfoDTO = new ArrayList<>();
         List<SaleInfoDTO> ongoingSalesInfoDTO = new ArrayList<>();
 
-        historicSalesPage.forEach(sale -> {
+        historicSalesPage.getPageList().forEach(sale -> {
             SaleDTO saleDTO = saleMapper.toDTO(sale);
             List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
             List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
@@ -466,7 +461,7 @@ public class SaleService {
                 .ongoingSalesInfo(ongoingSalesInfoDTO)
                 .historicSalesInfo(notOngoingSalesInfoDTO)
                 .currentHistoricPage(page)
-                .totalHistoricPages(historicSalesPage.getTotalPages())
+                .totalHistoricPages(historicSalesPage.getPageCount())
                 .build();
 
         return response;
