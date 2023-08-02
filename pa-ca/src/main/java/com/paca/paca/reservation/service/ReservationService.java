@@ -33,11 +33,8 @@ import com.paca.paca.reservation.repository.ReservationRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.support.PagedListHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -233,16 +230,14 @@ public class ReservationService {
         historicReservations.sort((s1, s2) -> s2.getReservationDateIn().compareTo(s1.getReservationDateIn()));
 
         // Create a Pageable object for the historic reservations
-        Pageable paging = PageRequest.of(page, size);
-        Page<Reservation> historicReservationsPage = new PageImpl<>(
-                historicReservations,
-                paging,
-                historicReservations.size());
+        PagedListHolder<Reservation> historicReservationsPage = new PagedListHolder<Reservation>(historicReservations);
+        historicReservationsPage.setPageSize(size);
+        historicReservationsPage.setPage(page);
 
         // Map the results to a list of ReservationDTO objects using the
         // ReservationMapper
         List<ReservationDTO> historicReservationsDTO = new ArrayList<>();
-        historicReservationsPage.forEach(reservation -> {
+        historicReservationsPage.getPageList().forEach(reservation -> {
             ReservationDTO dto = reservationMapper.toDTO(reservation);
             dto.completeData(guestRepository, clientGroupRepository, clientRepository);
             historicReservationsDTO.add(dto);
@@ -310,7 +305,7 @@ public class ReservationService {
                 .pendingReservations(pendingReservationsDTO)
                 .historicReservations(historicReservationsDTO)
                 .currentHistoricPage(page)
-                .totalHistoricPages(historicReservationsPage.getTotalPages())
+                .totalHistoricPages(historicReservationsPage.getPageCount())
                 .totalHistoricElements(historicReservations.size())
                 .build();
     }
