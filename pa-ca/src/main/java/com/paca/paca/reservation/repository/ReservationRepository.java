@@ -34,18 +34,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "            SELECT g " +
             "            FROM Guest g " +
             "            WHERE g.id = r.guest.id " +
-            "            AND (:name IS NULL OR LOWER(g.name) LIKE %:name%) " +
-            "            AND (:surname IS NULL OR LOWER(g.surname) LIKE %:surname%) " +
-            "            AND (:identityDocument IS NULL OR LOWER(g.identityDocument) LIKE %:identityDocument%)) "
+            "            AND (:name IS NULL OR g.name ILIKE CONCAT('%', :name, '%')) " +
+            "            AND (:surname IS NULL OR g.surname ILIKE CONCAT('%', :surname, '%')) " +
+            "            AND (:identityDocument IS NULL OR g.identityDocument ILIKE CONCAT('%', :identityDocument, '%'))) "
             +
             "        OR EXISTS ( " +
             "            SELECT cg " +
             "            FROM ClientGroup cg " +
             "            WHERE cg.reservation.id = r.id " +
             "                AND cg.isOwner = TRUE " +
-            "                AND (:name IS NULL OR LOWER(cg.client.name) LIKE %:name%) " +
-            "                AND (:surname IS NULL OR LOWER(cg.client.surname) LIKE %:surname%) " +
-            "                AND (:identityDocument IS NULL OR LOWER(cg.client.identityDocument) LIKE %:identityDocument%)))"
+            "                AND (:name IS NULL OR cg.client.name ILIKE CONCAT('%', :name, '%')) " +
+            "                AND (:surname IS NULL OR cg.client.surname ILIKE CONCAT('%', :surname, '%')) " +
+            "                AND (:identityDocument IS NULL OR cg.client.identityDocument ILIKE CONCAT('%', :identityDocument, '%'))))"
             +
             "ORDER BY r.reservationDateIn DESC")
     List<Reservation> findAllByBranchIdAndFilters(

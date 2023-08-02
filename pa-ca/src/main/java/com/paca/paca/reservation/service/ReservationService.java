@@ -188,7 +188,8 @@ public class ReservationService {
                     ReservationStatics.Status.rejected,
                     ReservationStatics.Status.closed,
                     ReservationStatics.Status.paid,
-                    ReservationStatics.Status.returned);
+                    ReservationStatics.Status.returned,
+                    ReservationStatics.Status.retired);
         }
 
         // Apply filter to the historical reservations
@@ -205,15 +206,23 @@ public class ReservationService {
         historicReservationsConcat.addAll(historicReservationsByWord);
         if (fullname != null) {
             // Separate the fullname in tokens to apply the filters dynamically
-            for (String word : fullname.toLowerCase().split(" ")) {
+            for (String word : fullname.split(" ")) {
                 historicReservationsByWord = reservationRepository.findAllByBranchIdAndFilters(
                         branchId,
                         status,
                         startTime,
                         endTime,
                         word,
-                        word,
+                        null,
                         identityDocument);
+                historicReservationsByWord.addAll(reservationRepository.findAllByBranchIdAndFilters(
+                        branchId,
+                        status,
+                        startTime,
+                        endTime,
+                        null,
+                        word,
+                        identityDocument));
                 historicReservationsConcat.retainAll(historicReservationsByWord);
             }
 

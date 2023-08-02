@@ -394,15 +394,23 @@ public class SaleService {
         historicSalesConcat.addAll(historicSalesByWord);
         if (fullname != null) {
             // Separate the fullname in tokens to apply the filters dynamically
-            for (String word : fullname.toLowerCase().split(" ")) {
+            for (String word : fullname.split(" ")) {
                 historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
                         branchId,
                         List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
                         startTime,
                         endTime,
                         word,
-                        word,
+                        null,
                         identityDocument);
+                historicSalesByWord.addAll(saleRepository.findAllByTableBranchIdAndFilters(
+                        branchId,
+                        List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                        startTime,
+                        endTime,
+                        word,
+                        null,
+                        identityDocument));
                 historicSalesConcat.retainAll(historicSalesByWord);
             }
         }

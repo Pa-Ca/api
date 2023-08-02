@@ -31,18 +31,18 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "            FROM Reservation r, Guest g " +
             "            WHERE r.id = s.reservation.id " +
             "            AND g.id = s.reservation.guest.id " +
-            "            AND (:name IS NULL OR LOWER(g.name) LIKE %:name%) " +
-            "            AND (:surname IS NULL OR LOWER(g.surname) LIKE %:surname%) " +
-            "            AND (:identityDocument IS NULL OR LOWER(g.identityDocument) LIKE %:identityDocument%)) "
+            "            AND (:name IS NULL OR g.name ILIKE CONCAT('%', :name, '%')) " +
+            "            AND (:surname IS NULL OR g.surname ILIKE CONCAT('%', :surname, '%')) " +
+            "            AND (:identityDocument IS NULL OR g.identityDocument ILIKE CONCAT('%', :identityDocument, '%'))) "
             +
             "        OR EXISTS ( " +
             "            SELECT g " +
             "            FROM ClientGroup g " +
             "            WHERE g.reservation.id = s.reservation.id " +
             "                AND g.isOwner = TRUE " +
-            "                AND (:name IS NULL OR LOWER(g.client.name) LIKE %:name%) " +
-            "                AND (:surname IS NULL OR LOWER(g.client.surname) LIKE %:surname%) " +
-            "                AND (:identityDocument IS NULL OR LOWER(g.client.identityDocument) LIKE %:identityDocument%)))"
+            "                AND (:name IS NULL OR g.client.name ILIKE CONCAT('%', :name, '%')) " +
+            "                AND (:surname IS NULL OR g.client.surname ILIKE CONCAT('%', :surname, '%')) " +
+            "                AND (:identityDocument IS NULL OR g.client.identityDocument ILIKE CONCAT('%', :identityDocument, '%'))))"
             +
             "ORDER BY s.startTime DESC")
     List<Sale> findAllByTableBranchIdAndFilters(
