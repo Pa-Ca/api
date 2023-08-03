@@ -8,7 +8,6 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,4 +17,5 @@ public class BranchSalesInfoDTO {
     List<SaleInfoDTO> historicSalesInfo; // Historic sales are sales that have already been closed or canceled
     int currentHistoricPage;
     int totalHistoricPages;
+    int totalHistoricElements;
 }

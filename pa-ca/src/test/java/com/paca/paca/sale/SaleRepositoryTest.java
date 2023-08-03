@@ -531,7 +531,8 @@ public class SaleRepositoryTest extends PacaTest {
             if (sale.getTable().getBranch().equals(branchA) &&
                     sale.getReservation() != null &&
                     sale.getReservation().getGuest() != null &&
-                    sale.getReservation().getGuest().getName().equals(group.getClient().getName())) {
+                    sale.getReservation().getGuest().getName().toLowerCase()
+                            .contains(group.getClient().getName().toLowerCase())) {
                 salesWithReservationName.add(sale);
             }
         }
@@ -554,9 +555,11 @@ public class SaleRepositoryTest extends PacaTest {
             if (sale.getTable().getBranch().equals(branchA) &&
                     sale.getReservation() != null &&
                     sale.getReservation().getGuest() != null &&
-                    sale.getReservation().getGuest().getSurname().equals(group.getClient().getSurname())) {
+                    sale.getReservation().getGuest().getSurname().toLowerCase()
+                            .contains(group.getClient().getSurname().toLowerCase())) {
                 salesWithReservationSurname.add(sale);
             }
+
         }
 
         salesWithReservationSurnameFromRepositoryList = saleRepository
@@ -577,8 +580,8 @@ public class SaleRepositoryTest extends PacaTest {
             if (sale.getTable().getBranch().equals(branchA) &&
                     sale.getReservation() != null &&
                     sale.getReservation().getGuest() != null &&
-                    sale.getReservation().getGuest().getIdentityDocument().equals(
-                            group.getClient().getIdentityDocument())) {
+                    sale.getReservation().getGuest().getIdentityDocument().toLowerCase().contains(
+                            group.getClient().getIdentityDocument().toLowerCase())) {
                 salesWithReservationIdentityDocument.add(sale);
             }
         }

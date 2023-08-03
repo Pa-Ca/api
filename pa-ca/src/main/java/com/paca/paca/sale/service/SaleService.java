@@ -462,6 +462,7 @@ public class SaleService {
                 .historicSalesInfo(notOngoingSalesInfoDTO)
                 .currentHistoricPage(page)
                 .totalHistoricPages(historicSalesPage.getPageCount())
+                .totalHistoricElements(historicSales.size())
                 .build();
 
         return response;
