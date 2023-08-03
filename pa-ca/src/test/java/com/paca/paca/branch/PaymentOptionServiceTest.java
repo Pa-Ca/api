@@ -70,6 +70,18 @@ public class PaymentOptionServiceTest {
         assertThat(response).isNotNull();
     }
 
+    @Test
+    void shouldGetNoContentExceptionDueToBranchNotExistingInSave(){
+        PaymentOptionDTO  paymentOptionDTO = utils.createPaymentOptionDTO(null);
+        Long branchId = paymentOptionDTO.getBranchId();
+        when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());  
+        try {
+            paymentOptionService.save(paymentOptionDTO);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).isEqualTo("Branch with id " + branchId + " does not exists");
+        }
+    }
+
 
     @Test
     void shouldUpdate(){
@@ -87,6 +99,32 @@ public class PaymentOptionServiceTest {
 
         assertThat(response).isNotNull();
     }
+
+    @Test
+    void shouldGetNoContentExceptionDueToBranchNotExistingInUpdate(){
+        PaymentOptionDTO  paymentOptionDTO = utils.createPaymentOptionDTO(null);
+        Long branchId = paymentOptionDTO.getBranchId();
+        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.of(new PaymentOption()));
+        when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());  
+        try {
+            paymentOptionService.update(1L ,paymentOptionDTO);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).isEqualTo("Branch with id " + branchId + " does not exists");
+        }
+    }
+
+    // @Test
+    // void shouldGetNoContentExceptionDueToPaymentOptionNotExistingInUpdate(){
+    //     PaymentOptionDTO  paymentOptionDTO = utils.createPaymentOptionDTO(null);
+    //     Long paymentOptionId = paymentOptionDTO.getId();
+    //     when(branchRepository.findById(anyLong())).thenReturn(Optional.of(new Branch()));  
+    //     when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());  
+    //     try {
+    //         paymentOptionService.update(1L ,paymentOptionDTO);
+    //     } catch (Exception e) {
+    //         assertThat(e.getMessage()).isEqualTo("Payment option with id " + paymentOption + " does not exists");
+    //     }
+    // }
 
     @Test
     void shouldDelete(){

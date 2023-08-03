@@ -53,7 +53,7 @@ public class PaymentOptionService {
         if (paymentOption.isEmpty()) {
                     throw new NoContentException(
                             "Payment option with id " + id + " does not exists",
-                            505);// TODO: Change the code
+                            58);// TODO: Change the code
                 }
         
         // Check if the branch exists (This may be redundant)
@@ -82,8 +82,8 @@ public class PaymentOptionService {
         Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(paymentOptionId);
         if (paymentOption.isEmpty()) {
                     throw new NoContentException(
-                            "Payment option with id " + paymentOption + " does not exists",
-                            505); // TODO Change the code
+                            "Payment option with id " + paymentOptionId + " does not exists",
+                            58); // Lista en docs
                 }
         // Delete the payment option
         
