@@ -109,13 +109,13 @@ public class SaleControllerTest extends ControllerTest {
     }
 
     @Test
-    void shouldGetForbiddenDueToBusinessNotOwnerOfSaleInSave() throws Exception{
+    void shouldGetForbiddenDueToBusinessNotOwnerOfTableInSave() throws Exception{
 
         SaleDTO dto = utils.createSaleDTO(null, null);
 
         Business business = utils.createBusiness(null);
 
-        when(saleRepository.existsByIdAndTable_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+        when(tableRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(false);
         when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
 
         utils.setAuthorities("business");
