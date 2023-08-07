@@ -2,6 +2,12 @@
 
 Rest API para la gestión de operaciones de Pa'Ca
 
+
+## Requisitos.
+1. Java 17 : [Enlace a la pagina de Oracle](https://www.oracle.com/java/technologies/downloads/#java17)
+2. Maven: Se puede instalar (En dsitribuciones basadas en debian) usando el comando: `sudo apt install maven`
+3. Docker
+
 ## **Run**
 
 Correr toda la API usando docker-compose

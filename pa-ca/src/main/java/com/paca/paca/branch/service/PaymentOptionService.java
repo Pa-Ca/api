@@ -53,7 +53,7 @@ public class PaymentOptionService {
         if (paymentOption.isEmpty()) {
                     throw new NoContentException(
                             "Payment option with id " + id + " does not exists",
-                            58);// TODO: Change the code
+                            58);
                 }
         
         // Check if the branch exists (This may be redundant)
