@@ -1,7 +1,7 @@
 package com.paca.paca.user.repository;
 
-import com.paca.paca.statics.UserRole;
 import com.paca.paca.user.model.Role;
+import com.paca.paca.statics.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
