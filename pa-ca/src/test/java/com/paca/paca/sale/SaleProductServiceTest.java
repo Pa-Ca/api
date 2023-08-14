@@ -192,6 +192,7 @@ public class SaleProductServiceTest {
         saleProductService.delete(1L);
 
         verify(saleProductRepository, times(1)).deleteById(1L);
+        
 
     }
 
