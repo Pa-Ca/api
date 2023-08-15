@@ -1,11 +1,12 @@
 package com.paca.paca.user.model;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Collection;
 
 import com.paca.paca.statics.AuthProvider;
-import com.paca.paca.user.statics.UserStatics;
+
 import lombok.*;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,12 +41,6 @@ public class User implements UserDetails {
     @Column(name = "verified", nullable = false)
     private Boolean verified;
 
-    @Column(name = "logged_in", nullable = false)
-    private Boolean loggedIn;
-
-    @Column(name = "registration_status", nullable = false)
-    private Short registrationStatus;
-
     @Column(name = "provider", nullable = false)
     private String provider;
 
@@ -56,10 +51,8 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.verified = false;
-        this.loggedIn = false;
         this.role = role;
         this.provider = AuthProvider.paca.name();
-        this.registrationStatus = UserStatics.RegistrationStatus.UNREGISTERED;
     }
 
     public User(Long id, String email, String password, Role role) {
@@ -67,10 +60,8 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.verified = false;
-        this.loggedIn = false;
         this.role = role;
         this.provider = AuthProvider.paca.name();
-        this.registrationStatus = UserStatics.RegistrationStatus.UNREGISTERED;
     }
 
     public User(Long id, String email, String password, Role role, String provider, String providerId) {
@@ -78,11 +69,9 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.verified = false;
-        this.loggedIn = false;
         this.role = role;
         this.provider = provider;
         this.providerId = providerId;
-        this.registrationStatus = UserStatics.RegistrationStatus.UNREGISTERED;
     }
 
     @Override

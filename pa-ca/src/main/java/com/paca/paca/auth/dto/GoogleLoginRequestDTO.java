@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GoogleLoginRequestDTO {
-    private String token;
+
     public String role;
+    private String token;
 }

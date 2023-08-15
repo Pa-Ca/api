@@ -1,10 +1,10 @@
 package com.paca.paca.auth.service;
 
 import com.paca.paca.auth.dto.*;
-import com.paca.paca.exception.exceptions.*;
-import com.paca.paca.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import com.paca.paca.auth.utils.AuthUtils;
+import com.paca.paca.exception.exceptions.*;
+import com.paca.paca.mail.service.MailService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -57,11 +57,10 @@ public class AuthenticationService {
 
         // Create and save new User
         User user = User.builder()
+                .role(role.get())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(role.get())
                 .verified(false)
-                .loggedIn(false)
                 .build();
         user = userRepository.save(user);
 
