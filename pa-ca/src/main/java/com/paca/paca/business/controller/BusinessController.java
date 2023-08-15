@@ -2,7 +2,6 @@ package com.paca.paca.business.controller;
 
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
-import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.statics.BusinessStatics;
 import com.paca.paca.business.service.BusinessService;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -28,13 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class BusinessController {
 
     private final BusinessService businessService;
-
-    @ValidateRoles({})
-    @GetMapping(BusinessStatics.Endpoint.GET_ALL)
-    @Operation(summary = "Get all business", description = "Returns a list with all business")
-    public ResponseEntity<BusinessListDTO> getAll() {
-        return ResponseEntity.ok(businessService.getAll());
-    }
 
     @GetMapping(BusinessStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get business by ID", description = "Gets the data of a business given its ID")

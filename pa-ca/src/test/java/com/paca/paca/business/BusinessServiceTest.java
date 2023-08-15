@@ -5,17 +5,16 @@ import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.branch.utils.TaxMapper;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
 import com.paca.paca.business.utils.BusinessMapper;
-import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.business.service.BusinessService;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -40,14 +39,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class BusinessServiceTest {
-    @Mock
-    private DefaultTaxRepository defaultTaxRepository;
 
     @Mock
-    private BusinessRepository businessRepository;
+    private TaxMapper defaultTaxMapper;
 
     @Mock
-    private BranchRepository branchRepository;
+    private BusinessMapper businessMapper;
 
     @Mock
     private UserRepository userRepository;
@@ -56,25 +53,18 @@ class BusinessServiceTest {
     private TierRepository tierRepository;
 
     @Mock
-    private BusinessMapper businessMapper;
+    private BranchRepository branchRepository;
 
     @Mock
-    private DefaultTaxMapper defaultTaxMapper;
+    private BusinessRepository businessRepository;
+
+    @Mock
+    private DefaultTaxRepository defaultTaxRepository;
 
     @InjectMocks
     private BusinessService businessService;
 
     private TestUtils utils = TestUtils.builder().build();
-
-    @Test
-    void shouldGetAllBusiness() {
-        List<Business> business = TestUtils.castList(Business.class, Mockito.mock(List.class));
-
-        when(businessRepository.findAll()).thenReturn(business);
-        BusinessListDTO responseDTO = businessService.getAll();
-
-        assertThat(responseDTO).isNotNull();
-    }
 
     @Test
     void shouldGetNoContentDueToMissingBusinessInGetBusinessById() {
@@ -100,9 +90,7 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.getById(business.getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -155,10 +143,7 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.save(dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
-        assertThat(dtoResponse.getTier()).isEqualTo(business.getTier().getName().name());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -193,10 +178,7 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.update(business.getId(), dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
-        assertThat(dtoResponse.getTier()).isEqualTo(business.getTier().getName().name());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -241,9 +223,7 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.getByUserId(business.getUser().getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test

@@ -10,33 +10,34 @@ import lombok.AllArgsConstructor;
 
 import jakarta.persistence.*;
 
-@Builder
-@Setter
 @Getter
+@Setter
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "`business`")
 public class Business {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "business_seq")
     @SequenceGenerator(name = "business_seq", sequenceName = "business_seq", allocationSize = 1)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "name")
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "tier_id", nullable = false)
+    private Tier tier;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "verified")
+    @Column(name = "verified", nullable = false)
     private Boolean verified;
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "tier_id")
-    private Tier tier;
 
     @Column(name = "phone_number")
     private String phoneNumber;
