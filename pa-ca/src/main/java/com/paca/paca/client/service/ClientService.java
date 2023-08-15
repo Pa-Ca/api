@@ -30,7 +30,6 @@ import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 
 import java.util.List;
-import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
 
@@ -42,9 +41,9 @@ public class ClientService {
 
     private final FriendMapper friendMapper;
 
-    private final ReservationMapper reservationMapper;
-
     private final BranchMapper branchMapper;
+
+    private final ReservationMapper reservationMapper;
 
     private final UserRepository userRepository;
 
@@ -52,21 +51,11 @@ public class ClientService {
 
     private final FriendRepository friendRepository;
 
+    private final BranchRepository branchRepository;
+
     private final ClientGroupRepository clientGroupRepository;
 
-    private final BranchRepository branchRepository;
-    
     private final FavoriteBranchRepository favoriteBranchRepository;
-    
-    public ClientListDTO getAll() {
-        List<ClientDTO> response = new ArrayList<>();
-        clientRepository.findAll().forEach(client -> {
-            ClientDTO dto = clientMapper.toDTO(client);
-            response.add(dto);
-        });
-
-        return ClientListDTO.builder().clients(response).build();
-    }
 
     public ClientDTO getById(Long id) throws NoContentException {
         Client client = clientRepository.findById(id)
@@ -317,25 +306,6 @@ public class ClientService {
         return ReservationListDTO.builder().reservations(response).build();
     }
 
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
-            throws NoContentException {
-        Optional<Client> client = clientRepository.findById(id);
-        if (client.isEmpty()) {
-            throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
-                    28);
-        }
-
-        List<ReservationDTO> response = new ArrayList<>();
-        clientGroupRepository.findAllByClientIdAndReservationReservationDateInGreaterThanEqual(id, reservationDateIn)
-                .forEach(group -> {
-                    ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
-                    response.add(dto);
-                });
-
-        return ReservationListDTO.builder().reservations(response).build();
-    }
-
     public BranchListDTO getFavoriteBranches(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
@@ -405,7 +375,8 @@ public class ClientService {
         if (!favExists) {
             throw new ConflictException("Favorite branch does not exists", 33);
         }
-        
+
         FavoriteBranch fav = favoriteBranchRepository.findByClientIdAndBranchId(id, branchId).get();
         favoriteBranchRepository.deleteById(fav.getId());
-    }}
+    }
+}

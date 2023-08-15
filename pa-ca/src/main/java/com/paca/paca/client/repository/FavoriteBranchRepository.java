@@ -12,10 +12,8 @@ import java.util.Optional;
 public interface FavoriteBranchRepository extends JpaRepository<FavoriteBranch, Long> {
 
     Boolean existsByClientIdAndBranchId(Long clientId, Long branchId);
-    
+
     Optional<FavoriteBranch> findByClientIdAndBranchId(Long clientId, Long branchId);
 
     List<FavoriteBranch> findAllByClientId(Long clientId);
-
-    List<FavoriteBranch> findAllByBranchId(Long branchId);
 }

@@ -14,19 +14,15 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 
     Boolean existsByRequesterIdAndAddresserId(Long requesterId, Long addresserId);
 
-    // Solicitudes aceptadas
+    // Accepted requests
     List<Friend> findAllByRequesterIdAndAcceptedTrue(Long userId);
 
     List<Friend> findAllByAddresserIdAndAcceptedTrue(Long userId);
 
-    // Solicitudes rechazadas
-    List<Friend> findAllByRequesterIdAndRejectedTrue(Long userId);
-
+    // Rejected requests
     List<Friend> findAllByAddresserIdAndRejectedTrue(Long userId);
 
-    // Solicitudes pendientes
-    List<Friend> findAllByRequesterIdAndAcceptedFalseAndRejectedFalse(Long userId);
-
+    // Pending requests
     List<Friend> findAllByAddresserIdAndAcceptedFalseAndRejectedFalse(Long userId);
 
 }

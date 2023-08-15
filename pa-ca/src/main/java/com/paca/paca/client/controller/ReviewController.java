@@ -1,7 +1,6 @@
 package com.paca.paca.client.controller;
 
 import com.paca.paca.client.dto.ReviewDTO;
-import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.client.service.ReviewService;
 import com.paca.paca.client.statics.ReviewStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -29,14 +28,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @GetMapping
-    @ValidateRoles({})
-    @Operation(summary = "Get all reviews", description = "Returns a list with all reviews")
-    public ResponseEntity<ReviewListDTO> getAll() {
-        return ResponseEntity.ok(reviewService.getAll());
-    }
-
-    @PostMapping
+    @PostMapping(ReviewStatics.Endpoint.SAVE)
     @ValidateRoles({ "client" })
     @Operation(summary = "Create new review", description = "Create a new review in the app")
     public ResponseEntity<ReviewDTO> save(@RequestBody ReviewDTO dto)
@@ -44,15 +36,16 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.save(dto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(ReviewStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get review by ID", description = "Gets the data of a review given its ID")
     public ResponseEntity<ReviewDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(reviewService.getById(id));
     }
 
-    @PutMapping("/{id}")
     @ValidateReviewOwner
     @ValidateRoles({ "client" })
+    @PutMapping(ReviewStatics.Endpoint.UPDATE)
+    @Operation(summary = "Update review", description = "Updates the data of a review given its ID")
     public ResponseEntity<ReviewDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReviewDTO dto)
@@ -61,8 +54,8 @@ public class ReviewController {
     }
 
     @ValidateReviewOwner
-    @DeleteMapping("/{id}")
     @ValidateRoles({ "client" })
+    @DeleteMapping(ReviewStatics.Endpoint.DELETE)
     @Operation(summary = "Update review", description = "Updates the data of a review given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         reviewService.delete(id);
@@ -70,7 +63,7 @@ public class ReviewController {
 
     @ValidateRoles({ "client" })
     @ValidateClient(idField = "clientId")
-    @PutMapping("/{id}/client/{clientId}")
+    @PutMapping(ReviewStatics.Endpoint.LIKE)
     @Operation(summary = "Mark a review as a customer favorite", description = "Mark a review as a customer's favorite given their IDs")
     public ResponseEntity<ReviewDTO> like(
             @PathVariable("id") Long id,
@@ -80,7 +73,7 @@ public class ReviewController {
 
     @ValidateRoles({ "client" })
     @ValidateClient(idField = "clientId")
-    @DeleteMapping("/{id}/client/{clientId}")
+    @DeleteMapping(ReviewStatics.Endpoint.DISLIKE)
     @Operation(summary = "Unmark a review as a customer favorite", description = "Unmark a review as a customer's favorite given their IDs")
     public ResponseEntity<ReviewDTO> dislike(
             @PathVariable("id") Long id,
