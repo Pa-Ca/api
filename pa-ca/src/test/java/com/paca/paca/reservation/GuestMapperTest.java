@@ -14,8 +14,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
 public class GuestMapperTest {
+
     @InjectMocks
     private GuestMapperImpl guestMapper;
+
     private TestUtils utils = TestUtils.builder().build();
 
     @Test
@@ -23,26 +25,31 @@ public class GuestMapperTest {
         Guest guest = utils.createGuest();
 
         GuestDTO response = guestMapper.toDTO(guest);
+        GuestDTO expected = new GuestDTO(
+                guest.getId(),
+                guest.getName(),
+                guest.getSurname(),
+                guest.getEmail(),
+                guest.getPhoneNumber(),
+                guest.getIdentityDocument());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(guest.getId());
-        assertThat(response.getName()).isEqualTo(guest.getName());
-        assertThat(response.getSurname()).isEqualTo(guest.getSurname());
-        assertThat(response.getEmail()).isEqualTo(guest.getEmail());
-        assertThat(response.getPhoneNumber()).isEqualTo(guest.getPhoneNumber());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
     void shouldMapGuestDTOtoGuestEntity() {
         GuestDTO dto = utils.createGuestDTO(utils.createGuest());
-        Guest entity = guestMapper.toEntity(dto);
 
-        assertThat(entity).isNotNull();
-        assertThat(entity.getId()).isEqualTo(dto.getId());
-        assertThat(entity.getName()).isEqualTo(dto.getName());
-        assertThat(entity.getSurname()).isEqualTo(dto.getSurname());
-        assertThat(entity.getEmail()).isEqualTo(dto.getEmail());
-        assertThat(entity.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
+        Guest entity = guestMapper.toEntity(dto);
+        Guest expected = new Guest(
+                dto.getId(),
+                dto.getName(),
+                dto.getSurname(),
+                dto.getEmail(),
+                dto.getPhoneNumber(),
+                dto.getIdentityDocument());
+
+        assertThat(entity).isEqualTo(expected);
     }
 
     @Test
@@ -88,5 +95,13 @@ public class GuestMapperTest {
         updatedGuest = guestMapper.updateModel(dto, guest);
         assertThat(updatedGuest).isNotNull();
         assertThat(updatedGuest.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
+
+        // Not changing identity document
+        dto = GuestDTO.builder()
+                .identityDocument(guest.getIdentityDocument() + "_test")
+                .build();
+        updatedGuest = guestMapper.updateModel(dto, guest);
+        assertThat(updatedGuest).isNotNull();
+        assertThat(updatedGuest.getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
     }
 }

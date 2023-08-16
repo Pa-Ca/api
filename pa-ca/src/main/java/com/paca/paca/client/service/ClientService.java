@@ -17,15 +17,19 @@ import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.client.utils.FriendMapper;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.client.model.FavoriteBranch;
+import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.reservation.dto.ReservationDTO;
+import com.paca.paca.reservation.utils.InvoiceMapper;
+import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
-import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.reservation.utils.ReservationMapper;
+import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 
@@ -41,17 +45,25 @@ public class ClientService {
 
     private final FriendMapper friendMapper;
 
+    private final GuestMapper guestMapper;
+
     private final BranchMapper branchMapper;
+
+    private final InvoiceMapper invoiceMapper;
 
     private final ReservationMapper reservationMapper;
 
     private final UserRepository userRepository;
+
+    private final GuestRepository guestRepository;
 
     private final ClientRepository clientRepository;
 
     private final FriendRepository friendRepository;
 
     private final BranchRepository branchRepository;
+
+    private final InvoiceRepository invoiceRepository;
 
     private final ClientGroupRepository clientGroupRepository;
 
@@ -289,7 +301,7 @@ public class ClientService {
         friendRepository.deleteById(request.get().getId());
     }
 
-    public ReservationListDTO getReservations(Long id) throws NoContentException {
+    public ReservationInfoListDTO getReservations(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
@@ -297,13 +309,21 @@ public class ClientService {
                     28);
         }
 
-        List<ReservationDTO> response = new ArrayList<>();
+        List<ReservationInfoDTO> response = new ArrayList<>();
         clientGroupRepository.findAllByClientId(id).forEach(group -> {
-            ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
-            response.add(dto);
+            response.add(new ReservationInfoDTO(
+                    group.getReservation(),
+                    guestRepository,
+                    clientRepository,
+                    invoiceRepository,
+                    clientGroupRepository,
+                    guestMapper,
+                    clientMapper,
+                    invoiceMapper,
+                    reservationMapper));
         });
 
-        return ReservationListDTO.builder().reservations(response).build();
+        return ReservationInfoListDTO.builder().reservations(response).build();
     }
 
     public BranchListDTO getFavoriteBranches(Long id) throws NoContentException {

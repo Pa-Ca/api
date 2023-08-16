@@ -10,7 +10,7 @@ import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.statics.ClientStatics;
-import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
@@ -136,7 +136,8 @@ public class ClientController {
     @ValidateRoles({ "client" })
     @GetMapping(ClientStatics.Endpoint.RESERVATIONS)
     @Operation(summary = "Gets all client reservations", description = "Obtains the data of all the reservations of the client given his ID")
-    public ResponseEntity<ReservationListDTO> getReservations(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ReservationInfoListDTO> getReservations(@PathVariable("id") Long id)
+            throws NoContentException {
         return ResponseEntity.ok(clientService.getReservations(id));
     }
 

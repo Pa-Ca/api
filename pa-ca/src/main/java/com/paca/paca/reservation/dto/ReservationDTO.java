@@ -1,15 +1,6 @@
 package com.paca.paca.reservation.dto;
 
 import java.util.Date;
-import java.util.List;
-
-import com.paca.paca.client.model.Client;
-import com.paca.paca.reservation.model.Guest;
-import com.paca.paca.reservation.model.ClientGroup;
-import com.paca.paca.client.repository.ClientRepository;
-import com.paca.paca.reservation.repository.GuestRepository;
-import com.paca.paca.reservation.repository.ClientGroupRepository;
-
 import java.math.BigDecimal;
 
 import lombok.Getter;
@@ -28,57 +19,14 @@ public class ReservationDTO {
     private Long id;
     private Long branchId;
     private Long guestId;
+    private Long invoiceId;
     private Date requestDate;
     private Date reservationDateIn;
     private Date reservationDateOut;
-    private Integer clientNumber;
-    private Integer tableNumber;
-    private String payment;
-    private Integer status;
-    private Date payDate;
     private BigDecimal price;
+    private Short status;
+    private Short tableNumber;
+    private Short clientNumber;
     private String occasion;
     private Boolean byClient;
-    private Boolean haveGuest;
-    private String name;
-    private String surname;
-    private String email;
-    private String phoneNumber;
-    private String identityDocument;
-
-    public void completeData(
-            GuestRepository guestRepository,
-            ClientGroupRepository clientGroupRepository,
-            ClientRepository clientRepository) {
-        if (guestRepository == null || clientGroupRepository == null || clientRepository == null) {
-            return;
-        }
-
-        if (this.guestId != null) {
-            // Complete the reservation data with those that appear in the
-            // associated guest
-            Guest guest = guestRepository.findById(this.guestId).get();
-            this.name = guest.getName();
-            this.surname = guest.getSurname();
-            this.email = guest.getEmail();
-            this.phoneNumber = guest.getPhoneNumber();
-            this.identityDocument = guest.getIdentityDocument();
-            this.haveGuest = Boolean.TRUE;
-        } else {
-            // We complete the reservation data with the data of the client who
-            // made the reservation
-            List<ClientGroup> clientGroups = clientGroupRepository.findAllByReservationId(this.id);
-            ClientGroup owner = clientGroups.stream()
-                    .filter(clientGroup -> clientGroup.getIsOwner())
-                    .findFirst()
-                    .get();
-            Client client = clientRepository.findById(owner.getClient().getId()).get();
-
-            this.name = client.getName();
-            this.surname = client.getSurname();
-            this.email = client.getUser().getEmail();
-            this.phoneNumber = client.getPhoneNumber();
-            this.haveGuest = Boolean.FALSE;
-        }
-    }
 }

@@ -2,7 +2,6 @@ package com.paca.paca.reservation.repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,10 +12,6 @@ import com.paca.paca.reservation.model.Reservation;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-
-    Optional<Reservation> findById(Long id);
-
-    List<Reservation> findAllByBranchId(Long id);
 
     @Query("SELECT r " +
             "FROM Reservation r " +
@@ -44,13 +39,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "            WHERE cg.reservation.id = r.id " +
             "                AND cg.isOwner = TRUE " +
             "                AND (:name IS NULL OR cg.client.name ILIKE CONCAT('%', :name, '%')) " +
-            "                AND (:surname IS NULL OR cg.client.surname ILIKE CONCAT('%', :surname, '%')) " +
+            "                AND (:surname IS NULL OR cg.client.surname ILIKE CONCAT('%', :surname, '%')) "
+            +
             "                AND (:identityDocument IS NULL OR cg.client.identityDocument ILIKE CONCAT('%', :identityDocument, '%'))))"
             +
             "ORDER BY r.reservationDateIn DESC")
     List<Reservation> findAllByBranchIdAndFilters(
             @Param("branchId") Long branchId,
-            @Param("status") List<Integer> status,
+            @Param("status") List<Short> status,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
             @Param("name") String name,
@@ -58,8 +54,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("identityDocument") String identityDocument);
 
     Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
-
-    Boolean existsByIdAndBranchId(Long id, Long businessId);
 
     Boolean existsByBranchBusinessIdAndGuestId(Long businessId, Long guestId);
 }

@@ -1,5 +1,8 @@
 package com.paca.paca.reservation.dto;
 
+import java.util.Date;
+import java.math.BigDecimal;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
@@ -11,12 +14,11 @@ import lombok.AllArgsConstructor;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GuestDTO {
+public class InvoiceDTO {
 
     private Long id;
-    private String name;
-    private String surname;
-    private String email;
-    private String phoneNumber;
-    private String identityDocument;
+    private Date payDate;
+    private BigDecimal price;
+    private String payment;
+    private String paymentCode;
 }

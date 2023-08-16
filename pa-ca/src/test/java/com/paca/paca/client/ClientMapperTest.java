@@ -1,7 +1,5 @@
 package com.paca.paca.client;
 
-import org.mockito.InjectMocks;
-import org.junit.jupiter.api.Test;
 import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.client.model.Client;
@@ -14,6 +12,8 @@ import com.paca.paca.client.utils.ClientMapperImpl;
 import com.paca.paca.client.utils.FriendMapperImpl;
 import com.paca.paca.client.utils.ReviewMapperImpl;
 
+import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -40,17 +40,19 @@ public class ClientMapperTest {
         Client client = utils.createClient(null);
 
         ClientDTO response = clientMapper.toDTO(client);
+        ClientDTO expected = new ClientDTO(
+                client.getId(),
+                client.getUser().getId(),
+                client.getUser().getEmail(),
+                client.getName(),
+                client.getSurname(),
+                client.getStripeCustomerId(),
+                client.getPhoneNumber(),
+                client.getAddress(),
+                client.getDateOfBirth(),
+                client.getIdentityDocument());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(client.getId());
-        assertThat(response.getUserId()).isEqualTo(client.getUser().getId());
-        assertThat(response.getName()).isEqualTo(client.getName());
-        assertThat(response.getSurname()).isEqualTo(client.getSurname());
-        assertThat(response.getStripeCustomerId()).isEqualTo(client.getStripeCustomerId());
-        assertThat(response.getPhoneNumber()).isEqualTo(client.getPhoneNumber());
-        assertThat(response.getAddress()).isEqualTo(client.getAddress());
-        assertThat(response.getDateOfBirth()).isEqualTo(client.getDateOfBirth());
-        assertThat(response.getIdentityDocument()).isEqualTo(client.getIdentityDocument());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -59,18 +61,18 @@ public class ClientMapperTest {
         ClientDTO dto = utils.createClientDTO(utils.createClient(user));
 
         Client client = clientMapper.toEntity(dto, user);
+        Client expected = new Client(
+                dto.getId(),
+                user,
+                dto.getName(),
+                dto.getSurname(),
+                dto.getIdentityDocument(),
+                dto.getAddress(),
+                dto.getPhoneNumber(),
+                dto.getStripeCustomerId(),
+                dto.getDateOfBirth());
 
-        assertThat(client).isNotNull();
-        assertThat(client.getId()).isEqualTo(dto.getId());
-        assertThat(client.getUser().getId()).isEqualTo(user.getId());
-        assertThat(client.getName()).isEqualTo(dto.getName());
-        assertThat(client.getSurname()).isEqualTo(dto.getSurname());
-        assertThat(client.getStripeCustomerId()).isEqualTo(dto.getStripeCustomerId());
-        assertThat(client.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
-        assertThat(client.getAddress()).isEqualTo(dto.getAddress());
-        assertThat(client.getDateOfBirth()).isEqualTo(dto.getDateOfBirth());
-        assertThat(client.getIdentityDocument()).isEqualTo(dto.getIdentityDocument());
-        assertThat(client.getStripeCustomerId()).isEqualTo(dto.getStripeCustomerId());
+        assertThat(client).isEqualTo(expected);
     }
 
     @Test
@@ -155,13 +157,14 @@ public class ClientMapperTest {
         Friend friend = utils.createFriendRequest(null, null, false, false);
 
         FriendDTO response = friendMapper.toDTO(friend);
+        FriendDTO expected = new FriendDTO(
+                friend.getId(),
+                friend.getRequester().getId(),
+                friend.getAddresser().getId(),
+                friend.getAccepted(),
+                friend.getRejected());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(friend.getId());
-        assertThat(response.getRequesterId()).isEqualTo(friend.getRequester().getId());
-        assertThat(response.getAddresserId()).isEqualTo(friend.getAddresser().getId());
-        assertThat(response.getAccepted()).isEqualTo(false);
-        assertThat(response.getRejected()).isEqualTo(false);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -170,13 +173,14 @@ public class ClientMapperTest {
         FriendDTO dto = utils.createFriendRequestDTO(request);
 
         Friend requestMapped = friendMapper.toEntity(dto, request.getRequester(), request.getAddresser());
+        Friend expected = new Friend(
+                dto.getId(),
+                request.getRequester(),
+                request.getAddresser(),
+                dto.getAccepted(),
+                dto.getRejected());
 
-        assertThat(requestMapped).isNotNull();
-        assertThat(requestMapped.getId()).isEqualTo(dto.getId());
-        assertThat(requestMapped.getRequester().getId()).isEqualTo(request.getRequester().getId());
-        assertThat(requestMapped.getAddresser().getId()).isEqualTo(request.getAddresser().getId());
-        assertThat(requestMapped.getAccepted()).isEqualTo(dto.getAccepted());
-        assertThat(requestMapped.getRejected()).isEqualTo(dto.getRejected());
+        assertThat(requestMapped).isEqualTo(expected);
     }
 
     @Test
@@ -229,13 +233,15 @@ public class ClientMapperTest {
         Review review = utils.createReview(null, null);
 
         ReviewDTO response = reviewMapper.toDTO(review);
+        ReviewDTO expected = new ReviewDTO(
+                review.getId(),
+                review.getClient().getId(),
+                review.getBranch().getId(),
+                review.getText(),
+                review.getDate(),
+                null);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(review.getId());
-        assertThat(response.getClientId()).isEqualTo(review.getClient().getId());
-        assertThat(response.getBranchId()).isEqualTo(review.getBranch().getId());
-        assertThat(response.getText()).isEqualTo(review.getText());
-        assertThat(response.getDate()).isEqualTo(review.getDate());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -244,13 +250,14 @@ public class ClientMapperTest {
         ReviewDTO dto = utils.createReviewDTO(request);
 
         Review requestMapped = reviewMapper.toEntity(dto, request.getClient(), request.getBranch());
+        Review expected = new Review(
+                dto.getId(),
+                request.getClient(),
+                request.getBranch(),
+                dto.getText(),
+                dto.getDate());
 
-        assertThat(requestMapped).isNotNull();
-        assertThat(requestMapped.getId()).isEqualTo(dto.getId());
-        assertThat(requestMapped.getClient().getId()).isEqualTo(request.getClient().getId());
-        assertThat(requestMapped.getBranch().getId()).isEqualTo(request.getBranch().getId());
-        assertThat(requestMapped.getText()).isEqualTo(dto.getText());
-        assertThat(requestMapped.getDate()).isEqualTo(dto.getDate());
+        assertThat(requestMapped).isEqualTo(expected);
     }
 
     @Test
@@ -297,4 +304,5 @@ public class ClientMapperTest {
         assertThat(updateReview).isNotNull();
         assertThat(updateReview.getDate()).isEqualTo(dto.getDate());
     }
+
 }

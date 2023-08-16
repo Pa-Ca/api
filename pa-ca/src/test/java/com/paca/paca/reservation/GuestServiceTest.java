@@ -2,27 +2,24 @@ package com.paca.paca.reservation;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.reservation.model.Guest;
-import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.dto.GuestDTO;
-import com.paca.paca.reservation.dto.GuestListDTO;
+import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.reservation.repository.GuestRepository;
-import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.reservation.repository.ReservationRepository;
 
 import junit.framework.TestCase;
 
 import org.junit.Assert;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -45,16 +42,6 @@ public class GuestServiceTest {
     private GuestService guestService;
 
     private TestUtils utils = TestUtils.builder().build();
-
-    @Test
-    void shouldGetAllGuest() {
-        List<Guest> guests = TestUtils.castList(Guest.class, Mockito.mock(List.class));
-
-        when(guestRepository.findAll()).thenReturn(guests);
-        GuestListDTO responseDTO = guestService.getAll();
-
-        assertThat(responseDTO).isNotNull();
-    }
 
     @Test
     void shouldGetNoContentDueToMissingGuestInGetGuestById() {
@@ -80,8 +67,7 @@ public class GuestServiceTest {
 
         GuestDTO dtoResponse = guestService.getById(guest.getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(guest.getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -102,14 +88,16 @@ public class GuestServiceTest {
     void shouldGetForbiddenDueToMissingReservationWithBusinessInGetGuestByIdentityDocument() {
         Guest guest = utils.createGuest();
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
-        when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class),any(Long.class))).thenReturn(false);
+        when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class), any(Long.class)))
+                .thenReturn(false);
 
         try {
             guestService.getByIdentityDocument(1L, "iden_doc_test");
             TestCase.fail();
-        } catch (Exception e){
+        } catch (Exception e) {
             Assert.assertTrue(e instanceof ForbiddenException);
-            Assert.assertEquals(e.getMessage(), "Guest with identityDocument iden_doc_test does not have a past reservation with this business");
+            Assert.assertEquals(e.getMessage(),
+                    "Guest with identityDocument iden_doc_test does not have a past reservation with this business");
             Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 40);
         }
     }
@@ -119,15 +107,17 @@ public class GuestServiceTest {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
         Reservation reservation = utils.createReservation(null, guest);
-        
+
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
-        when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class),any(Long.class))).thenReturn(true);
+        when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class), any(Long.class)))
+                .thenReturn(true);
 
-        GuestDTO dtoResponse = guestService.getByIdentityDocument(reservation.getBranch().getBusiness().getId(), guest.getIdentityDocument());
+        GuestDTO dtoResponse = guestService.getByIdentityDocument(
+                reservation.getBranch().getBusiness().getId(),
+                guest.getIdentityDocument());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -141,8 +131,7 @@ public class GuestServiceTest {
 
         GuestDTO dtoResponse = guestService.save(dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(guest.getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -174,8 +163,7 @@ public class GuestServiceTest {
 
         GuestDTO dtoResponse = guestService.update(guest.getId(), dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(guest.getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
@@ -193,5 +181,4 @@ public class GuestServiceTest {
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
         }
     }
-
 }

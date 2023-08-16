@@ -13,14 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.paca.paca.business.model.Business;
 import com.paca.paca.reservation.dto.GuestDTO;
-import com.paca.paca.reservation.dto.GuestListDTO;
 import com.paca.paca.reservation.service.GuestService;
+import com.paca.paca.reservation.statics.GuestStatics;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.business.model.Business;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,44 +31,38 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-@RequestMapping(ReservationStatics.Endpoint.GUEST_PATH)
+@RequestMapping(GuestStatics.Endpoint.PATH)
 @Tag(name = "08. Guest", description = "Guest Management Controller")
 public class GuestController {
 
     private final GuestService guestService;
     private final BusinessRepository businessRepository;
 
-    @GetMapping
-    @ValidateRoles({})
-    @Operation(summary = "Get all user guest", description = "Returns a list with all user guest")
-    public ResponseEntity<GuestListDTO> getAll() {
-        return ResponseEntity.ok(guestService.getAll());
-    }
-
-    @GetMapping("/{id}")
+    @GetMapping(GuestStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get user guest by ID", description = "Gets the data of a user guest given its ID")
     public ResponseEntity<GuestDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(guestService.getById(id));
     }
 
-    @GetMapping("/identity-document/{identityDocument}")
     @ValidateRoles({ "business" })
+    @GetMapping(GuestStatics.Endpoint.GET_BY_IDENTITY_DOCUMENT)
     @Operation(summary = "Get user guest by identity document", description = "Gets the data of a user guest given its identity document")
-    public ResponseEntity<GuestDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument) throws NoContentException {
+    public ResponseEntity<GuestDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument)
+            throws NoContentException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Business business = businessRepository.findByUserEmail(auth.getName()).get();
-        return ResponseEntity.ok(guestService.getByIdentityDocument(business.getId(),identityDocument));
+        return ResponseEntity.ok(guestService.getByIdentityDocument(business.getId(), identityDocument));
     }
 
-    @PostMapping
     @ValidateRoles({})
+    @PostMapping(GuestStatics.Endpoint.SAVE)
     @Operation(summary = "Create new user guest", description = "Create a new user guest in the app")
     public ResponseEntity<GuestDTO> save(@RequestBody GuestDTO dto) {
         return ResponseEntity.ok(guestService.save(dto));
     }
 
     @ValidateRoles({})
-    @PutMapping("/{id}")
+    @PutMapping(GuestStatics.Endpoint.UPDATE)
     @Operation(summary = "Update user guest", description = "Updates the data of a user guest given its ID")
     public ResponseEntity<GuestDTO> update(
             @PathVariable("id") Long id,
@@ -79,7 +72,7 @@ public class GuestController {
     }
 
     @ValidateRoles({})
-    @DeleteMapping("/{id}")
+    @DeleteMapping(GuestStatics.Endpoint.DELETE)
     @Operation(summary = "Delete user guest", description = "Delete the data of a user guest given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         guestService.delete(id);

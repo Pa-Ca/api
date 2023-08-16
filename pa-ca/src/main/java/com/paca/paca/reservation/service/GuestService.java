@@ -1,17 +1,14 @@
 package com.paca.paca.reservation.service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.dto.GuestDTO;
-import com.paca.paca.reservation.dto.GuestListDTO;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.repository.GuestRepository;
-import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.reservation.repository.ReservationRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,17 +23,6 @@ public class GuestService {
 
     private final ReservationRepository reservationRepository;
 
-
-    public GuestListDTO getAll() {
-        List<GuestDTO> response = new ArrayList<>();
-        guestRepository.findAll().forEach(guest -> {
-            GuestDTO dto = guestMapper.toDTO(guest);
-            response.add(dto);
-        });
-
-        return GuestListDTO.builder().guests(response).build();
-    }
-
     public GuestDTO getById(Long id) throws NoContentException {
         Guest guest = guestRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
@@ -47,19 +33,19 @@ public class GuestService {
         return dto;
     }
 
-    public GuestDTO getByIdentityDocument(Long businessId, String identityDocument) 
+    public GuestDTO getByIdentityDocument(Long businessId, String identityDocument)
             throws NoContentException, ForbiddenException {
-        
+
         Guest guest = guestRepository.findByIdentityDocument(identityDocument)
-        .orElseThrow(() -> new NoContentException(
-            "Guest with identityDocument " + identityDocument + " does not exists",
-            40));
-            
+                .orElseThrow(() -> new NoContentException(
+                        "Guest with identityDocument " + identityDocument + " does not exists",
+                        40));
+
         if (!reservationRepository.existsByBranchBusinessIdAndGuestId(businessId, guest.getId())) {
             throw new ForbiddenException(
-            "Guest with identityDocument " + identityDocument + 
-            " does not have a past reservation with this business",
-            40);
+                    "Guest with identityDocument " + identityDocument +
+                            " does not have a past reservation with this business",
+                    40);
         }
         GuestDTO dto = guestMapper.toDTO(guest);
         return dto;
@@ -98,5 +84,4 @@ public class GuestService {
         }
         guestRepository.deleteById(id);
     }
-
 }

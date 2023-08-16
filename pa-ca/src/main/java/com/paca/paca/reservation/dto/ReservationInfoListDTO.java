@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationListDTO {
-    List<ReservationDTO> reservations;
+public class ReservationInfoListDTO {
+
+    List<ReservationInfoDTO> reservations;
 }

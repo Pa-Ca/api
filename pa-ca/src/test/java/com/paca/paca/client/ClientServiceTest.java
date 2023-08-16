@@ -35,7 +35,7 @@ import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
-import com.paca.paca.reservation.dto.ReservationListDTO;
+import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -624,7 +624,7 @@ public class ClientServiceTest {
         when(clientGroupRepository.findAllByClientId(any(Long.class)))
                 .thenReturn(clientGroups);
 
-        ReservationListDTO response = clientService.getReservations(client.getId());
+        ReservationInfoListDTO response = clientService.getReservations(client.getId());
 
         assertThat(response).isNotNull();
     }

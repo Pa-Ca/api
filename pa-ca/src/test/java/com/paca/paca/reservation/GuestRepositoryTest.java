@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -81,71 +80,20 @@ class GuestRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCreateGuest() {
-        Guest guest = Guest.builder()
-                .id(1L)
-                .name("name_test")
-                .surname("surname_test")
-                .email("email_test")
-                .phoneNumber("phone_number_test")
-                .identityDocument("iden_doc_test")
-                .build();
-
-        Guest savedGuest = guestRepository.save(guest);
-
-        assertThat(savedGuest).isNotNull();
-        assertThat(savedGuest.getName()).isEqualTo(guest.getName());
-        assertThat(savedGuest.getSurname()).isEqualTo(guest.getSurname());
-        assertThat(savedGuest.getEmail()).isEqualTo(guest.getEmail());
-        assertThat(savedGuest.getPhoneNumber()).isEqualTo(guest.getPhoneNumber());
-        assertThat(savedGuest.getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
-    }
-
-    @Test
-    void shouldGetAllGuests() {
-        int nUsers = 10;
-
-        for (int i = 0; i < nUsers; i++) {
-            utils.createGuest();
-        }
-
-        List<Guest> guests = guestRepository.findAll();
-
-        assertThat(guests.size()).isEqualTo(nUsers);
-    }
-
-    @Test
-    void shouldCheckThatGuestExistsById() {
+    void shouldCheckThatGuestExistsByIdentityDocument() {
         Guest guest = utils.createGuest();
 
-        boolean expected = guestRepository.existsById(guest.getId());
-        Optional<Guest> expectedGuest = guestRepository.findById(guest.getId());
+        Optional<Guest> expectedGuest = guestRepository.findByIdentityDocument(guest.getIdentityDocument());
 
-        assertThat(expected).isTrue();
         assertThat(expectedGuest.isPresent()).isTrue();
-        assertThat(expectedGuest.get().getName()).isEqualTo(guest.getName());
-        assertThat(expectedGuest.get().getSurname()).isEqualTo(guest.getSurname());
-        assertThat(expectedGuest.get().getEmail()).isEqualTo(guest.getEmail());
-        assertThat(expectedGuest.get().getPhoneNumber()).isEqualTo(guest.getPhoneNumber());
-        assertThat(expectedGuest.get().getIdentityDocument()).isEqualTo(guest.getIdentityDocument());
+        assertThat(expectedGuest.get()).isEqualTo(guest);
     }
 
     @Test
-    void shouldCheckThatGuestDoesNotExistsById() {
-        boolean expected = guestRepository.existsById(1L);
-        Optional<Guest> expectedGuest = guestRepository.findById(1L);
+    void shouldCheckThatGuestDoesNotExistsByIdentityDocument() {
+        Optional<Guest> expectedGuest = guestRepository.findByIdentityDocument("V");
 
-        assertThat(expected).isFalse();
         assertThat(expectedGuest.isEmpty()).isTrue();
     }
 
-    @Test
-    void shouldDeleteGuest() {
-        Guest guest = utils.createGuest();
-
-        guestRepository.delete(guest);
-
-        List<Guest> guests = guestRepository.findAll();
-        assertThat(guests.size()).isEqualTo(0);
-    }
 }
