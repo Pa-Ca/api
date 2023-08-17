@@ -15,6 +15,6 @@ public class PromotionDTO {
 
     private Long id;
     private Long branchId;
-    private Boolean disabled;
     private String text;
+    private Boolean disabled;
 }

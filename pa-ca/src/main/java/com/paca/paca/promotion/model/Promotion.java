@@ -13,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "promotion")
 public class Promotion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "promotion_seq")
     @SequenceGenerator(name = "promotion_seq", sequenceName = "promotion_seq", allocationSize = 1)
@@ -23,9 +24,9 @@ public class Promotion {
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
-    @Column(name = "disabled", nullable = false)
-    private Boolean disabled;
-
     @Column(name = "text", nullable = false)
     private String text;
+
+    @Column(name = "disabled", nullable = false)
+    private Boolean disabled;
 }

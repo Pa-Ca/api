@@ -1,19 +1,15 @@
 package com.paca.paca.promotion.service;
 
-import com.paca.paca.promotion.utils.PromotionMapper;
-
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.promotion.dto.PromotionDTO;
-import com.paca.paca.promotion.dto.PromotionListDTO;
+import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.promotion.repository.PromotionRepository;
@@ -27,16 +23,6 @@ public class PromotionService {
     private final PromotionRepository promotionRepository;
 
     private final BranchRepository branchRepository;
-
-    public PromotionListDTO getAll() {
-        List<PromotionDTO> response = new ArrayList<>();
-        promotionRepository.findAll().forEach(promotion -> {
-            PromotionDTO dto = promotionMapper.toDTO(promotion);
-            response.add(dto);
-        });
-
-        return PromotionListDTO.builder().promotions(response).build();
-    }
 
     public PromotionDTO getById(Long id) throws NoContentException {
         Promotion promotion = promotionRepository.findById(id)
