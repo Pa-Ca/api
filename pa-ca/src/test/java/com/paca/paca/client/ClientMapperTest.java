@@ -78,78 +78,30 @@ public class ClientMapperTest {
     @Test
     void shouldPartiallyMapClientDTOtoClientEntity() {
         Client client = utils.createClient(null);
+        ClientDTO dto = new ClientDTO(
+                client.getId() + 1,
+                client.getUser().getId() + 1,
+                client.getUser().getEmail() + ".",
+                client.getName() + ".",
+                client.getSurname() + ".",
+                client.getStripeCustomerId() + ".",
+                client.getPhoneNumber() + ".",
+                client.getAddress() + ".",
+                new Date(System.currentTimeMillis()),
+                client.getIdentityDocument() + ".");
+        Client response = clientMapper.updateModel(dto, client);
+        Client expected = new Client(
+                client.getId(),
+                client.getUser(),
+                dto.getName(),
+                dto.getSurname(),
+                dto.getIdentityDocument(),
+                dto.getAddress(),
+                dto.getPhoneNumber(),
+                dto.getStripeCustomerId(),
+                dto.getDateOfBirth());
 
-        // Not changing ID
-        ClientDTO dto = ClientDTO.builder()
-                .id(client.getId() + 1)
-                .build();
-        Client updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getId()).isEqualTo(client.getId());
-
-        // Not changing User ID
-        dto = ClientDTO.builder()
-                .userId(client.getUser().getId() + 1)
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getUser().getId()).isEqualTo(client.getUser().getId());
-
-        // Changing name
-        dto = ClientDTO.builder()
-                .name("m_test")
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getName()).isEqualTo(dto.getName());
-
-        // Changing surname
-        dto = ClientDTO.builder()
-                .surname("m_Test")
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getSurname()).isEqualTo(dto.getSurname());
-
-        // Change stripe customer id
-        dto = ClientDTO.builder()
-                .stripeCustomerId("m_stripe_id_test")
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getStripeCustomerId()).isEqualTo(dto.getStripeCustomerId());
-
-        // Change phone number
-        dto = ClientDTO.builder()
-                .phoneNumber("+580000001")
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
-
-        // Change address
-        dto = ClientDTO.builder()
-                .address("m_Test address")
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getAddress()).isEqualTo(dto.getAddress());
-
-        // Change date of birth
-        dto = ClientDTO.builder()
-                .dateOfBirth(new Date(System.currentTimeMillis()))
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getDateOfBirth()).isEqualTo(dto.getDateOfBirth());
-
-        // Not change identity document
-        dto = ClientDTO.builder()
-                .identityDocument("V0")
-                .build();
-        updatedClient = clientMapper.updateModel(dto, client);
-        assertThat(updatedClient).isNotNull();
-        assertThat(updatedClient.getIdentityDocument()).isEqualTo(client.getIdentityDocument());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -187,45 +139,21 @@ public class ClientMapperTest {
     void shouldPartiallyMapFriendDTOtoFriendEntity() {
         Friend friend = utils.createFriendRequest(null, null, false, false);
 
-        // Not changing ID
-        FriendDTO dto = FriendDTO.builder()
-                .id(friend.getId() + 1)
-                .build();
-        Friend updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getId()).isEqualTo(friend.getId());
+        FriendDTO dto = new FriendDTO(
+                friend.getId() + 1,
+                friend.getRequester().getId() + 1,
+                friend.getAddresser().getId() + 1,
+                !friend.getAccepted(),
+                !friend.getRejected());
+        Friend response = friendMapper.updateModel(dto, friend);
+        Friend expected = new Friend(
+                friend.getId(),
+                friend.getRequester(),
+                friend.getAddresser(),
+                dto.getAccepted(),
+                dto.getRejected());
 
-        // Not changing Requester ID
-        dto = FriendDTO.builder()
-                .requesterId(friend.getRequester().getId() + 1)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getRequester().getId()).isEqualTo(friend.getRequester().getId());
-
-        // Not changing Addreser ID
-        dto = FriendDTO.builder()
-                .addresserId(friend.getAddresser().getId() + 1)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getAddresser().getId()).isEqualTo(friend.getAddresser().getId());
-
-        // Changing accepted
-        dto = FriendDTO.builder()
-                .accepted(true)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getAccepted()).isEqualTo(dto.getAccepted());
-
-        // Changing rejected
-        dto = FriendDTO.builder()
-                .rejected(true)
-                .build();
-        updateFriend = friendMapper.updateModel(dto, friend);
-        assertThat(updateFriend).isNotNull();
-        assertThat(updateFriend.getRejected()).isEqualTo(dto.getRejected());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -264,45 +192,22 @@ public class ClientMapperTest {
     void shouldPartiallyMapReviewDTOtoReviewEntity() {
         Review review = utils.createReview(null, null);
 
-        // Not changing ID
-        ReviewDTO dto = ReviewDTO.builder()
-                .id(review.getId() + 1)
-                .build();
-        Review updateReview = reviewMapper.updateModel(dto, review);
-        assertThat(updateReview).isNotNull();
-        assertThat(updateReview.getId()).isEqualTo(review.getId());
+        ReviewDTO dto = new ReviewDTO(
+                review.getId() + 1,
+                review.getClient().getId() + 1,
+                review.getBranch().getId() + 1,
+                review.getText() + ".",
+                new Date(System.currentTimeMillis()),
+                null);
+        Review response = reviewMapper.updateModel(dto, review);
+        Review expected = new Review(
+                review.getId(),
+                review.getClient(),
+                review.getBranch(),
+                dto.getText(),
+                dto.getDate());
 
-        // Not changing Client ID
-        dto = ReviewDTO.builder()
-                .clientId(review.getClient().getId() + 1)
-                .build();
-        updateReview = reviewMapper.updateModel(dto, review);
-        assertThat(updateReview).isNotNull();
-        assertThat(updateReview.getClient().getId()).isEqualTo(review.getClient().getId());
-
-        // Not changing Branch ID
-        dto = ReviewDTO.builder()
-                .branchId(review.getBranch().getId() + 1)
-                .build();
-        updateReview = reviewMapper.updateModel(dto, review);
-        assertThat(updateReview).isNotNull();
-        assertThat(updateReview.getBranch().getId()).isEqualTo(review.getBranch().getId());
-
-        // Changing text
-        dto = ReviewDTO.builder()
-                .text(review.getText() + "_test")
-                .build();
-        updateReview = reviewMapper.updateModel(dto, review);
-        assertThat(updateReview).isNotNull();
-        assertThat(updateReview.getText()).isEqualTo(dto.getText());
-
-        // Changing date
-        dto = ReviewDTO.builder()
-                .date(new Date(System.currentTimeMillis()))
-                .build();
-        updateReview = reviewMapper.updateModel(dto, review);
-        assertThat(updateReview).isNotNull();
-        assertThat(updateReview.getDate()).isEqualTo(dto.getDate());
+        assertThat(response).isEqualTo(expected);
     }
 
 }

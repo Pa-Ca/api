@@ -45,17 +45,17 @@ public class PaymentOptionServiceTest {
 
     @Test
     void shouldSave() {
-        PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
+        PaymentOptionDTO dto = utils.createPaymentOptionDTO(null);
         PaymentOption paymentOption = utils.createPaymentOption(null);
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(paymentOptionRepository.save(any())).thenReturn(paymentOption);
-        when(paymentOptionMapper.toDTO(any())).thenReturn(paymentOptionDTO);
+        when(paymentOptionMapper.toDTO(any())).thenReturn(dto);
 
-        PaymentOptionDTO response = paymentOptionService.save(paymentOptionDTO);
+        PaymentOptionDTO response = paymentOptionService.save(dto);
 
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -74,19 +74,19 @@ public class PaymentOptionServiceTest {
 
     @Test
     void shouldUpdate() {
-        PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
+        PaymentOptionDTO dto = utils.createPaymentOptionDTO(null);
         PaymentOption paymentOption = utils.createPaymentOption(null);
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.of(paymentOption));
         when(paymentOptionRepository.save(any())).thenReturn(paymentOption);
-        when(paymentOptionMapper.toDTO(any())).thenReturn(paymentOptionDTO);
+        when(paymentOptionMapper.toDTO(any())).thenReturn(dto);
         when(paymentOptionMapper.updateModel(any(), any())).thenReturn(paymentOption);
 
-        PaymentOptionDTO response = paymentOptionService.update(1L, paymentOptionDTO);
+        PaymentOptionDTO response = paymentOptionService.update(1L, dto);
 
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test

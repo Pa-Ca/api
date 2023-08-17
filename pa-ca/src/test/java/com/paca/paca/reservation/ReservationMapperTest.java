@@ -10,6 +10,7 @@ import com.paca.paca.branch.model.Branch;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.utils.ReservationMapperImpl;
 
@@ -147,112 +148,42 @@ public class ReservationMapperTest {
 
     @Test
     void shouldPartiallyMapReservationDTOtoReservationEntity() {
-        Reservation reservation = utils.createReservation(
-                utils.createBranch(null),
-                utils.createGuest());
+        Reservation reservation = utils.createReservation(null, null, null);
+        Branch branch = utils.createBranch(null);
+        Guest guest = utils.createGuest();
+        Invoice invoice = utils.createInvoice();
 
-        // Not changing ID
-        ReservationDTO dto = ReservationDTO.builder()
-                .id(reservation.getId() + 1)
-                .build();
-        Reservation updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getId()).isEqualTo(reservation.getId());
+        ReservationDTO dto = new ReservationDTO(
+                reservation.getId() + 1,
+                branch.getId() + 1,
+                guest.getId() + 1,
+                invoice.getId() + 1,
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()),
+                new BigDecimal(100),
+                ReservationStatics.Status.ACCEPTED,
+                (short) (reservation.getTableNumber() + 1),
+                (short) (reservation.getClientNumber() + 1),
+                reservation.getOccasion() + ".",
+                !reservation.getByClient());
 
-        // Not changing Branch ID
-        dto = ReservationDTO.builder()
-                .branchId(reservation.getBranch().getId() + 1)
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getBranch().getId()).isEqualTo(reservation.getBranch().getId());
+        Reservation response = reservationMapper.updateModel(dto, reservation);
+        Reservation expected = new Reservation(
+                reservation.getId(),
+                branch,
+                guest,
+                invoice,
+                dto.getRequestDate(),
+                dto.getReservationDateIn(),
+                dto.getReservationDateOut(),
+                dto.getPrice(),
+                dto.getStatus(),
+                dto.getTableNumber(),
+                dto.getClientNumber(),
+                dto.getOccasion(),
+                dto.getByClient());
 
-        // Not changing Guest ID
-        dto = ReservationDTO.builder()
-                .guestId(reservation.getGuest().getId() + 1)
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getGuest().getId()).isEqualTo(reservation.getGuest().getId());
-
-        // Not changing Invoice ID
-        dto = ReservationDTO.builder()
-                .invoiceId(reservation.getInvoice().getId() + 1)
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getInvoice().getId()).isEqualTo(reservation.getInvoice().getId());
-
-        // Changing requestDate
-        dto = ReservationDTO.builder()
-                .requestDate(new Date(System.currentTimeMillis()))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getRequestDate()).isEqualTo(dto.getRequestDate());
-
-        // Changing ReservationDateIn
-        dto = ReservationDTO.builder()
-                .reservationDateIn(new Date(System.currentTimeMillis()))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getReservationDateIn()).isEqualTo(dto.getReservationDateIn());
-
-        // Changing ReservationDateOut
-        dto = ReservationDTO.builder()
-                .reservationDateOut(new Date(System.currentTimeMillis()))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getReservationDateIn()).isEqualTo(dto.getReservationDateOut());
-
-        // Changing clientNumber
-        dto = ReservationDTO.builder()
-                .clientNumber(Short.valueOf("69"))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getClientNumber()).isEqualTo(dto.getClientNumber());
-
-        // Changing tableNumber
-        dto = ReservationDTO.builder()
-                .tableNumber(Short.valueOf("69"))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getTableNumber()).isEqualTo(dto.getTableNumber());
-
-        // Changing status
-        dto = ReservationDTO.builder()
-                .status(Short.valueOf("1"))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getStatus()).isEqualTo(dto.getStatus());
-
-        // Changing price
-        dto = ReservationDTO.builder()
-                .price(BigDecimal.valueOf(69.69F))
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getPrice()).isEqualTo(dto.getPrice());
-
-        // Changing occasion
-        dto = ReservationDTO.builder()
-                .occasion("Anniversary")
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getOccasion()).isEqualTo(dto.getOccasion());
-
-        // Changing byClient
-        dto = ReservationDTO.builder()
-                .byClient(Boolean.TRUE)
-                .build();
-        updatedReservation = reservationMapper.updateModel(dto, reservation);
-        assertThat(updatedReservation).isNotNull();
-        assertThat(updatedReservation.getByClient()).isEqualTo(dto.getByClient());
+        assertThat(response).isEqualTo(expected);
     }
 }

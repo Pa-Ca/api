@@ -54,37 +54,19 @@ public class PaymentOptionMapperTest {
     void shouldPartiallyMappaymentOptionDTOtopaymentOptionEntity() {
         PaymentOption paymentOption = utils.createPaymentOption(null);
 
-        // Not changing ID
-        PaymentOptionDTO dto = PaymentOptionDTO.builder()
-                .id(paymentOption.getId() + 1)
-                .build();
-        PaymentOption updatedPaymentOption = paymentOptionMapper.updateModel(dto, paymentOption);
-        assertThat(updatedPaymentOption).isNotNull();
-        assertThat(updatedPaymentOption.getId()).isEqualTo(paymentOption.getId());
+        PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO(
+                paymentOption.getId() + 1,
+                paymentOption.getBranch().getId() + 1,
+                paymentOption.getName() + ".",
+                paymentOption.getDescription() + ".");
+        PaymentOption response = paymentOptionMapper.toEntity(paymentOptionDTO, paymentOption.getBranch());
+        PaymentOption expected = new PaymentOption(
+                paymentOption.getId(),
+                paymentOption.getBranch(),
+                paymentOptionDTO.getName(),
+                paymentOptionDTO.getDescription());
 
-        // Not changing branch
-        dto = PaymentOptionDTO.builder()
-                .branchId(paymentOption.getBranch().getId() + 1)
-                .build();
-        updatedPaymentOption = paymentOptionMapper.updateModel(dto, paymentOption);
-        assertThat(updatedPaymentOption).isNotNull();
-        assertThat(updatedPaymentOption.getBranch()).isEqualTo(paymentOption.getBranch());
-
-        // Changing name
-        dto = PaymentOptionDTO.builder()
-                .name(paymentOption.getName() + "m_test")
-                .build();
-        updatedPaymentOption = paymentOptionMapper.updateModel(dto, paymentOption);
-        assertThat(updatedPaymentOption).isNotNull();
-        assertThat(updatedPaymentOption.getName()).isEqualTo(dto.getName());
-
-        // Changing description
-        dto = PaymentOptionDTO.builder()
-                .description(paymentOption.getDescription() + "m_test")
-                .build();
-        updatedPaymentOption = paymentOptionMapper.updateModel(dto, paymentOption);
-        assertThat(updatedPaymentOption).isNotNull();
-        assertThat(updatedPaymentOption.getDescription()).isEqualTo(dto.getDescription());
+        assertThat(response).isEqualTo(expected);
     }
 
 }

@@ -119,11 +119,9 @@ public class ClientServiceTest {
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO dtoResponse = clientService.getById(client.getId());
+        ClientDTO response = clientService.getById(client.getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(client.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(client.getUser().getId());
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -171,9 +169,9 @@ public class ClientServiceTest {
         when(clientMapper.toEntity(any(ClientDTO.class), any(User.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO dtoResponse = clientService.save(dto);
+        ClientDTO response = clientService.save(dto);
 
-        assertThat(dtoResponse).isEqualTo(client);
+        assertThat(response).isEqualTo(client);
     }
 
     @Test
@@ -203,9 +201,9 @@ public class ClientServiceTest {
         when(clientMapper.updateModel(any(ClientDTO.class), any(Client.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO dtoResponse = clientService.update(client.getId(), dto);
+        ClientDTO response = clientService.update(client.getId(), dto);
 
-        assertThat(dtoResponse).isEqualTo(client);
+        assertThat(response).isEqualTo(client);
     }
 
     @Test
@@ -248,9 +246,9 @@ public class ClientServiceTest {
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO dtoResponse = clientService.getByUserId(client.getUser().getId());
+        ClientDTO response = clientService.getByUserId(client.getUser().getId());
 
-        assertThat(dtoResponse).isEqualTo(client);
+        assertThat(response).isEqualTo(client);
     }
 
     @Test
@@ -731,9 +729,9 @@ public class ClientServiceTest {
         when(favoriteBranchRepository.save(any(FavoriteBranch.class))).thenReturn(fav);
         when(branchMapper.toDTO(any(Branch.class))).thenReturn(branchDTO);
 
-        ClientDTO dtoResponse = clientService.save(dto);
+        ClientDTO response = clientService.save(dto);
 
-        assertThat(dtoResponse).isEqualTo(branchDTO);
+        assertThat(response).isEqualTo(branchDTO);
     }
 
     @Test
@@ -812,9 +810,9 @@ public class ClientServiceTest {
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(review));
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(dto);
 
-        ReviewDTO dtoResponse = reviewService.getById(review.getId());
+        ReviewDTO response = reviewService.getById(review.getId());
 
-        assertThat(dtoResponse).isEqualTo(review);
+        assertThat(response).isEqualTo(review);
     }
 
     @Test
@@ -885,9 +883,9 @@ public class ClientServiceTest {
         when(reviewMapper.toEntity(any(ReviewDTO.class), any(Client.class), any(Branch.class))).thenReturn(review);
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(dto);
 
-        ReviewDTO dtoResponse = reviewService.save(dto);
+        ReviewDTO response = reviewService.save(dto);
 
-        assertThat(dtoResponse).isEqualTo(review);
+        assertThat(response).isEqualTo(review);
     }
 
     @Test
@@ -917,9 +915,9 @@ public class ClientServiceTest {
         when(reviewMapper.updateModel(any(ReviewDTO.class), any(Review.class))).thenReturn(review);
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(dto);
 
-        ReviewDTO dtoResponse = reviewService.update(review.getId(), dto);
+        ReviewDTO response = reviewService.update(review.getId(), dto);
 
-        assertThat(dtoResponse).isEqualTo(review);
+        assertThat(response).isEqualTo(review);
     }
 
     @Test
@@ -1003,12 +1001,9 @@ public class ClientServiceTest {
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(dto);
         when(reviewLikeRepository.findAllByReviewId(any(Long.class))).thenReturn(likes);
 
-        ReviewDTO dtoResponse = reviewService.like(like.getReview().getId(), like.getClient().getId());
+        ReviewDTO response = reviewService.like(like.getReview().getId(), like.getClient().getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(like.getReview().getId());
-        assertThat(dtoResponse.getClientId()).isEqualTo(like.getReview().getClient().getId());
-        assertThat(dtoResponse.getLikes()).isEqualTo(1);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -1077,12 +1072,9 @@ public class ClientServiceTest {
         when(reviewMapper.toDTO(any(Review.class))).thenReturn(dto);
         when(reviewLikeRepository.findAllByReviewId(any(Long.class))).thenReturn(likes);
 
-        ReviewDTO dtoResponse = reviewService.dislike(like.getReview().getId(), like.getClient().getId());
+        ReviewDTO response = reviewService.dislike(like.getReview().getId(), like.getClient().getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(like.getReview().getId());
-        assertThat(dtoResponse.getClientId()).isEqualTo(like.getReview().getClient().getId());
-        assertThat(dtoResponse.getLikes()).isEqualTo(1);
+        assertThat(response).isEqualTo(dto);
     }
 
 }

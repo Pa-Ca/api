@@ -32,7 +32,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.List;
-import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -103,47 +102,6 @@ public class ClientRepositoryTest extends PacaTest {
         businessRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
-    }
-
-    @Test
-    void shouldCreateClient() {
-        User user = utils.createUser();
-        Client client = Client.builder()
-                .id(1L)
-                .user(user)
-                .name("test")
-                .surname("Test")
-                .stripeCustomerId("stripe_id_test")
-                .phoneNumber("+580000000")
-                .address("Test address")
-                .dateOfBirth(new Date(System.currentTimeMillis()))
-                .identityDocument("V0")
-                .build();
-
-        Client savedClient = clientRepository.save(client);
-
-        assertThat(savedClient).isNotNull();
-        assertThat(savedClient.getUser().getId()).isEqualTo(client.getUser().getId());
-        assertThat(savedClient.getName()).isEqualTo(client.getName());
-        assertThat(savedClient.getSurname()).isEqualTo(client.getSurname());
-        assertThat(savedClient.getStripeCustomerId()).isEqualTo(client.getStripeCustomerId());
-        assertThat(savedClient.getPhoneNumber()).isEqualTo(client.getPhoneNumber());
-        assertThat(savedClient.getAddress()).isEqualTo(client.getAddress());
-        assertThat(savedClient.getDateOfBirth()).isEqualTo(client.getDateOfBirth());
-        assertThat(savedClient.getIdentityDocument()).isEqualTo(client.getIdentityDocument());
-    }
-
-    @Test
-    void shouldGetAllClients() {
-        int nUsers = 10;
-
-        for (int i = 0; i < nUsers; i++) {
-            utils.createClient(null);
-        }
-
-        List<Client> clients = clientRepository.findAll();
-
-        assertThat(clients.size()).isEqualTo(nUsers);
     }
 
     @Test

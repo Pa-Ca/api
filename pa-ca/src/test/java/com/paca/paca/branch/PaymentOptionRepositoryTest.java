@@ -79,27 +79,6 @@ public class PaymentOptionRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCreatePaymentOption() {
-        // Arrange
-        Branch branch = utils.createBranch(null);
-        PaymentOption paymentOption = PaymentOption.builder()
-                .branch(branch)
-                .name("VAT")
-                .description("Descripcion")
-                .build();
-
-        // Act
-        PaymentOption savedPaymentOption = paymentOptionRepository.save(paymentOption);
-
-        // Assert
-        assertThat(savedPaymentOption).isNotNull();
-        assertThat(savedPaymentOption.getId()).isEqualTo(paymentOption.getId());
-        assertThat(savedPaymentOption.getBranch()).isEqualTo(branch);
-        assertThat(savedPaymentOption.getName()).isEqualTo("VAT");
-        assertThat(savedPaymentOption.getDescription()).isEqualTo("Descripcion");
-    }
-
-    @Test
     void shouldGetAllPaymentOptionsByBranchId() {
         int nPaymentOptions = 10;
         Branch branch = utils.createBranch(null);

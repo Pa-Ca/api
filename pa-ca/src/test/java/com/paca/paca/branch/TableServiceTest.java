@@ -56,7 +56,7 @@ public class TableServiceTest {
 
         TableDTO response = tableService.save(tableDTO);
 
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(tableDTO);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class TableServiceTest {
 
         TableDTO response = tableService.update(1L, tableDTO);
 
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(tableDTO);
     }
 
     @Test

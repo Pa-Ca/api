@@ -296,7 +296,7 @@ public class BranchService {
                 .build();
     }
 
-    public TableListDTO getTablesbyBranchId(Long branchId) {
+    public TableListDTO getTablesByBranchId(Long branchId) {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(

@@ -207,7 +207,7 @@ public class BranchController {
     @Operation(summary = "Gets all the tables of a branch", description = "Gets all the tables of a branch given its id")
     public ResponseEntity<TableListDTO> getTablesByBranchId(@PathVariable("id") Long id)
             throws NoContentException {
-        return ResponseEntity.ok(branchService.getTablesbyBranchId(id));
+        return ResponseEntity.ok(branchService.getTablesByBranchId(id));
     }
 
     @ValidateRoles({ "business" })

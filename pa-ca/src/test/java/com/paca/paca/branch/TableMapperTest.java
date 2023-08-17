@@ -52,29 +52,18 @@ public class TableMapperTest {
     void shouldPartiallyMapTableDTOtoTableEntity() {
         Table table = utils.createTable(null);
 
-        // Not changing ID
-        TableDTO dto = TableDTO.builder()
-                .id(table.getId() + 1)
-                .build();
-        Table updatedTable = tableMapper.updateModel(dto, table);
-        assertThat(updatedTable).isNotNull();
-        assertThat(updatedTable.getId()).isEqualTo(table.getId());
+        TableDTO tableDTO = new TableDTO(
+                table.getId() + 1,
+                table.getBranch().getId() + 1,
+                table.getName() + ".");
 
-        // Not changing branch
-        dto = TableDTO.builder()
-                .branchId(table.getBranch().getId() + 1)
-                .build();
-        updatedTable = tableMapper.updateModel(dto, table);
-        assertThat(updatedTable).isNotNull();
-        assertThat(updatedTable.getBranch().getId()).isEqualTo(table.getBranch().getId());
+        Table response = tableMapper.toEntity(tableDTO, table.getBranch());
+        Table expected = new Table(
+                tableDTO.getId(),
+                table.getBranch(),
+                tableDTO.getName());
 
-        // Changing name
-        dto = TableDTO.builder()
-                .name(table.getName() + "a")
-                .build();
-        updatedTable = tableMapper.updateModel(dto, table);
-        assertThat(updatedTable).isNotNull();
-        assertThat(updatedTable.getName()).isEqualTo(dto.getName());
+        assertThat(response).isEqualTo(expected);
     }
 
 }

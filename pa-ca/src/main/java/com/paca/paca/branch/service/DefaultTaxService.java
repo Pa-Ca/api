@@ -41,6 +41,13 @@ public class DefaultTaxService {
         }
 
         TaxDTO taxDTO = defaultTaxDTO.getTax();
+        Short taxType = taxDTO.getType();
+        if (!DefaultTaxStatics.Types.isTypeValid(taxType)) {
+            throw new BadRequestException(
+                    "Invalid tax type: " + taxType,
+                    51);
+        }
+
         Tax tax = taxMapper.toEntity(taxDTO);
 
         tax = taxRepository.save(tax);
@@ -73,8 +80,6 @@ public class DefaultTaxService {
         // Update the default tax
         Tax taxToUpdate = tax.get();
         taxToUpdate = taxMapper.updateModel(dto, taxToUpdate);
-
-        // Save the default tax
         taxToUpdate = taxRepository.save(taxToUpdate);
 
         // Return the default tax
