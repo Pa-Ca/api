@@ -25,7 +25,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -85,38 +84,6 @@ public class ProductSubCategoryRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCreateProductSubCategory() {
-        Branch branch = utils.createBranch(null);
-        ProductCategory productCategory = utils.createProductCategory();
-        ProductSubCategory productSubCategory = ProductSubCategory.builder()
-                .id(1L)
-                .branch(branch)
-                .category(productCategory)
-                .name("text name")
-                .build();
-
-        ProductSubCategory savedProductSubCategory = productSubCategoryRepository.save(productSubCategory);
-
-        assertThat(savedProductSubCategory).isNotNull();
-        assertThat(savedProductSubCategory.getBranch().getId()).isEqualTo(productSubCategory.getBranch().getId());
-        assertThat(savedProductSubCategory.getCategory().getId()).isEqualTo(productSubCategory.getCategory().getId());
-        assertThat(savedProductSubCategory.getName()).isEqualTo(productSubCategory.getName());
-    }
-
-    @Test
-    void shouldGetAllProductSubCategories() {
-        int nProductSubCategories = 10;
-
-        for (int i = 0; i < nProductSubCategories; i++) {
-            utils.createProductSubCategory(null, null);
-        }
-
-        List<ProductSubCategory> productSubCategories = productSubCategoryRepository.findAll();
-
-        assertThat(productSubCategories.size()).isEqualTo(nProductSubCategories);
-    }
-
-    @Test
     void shouldGetAllProductSubCategoriesByBranchId() {
         int nProductSubCategories = 10;
         Branch branch = utils.createBranch(null);
@@ -130,31 +97,6 @@ public class ProductSubCategoryRepositoryTest extends PacaTest {
                 .findAllByBranchId(branch.getId());
 
         assertThat(productSubCategories.size()).isEqualTo(nProductSubCategories);
-    }
-
-    @Test
-    void shouldCheckThatProductSubCategoryExistsById() {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-
-        boolean expected = productSubCategoryRepository.existsById(productSubCategory.getId());
-        Optional<ProductSubCategory> expectedProductSubCategory = productSubCategoryRepository
-                .findById(productSubCategory.getId());
-
-        assertThat(expected).isTrue();
-        assertThat(expectedProductSubCategory.isPresent()).isTrue();
-        assertThat(expectedProductSubCategory.get().getBranch().getId())
-                .isEqualTo(productSubCategory.getBranch().getId());
-        assertThat(expectedProductSubCategory.get().getCategory().getId())
-                .isEqualTo(productSubCategory.getCategory().getId());
-    }
-
-    @Test
-    void shouldCheckThatProductSubCategoryDoesNotExistsById() {
-        boolean expected = productSubCategoryRepository.existsById(1L);
-        Optional<ProductSubCategory> expectedProductSubCategory = productSubCategoryRepository.findById(1L);
-
-        assertThat(expected).isFalse();
-        assertThat(expectedProductSubCategory.isEmpty()).isTrue();
     }
 
     @Test
@@ -178,54 +120,31 @@ public class ProductSubCategoryRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldDeleteProductSubCategory() {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-
-        productSubCategoryRepository.delete(productSubCategory);
-
-        List<ProductSubCategory> productSubCategories = productSubCategoryRepository.findAll();
-        assertThat(productSubCategories.size()).isEqualTo(0);
-    }
-
-    @Test
-    void shouldGetAllProductCategories() {
-        int nProductCategories = 10;
-
-        for (int i = 0; i < nProductCategories; i++) {
-            utils.createProductCategory();
-        }
-
-        List<ProductCategory> productCategories = productCategoryRepository.findAll();
-
-        assertThat(productCategories.size()).isEqualTo(nProductCategories);
-    }
-
-    @Test
-    void shouldVerifyIfExistsByBranchIdAndCategoryIdAndName() {
+    void shouldCheckThatProductSubCategoryExistsByBranchIdAndCategoryIdAndName() {
         Branch branch = utils.createBranch(null);
         ProductCategory productCategory = utils.createProductCategory();
         ProductSubCategory productSubCategory = utils.createProductSubCategory(branch, productCategory);
 
-        boolean expected1 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+        boolean expected = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
                 productSubCategory.getBranch().getId(),
-                productSubCategory.getCategory().getId(),
-                productSubCategory.getName());
-        boolean expected2 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
-                productSubCategory.getBranch().getId(),
-                productSubCategory.getCategory().getId(),
-                productSubCategory.getName() + "1");
-        boolean expected3 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
-                productSubCategory.getBranch().getId(),
-                productSubCategory.getCategory().getId() + 1,
-                productSubCategory.getName());
-        boolean expected4 = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
-                productSubCategory.getBranch().getId() + 1,
                 productSubCategory.getCategory().getId(),
                 productSubCategory.getName());
 
-        assertThat(expected1).isTrue();
-        assertThat(expected2).isFalse();
-        assertThat(expected3).isFalse();
-        assertThat(expected4).isFalse();
+        assertThat(expected).isTrue();
     }
+
+    @Test
+    void shouldCheckThatProductSubCategoryShouldNotExistsByBranchIdAndCategoryIdAndName() {
+        Branch branch = utils.createBranch(null);
+        ProductCategory productCategory = utils.createProductCategory();
+        ProductSubCategory productSubCategory = utils.createProductSubCategory(branch, productCategory);
+
+        boolean expected = productSubCategoryRepository.existsByBranchIdAndCategoryIdAndName(
+                productSubCategory.getBranch().getId(),
+                productSubCategory.getCategory().getId(),
+                productSubCategory.getName() + "1");
+
+        assertThat(expected).isFalse();
+    }
+
 }

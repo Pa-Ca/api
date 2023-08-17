@@ -12,16 +12,15 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
 import com.paca.paca.productSubCategory.utils.ProductCategoryMapper;
-import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
 import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
 import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
@@ -32,29 +31,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductSubCategoryService {
 
-    private final ProductSubCategoryMapper productSubCategoryMapper;
+    private final ProductMapper productMapper;
 
     private final ProductCategoryMapper productCategoryMapper;
 
-    private final ProductMapper productMapper;
-
-    private final ProductSubCategoryRepository productSubCategoryRepository;
-
-    private final ProductCategoryRepository productCategoryRepository;
+    private final ProductSubCategoryMapper productSubCategoryMapper;
 
     private final BranchRepository branchRepository;
 
     private final ProductRepository productRepository;
 
-    public ProductSubCategoryListDTO getAll() {
-        List<ProductSubCategoryDTO> response = new ArrayList<>();
-        productSubCategoryRepository.findAll().forEach(category -> {
-            ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(category);
-            response.add(dto);
-        });
+    private final ProductCategoryRepository productCategoryRepository;
 
-        return ProductSubCategoryListDTO.builder().productSubCategories(response).build();
-    }
+    private final ProductSubCategoryRepository productSubCategoryRepository;
 
     public ProductCategoryListDTO getAllProductCategories() {
         List<ProductCategoryDTO> response = new ArrayList<>();

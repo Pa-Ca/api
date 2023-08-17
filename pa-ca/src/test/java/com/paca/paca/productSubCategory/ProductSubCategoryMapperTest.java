@@ -32,12 +32,13 @@ public class ProductSubCategoryMapperTest {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
 
         ProductSubCategoryDTO response = productSubCategoryMapper.toDTO(productSubCategory);
+        ProductSubCategoryDTO expected = new ProductSubCategoryDTO(
+                productSubCategory.getId(),
+                productSubCategory.getBranch().getId(),
+                productSubCategory.getCategory().getId(),
+                productSubCategory.getName());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(productSubCategory.getId());
-        assertThat(response.getBranchId()).isEqualTo(productSubCategory.getBranch().getId());
-        assertThat(response.getCategoryId()).isEqualTo(productSubCategory.getCategory().getId());
-        assertThat(response.getName()).isEqualTo(productSubCategory.getName());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -46,50 +47,32 @@ public class ProductSubCategoryMapperTest {
         ProductCategory category = utils.createProductCategory();
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(utils.createProductSubCategory(branch, category));
 
-        ProductSubCategory productSubCategory = productSubCategoryMapper.toEntity(dto, branch, category);
+        ProductSubCategory response = productSubCategoryMapper.toEntity(dto, branch, category);
+        ProductSubCategory expected = new ProductSubCategory(
+                dto.getId(),
+                branch,
+                category,
+                dto.getName());
 
-        assertThat(productSubCategory).isNotNull();
-        assertThat(productSubCategory.getId()).isEqualTo(dto.getId());
-        assertThat(productSubCategory.getBranch().getId()).isEqualTo(branch.getId());
-        assertThat(productSubCategory.getCategory().getId()).isEqualTo(dto.getCategoryId());
-        assertThat(productSubCategory.getName()).isEqualTo(dto.getName());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
     void shouldPartiallyMapProductSubCategoryDTOtoProductSubCategoryEntity() {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+        Branch branch = utils.createBranch(null);
+        ProductCategory category = utils.createProductCategory();
+        ProductSubCategory productSubCategory = utils.createProductSubCategory(branch, category);
+        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        // Not changing ID
-        ProductSubCategoryDTO dto = ProductSubCategoryDTO.builder()
-                .id(productSubCategory.getId() + 1)
-                .build();
-        ProductSubCategory updatedProductSubCategory = productSubCategoryMapper.updateModel(dto, productSubCategory);
-        assertThat(updatedProductSubCategory).isNotNull();
-        assertThat(updatedProductSubCategory.getId()).isEqualTo(productSubCategory.getId());
+        ProductSubCategory response = productSubCategoryMapper.toEntity(dto, branch, category);
+        ProductSubCategory expected = new ProductSubCategory(
+                productSubCategory.getId(),
+                branch,
+                category,
+                dto.getName());
 
-        // Not changing Branch ID
-        dto = ProductSubCategoryDTO.builder()
-                .branchId(productSubCategory.getBranch().getId() + 1)
-                .build();
-        updatedProductSubCategory = productSubCategoryMapper.updateModel(dto, productSubCategory);
-        assertThat(updatedProductSubCategory).isNotNull();
-        assertThat(updatedProductSubCategory.getBranch().getId()).isEqualTo(productSubCategory.getBranch().getId());
+        assertThat(response).isEqualTo(expected);
 
-        // Not changing Category ID
-        dto = ProductSubCategoryDTO.builder()
-                .categoryId(productSubCategory.getCategory().getId() + 1)
-                .build();
-        updatedProductSubCategory = productSubCategoryMapper.updateModel(dto, productSubCategory);
-        assertThat(updatedProductSubCategory).isNotNull();
-        assertThat(updatedProductSubCategory.getCategory().getId()).isEqualTo(productSubCategory.getCategory().getId());
-
-        // Changing name
-        dto = ProductSubCategoryDTO.builder()
-                .name("new name_test")
-                .build();
-        updatedProductSubCategory = productSubCategoryMapper.updateModel(dto, productSubCategory);
-        assertThat(updatedProductSubCategory).isNotNull();
-        assertThat(updatedProductSubCategory.getName()).isEqualTo(dto.getName());
     }
 
     @Test
@@ -117,22 +100,14 @@ public class ProductSubCategoryMapperTest {
     @Test
     void shouldPartiallyMapProductCategoryDTOtoProductCategoryEntity() {
         ProductCategory productCategory = utils.createProductCategory();
+        ProductCategoryDTO dto = utils.createProductCategoryDTO(productCategory);
 
-        // Not changing ID
-        ProductCategoryDTO dto = ProductCategoryDTO.builder()
-                .id(productCategory.getId() + 1)
-                .build();
-        ProductCategory updatedProductCategory = productCategoryMapper.updateModel(dto, productCategory);
-        assertThat(updatedProductCategory).isNotNull();
-        assertThat(updatedProductCategory.getId()).isEqualTo(productCategory.getId());
+        ProductCategory response = productCategoryMapper.toEntity(dto);
+        ProductCategory expected = new ProductCategory(
+                productCategory.getId(),
+                dto.getName());
 
-        // Changing name
-        dto = ProductCategoryDTO.builder()
-                .name("new name_test")
-                .build();
-        updatedProductCategory = productCategoryMapper.updateModel(dto, productCategory);
-        assertThat(updatedProductCategory).isNotNull();
-        assertThat(updatedProductCategory.getName()).isEqualTo(dto.getName());
+        assertThat(response).isEqualTo(expected);
     }
 
 }

@@ -13,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "product_sub_category")
 public class ProductSubCategory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_sub_category_seq")
     @SequenceGenerator(name = "product_sub_category_seq", sequenceName = "product_sub_category_seq", allocationSize = 1)
