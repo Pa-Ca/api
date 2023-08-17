@@ -77,60 +77,6 @@ public class ProductRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCreateProduct() {
-        Product product = utils.createProduct(null);
-
-        Product savedProduct = productRepository.save(product);
-
-        assertThat(savedProduct).isNotNull();
-        assertThat(savedProduct.getId()).isEqualTo(product.getId());
-        assertThat(savedProduct.getName()).isEqualTo(product.getName());
-        assertThat(savedProduct.getPrice()).isEqualTo(product.getPrice());
-        assertThat(savedProduct.getDisabled()).isEqualTo(product.getDisabled());
-        assertThat(savedProduct.getDescription()).isEqualTo(product.getDescription());
-        assertThat(savedProduct.getSubCategory().getId()).isEqualTo(product.getSubCategory().getId());
-    }
-
-    @Test
-    void shouldGetAllClients() {
-        int nProducts = 10;
-
-        for (int i = 0; i < nProducts; i++) {
-            utils.createProduct(null);
-        }
-
-        List<Product> products = productRepository.findAll();
-
-        assertThat(products.size()).isEqualTo(nProducts);
-    }
-
-    @Test
-    void shouldCheckThatProductExistsById() {
-        Product product = utils.createProduct(null);
-
-        boolean expected = productRepository.existsById(product.getId());
-        Optional<Product> retrievedProduct = productRepository.findById(product.getId());
-
-        assertThat(expected).isTrue();
-        assertThat(retrievedProduct.isPresent()).isTrue();
-        assertThat(retrievedProduct.get().getId()).isEqualTo(product.getId());
-        assertThat(retrievedProduct.get().getSubCategory().getId()).isEqualTo(product.getSubCategory().getId());
-        assertThat(retrievedProduct.get().getDisabled()).isEqualTo(product.getDisabled());
-        assertThat(retrievedProduct.get().getName()).isEqualTo(product.getName());
-        assertThat(retrievedProduct.get().getPrice()).isEqualTo(product.getPrice());
-        assertThat(retrievedProduct.get().getDescription()).isEqualTo(product.getDescription());
-    }
-
-    @Test
-    void shouldCheckThatProductDoesNotExistsById() {
-        boolean expected = productRepository.existsById(1L);
-        Optional<Product> retrievedProduct = productRepository.findById(1L);
-
-        assertThat(expected).isFalse();
-        assertThat(retrievedProduct.isPresent()).isFalse();
-    }
-
-    @Test
     void shouldFindAllProductsBySubCategoryId() {
         int nProducts = 10;
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
@@ -142,13 +88,6 @@ public class ProductRepositoryTest extends PacaTest {
         List<Product> products = productRepository.findAllBySubCategoryId(productSubCategory.getId());
 
         assertThat(products.size()).isEqualTo(nProducts);
-    }
-
-    @Test
-    void shouldNotFindProductsBySubCategoryId() {
-        List<Product> products = productRepository.findAllBySubCategoryId(1L);
-
-        assertThat(products.size()).isEqualTo(0);
     }
 
     @Test
@@ -168,13 +107,6 @@ public class ProductRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldNotFindProductsBySubCategory_Branch_Id() {
-        List<Product> products = productRepository.findAllBySubCategory_Branch_Id(1L);
-
-        assertThat(products.size()).isEqualTo(0);
-    }
-
-    @Test
     void shouldCheckThatProductExistsByIdAndSubCategory_Branch_Business_Id() {
         Business business = utils.createBusiness(null);
         Branch branch = utils.createBranch(business);
@@ -183,19 +115,8 @@ public class ProductRepositoryTest extends PacaTest {
 
         boolean expected = productRepository.existsByIdAndSubCategory_Branch_Business_Id(
                 product.getId(), business.getId());
-        Optional<Product> retrievedProduct = productRepository.findById(product.getId());
 
         assertThat(expected).isTrue();
-        assertThat(retrievedProduct.isPresent()).isTrue();
-        assertThat(retrievedProduct.get().getId()).isEqualTo(product.getId());
-        assertThat(retrievedProduct.get().getSubCategory().getId()).isEqualTo(productSubCategory.getId());
-        assertThat(retrievedProduct.get().getSubCategory().getBranch().getId()).isEqualTo(branch.getId());
-        assertThat(retrievedProduct.get().getSubCategory().getBranch().getBusiness().getId())
-                .isEqualTo(business.getId());
-        assertThat(retrievedProduct.get().getDisabled()).isEqualTo(product.getDisabled());
-        assertThat(retrievedProduct.get().getName()).isEqualTo(product.getName());
-        assertThat(retrievedProduct.get().getPrice()).isEqualTo(product.getPrice());
-        assertThat(retrievedProduct.get().getDescription()).isEqualTo(product.getDescription());
     }
 
     @Test

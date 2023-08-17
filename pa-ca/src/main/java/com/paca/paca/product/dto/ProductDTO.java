@@ -17,8 +17,8 @@ public class ProductDTO {
 
     private Long id;
     private Long subCategoryId;
-    private Boolean disabled;
     private String name;
     private BigDecimal price;
     private String description;
+    private Boolean disabled;
 }

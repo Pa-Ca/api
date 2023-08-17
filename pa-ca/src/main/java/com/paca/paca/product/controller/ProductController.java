@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paca.paca.product.dto.ProductDTO;
-import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
@@ -36,30 +35,23 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @GetMapping
-    @ValidateRoles({})
-    @Operation(summary = "Get all products", description = "Returns a list with all products")
-    public ResponseEntity<ProductListDTO> getAll() {
-        return ResponseEntity.ok(productService.getAll());
-    }
-
-    @PostMapping
     @ValidateRoles({ "business" })
+    @PostMapping(ProductStatics.Endpoint.SAVE)
     @Operation(summary = "Create new product", description = "Create a new product in the app")
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto)
             throws NoContentException, ConflictException {
         return ResponseEntity.ok(productService.save(dto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(ProductStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get product by ID", description = "Gets the data of a product given its ID")
     public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(productService.getById(id));
     }
 
-    @PutMapping("/{id}")
     @ValidateProductOwner
     @ValidateRoles({ "business" })
+    @PutMapping(ProductStatics.Endpoint.UPDATE)
     @Operation(summary = "Update product", description = "Updates the data of a product given its ID")
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
@@ -69,8 +61,8 @@ public class ProductController {
     }
 
     @ValidateProductOwner
-    @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @DeleteMapping(ProductStatics.Endpoint.DELETE)
     @Operation(summary = "Delete product", description = "Delete the data of a product given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         productService.delete(id);

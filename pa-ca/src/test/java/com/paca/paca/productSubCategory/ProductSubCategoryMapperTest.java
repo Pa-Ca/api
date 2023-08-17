@@ -62,8 +62,12 @@ public class ProductSubCategoryMapperTest {
         Branch branch = utils.createBranch(null);
         ProductCategory category = utils.createProductCategory();
         ProductSubCategory productSubCategory = utils.createProductSubCategory(branch, category);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
+        ProductSubCategoryDTO dto = new ProductSubCategoryDTO(
+                productSubCategory.getId() + 1,
+                branch.getId() + 1,
+                category.getId() + 1,
+                productSubCategory.getName() + ".");
         ProductSubCategory response = productSubCategoryMapper.toEntity(dto, branch, category);
         ProductSubCategory expected = new ProductSubCategory(
                 productSubCategory.getId(),
@@ -100,8 +104,10 @@ public class ProductSubCategoryMapperTest {
     @Test
     void shouldPartiallyMapProductCategoryDTOtoProductCategoryEntity() {
         ProductCategory productCategory = utils.createProductCategory();
-        ProductCategoryDTO dto = utils.createProductCategoryDTO(productCategory);
 
+        ProductCategoryDTO dto = new ProductCategoryDTO(
+                productCategory.getId() + 1,
+                productCategory.getName() + ".");
         ProductCategory response = productCategoryMapper.toEntity(dto);
         ProductCategory expected = new ProductCategory(
                 productCategory.getId(),

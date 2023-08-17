@@ -16,6 +16,7 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Table(name = "product")
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
     @SequenceGenerator(name = "product_seq", sequenceName = "product_seq", allocationSize = 1)
@@ -26,11 +27,11 @@ public class Product {
     @JoinColumn(name = "product_sub_category_id", nullable = false)
     private ProductSubCategory subCategory;
 
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
-
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
 
     @Column(name = "description", nullable = false)
     private String description;
