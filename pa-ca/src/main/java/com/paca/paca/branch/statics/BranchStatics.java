@@ -6,19 +6,22 @@ public interface BranchStatics {
         String PATH = "/api/v1/branch";
 
         String SAVE = "";
-    }
+        String UPDATE = "/{id}";
+        String DELETE = "/{id}";
+        String GET_BY_ID = "/{id}";
 
-    interface BranchSortingKeys {
-        String SCORE = "score";
-        String CAPACITY = "capacity";
-        String RESERVATION_PRICE = "reservation_price";
-        String NAME = "name";
+        String SAVE_AMENITIES = "/{id}/amenity";
+        String DELETE_AMENITIES = "/{id}/amenity/{amenityId}";
 
-        static boolean contains(String sorting_key) {
-            return sorting_key.equals(SCORE) ||
-                    sorting_key.equals(CAPACITY) ||
-                    sorting_key.equals(RESERVATION_PRICE) ||
-                    sorting_key.equals(NAME);
-        }
+        String GET_SALES = "/{id}/sale";
+        String GET_REVIEWS = "/{id}/review";
+        String GET_ALL_TABLES = "/{id}/table";
+        String GET_ALL_PRODUCTS = "/{id}/product";
+        String GET_ALL_AMENITIES = "/{id}/amenity";
+        String GET_RESERVATIONS = "/{id}/reservation";
+        String GET_ALL_PROMOTIONS = "/{id}/promotion";
+        String GET_ALL_PAYMENT_OPTIONS = "/{id}/payment-option";
+        String GET_ALL_FAVORITE_CLIENTS = "/{id}/favorite-client";
+        String GET_ALL_PRODUCT_SUB_CATEGORIES = "/{id}/product-sub-category";
     }
 }

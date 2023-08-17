@@ -12,8 +12,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentOptionDTO {
+
     private Long id;
-    private Long branchId; 
+    private Long branchId;
     private String name;
     private String description;
 }

@@ -1,10 +1,10 @@
 package com.paca.paca.business.service;
 
 import com.paca.paca.user.model.User;
-import com.paca.paca.branch.dto.TaxDTO;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.branch.utils.TaxMapper;
+import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.BranchInfoDTO;
 import com.paca.paca.business.dto.BusinessDTO;

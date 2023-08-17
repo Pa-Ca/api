@@ -8,15 +8,13 @@ public interface TaxStatics {
         String SAVE = "";
     }
 
-
     interface Types {
-        Integer FIXED = 0;
-        Integer PERCENTAGE = 1; 
-        
-        static boolean isTypeValid(Integer type) {
+        Short FIXED = 0;
+        Short PERCENTAGE = 1;
+
+        static boolean isTypeValid(Short type) {
             return type.equals(FIXED) || type.equals(PERCENTAGE);
         }
     }
 
-    
 }

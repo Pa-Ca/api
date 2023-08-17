@@ -1,1 +1,0 @@
-ALTER TABLE reservation DROP COLUMN petition;

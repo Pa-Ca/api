@@ -12,8 +12,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TableDTO {
+
     private Long id;
+    private Long branchId;
     private String name;
-    private Long branchId; 
-    private boolean deleted;
 }

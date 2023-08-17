@@ -14,7 +14,6 @@ import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
-import com.paca.paca.business.model.Business;
 import com.paca.paca.business.repository.BusinessRepository;
 
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -33,7 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class PaymentOptionRepositoryTest extends PacaTest {
-    
+
     @Autowired
     private BranchRepository branchRepository;
 
@@ -66,7 +65,7 @@ public class PaymentOptionRepositoryTest extends PacaTest {
     void restoreBranchDB() {
         branchRepository.deleteAll();
         paymentOptionRepository.deleteAll();
-        
+
     }
 
     @AfterEach
@@ -76,7 +75,7 @@ public class PaymentOptionRepositoryTest extends PacaTest {
         userRepository.deleteAll();
         businessRepository.deleteAll();
         branchRepository.deleteAll();
-        
+
     }
 
     @Test
@@ -84,12 +83,11 @@ public class PaymentOptionRepositoryTest extends PacaTest {
         // Arrange
         Branch branch = utils.createBranch(null);
         PaymentOption paymentOption = PaymentOption.builder()
-                                .branch(branch)
-                                .name("VAT")
-                                .description("Descripcion")
-                                .build();
+                .branch(branch)
+                .name("VAT")
+                .description("Descripcion")
+                .build();
 
-            
         // Act
         PaymentOption savedPaymentOption = paymentOptionRepository.save(paymentOption);
 
@@ -101,59 +99,36 @@ public class PaymentOptionRepositoryTest extends PacaTest {
         assertThat(savedPaymentOption.getDescription()).isEqualTo("Descripcion");
     }
 
-    @Test 
-    void shouldGetAllPaymentOptions(){
-        // Arrange
+    @Test
+    void shouldGetAllPaymentOptionsByBranchId() {
+        int nPaymentOptions = 10;
         Branch branch = utils.createBranch(null);
-        PaymentOption paymentOption1 = PaymentOption.builder()
-                                .branch(branch)
-                                .name("VAT")
-                                .description("Descripcion")
-                                .build();
-        PaymentOption paymentOption2 = PaymentOption.builder()
-                                .branch(branch)
-                                .name("IVA")
-                                .description("Descripcion")
-                                .build();
-        PaymentOption paymentOption3 = PaymentOption.builder()
-                                .branch(branch)
-                                .name("VATB")
-                                .description("Descripcion")
-                                .build();
-        paymentOptionRepository.save(paymentOption1);
-        paymentOptionRepository.save(paymentOption2);
-        paymentOptionRepository.save(paymentOption3);
 
-        // Act
-        List<PaymentOption> paymentOptions = paymentOptionRepository.findAll();
+        for (int i = 0; i < nPaymentOptions; i++) {
+            utils.createPaymentOption(branch);
+            utils.createPaymentOption(null);
+        }
 
-        // Assert
-        assertThat(paymentOptions).isNotNull();
-        assertThat(paymentOptions.size()).isEqualTo(3);
-        assertThat(paymentOptions.get(0)).isEqualTo(paymentOption1);
-        assertThat(paymentOptions.get(1)).isEqualTo(paymentOption2);
-        assertThat(paymentOptions.get(2)).isEqualTo(paymentOption3);
+        List<PaymentOption> paymentOptions = paymentOptionRepository.findAllByBranchId(branch.getId());
+
+        assertThat(paymentOptions.size()).isEqualTo(nPaymentOptions);
     }
 
+    @Test
+    void shouldCheckThatPaymentOptionExistsByIdAndBranch_Business_Id() {
+        Branch branch = utils.createBranch(null);
+        PaymentOption paymentOption = utils.createPaymentOption(branch);
+
+        assertThat(paymentOptionRepository.existsByIdAndBranch_Business_Id(paymentOption.getId(),
+                branch.getBusiness().getId())).isTrue();
+    }
 
     @Test
-    void shouldCheckPaymentOptionBusiness(){
-        // Create a business
-        Business business = utils.createBusiness(null);
-        // Create a branch
-        Branch branch = utils.createBranch(business);
-        // Create a payment option
-        PaymentOption paymentOption = PaymentOption.builder()
-                                .branch(branch)
-                                .name("VAT")
-                                .description("Descripcion")
-                                .build();
-        
-        // Save payment option
-        paymentOptionRepository.save(paymentOption);
-        
-        assertThat(
-            paymentOptionRepository.existsByIdAndBranch_Business_Id(paymentOption.getId(), business.getId())
-        ).isTrue();
+    void shouldCheckThatPaymentOptionDoesNotExistsByIdAndBranch_Business_Id() {
+        Branch branch = utils.createBranch(null);
+        PaymentOption paymentOption = utils.createPaymentOption(branch);
+
+        assertThat(paymentOptionRepository.existsByIdAndBranch_Business_Id(paymentOption.getId(),
+                branch.getBusiness().getId() + 1)).isFalse();
     }
 }

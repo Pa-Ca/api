@@ -16,17 +16,17 @@ public class ProductSubCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_sub_category_seq")
     @SequenceGenerator(name = "product_sub_category_seq", sequenceName = "product_sub_category_seq", allocationSize = 1)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "branch_id")
+    @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "product_category_id")
+    @JoinColumn(name = "product_category_id", nullable = false)
     private ProductCategory category;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 }

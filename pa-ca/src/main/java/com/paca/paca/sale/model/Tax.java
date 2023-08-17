@@ -21,7 +21,7 @@ public class Tax {
     private String name;
 
     @Column(name = "type")
-    private Integer type;
+    private Short type;
 
     @Column(name = "value")
     private Float value;
@@ -31,6 +31,3 @@ public class Tax {
     private Sale sale;
 
 };
-
-
-

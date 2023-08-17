@@ -2,9 +2,7 @@ package com.paca.paca.branch;
 
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.branch.dto.BranchDTO;
-import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.utils.BranchMapperImpl;
 import com.paca.paca.branch.utils.AmenityMapperImpl;
@@ -34,25 +32,27 @@ public class BranchMapperTest {
         Branch branch = utils.createBranch(null);
 
         BranchDTO response = branchMapper.toDTO(branch);
+        BranchDTO expected = new BranchDTO(
+                branch.getId(),
+                branch.getBusiness().getId(),
+                branch.getName(),
+                branch.getScore(),
+                branch.getCapacity(),
+                branch.getReservationPrice(),
+                branch.getMapsLink(),
+                branch.getLocation(),
+                branch.getOverview(),
+                branch.getVisibility(),
+                branch.getReserveOff(),
+                branch.getPhoneNumber(),
+                branch.getType(),
+                branch.getHourIn(),
+                branch.getHourOut(),
+                branch.getAverageReserveTime(),
+                branch.getDollarExchange(),
+                branch.getDeleted());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(branch.getId());
-        assertThat(response.getBusinessId()).isEqualTo(branch.getBusiness().getId());
-        assertThat(response.getLocation()).isEqualTo(branch.getLocation());
-        assertThat(response.getMapsLink()).isEqualTo(branch.getMapsLink());
-        assertThat(response.getName()).isEqualTo(branch.getName());
-        assertThat(response.getOverview()).isEqualTo(branch.getOverview());
-        assertThat(response.getScore()).isEqualTo(branch.getScore());
-        assertThat(response.getCapacity()).isEqualTo(branch.getCapacity());
-        assertThat(response.getReservationPrice()).isEqualTo(branch.getReservationPrice());
-        assertThat(response.getReserveOff()).isEqualTo(branch.getReserveOff());
-        assertThat(response.getAverageReserveTime()).isEqualTo(branch.getAverageReserveTime());
-        assertThat(response.getVisibility()).isEqualTo(branch.getVisibility());
-        assertThat(response.getPhoneNumber()).isEqualTo(branch.getPhoneNumber());
-        assertThat(response.getType()).isEqualTo(branch.getType());
-        assertThat(response.getHourIn()).isEqualTo(branch.getHourIn());
-        assertThat(response.getHourOut()).isEqualTo(branch.getHourOut());
-        assertThat(response.getDeleted()).isEqualTo(branch.getDeleted());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -60,26 +60,28 @@ public class BranchMapperTest {
         Business business = utils.createBusiness(null);
         BranchDTO dto = utils.createBranchDTO(utils.createBranch(business));
 
-        Branch branch = branchMapper.toEntity(dto, business);
+        Branch response = branchMapper.toEntity(dto, business);
+        Branch expected = new Branch(
+                dto.getId(),
+                business,
+                dto.getName(),
+                dto.getScore(),
+                dto.getCapacity(),
+                dto.getReservationPrice(),
+                dto.getMapsLink(),
+                dto.getLocation(),
+                dto.getOverview(),
+                dto.getVisibility(),
+                dto.getReserveOff(),
+                dto.getPhoneNumber(),
+                dto.getType(),
+                dto.getHourIn(),
+                dto.getHourOut(),
+                dto.getAverageReserveTime(),
+                dto.getDollarExchange(),
+                dto.getDeleted());
 
-        assertThat(branch).isNotNull();
-        assertThat(branch.getId()).isEqualTo(dto.getId());
-        assertThat(branch.getBusiness().getId()).isEqualTo(business.getId());
-        assertThat(branch.getLocation()).isEqualTo(dto.getLocation());
-        assertThat(branch.getMapsLink()).isEqualTo(dto.getMapsLink());
-        assertThat(branch.getName()).isEqualTo(dto.getName());
-        assertThat(branch.getOverview()).isEqualTo(dto.getOverview());
-        assertThat(branch.getScore()).isEqualTo(dto.getScore());
-        assertThat(branch.getCapacity()).isEqualTo(dto.getCapacity());
-        assertThat(branch.getReservationPrice()).isEqualTo(dto.getReservationPrice());
-        assertThat(branch.getReserveOff()).isEqualTo(dto.getReserveOff());
-        assertThat(branch.getAverageReserveTime()).isEqualTo(dto.getAverageReserveTime());
-        assertThat(branch.getVisibility()).isEqualTo(dto.getVisibility());
-        assertThat(branch.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
-        assertThat(branch.getType()).isEqualTo(dto.getType());
-        assertThat(branch.getHourIn()).isEqualTo(dto.getHourIn());
-        assertThat(branch.getHourOut()).isEqualTo(dto.getHourOut());
-        assertThat(branch.getDeleted()).isEqualTo(dto.getDeleted());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -144,7 +146,7 @@ public class BranchMapperTest {
 
         // Changing capacity
         dto = BranchDTO.builder()
-                .capacity(branch.getCapacity() + 1)
+                .capacity((short) (branch.getCapacity() + 1))
                 .build();
         updatedBranch = branchMapper.updateModel(dto, branch);
         assertThat(updatedBranch).isNotNull();
@@ -214,6 +216,14 @@ public class BranchMapperTest {
         assertThat(updatedBranch).isNotNull();
         assertThat(updatedBranch.getHourOut()).isEqualTo(dto.getHourOut());
 
+        // Changing dollar exchange
+        dto = BranchDTO.builder()
+                .dollarExchange(branch.getDollarExchange() + 1F)
+                .build();
+        updatedBranch = branchMapper.updateModel(dto, branch);
+        assertThat(updatedBranch).isNotNull();
+        assertThat(updatedBranch.getDollarExchange()).isEqualTo(dto.getDollarExchange());
+
         // Changing deleted
         dto = BranchDTO.builder()
                 .deleted(!branch.getDeleted())
@@ -221,27 +231,5 @@ public class BranchMapperTest {
         updatedBranch = branchMapper.updateModel(dto, branch);
         assertThat(updatedBranch).isNotNull();
         assertThat(updatedBranch.getDeleted()).isEqualTo(dto.getDeleted());
-    }
-
-    @Test
-    void shouldMapAmenityEntityToAmenityDTO() {
-        Amenity amenity = utils.createAmenity();
-
-        AmenityDTO response = amenityMapper.toDTO(amenity);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(amenity.getId());
-        assertThat(response.getName()).isEqualTo(amenity.getName());
-    }
-
-    @Test
-    void shouldMapAmenityDTOtoAmenityEntity() {
-        AmenityDTO dto = utils.createAmenityDTO(utils.createAmenity());
-
-        Amenity amenity = amenityMapper.toEntity(dto);
-
-        assertThat(amenity).isNotNull();
-        assertThat(amenity.getId()).isEqualTo(dto.getId());
-        assertThat(amenity.getName()).isEqualTo(dto.getName());
     }
 }

@@ -1,12 +1,13 @@
 package com.paca.paca.utils;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Date;
 import java.util.UUID;
+import java.util.Calendar;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -27,6 +28,7 @@ import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.branch.model.Amenity;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
@@ -37,25 +39,28 @@ import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.user.dto.UserRequestDTO;
-import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.branch.model.Tax;
 import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.sale.statics.TaxStatics;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
 import com.paca.paca.user.dto.UserResponseDTO;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
+import com.paca.paca.branch.dto.TaxDTO;
 import com.paca.paca.branch.dto.PaymentOptionDTO;
 import com.paca.paca.reservation.dto.GuestDTO;
+import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
+import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.reservation.model.ClientGroup;
@@ -78,6 +83,7 @@ import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.productSubCategory.model.ProductCategory;
@@ -89,6 +95,7 @@ import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
 import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
@@ -117,6 +124,10 @@ public class TestUtils {
 
     TierRepository tierRepository;
 
+    SaleRepository saleRepository;
+
+    TableRepository tableRepository;
+
     GuestRepository guestRepository;
 
     ClientRepository clientRepository;
@@ -127,23 +138,21 @@ public class TestUtils {
 
     ReviewRepository reviewRepository;
 
+    InvoiceRepository invoiceRepository;
+
     AmenityRepository amenityRepository;
 
     ProductRepository productRepository;
 
     BusinessRepository businessRepository;
 
-    TableRepository tableRepository;
+    PromotionRepository promotionRepository;
 
     DefaultTaxRepository defaultTaxRepository;
 
-    SaleRepository saleRepository;
+    ReviewLikeRepository reviewLikeRepository;
 
     SaleProductRepository saleProductRepository;
-
-    PromotionRepository promotionRepository;
-
-    ReviewLikeRepository reviewLikeRepository;
 
     ClientGroupRepository clientGroupRepository;
 
@@ -151,13 +160,13 @@ public class TestUtils {
 
     BranchAmenityRepository branchAmenityRepository;
 
+    PaymentOptionRepository paymentOptionRepository;
+
     FavoriteBranchRepository favoriteBranchRepository;
 
     ProductCategoryRepository productCategoryRepository;
 
     ProductSubCategoryRepository productSubCategoryRepository;
-
-    PaymentOptionRepository paymentOptionRepository;
 
     public static <T> List<T> castList(Class<? extends T> clazz, List<?> rawCollection) {
         List<T> result = new ArrayList<>(rawCollection.size());
@@ -301,7 +310,7 @@ public class TestUtils {
                 .stripeCustomerId("stripe_id_test")
                 .phoneNumber("+580000000")
                 .address("Test address")
-                .dateOfBirth(new java.sql.Date(System.currentTimeMillis()))
+                .dateOfBirth(new java.util.Date(System.currentTimeMillis()))
                 .identityDocument("V" + ThreadLocalRandom.current().nextLong(99999999))
                 .build();
         if (clientRepository != null) {
@@ -832,18 +841,16 @@ public class TestUtils {
         return dto;
     }
 
-    public Reservation createReservation(Branch branch, Guest guest) {
+    public Reservation createReservation(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
-        }
-        if (guest == null) {
-            guest = createGuest();
         }
 
         Reservation reservation = Reservation.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch)
-                .guest(guest)
+                .guest(null)
+                .invoice(null)
                 .requestDate(new Date(System.currentTimeMillis()))
                 .reservationDateIn(new Date(System.currentTimeMillis()))
                 .reservationDateOut(new Date(System.currentTimeMillis()))
@@ -864,15 +871,55 @@ public class TestUtils {
         return reservation;
     }
 
-    public Reservation createReservation(Branch branch) {
+    public Reservation createReservation(Branch branch, Guest guest) {
         if (branch == null) {
             branch = createBranch(null);
+        }
+        if (guest == null) {
+            guest = createGuest();
         }
 
         Reservation reservation = Reservation.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
                 .branch(branch)
-                .guest(null)
+                .guest(guest)
+                .invoice(null)
+                .requestDate(new Date(System.currentTimeMillis()))
+                .reservationDateIn(new Date(System.currentTimeMillis()))
+                .reservationDateOut(new Date(System.currentTimeMillis()))
+                .clientNumber(5)
+                .tableNumber(2)
+                .payment("payment_test")
+                .status(0)
+                .payDate(new Date(System.currentTimeMillis()))
+                .price(BigDecimal.valueOf(5.0f))
+                .occasion("Anniversary")
+                .byClient(Boolean.TRUE)
+                .build();
+
+        if (reservationRepository != null) {
+            reservation = reservationRepository.save(reservation);
+        }
+
+        return reservation;
+    }
+
+    public Reservation createReservation(Branch branch, Guest guest, Invoice invoice) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+        if (guest == null) {
+            guest = createGuest();
+        }
+        if (invoice == null) {
+            invoice = createInvoice(null, null);
+        }
+
+        Reservation reservation = Reservation.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .branch(branch)
+                .guest(guest)
+                .invoice(invoice)
                 .requestDate(new Date(System.currentTimeMillis()))
                 .reservationDateIn(new Date(System.currentTimeMillis()))
                 .reservationDateOut(new Date(System.currentTimeMillis()))
@@ -1038,15 +1085,10 @@ public class TestUtils {
     }
 
     // Create a new Tax
-    public Tax createTax(Sale sale) {
-
-        if (sale == null) {
-            sale = createSale(null, null, null);
-        }
+    public Tax createTax() {
 
         Tax tax = Tax.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
-                .sale(sale)
                 .name("Tax")
                 .type(TaxStatics.Types.PERCENTAGE)
                 .value(50.f)
@@ -1056,18 +1098,18 @@ public class TestUtils {
     }
 
     // Create a new DefaultTax
-    public DefaultTax createDefaultTax(Branch branch) {
-
-        // If the branch is null, create a new one
+    public DefaultTax createDefaultTax(Tax tax, Branch branch) {
+        if (tax == null) {
+            tax = createTax();
+        }
         if (branch == null) {
             branch = createBranch(null);
         }
 
         DefaultTax defaultTax = DefaultTax.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
+                .tax(tax)
                 .branch(branch)
-                .name("Default Tax")
-                .type(DefaultTaxStatics.Types.PERCENTAGE)
                 .build();
 
         if (defaultTaxRepository != null) {
@@ -1096,7 +1138,7 @@ public class TestUtils {
         return table;
     }
 
-    public PaymentOption createPaymentOption(Branch branch){
+    public PaymentOption createPaymentOption(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
         }
@@ -1106,7 +1148,7 @@ public class TestUtils {
                 .branch(branch)
                 .name("PaymentOption_" + UUID.randomUUID().toString())
                 .build();
-        
+
         if (paymentOptionRepository != null) {
             paymentOption = paymentOptionRepository.save(paymentOption);
         }
@@ -1232,7 +1274,7 @@ public class TestUtils {
         return dto;
     }
 
-    public PaymentOptionDTO createPaymentOptionDTO(Branch branch){
+    public PaymentOptionDTO createPaymentOptionDTO(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
         }
@@ -1246,43 +1288,61 @@ public class TestUtils {
         return dto;
     }
 
-    public DefaultTaxDTO createDefaultTaxDTO(Branch branch) {
-
-        // If the branch is null, create a new one
-        if (branch == null) {
-            branch = createBranch(null);
+    public DefaultTaxDTO createDefaultTaxDTO(DefaultTax defaultTax) {
+        if (defaultTax == null) {
+            defaultTax = createDefaultTax(null, null);
         }
 
         DefaultTaxDTO dto = DefaultTaxDTO.builder()
                 .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branchId(branch.getId())
-                .name("Default Tax")
-                .type(DefaultTaxStatics.Types.PERCENTAGE)
-                .value(5.0f)
+                .branchId(defaultTax.getBranch().getId())
+                .tax(createTaxDTO(defaultTax.getTax()))
                 .build();
 
         return dto;
     }
 
-    public TaxDTO createTaxDTO(Sale sale) {
-
-        // If the branch is null, create a new one
-        if (sale == null) {
-            sale = createSale(null, null, null);
+    public TaxDTO createTaxDTO(Tax tax) {
+        if (tax == null) {
+            tax = createTax();
         }
 
         TaxDTO dto = TaxDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .saleId(sale.getId())
-                .name("Tax")
-                .type(TaxStatics.Types.PERCENTAGE)
-                .value(5.0f)
+                .id(tax.getId())
+                .type(tax.getType())
+                .name(tax.getName())
+                .value(tax.getValue())
                 .build();
 
         return dto;
     }
 
-    public List<Sale> createTestSales(Branch branchA, Branch branchB) {
+    public List<Sale> createTestSales(
+            List<Branch> branches,
+            Date minDate,
+            Date maxDate,
+            List<String> names,
+            List<String> surnames,
+            List<String> identityDocuments) {
+        Random rand = new Random();
+
+        // Create random tables
+        List<Table> tables = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            Table table = createTable(branches.get(rand.nextInt(branches.size())));
+            if (tableRepository != null) {
+                table = tableRepository.save(table);
+            }
+            tables.add(table);
+        }
+
+        // Create random reservations
+        List<Reservation> reservations = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            Reservation reservation = createReservation(branches.get(rand.nextInt(branches.size())));
+            reservations.add(reservation);
+        }
+
         // Create reservations
         Reservation reservationA1 = createReservation(branchA, null);
         Reservation reservationA2 = createReservation(branchA);
@@ -1312,188 +1372,6 @@ public class TestUtils {
         calendar.add(Calendar.HOUR_OF_DAY, -2);
         Date fourHoursBeforeNow = calendar.getTime();
 
-        // For each table create a sale
-        // Have the sales vary status and time
-        // If the sales status is ongoing then the endTime nowtus is closed then the
-        // endTime now status is cancelled then the endTime now
-        Sale saleAA1 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .note("Nota de prueba 1")
-                .startTime(fourHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(reservationA1)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableAA.getName())
-                .build();
-        Sale saleAA2 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .note("Nota de prueba 2")
-                .startTime(twoHoursBeforeNow)
-                .endTime(now)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.cancelled)
-                .reservation(reservationA2)
-                .tableName(tableAA.getName())
-                .build();
-
-        Sale saleAA3 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(reservationA1)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableAA.getName())
-                .endTime(oneHourAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-
-        Sale saleAA4 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .startTime(fourHoursBeforeNow)
-                .note("Nota de prueba 4")
-                .reservation(null)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.cancelled)
-                .tableName(tableAA.getName())
-                .endTime(oneHourAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-        // Now do the rest of the tables
-        // TableAB
-        Sale saleAB1 = Sale.builder()
-                .table(tableAB)
-                .tableName(tableAB.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableAB.getName())
-                .build();
-        Sale saleAB2 = Sale.builder()
-                .table(tableAB)
-                .tableName(tableAB.getName())
-                .note("Nota de prueba 2")
-                .startTime(fourHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.ongoing)
-                .reservation(null)
-                .tableName(tableAB.getName())
-                .build();
-
-        Sale saleAB3 = Sale.builder()
-                .table(tableAB)
-                .tableName(tableAB.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(reservationA1)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableAB.getName())
-                .endTime(twoHoursAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-
-        // TableAC
-        Sale saleAC1 = Sale.builder()
-                .table(tableAC)
-                .tableName(tableAC.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(reservationA2)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableAC.getName())
-                .build();
-
-        Sale saleAC2 = Sale.builder()
-                .table(tableAC)
-                .tableName(tableAC.getName())
-                .note("Nota de prueba 2")
-                .startTime(twoHoursBeforeNow)
-                .endTime(now)
-                .clientQuantity(3)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.closed)
-                .reservation(reservationA1)
-                .tableName(tableAC.getName())
-                .build();
-
-        Sale saleAC3 = Sale.builder()
-                .table(tableAC)
-                .tableName(tableAC.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(reservationA2)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableAC.getName())
-                .endTime(oneHourAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-
-        // TableBA
-        Sale saleBA1 = Sale.builder()
-                .table(tableBA)
-                .tableName(tableBA.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableBA.getName())
-                .build();
-
-        Sale saleBA2 = Sale.builder()
-                .table(tableBA)
-                .tableName(tableBA.getName())
-                .note("Nota de prueba 2")
-                .startTime(fourHoursBeforeNow)
-                .endTime(now)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.cancelled)
-                .reservation(null)
-                .tableName(tableBA.getName())
-                .build();
-
-        Sale saleBA3 = Sale.builder()
-                .table(tableBA)
-                .tableName(tableBA.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(null)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableBA.getName())
-                .endTime(now)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-        // TableBB
-
-        Sale saleBB1 = Sale.builder()
-                .table(tableBB)
-                .tableName(tableBB.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableBB.getName())
-                .build();
-
         // Now create a list of sales
         List<Sale> sales = new ArrayList<>();
         sales.add(saleAA1);
@@ -1517,6 +1395,126 @@ public class TestUtils {
         }
 
         return sales;
+    }
+
+    public Invoice createInvoice() {
+        Invoice invoice = new Invoice(
+                ThreadLocalRandom.current().nextLong(999999999),
+                new Date(System.currentTimeMillis()),
+                BigDecimal.valueOf(10.0f),
+                "payment test",
+                UUID.randomUUID().toString());
+
+        if (invoiceRepository != null) {
+            invoice = invoiceRepository.save(invoice);
+        }
+        return invoice;
+    }
+
+    public InvoiceDTO createInvoiceDTO(Invoice invoice) {
+        if (invoice == null) {
+            invoice = createInvoice(null);
+        }
+
+        InvoiceDTO dto = new InvoiceDTO(
+                invoice.getId(),
+                invoice.getReservation().getId(),
+                invoice.getPayDate(),
+                invoice.getPrice(),
+                invoice.getPayment(),
+                invoice.getPaymentCode());
+
+        return dto;
+    }
+
+    public List<Reservation> createTestReservations(
+            List<Branch> branches,
+            Date minDate,
+            Date maxDate,
+            List<String> names,
+            List<String> surnames,
+            List<String> identityDocuments) {
+        Random rand = new Random();
+
+        // Create random guests
+        List<Guest> guests = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Guest guest = new Guest(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    "email_test_" + UUID.randomUUID().toString(),
+                    "phone_number_test_" + UUID.randomUUID().toString(),
+                    identityDocuments.get(rand.nextInt(names.size())) + UUID.randomUUID().toString());
+            if (guestRepository != null) {
+                guest = guestRepository.save(guest);
+            }
+            guests.add(guest);
+        }
+
+        // Create random clients
+        List<Client> clients = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            User user = createUser();
+            Client client = new Client(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    user,
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    identityDocuments.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    "address_test_" + UUID.randomUUID().toString(),
+                    "phone_number_test_" + UUID.randomUUID().toString(),
+                    "stripe_id_test_" + UUID.randomUUID().toString(),
+                    new Date(System.currentTimeMillis()));
+            if (clientRepository != null) {
+                client = clientRepository.save(client);
+            }
+            clients.add(client);
+        }
+
+        // Create random reservations
+        List<Reservation> reservations = new ArrayList<>();
+        for (int i = 0; i < 5000; i++) {
+            Date date = new Date(ThreadLocalRandom.current().nextLong(
+                    minDate.getTime(),
+                    maxDate.getTime()));
+            Reservation reservation = new Reservation(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    branches.get(rand.nextInt(branches.size())),
+                    null,
+                    new Date(System.currentTimeMillis()),
+                    date,
+                    new Date(date.getTime() + 1000 * 60 * 60),
+                    BigDecimal.valueOf(5.0f),
+                    ReservationStatics.Status.ALL.get(rand.nextInt(ReservationStatics.Status.ALL.size())),
+                    Short.valueOf("1"),
+                    Short.valueOf("5"),
+                    "occasion_test_" + UUID.randomUUID().toString(),
+                    Boolean.TRUE);
+
+            if (rand.nextDouble() < 0.5) {
+                // Reservation with guest
+                reservation.setGuest(guests.get(rand.nextInt(guests.size())));
+                reservation.setByClient(Boolean.FALSE);
+            } else {
+                // Reservation with client
+                ClientGroup owner = new ClientGroup(
+                        ThreadLocalRandom.current().nextLong(999999999),
+                        clients.get(rand.nextInt(clients.size())),
+                        reservation,
+                        true);
+                if (clientGroupRepository != null) {
+                    owner = clientGroupRepository.save(owner);
+                }
+            }
+
+            if (reservationRepository != null) {
+                reservation = reservationRepository.save(reservation);
+            }
+            reservations.add(reservation);
+        }
+
+        return reservations;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.paca.paca.promotion;
 
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.auth.ControllerTest;
+import com.paca.paca.ControllerTest;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.promotion.model.Promotion;
@@ -38,112 +38,115 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = { PromotionController.class })
 public class PromotionControllerTest extends ControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private JwtService jwtService;
+        @MockBean
+        private JwtService jwtService;
 
-    @MockBean
-    private PromotionService promotionService;
+        @MockBean
+        private PromotionService promotionService;
 
-    private TestUtils utils = TestUtils.builder().build();
+        private TestUtils utils = TestUtils.builder().build();
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInGetPromotionList() throws Exception {
-        ArrayList<PromotionDTO> dtoList = new ArrayList<>();
-        dtoList.add(utils.createPromotionDTO(null));
-        PromotionListDTO promotionListDTO = PromotionListDTO.builder().promotions(dtoList).build();
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInGetPromotionList() throws Exception {
+                ArrayList<PromotionDTO> dtoList = new ArrayList<>();
+                dtoList.add(utils.createPromotionDTO(null));
+                PromotionListDTO promotionListDTO = PromotionListDTO.builder().promotions(dtoList).build();
 
-        when(promotionService.getAll()).thenReturn(promotionListDTO);
+                when(promotionService.getAll()).thenReturn(promotionListDTO);
 
-        utils.setAuthorities("client");
-        mockMvc.perform(get(PromotionStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
+                utils.setAuthorities("client");
+                mockMvc.perform(get(PromotionStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
 
-        utils.setAuthorities("business");
-        mockMvc.perform(get(PromotionStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                utils.setAuthorities("business");
+                mockMvc.perform(get(PromotionStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetPromotionList() throws Exception {
-        ArrayList<PromotionDTO> dtoList = new ArrayList<>();
-        dtoList.add(utils.createPromotionDTO(null));
-        PromotionListDTO promotionListDTO = PromotionListDTO.builder().promotions(dtoList).build();
+        @Test
+        public void shouldGetPromotionList() throws Exception {
+                ArrayList<PromotionDTO> dtoList = new ArrayList<>();
+                dtoList.add(utils.createPromotionDTO(null));
+                PromotionListDTO promotionListDTO = PromotionListDTO.builder().promotions(dtoList).build();
 
-        when(promotionService.getAll()).thenReturn(promotionListDTO);
+                when(promotionService.getAll()).thenReturn(promotionListDTO);
 
-        utils.setAuthorities("admin");
+                utils.setAuthorities("admin");
 
-        mockMvc.perform(get(PromotionStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.promotions", CoreMatchers.hasItems()));
-    }
+                mockMvc.perform(get(PromotionStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.promotions", CoreMatchers.hasItems()));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInSavePromotion() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInSavePromotion() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
 
-        when(promotionService.save(any(PromotionDTO.class))).thenReturn(dto);
+                when(promotionService.save(any(PromotionDTO.class))).thenReturn(dto);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(post(PromotionStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(post(PromotionStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetNoContentInSavePromotion() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
+        @Test
+        public void shouldGetNoContentInSavePromotion() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
 
-        when(promotionService.save(any(PromotionDTO.class))).thenThrow(new NoContentException("message", 0));
+                when(promotionService.save(any(PromotionDTO.class))).thenThrow(new NoContentException("message", 0));
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(post(PromotionStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(post(PromotionStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldSavePromotion() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
+        @Test
+        public void shouldSavePromotion() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
 
-        when(promotionService.save(any(PromotionDTO.class))).thenReturn(dto);
+                when(promotionService.save(any(PromotionDTO.class))).thenReturn(dto);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(post(PromotionStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.branchId", CoreMatchers.is(dto.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())));
-    }
+                mockMvc.perform(post(PromotionStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.branchId",
+                                                                CoreMatchers.is(dto.getBranchId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled",
+                                                CoreMatchers.is(dto.getDisabled())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())));
+        }
 
     @Test
     public void shouldGetNoContentInGetPromotionById() throws Exception {
@@ -158,170 +161,175 @@ public class PromotionControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test
-    public void shouldGetPromotionById() throws Exception {
-        PromotionDTO dto = utils.createPromotionDTO(null);
+        @Test
+        public void shouldGetPromotionById() throws Exception {
+                PromotionDTO dto = utils.createPromotionDTO(null);
 
-        when(promotionService.getById(anyLong())).thenReturn(dto);
+                when(promotionService.getById(anyLong())).thenReturn(dto);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(get(PromotionStatics.Endpoint.PATH.concat("/" + dto.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.branchId", CoreMatchers.is(dto.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())));
-    }
+                mockMvc.perform(get(PromotionStatics.Endpoint.PATH.concat("/" + dto.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.branchId",
+                                                                CoreMatchers.is(dto.getBranchId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled",
+                                                CoreMatchers.is(dto.getDisabled())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInUpdatePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInUpdatePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidUserInUpdatePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetForbiddenDueToInvalidUserInUpdatePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
+                Business business = utils.createBusiness(null);
 
-        when(promotionService.update(anyLong(), any(PromotionDTO.class))).thenReturn(dto);
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+                when(promotionService.update(anyLong(), any(PromotionDTO.class))).thenReturn(dto);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(false);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetNoContentInUpdatePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        Business business = utils.createBusiness(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
+        @Test
+        public void shouldGetNoContentInUpdatePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                Business business = utils.createBusiness(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
 
-        when(promotionService.update(anyLong(), any(PromotionDTO.class))).thenThrow(new NoContentException("message", 0));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                when(promotionService.update(anyLong(), any(PromotionDTO.class)))
+                                .thenThrow(new NoContentException("message", 0));
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldUpdatePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        Business business = utils.createBusiness(null);
-        PromotionDTO dto = utils.createPromotionDTO(promotion);
+        @Test
+        public void shouldUpdatePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                Business business = utils.createBusiness(null);
+                PromotionDTO dto = utils.createPromotionDTO(promotion);
 
-        when(promotionService.update(anyLong(), any(PromotionDTO.class))).thenReturn(dto);
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                when(promotionService.update(anyLong(), any(PromotionDTO.class))).thenReturn(dto);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.branchId", CoreMatchers.is(dto.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled", CoreMatchers.is(dto.getDisabled())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())));
-    }
+                mockMvc.perform(put(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.branchId",
+                                                                CoreMatchers.is(dto.getBranchId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.disabled",
+                                                CoreMatchers.is(dto.getDisabled())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.text", CoreMatchers.is(dto.getText())));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInDeletePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInDeletePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidUserInDeletePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetForbiddenDueToInvalidUserInDeletePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(false);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetNoContentInDeletePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetNoContentInDeletePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
-        doThrow(new NoContentException("message", 0)).when(promotionService).delete(anyLong());
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                doThrow(new NoContentException("message", 0)).when(promotionService).delete(anyLong());
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldDeletePromotionById() throws Exception {
-        Promotion promotion = utils.createPromotion(null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldDeletePromotionById() throws Exception {
+                Promotion promotion = utils.createPromotion(null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
-        doNothing().when(promotionService).delete(anyLong());
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(promotionRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                doNothing().when(promotionService).delete(anyLong());
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+                mockMvc.perform(delete(PromotionStatics.Endpoint.PATH.concat("/" + promotion.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
 
-
-    
 }

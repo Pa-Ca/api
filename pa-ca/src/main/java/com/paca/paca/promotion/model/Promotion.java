@@ -16,16 +16,16 @@ public class Promotion {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "promotion_seq")
     @SequenceGenerator(name = "promotion_seq", sequenceName = "promotion_seq", allocationSize = 1)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "branch_id")
+    @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
-    @Column(name = "disabled")
+    @Column(name = "disabled", nullable = false)
     private Boolean disabled;
 
-    @Column(name = "text")
+    @Column(name = "text", nullable = false)
     private String text;
 }

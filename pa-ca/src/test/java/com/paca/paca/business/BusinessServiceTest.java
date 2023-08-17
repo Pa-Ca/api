@@ -5,7 +5,7 @@ import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.branch.utils.TaxMapper;
+import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;

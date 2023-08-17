@@ -8,7 +8,7 @@ import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.branch.model.Tax;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.dto.SaleDTO;
@@ -247,7 +247,7 @@ public class SaleServiceTest {
         SaleDTO saleDTO = utils.createSaleDTO(null, null);
         Sale sale = utils.createSale(null, null, null);
         List<Tax> taxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
-        List<DefaultTax> defaultTaxes = TestUtils.castList(DefaultTax.class, Mockito.mock(List.class));
+        List<Tax> defaultTaxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
         SaleProduct saleProduct = utils.createSaleProduct(sale, null);
         List<SaleProduct> saleProducts = List.of(saleProduct);
 

@@ -1,7 +1,7 @@
 package com.paca.paca.sale;
 
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.auth.ControllerTest;
+import com.paca.paca.ControllerTest;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.business.model.Business;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,208 +35,202 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = { TaxController.class })
 public class TaxControllerTest extends ControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private JwtService jwtService;
+        @MockBean
+        private JwtService jwtService;
 
-    @MockBean
-    private TaxService taxService;
-    
+        @MockBean
+        private TaxService taxService;
 
-    private TestUtils utils = TestUtils.builder().build();
+        private TestUtils utils = TestUtils.builder().build();
 
-    @Test
-    void shouldSave() throws Exception{
-        
-        TaxDTO dto = utils.createTaxDTO(null);
+        @Test
+        void shouldSave() throws Exception {
 
-        Business business = utils.createBusiness(null);
+                TaxDTO dto = utils.createTaxDTO(null);
 
-        when(taxService.save(any(TaxDTO.class))).thenReturn(dto);
-        when(saleRepository.existsByIdAndTable_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+                Business business = utils.createBusiness(null);
 
-        utils.setAuthorities("business");
+                when(taxService.save(any(TaxDTO.class))).thenReturn(dto);
+                when(saleRepository.existsByIdAndTable_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
 
-        mockMvc.perform(post(TaxStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
-                        CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", 
-                        CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.type", 
-                        CoreMatchers.is(dto.getType())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.value",
-                        CoreMatchers.is(dto.getValue().doubleValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.saleId",
-                        CoreMatchers.is(dto.getSaleId().intValue())));
-    }
+                utils.setAuthorities("business");
 
-    @Test
-    void shouldGetForbiddenDueToInvalidRoleInSave() throws Exception{
+                mockMvc.perform(post(TaxStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                                                CoreMatchers.is(dto.getName())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.type",
+                                                CoreMatchers.is(dto.getType())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.value",
+                                                CoreMatchers.is(dto.getValue().doubleValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.saleId",
+                                                CoreMatchers.is(dto.getSaleId().intValue())));
+        }
 
-        utils.setAuthorities("client");
+        @Test
+        void shouldGetForbiddenDueToInvalidRoleInSave() throws Exception {
 
-        mockMvc.perform(post(TaxStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
+                utils.setAuthorities("client");
 
-        utils.setAuthorities("user");
-        mockMvc.perform(post(TaxStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(post(TaxStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
 
-    @Test
-    void shouldGetForbiddenDueToBusinessNotOwnerOfSaleInSave() throws Exception{
+                utils.setAuthorities("user");
+                mockMvc.perform(post(TaxStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-        TaxDTO dto = utils.createTaxDTO(null);
+        @Test
+        void shouldGetForbiddenDueToBusinessNotOwnerOfSaleInSave() throws Exception {
 
-        Business business = utils.createBusiness(null);
+                TaxDTO dto = utils.createTaxDTO(null);
 
-        when(taxService.save(any(TaxDTO.class))).thenReturn(dto);
-        when(saleRepository.existsByIdAndTable_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+                Business business = utils.createBusiness(null);
 
-        utils.setAuthorities("business");
+                when(taxService.save(any(TaxDTO.class))).thenReturn(dto);
+                when(saleRepository.existsByIdAndTable_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
 
-        mockMvc.perform(post(TaxStatics.Endpoint.PATH)
-                .content(objectMapper.writeValueAsString(dto))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                utils.setAuthorities("business");
 
+                mockMvc.perform(post(TaxStatics.Endpoint.PATH)
+                                .content(objectMapper.writeValueAsString(dto))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    void shouldUpdate()throws Exception{
-        TaxDTO dto = utils.createTaxDTO(null);
+        @Test
+        void shouldUpdate() throws Exception {
+                TaxDTO dto = utils.createTaxDTO(null);
 
-        Business business = utils.createBusiness(null);
-        
-        utils.setAuthorities("business");
+                Business business = utils.createBusiness(null);
 
-        when(taxService.update(anyLong(), any(TaxDTO.class))).thenReturn(dto);
-        when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(TaxStatics.Endpoint.PATH.concat("/" + dto.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
-                        CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", 
-                        CoreMatchers.is(dto.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.type", 
-                        CoreMatchers.is(dto.getType())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.value",
-                        CoreMatchers.is(dto.getValue().doubleValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.saleId",
-                        CoreMatchers.is(dto.getSaleId().intValue())));
-    } 
+                when(taxService.update(anyLong(), any(TaxDTO.class))).thenReturn(dto);
+                when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
 
-    @Test
-    void shouldGetForbiddenDueToInvalidRoleInUpdate()throws Exception{
-        TaxDTO dto = utils.createTaxDTO(null);
-        
-        utils.setAuthorities("client");
+                mockMvc.perform(put(TaxStatics.Endpoint.PATH.concat("/" + dto.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name",
+                                                CoreMatchers.is(dto.getName())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.type",
+                                                CoreMatchers.is(dto.getType())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.value",
+                                                CoreMatchers.is(dto.getValue().doubleValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.saleId",
+                                                CoreMatchers.is(dto.getSaleId().intValue())));
+        }
 
+        @Test
+        void shouldGetForbiddenDueToInvalidRoleInUpdate() throws Exception {
+                TaxDTO dto = utils.createTaxDTO(null);
 
-        mockMvc.perform(put(TaxStatics.Endpoint.PATH.concat("/" + dto.getId()))
-                .content(objectMapper.writeValueAsString(dto))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                utils.setAuthorities("client");
 
-    @Test
-    void shouldGetForbiddenDueToBusinessNotOwnerOfTaxInUpdate()throws Exception{
-        TaxDTO dto = utils.createTaxDTO(null);
+                mockMvc.perform(put(TaxStatics.Endpoint.PATH.concat("/" + dto.getId()))
+                                .content(objectMapper.writeValueAsString(dto))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-        Business business = utils.createBusiness(null);
-        
-        utils.setAuthorities("business");
+        @Test
+        void shouldGetForbiddenDueToBusinessNotOwnerOfTaxInUpdate() throws Exception {
+                TaxDTO dto = utils.createTaxDTO(null);
 
-        when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+                Business business = utils.createBusiness(null);
 
-        mockMvc.perform(put(TaxStatics.Endpoint.PATH.concat("/" + dto.getId()))
-                .content(objectMapper.writeValueAsString(dto))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    } 
+                utils.setAuthorities("business");
 
-    @Test
-    void shouldDelete()throws Exception{
+                when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
 
-        Tax tax = utils.createTax(null);
-        Business business = utils.createBusiness(null);
+                mockMvc.perform(put(TaxStatics.Endpoint.PATH.concat("/" + dto.getId()))
+                                .content(objectMapper.writeValueAsString(dto))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-        when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
-        doNothing().when(taxService).delete(anyLong());
+        @Test
+        void shouldDelete() throws Exception {
 
-        utils.setAuthorities("business");
+                Tax tax = utils.createTax(null);
+                Business business = utils.createBusiness(null);
 
-        mockMvc.perform(delete(TaxStatics.Endpoint.PATH.concat("/" + tax.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    } 
+                when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(true);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+                doNothing().when(taxService).delete(anyLong());
 
-    @Test
-    void shouldGetForbiddenDueToBusinessNotOwnerOfTaxInDelete()throws Exception{
+                utils.setAuthorities("business");
 
-        Tax tax = utils.createTax(null);
-        Business business = utils.createBusiness(null);
+                mockMvc.perform(delete(TaxStatics.Endpoint.PATH.concat("/" + tax.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
 
-        when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
-        doNothing().when(taxService).delete(anyLong());
+        @Test
+        void shouldGetForbiddenDueToBusinessNotOwnerOfTaxInDelete() throws Exception {
 
-        utils.setAuthorities("business");
+                Tax tax = utils.createTax(null);
+                Business business = utils.createBusiness(null);
 
-        mockMvc.perform(delete(TaxStatics.Endpoint.PATH.concat("/" + tax.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    } 
+                when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+                doNothing().when(taxService).delete(anyLong());
 
-    @Test
-    void shouldGetForbiddenDueToInvalidRoleInDelete()throws Exception{
+                utils.setAuthorities("business");
 
-        Tax tax = utils.createTax(null);
-        Business business = utils.createBusiness(null);
+                mockMvc.perform(delete(TaxStatics.Endpoint.PATH.concat("/" + tax.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-        when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
-        when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
+        @Test
+        void shouldGetForbiddenDueToInvalidRoleInDelete() throws Exception {
 
-        utils.setAuthorities("client");
+                Tax tax = utils.createTax(null);
+                Business business = utils.createBusiness(null);
 
-        mockMvc.perform(delete(TaxStatics.Endpoint.PATH.concat("/" + tax.getId())))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-        
-    } 
+                when(taxRepository.existsByIdAndSale_Table_Branch_Business_Id(anyLong(), anyLong())).thenReturn(false);
+                when(businessRepository.findByUserEmail(anyString())).thenReturn(Optional.of(business));
 
+                utils.setAuthorities("client");
 
-    
+                mockMvc.perform(delete(TaxStatics.Endpoint.PATH.concat("/" + tax.getId())))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+
+        }
 
 }

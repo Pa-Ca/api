@@ -14,7 +14,5 @@ public interface BranchAmenityRepository extends JpaRepository<BranchAmenity, Lo
 
     List<BranchAmenity> findAllByAmenityId(Long id);
 
-    boolean existsByBranchIdAndAmenityId(Long branchId, Long amenityId);
-
     Optional<BranchAmenity> findByBranchIdAndAmenityId(Long branchId, Long amenityId);
 }

@@ -19,21 +19,21 @@ public class BranchDTO {
 
     protected Long id;
     protected Long businessId;
-    protected String location;
-    protected String mapsLink;
     protected String name;
-    protected String overview;
     protected Float score;
-    protected Integer capacity;
+    protected Short capacity;
     protected BigDecimal reservationPrice;
-    protected Boolean reserveOff;
-    protected Duration averageReserveTime;
+    protected String mapsLink;
+    protected String location;
+    protected String overview;
     protected Boolean visibility;
+    protected Boolean reserveOff;
     protected String phoneNumber;
     protected String type;
     protected LocalTime hourIn;
     protected LocalTime hourOut;
+    protected Duration averageReserveTime;
+    protected Float dollarExchange;
     protected Boolean deleted;
-    protected BigDecimal dollarToLocalCurrencyExchange;
 
 }

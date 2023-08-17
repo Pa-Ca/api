@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 
 import com.paca.paca.PacaTest;
+import com.paca.paca.sale.model.Tax;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.DefaultTax;
@@ -32,7 +33,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class DefaultTaxRepositoryTest extends PacaTest {
-    
+
     @Autowired
     private BranchRepository branchRepository;
 
@@ -65,7 +66,7 @@ public class DefaultTaxRepositoryTest extends PacaTest {
     void restoreBranchDB() {
         branchRepository.deleteAll();
         defaultTaxRepository.deleteAll();
-        
+
     }
 
     @AfterEach
@@ -75,67 +76,56 @@ public class DefaultTaxRepositoryTest extends PacaTest {
         userRepository.deleteAll();
         businessRepository.deleteAll();
         branchRepository.deleteAll();
-        
+
     }
 
     @Test
-    void shouldCreateDefaultTax() {
-        // Arrange
+    void shouldGetAllDefaultTaxesByBranchId() {
+        int nTaxes = 10;
         Branch branch = utils.createBranch(null);
-        DefaultTax defaultTax = DefaultTax.builder()
-                                .branch(branch)
-                                .name("VAT")
-                                .type(1)
-                                .value(10.0F)
-                                .build();
 
-            
-        // Act
-        DefaultTax savedDefaultTax = defaultTaxRepository.save(defaultTax);
+        for (int i = 0; i < nTaxes; i++) {
+            Tax tax = utils.createTax();
+            defaultTaxRepository.save(DefaultTax.builder()
+                    .branch(branch)
+                    .tax(tax)
+                    .build());
+            utils.createTax();
+        }
 
-        // Assert
-        assertThat(savedDefaultTax).isNotNull();
-        assertThat(savedDefaultTax.getId()).isEqualTo(defaultTax.getId());
-        assertThat(savedDefaultTax.getBranch()).isEqualTo(branch);
-        assertThat(savedDefaultTax.getName()).isEqualTo("VAT");
-        assertThat(savedDefaultTax.getType()).isEqualTo(1);
-        assertThat(savedDefaultTax.getValue()).isEqualTo(10.0F);
+        List<Tax> taxes = defaultTaxRepository.findAllByBranchId(branch.getId());
+
+        assertThat(taxes.size()).isEqualTo(nTaxes);
     }
 
-    @Test 
-    void shouldGetAllDefaultTaxes(){
-        // Arrange
+    @Test
+    void shouldCheckThatDefaultTaxExistsByIdAndBranch_Business_Id() {
         Branch branch = utils.createBranch(null);
-        DefaultTax defaultTax1 = DefaultTax.builder()
-                                .branch(branch)
-                                .name("VAT")
-                                .type(1)
-                                .value(10.0F)
-                                .build();
-        DefaultTax defaultTax2 = DefaultTax.builder()
-                                .branch(branch)
-                                .name("IVA")
-                                .type(0)
-                                .value(15.0F)
-                                .build();
-        DefaultTax defaultTax3 = DefaultTax.builder()
-                                .branch(branch)
-                                .name("VATB")
-                                .type(1)
-                                .value(16.0F)
-                                .build();
-        defaultTaxRepository.save(defaultTax1);
-        defaultTaxRepository.save(defaultTax2);
-        defaultTaxRepository.save(defaultTax3);
+        Tax tax = utils.createTax();
+        DefaultTax defaultTax = defaultTaxRepository.save(DefaultTax.builder()
+                .branch(branch)
+                .tax(tax)
+                .build());
 
-        // Act
-        List<DefaultTax> defaultTaxes = defaultTaxRepository.findAll();
+        Boolean exists = defaultTaxRepository.existsByIdAndBranch_Business_Id(defaultTax.getId(),
+                branch.getBusiness().getId());
 
-        // Assert
-        assertThat(defaultTaxes).isNotNull();
-        assertThat(defaultTaxes.size()).isEqualTo(3);
-        assertThat(defaultTaxes.get(0)).isEqualTo(defaultTax1);
-        assertThat(defaultTaxes.get(1)).isEqualTo(defaultTax2);
-        assertThat(defaultTaxes.get(2)).isEqualTo(defaultTax3);
+        assertThat(exists).isTrue();
     }
+
+    @Test
+    void shouldCheckThatDefaultTaxDoesNotExistsByIdAndBranch_Business_Id() {
+        Branch branch = utils.createBranch(null);
+        Tax tax = utils.createTax();
+        DefaultTax defaultTax = defaultTaxRepository.save(DefaultTax.builder()
+                .branch(branch)
+                .tax(tax)
+                .build());
+
+        Boolean exists = defaultTaxRepository.existsByIdAndBranch_Business_Id(defaultTax.getId(),
+                branch.getBusiness().getId() + 1);
+
+        assertThat(exists).isFalse();
+    }
+
 }

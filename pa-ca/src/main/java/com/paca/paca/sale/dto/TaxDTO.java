@@ -12,9 +12,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaxDTO {
+
     private Long id;
+    private Short type;
     private String name;
-    private Integer type;
     private Float value;
-    private Long saleId;
 }

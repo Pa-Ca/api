@@ -12,5 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BranchInfoListDTO {
+
     List<BranchInfoDTO> branches;
 }

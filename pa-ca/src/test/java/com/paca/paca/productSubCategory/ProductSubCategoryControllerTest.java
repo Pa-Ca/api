@@ -1,8 +1,8 @@
 package com.paca.paca.productSubCategory;
 
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.auth.ControllerTest;
 import com.paca.paca.product.dto.ProductDTO;
+import com.paca.paca.ControllerTest;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.product.dto.ProductListDTO;
@@ -43,155 +43,155 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = { ProductSubCategoryController.class })
 public class ProductSubCategoryControllerTest extends ControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private JwtService jwtService;
+        @MockBean
+        private JwtService jwtService;
 
-    @MockBean
-    private ProductSubCategoryService productSubCategoryService;
+        @MockBean
+        private ProductSubCategoryService productSubCategoryService;
 
-    private TestUtils utils = TestUtils.builder().build();
+        private TestUtils utils = TestUtils.builder().build();
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInGetProductSubCategoryList() throws Exception {
-        ArrayList<ProductSubCategoryDTO> dtoList = new ArrayList<>();
-        dtoList.add(utils.createProductSubCategoryDTO(null));
-        ProductSubCategoryListDTO productSubCategoryListDTO = ProductSubCategoryListDTO.builder()
-                .productSubCategories(dtoList).build();
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInGetProductSubCategoryList() throws Exception {
+                ArrayList<ProductSubCategoryDTO> dtoList = new ArrayList<>();
+                dtoList.add(utils.createProductSubCategoryDTO(null));
+                ProductSubCategoryListDTO productSubCategoryListDTO = ProductSubCategoryListDTO.builder()
+                                .productSubCategories(dtoList).build();
 
-        when(productSubCategoryService.getAll()).thenReturn(productSubCategoryListDTO);
+                when(productSubCategoryService.getAll()).thenReturn(productSubCategoryListDTO);
 
-        utils.setAuthorities("client");
-        mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
+                utils.setAuthorities("client");
+                mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
 
-        utils.setAuthorities("business");
-        mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                utils.setAuthorities("business");
+                mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetProductSubCategoryList() throws Exception {
-        ArrayList<ProductSubCategoryDTO> dtoList = new ArrayList<>();
-        dtoList.add(utils.createProductSubCategoryDTO(null));
-        ProductSubCategoryListDTO productSubCategoryListDTO = ProductSubCategoryListDTO.builder()
-                .productSubCategories(dtoList).build();
+        @Test
+        public void shouldGetProductSubCategoryList() throws Exception {
+                ArrayList<ProductSubCategoryDTO> dtoList = new ArrayList<>();
+                dtoList.add(utils.createProductSubCategoryDTO(null));
+                ProductSubCategoryListDTO productSubCategoryListDTO = ProductSubCategoryListDTO.builder()
+                                .productSubCategories(dtoList).build();
 
-        when(productSubCategoryService.getAll()).thenReturn(productSubCategoryListDTO);
+                when(productSubCategoryService.getAll()).thenReturn(productSubCategoryListDTO);
 
-        utils.setAuthorities("admin");
+                utils.setAuthorities("admin");
 
-        mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.productSubCategories",
-                        CoreMatchers.hasItems()));
-    }
+                mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.productSubCategories",
+                                                CoreMatchers.hasItems()));
+        }
 
-    @Test
-    public void shouldGetProductCategoryList() throws Exception {
-        ArrayList<ProductCategoryDTO> dtoList = new ArrayList<>();
-        dtoList.add(utils.createProductCategoryDTO(null));
-        ProductCategoryListDTO productCategoryListDTO = ProductCategoryListDTO.builder()
-                .productCategories(dtoList).build();
+        @Test
+        public void shouldGetProductCategoryList() throws Exception {
+                ArrayList<ProductCategoryDTO> dtoList = new ArrayList<>();
+                dtoList.add(utils.createProductCategoryDTO(null));
+                ProductCategoryListDTO productCategoryListDTO = ProductCategoryListDTO.builder()
+                                .productCategories(dtoList).build();
 
-        when(productSubCategoryService.getAllProductCategories()).thenReturn(productCategoryListDTO);
+                when(productSubCategoryService.getAllProductCategories()).thenReturn(productCategoryListDTO);
 
-        utils.setAuthorities("admin");
+                utils.setAuthorities("admin");
 
-        mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH.concat("/categories"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.productCategories",
-                        CoreMatchers.hasItems()));
-    }
+                mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH.concat("/categories"))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.productCategories",
+                                                CoreMatchers.hasItems()));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInSaveProductSubCategory() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInSaveProductSubCategory() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.save(any(ProductSubCategoryDTO.class))).thenReturn(dto);
+                when(productSubCategoryService.save(any(ProductSubCategoryDTO.class))).thenReturn(dto);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetNoContentInSaveProductSubCategory() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldGetNoContentInSaveProductSubCategory() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.save(any(ProductSubCategoryDTO.class)))
-                .thenThrow(new NoContentException("message", 0));
+                when(productSubCategoryService.save(any(ProductSubCategoryDTO.class)))
+                                .thenThrow(new NoContentException("message", 0));
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldGetConflictDueToNameRepeatedInSaveProductSubCategory() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldGetConflictDueToNameRepeatedInSaveProductSubCategory() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.save(any(ProductSubCategoryDTO.class)))
-                .thenThrow(new ConflictException("message", 0));
+                when(productSubCategoryService.save(any(ProductSubCategoryDTO.class)))
+                                .thenThrow(new ConflictException("message", 0));
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isConflict())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldSaveProductSubCategory() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldSaveProductSubCategory() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.save(any(ProductSubCategoryDTO.class))).thenReturn(dto);
+                when(productSubCategoryService.save(any(ProductSubCategoryDTO.class))).thenReturn(dto);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
-                        CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.branchId",
-                                CoreMatchers.is(dto.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.categoryId",
-                        CoreMatchers.is(dto.getCategoryId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())));
-    }
+                mockMvc.perform(post(ProductSubCategoryStatics.Endpoint.PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.branchId",
+                                                                CoreMatchers.is(dto.getBranchId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.categoryId",
+                                                CoreMatchers.is(dto.getCategoryId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())));
+        }
 
     @Test
     public void shouldGetNoContentInGetProductSubCategoryById() throws Exception {
@@ -206,205 +206,205 @@ public class ProductSubCategoryControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test
-    public void shouldGetProductSubCategoryById() throws Exception {
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(null);
+        @Test
+        public void shouldGetProductSubCategoryById() throws Exception {
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(null);
 
-        when(productSubCategoryService.getById(anyLong())).thenReturn(dto);
+                when(productSubCategoryService.getById(anyLong())).thenReturn(dto);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + dto.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
-                        CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.branchId",
-                                CoreMatchers.is(dto.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.categoryId",
-                        CoreMatchers.is(dto.getCategoryId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())));
-    }
+                mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + dto.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.branchId",
+                                                                CoreMatchers.is(dto.getBranchId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.categoryId",
+                                                CoreMatchers.is(dto.getCategoryId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInUpdateProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInUpdateProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidUserInUpdateProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetForbiddenDueToInvalidUserInUpdateProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+                Business business = utils.createBusiness(null);
 
-        when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class))).thenReturn(dto);
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(false);
+                when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class))).thenReturn(dto);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(false);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetNoContentInUpdateProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldGetNoContentInUpdateProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class)))
-                .thenThrow(new NoContentException("message", 0));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(true);
+                when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class)))
+                                .thenThrow(new NoContentException("message", 0));
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(true);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldGetConflictDueToNameRepeatedInUpdateProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldGetConflictDueToNameRepeatedInUpdateProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class)))
-                .thenThrow(new ConflictException("message", 0));
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(true);
+                when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class)))
+                                .thenThrow(new ConflictException("message", 0));
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(true);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isConflict())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldUpdateProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
-        ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
+        @Test
+        public void shouldUpdateProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
+                ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
-        when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class))).thenReturn(dto);
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(true);
+                when(productSubCategoryService.update(anyLong(), any(ProductSubCategoryDTO.class))).thenReturn(dto);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(true);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
-                        CoreMatchers.is(dto.getId().intValue())))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.branchId",
-                                CoreMatchers.is(dto.getBranchId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.categoryId",
-                        CoreMatchers.is(dto.getCategoryId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())));
-    }
+                mockMvc.perform(put(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id",
+                                                CoreMatchers.is(dto.getId().intValue())))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.branchId",
+                                                                CoreMatchers.is(dto.getBranchId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.categoryId",
+                                                CoreMatchers.is(dto.getCategoryId().intValue())))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(dto.getName())));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidRoleInDeleteProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetForbiddenDueToInvalidRoleInDeleteProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(true);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(true);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetForbiddenDueToInvalidUserInDeleteProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetForbiddenDueToInvalidUserInDeleteProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(false);
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(false);
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-    @Test
-    public void shouldGetNoContentInDeleteProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldGetNoContentInDeleteProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(true);
-        doThrow(new NoContentException("message", 0)).when(productSubCategoryService).delete(anyLong());
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(true);
+                doThrow(new NoContentException("message", 0)).when(productSubCategoryService).delete(anyLong());
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
-    }
+                mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(0)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
+        }
 
-    @Test
-    public void shouldDeleteProductSubCategoryById() throws Exception {
-        ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
-        Business business = utils.createBusiness(null);
+        @Test
+        public void shouldDeleteProductSubCategoryById() throws Exception {
+                ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
+                Business business = utils.createBusiness(null);
 
-        when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
-        when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
-                .thenReturn(true);
-        doNothing().when(productSubCategoryService).delete(anyLong());
+                when(businessRepository.findByUserEmail(any(String.class))).thenReturn(Optional.ofNullable(business));
+                when(productSubCategoryRepository.existsByIdAndBranch_Business_Id(anyLong(), anyLong()))
+                                .thenReturn(true);
+                doNothing().when(productSubCategoryService).delete(anyLong());
 
-        utils.setAuthorities("business");
+                utils.setAuthorities("business");
 
-        mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+                mockMvc.perform(delete(ProductSubCategoryStatics.Endpoint.PATH.concat("/" + productSubCategory.getId()))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
 
     @Test
     public void shouldGetNoContentDueToInvalidRoleInGetAllProductsByProductSubCategoryId() throws Exception {
@@ -419,21 +419,21 @@ public class ProductSubCategoryControllerTest extends ControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("message")));
     }
 
-    @Test
-    public void shouldGetAllProductsByProductSubCategoryId() throws Exception {
-        ArrayList<ProductDTO> dtoList = new ArrayList<>();
-        dtoList.add(utils.createProductDTO(null));
-        ProductListDTO productListDTO = ProductListDTO.builder()
-                .products(dtoList).build();
+        @Test
+        public void shouldGetAllProductsByProductSubCategoryId() throws Exception {
+                ArrayList<ProductDTO> dtoList = new ArrayList<>();
+                dtoList.add(utils.createProductDTO(null));
+                ProductListDTO productListDTO = ProductListDTO.builder()
+                                .products(dtoList).build();
 
-        when(productSubCategoryService.getAllProducts(anyLong())).thenReturn(productListDTO);
+                when(productSubCategoryService.getAllProducts(anyLong())).thenReturn(productListDTO);
 
-        utils.setAuthorities("client");
+                utils.setAuthorities("client");
 
-        mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH.concat("/1/product"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.products", CoreMatchers.hasItems()));
-    }
+                mockMvc.perform(get(ProductSubCategoryStatics.Endpoint.PATH.concat("/1/product"))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.products", CoreMatchers.hasItems()));
+        }
 
 }
