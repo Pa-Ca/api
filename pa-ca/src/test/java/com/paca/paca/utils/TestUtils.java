@@ -22,6 +22,7 @@ import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.client.model.Client;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
@@ -72,6 +73,7 @@ import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.branch.statics.DefaultTaxStatics;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.business.repository.TierRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
@@ -155,6 +157,8 @@ public class TestUtils {
     SaleProductRepository saleProductRepository;
 
     ClientGroupRepository clientGroupRepository;
+
+    ClientGuestRepository clientGuestRepository;
 
     ReservationRepository reservationRepository;
 
@@ -1517,4 +1521,41 @@ public class TestUtils {
         return reservations;
     }
 
+    public ClientGuest createClientGuest(Client client) {
+        if (client == null) {
+            client = createClient(null);
+        }
+
+        ClientGuest clientGuest = ClientGuest.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .client(client)
+                .guest(null)
+                .haveGuest(false)
+                .build();
+
+        if (clientGuestRepository != null) {
+            clientGuest = clientGuestRepository.save(clientGuest);
+        }
+
+        return clientGuest;
+    }
+
+    public ClientGuest createClientGuest(Guest guest) {
+        if (guest == null) {
+            guest = createGuest();
+        }
+
+        ClientGuest clientGuest = ClientGuest.builder()
+                .id(ThreadLocalRandom.current().nextLong(999999999))
+                .client(null)
+                .guest(guest)
+                .haveGuest(true)
+                .build();
+
+        if (clientGuestRepository != null) {
+            clientGuest = clientGuestRepository.save(clientGuest);
+        }
+
+        return clientGuest;
+    }
 }

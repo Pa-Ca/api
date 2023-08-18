@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.dto.GuestDTO;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.repository.ReservationRepository;
@@ -20,6 +22,8 @@ public class GuestService {
     private final GuestMapper guestMapper;
 
     private final GuestRepository guestRepository;
+
+    private final ClientGuestRepository clientGuestRepository;
 
     private final ReservationRepository reservationRepository;
 
@@ -56,6 +60,13 @@ public class GuestService {
         newGuest = guestRepository.save(newGuest);
 
         GuestDTO dtoResponse = guestMapper.toDTO(newGuest);
+
+        ClientGuest clientGuest = ClientGuest.builder()
+                .client(null)
+                .guest(newGuest)
+                .haveGuest(true)
+                .build();
+        clientGuestRepository.save(clientGuest);
 
         return dtoResponse;
     }

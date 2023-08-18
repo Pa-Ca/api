@@ -11,6 +11,7 @@ import com.paca.paca.client.model.Friend;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.utils.ClientMapper;
@@ -28,6 +29,7 @@ import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
@@ -65,6 +67,8 @@ public class ClientService {
 
     private final InvoiceRepository invoiceRepository;
 
+    private final ClientGuestRepository clientGuestRepository;
+
     private final ClientGroupRepository clientGroupRepository;
 
     private final FavoriteBranchRepository favoriteBranchRepository;
@@ -98,6 +102,13 @@ public class ClientService {
 
         Client newClient = clientMapper.toEntity(dto, user.get());
         newClient = clientRepository.save(newClient);
+
+        ClientGuest clientGuest = ClientGuest.builder()
+                .client(newClient)
+                .guest(null)
+                .haveGuest(false)
+                .build();
+        clientGuestRepository.save(clientGuest);
 
         ClientDTO dtoResponse = clientMapper.toDTO(newClient);
 

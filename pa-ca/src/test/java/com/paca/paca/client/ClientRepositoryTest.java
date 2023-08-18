@@ -14,6 +14,7 @@ import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.ReviewLike;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
@@ -21,8 +22,10 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
+import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -66,6 +69,9 @@ public class ClientRepositoryTest extends PacaTest {
 
     @Autowired
     private ReviewLikeRepository reviewLikeRepository;
+
+    @Autowired
+    private ClientGuestRepository clientGuestRepository;
 
     @Autowired
     private FavoriteBranchRepository favoriteBranchRepository;
@@ -411,6 +417,46 @@ public class ClientRepositoryTest extends PacaTest {
         assertThat(likes.size()).isEqualTo(2);
         assertThat(likes.contains(like1)).isTrue();
         assertThat(likes.contains(like2)).isTrue();
+    }
+
+    @Test
+    void shouldGetClientGuestByClientId() {
+        Client client = utils.createClient(null);
+        ClientGuest clientGuest = utils.createClientGuest(client);
+
+        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByClientId(clientGuest.getId());
+
+        assertThat(expectedGuest.get()).isEqualTo(clientGuest);
+    }
+
+    @Test
+    void shouldDoesNotGetClientGuestByClientId() {
+        Client client = utils.createClient(null);
+        ClientGuest clientGuest = utils.createClientGuest(client);
+
+        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByClientId(clientGuest.getId() + 1);
+
+        assertThat(expectedGuest.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldGetClientGuestByGuestId() {
+        Guest guest = utils.createGuest();
+        ClientGuest clientGuest = utils.createClientGuest(guest);
+
+        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByGuestId(clientGuest.getId());
+
+        assertThat(expectedGuest.get()).isEqualTo(guest);
+    }
+
+    @Test
+    void shouldDoesNotGetClientGuestByGuestId() {
+        Guest guest = utils.createGuest();
+        ClientGuest clientGuest = utils.createClientGuest(guest);
+
+        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByGuestId(clientGuest.getId() + 1);
+
+        assertThat(expectedGuest.isEmpty()).isTrue();
     }
 
 }

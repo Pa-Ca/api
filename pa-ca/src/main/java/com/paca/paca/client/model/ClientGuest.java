@@ -1,8 +1,8 @@
-package com.paca.paca.reservation.model;
+package com.paca.paca.client.model;
 
 import lombok.*;
 
-import com.paca.paca.client.model.Client;
+import com.paca.paca.reservation.model.Guest;
 
 import jakarta.persistence.*;
 

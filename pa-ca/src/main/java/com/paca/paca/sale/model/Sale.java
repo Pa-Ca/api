@@ -9,6 +9,7 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.branch.model.Table;
 
@@ -20,6 +21,7 @@ import com.paca.paca.branch.model.Table;
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "sale")
 public class Sale {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sale_seq")
     @SequenceGenerator(name = "sale_seq", sequenceName = "sale_seq", allocationSize = 1)
@@ -27,8 +29,8 @@ public class Sale {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "table_id")
-    private Table table;
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
 
     @Column(name = "client_quantity")
     private Integer clientQuantity;
