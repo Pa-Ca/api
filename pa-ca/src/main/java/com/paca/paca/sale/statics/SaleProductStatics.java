@@ -5,5 +5,7 @@ public interface SaleProductStatics {
         String PATH = "/api/v1/sale-product";
 
         String SAVE = "";
+        String UPDATE = "/{id}";
+        String DELETE = "/{id}";
     }
 }

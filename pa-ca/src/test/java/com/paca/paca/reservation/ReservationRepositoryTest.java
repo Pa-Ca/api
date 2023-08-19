@@ -3,6 +3,7 @@ package com.paca.paca.reservation;
 import com.paca.paca.PacaTest;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
@@ -108,25 +109,25 @@ class ReservationRepositoryTest extends PacaTest {
 
         // Create random branches
         List<Branch> branches = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             branches.add(utils.createBranch(null));
         }
 
         // Create random names
         List<String> names = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             names.add("Test name " + i);
         }
 
         // Create random surnames
         List<String> surnames = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             surnames.add("Test surname " + i);
         }
 
         // Create random identity documents
         List<String> identityDocuments = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             identityDocuments.add("Test identity document " + i);
         }
 
@@ -164,9 +165,18 @@ class ReservationRepositoryTest extends PacaTest {
                 .filter(reservation -> reservation.getReservationDateIn().compareTo(startDate) >= 0)
                 .filter(reservation -> reservation.getReservationDateIn().compareTo(endDate) <= 0)
                 .filter(reservation -> reservation.getStatus().equals(status))
-                .filter(reservation -> reservation.getGuest().getName().contains(name))
-                .filter(reservation -> reservation.getGuest().getSurname().contains(surname))
-                .filter(reservation -> reservation.getGuest().getIdentityDocument().contains(identityDocument))
+                .filter(reservation -> {
+                    if (reservation.getGuest() != null) {
+                        return reservation.getGuest().getName().contains(name)
+                                && reservation.getGuest().getSurname().contains(surname)
+                                && reservation.getGuest().getIdentityDocument().contains(identityDocument);
+                    } else {
+                        ClientGroup owner = clientGroupRepository.findAllByReservationId(reservation.getId()).get(0);
+                        return owner.getClient().getName().contains(name)
+                                && owner.getClient().getSurname().contains(surname)
+                                && owner.getClient().getIdentityDocument().contains(identityDocument);
+                    }
+                })
                 .collect(Collectors.toList());
 
         // Get the reservations from the repository

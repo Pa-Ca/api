@@ -5,7 +5,8 @@ public interface TaxStatics {
     interface Endpoint {
         String PATH = "/api/v1/tax";
 
-        String SAVE = "";
+        String UPDATE = "/{id}";
+        String DELETE = "/{id}";
     }
 
     interface Types {

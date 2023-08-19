@@ -430,7 +430,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldDoesNotGetClientGuestByClientId() {
+    void shouldNotGetClientGuestByClientId() {
         Client client = utils.createClient(null);
         ClientGuest clientGuest = utils.createClientGuest(client);
 
@@ -450,7 +450,7 @@ public class ClientRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldDoesNotGetClientGuestByGuestId() {
+    void shouldNotGetClientGuestByGuestId() {
         Guest guest = utils.createGuest();
         ClientGuest clientGuest = utils.createClientGuest(guest);
 

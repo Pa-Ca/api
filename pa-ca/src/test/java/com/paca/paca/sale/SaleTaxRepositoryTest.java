@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
-
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +14,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import com.paca.paca.PacaTest;
-import com.paca.paca.sale.model.Sale;
 import com.paca.paca.utils.TestUtils;
-import com.paca.paca.product.model.Product;
-import com.paca.paca.sale.model.SaleProduct;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -39,7 +39,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class SaleProductRepositoryTest extends PacaTest {
+public class SaleTaxRepositoryTest extends PacaTest {
 
     @Autowired
     private BranchRepository branchRepository;
@@ -75,6 +75,12 @@ public class SaleProductRepositoryTest extends PacaTest {
     private ProductCategoryRepository productCategoryRepository;
 
     @Autowired
+    private InsiteSaleRepository insiteSaleRepository;
+
+    @Autowired
+    private SaleTaxRepository saleTaxRepository;
+
+    @Autowired
     private ProductSubCategoryRepository productSubCategoryRepository;
 
     private TestUtils utils;
@@ -94,11 +100,15 @@ public class SaleProductRepositoryTest extends PacaTest {
                 .productCategoryRepository(productCategoryRepository)
                 .productSubCategoryRepository(productSubCategoryRepository)
                 .saleProductRepository(saleProductRepository)
+                .insiteSaleRepository(insiteSaleRepository)
+                .saleTaxRepository(saleTaxRepository)
                 .build();
     }
 
     @BeforeEach
     void restoreBranchDB() {
+        saleTaxRepository.deleteAll();
+        insiteSaleRepository.deleteAll();
         saleProductRepository.deleteAll();
         saleRepository.deleteAll();
         tableRepository.deleteAll();
@@ -110,6 +120,8 @@ public class SaleProductRepositoryTest extends PacaTest {
 
     @AfterEach
     void restoreTest() {
+        saleTaxRepository.deleteAll();
+        insiteSaleRepository.deleteAll();
         reservationRepository.deleteAll();
         paymentOptionRepository.deleteAll();
         saleProductRepository.deleteAll();
@@ -123,60 +135,57 @@ public class SaleProductRepositoryTest extends PacaTest {
 
     @Test
     void shouldGetAllBySaleId() {
-        int nProducts = 10;
+        int nTaxes = 10;
         Sale sale = utils.createSale(null, null, null);
 
-        for (int i = 0; i < nProducts; i++) {
-            utils.createSaleProduct(sale, null);
-            utils.createSaleProduct(null, null);
+        for (int i = 0; i < nTaxes; i++) {
+            utils.createSaleTax(sale, null);
+            utils.createSaleTax(null, null);
         }
 
-        List<SaleProduct> products = saleProductRepository.findAllBySaleId(sale.getId());
+        List<SaleTax> taxes = saleTaxRepository.findAllBySaleId(sale.getId());
 
-        assertThat(products.size()).isEqualTo(nProducts);
+        assertThat(taxes.size()).isEqualTo(nTaxes);
     }
 
     @Test
-    void shouldDeleteAllbySaleId() {
-        int nProducts = 10;
+    void shouldDeleteAllBySaleId() {
+        int nTaxes = 10;
         Sale sale = utils.createSale(null, null, null);
 
-        for (int i = 0; i < nProducts; i++) {
-            utils.createSaleProduct(sale, null);
-            utils.createSaleProduct(null, null);
+        for (int i = 0; i < nTaxes; i++) {
+            utils.createSaleTax(sale, null);
+            utils.createSaleTax(null, null);
         }
 
-        saleProductRepository.deleteAllBySaleId(sale.getId());
+        saleTaxRepository.deleteAllBySaleId(sale.getId());
 
-        List<SaleProduct> products = saleProductRepository.findAllBySaleId(sale.getId());
+        List<SaleTax> taxes = saleTaxRepository.findAllBySaleId(sale.getId());
 
-        assertThat(products.size()).isEqualTo(0);
+        assertThat(taxes.size()).isEqualTo(0);
     }
 
     @Test
-    void shoudCheckThatExistsByIdAndSale_Table_Branch_Business_Id() {
+    void shouldCheckThatExistsByTaxIdAndSale_Branch_Business_Id() {
         Sale sale = utils.createSale(null, null, null);
-        Product product = utils.createProduct(null);
-        SaleProduct saleProduct = utils.createSaleProduct(sale, product);
+        SaleTax tax = utils.createSaleTax(sale, null);
 
-        Boolean exists = saleProductRepository.existsByIdAndSale_Branch_Business_Id(
-                saleProduct.getId(),
+        Boolean exists = saleTaxRepository.existsByTaxIdAndSale_Branch_Business_Id(
+                tax.getId(),
                 sale.getBranch().getBusiness().getId());
 
         assertThat(exists).isTrue();
     }
 
     @Test
-    void shoudCheckThatDoesNotExistsByIdAndSale_Table_Branch_Business_Id() {
+    void shouldCheckThatDoesNotExistsByTaxIdAndSale_Branch_Business_Id() {
         Sale sale = utils.createSale(null, null, null);
-        Product product = utils.createProduct(null);
-        SaleProduct saleProduct = utils.createSaleProduct(sale, product);
+        SaleTax tax = utils.createSaleTax(sale, null);
 
-        Boolean exists = saleProductRepository.existsByIdAndSale_Branch_Business_Id(
-                saleProduct.getId(),
+        Boolean exists = saleTaxRepository.existsByTaxIdAndSale_Branch_Business_Id(
+                tax.getId(),
                 sale.getBranch().getBusiness().getId() + 1);
 
         assertThat(exists).isFalse();
     }
-
 }

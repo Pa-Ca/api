@@ -490,7 +490,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be canceled because it is already returned");
+                            " can't be cancelled because it is already returned");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
         }
 
@@ -505,7 +505,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be canceled because it is already closed");
+                            " can't be cancelled because it is already closed");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
         }
 
@@ -520,11 +520,11 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be canceled because it is already rejected");
+                            " can't be cancelled because it is already rejected");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
         }
 
-        // canceled
+        // cancelled
         reservation.setStatus(ReservationStatics.Status.CANCELED);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
@@ -535,7 +535,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be canceled because it is already canceled");
+                            " can't be cancelled because it is already cancelled");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 72);
         }
     }

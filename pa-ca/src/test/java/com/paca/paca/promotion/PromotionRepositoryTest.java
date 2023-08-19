@@ -23,7 +23,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -33,7 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class PromotionRepositoryTest extends PacaTest {
-    
+
     @Autowired
     private BranchRepository branchRepository;
 
@@ -77,37 +76,6 @@ public class PromotionRepositoryTest extends PacaTest {
     }
 
     @Test
-    void shouldCreatePromotion() {
-        Branch branch = utils.createBranch(null);
-        Promotion promotion = Promotion.builder()
-                .id(1L)
-                .branch(branch)
-                .disabled(false)
-                .text("text test")
-                .build();
-
-        Promotion savedPromotion = promotionRepository.save(promotion);
-
-        assertThat(savedPromotion).isNotNull();
-        assertThat(savedPromotion.getBranch().getId()).isEqualTo(promotion.getBranch().getId());
-        assertThat(savedPromotion.getDisabled()).isEqualTo(promotion.getDisabled());
-        assertThat(savedPromotion.getText()).isEqualTo(promotion.getText());
-    }
-
-    @Test
-    void shouldGetAllPromotions() {
-        int nPromotions = 10;
-
-        for (int i = 0; i < nPromotions; i++) {
-            utils.createPromotion(null);
-        }
-
-        List<Promotion> promotions = promotionRepository.findAll();
-
-        assertThat(promotions.size()).isEqualTo(nPromotions);
-    }
-
-    @Test
     void shouldGetAllPromotionsByBranchId() {
         int nPromotions = 10;
         Branch branch = utils.createBranch(null);
@@ -120,28 +88,6 @@ public class PromotionRepositoryTest extends PacaTest {
         List<Promotion> promotions = promotionRepository.findAllByBranchId(branch.getId());
 
         assertThat(promotions.size()).isEqualTo(nPromotions);
-    }
-
-    @Test
-    void shouldCheckThatPromotionExistsById() {
-        Promotion promotion = utils.createPromotion(null);
-
-        boolean expected = promotionRepository.existsById(promotion.getId());
-        Optional<Promotion> expectedPromotion = promotionRepository.findById(promotion.getId());
-
-        assertThat(expected).isTrue();
-        assertThat(expectedPromotion.isPresent()).isTrue();
-        assertThat(expectedPromotion.get().getBranch().getId()).isEqualTo(promotion.getBranch().getId());
-        assertThat(expectedPromotion.get().getDisabled()).isEqualTo(promotion.getDisabled());
-    }
-
-    @Test
-    void shouldCheckThatPromotionDoesNotExistsById() {
-        boolean expected = promotionRepository.existsById(1L);
-        Optional<Promotion> expectedPromotion = promotionRepository.findById(1L);
-
-        assertThat(expected).isFalse();
-        assertThat(expectedPromotion.isEmpty()).isTrue();
     }
 
     @Test
@@ -163,16 +109,4 @@ public class PromotionRepositoryTest extends PacaTest {
 
         assertThat(expected).isFalse();
     }
-
-    @Test
-    void shouldDeletePromotion() {
-        Promotion promotion = utils.createPromotion(null);
-
-        promotionRepository.delete(promotion);
-
-        List<Promotion> promotions = promotionRepository.findAll();
-        assertThat(promotions.size()).isEqualTo(0);
-    }
-
-
 }

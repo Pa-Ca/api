@@ -356,22 +356,22 @@ public class ReservationService {
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be canceled because it is already returned", 69);
+                    "Reservation with id " + id + " can't be cancelled because it is already returned", 69);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.CLOSED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be canceled because it is already closed", 70);
+                    "Reservation with id " + id + " can't be cancelled because it is already closed", 70);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.REJECTED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be canceled because it is already rejected", 71);
+                    "Reservation with id " + id + " can't be cancelled because it is already rejected", 71);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.CANCELED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be canceled because it is already canceled", 72);
+                    "Reservation with id " + id + " can't be cancelled because it is already cancelled", 72);
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.CANCELED).build();

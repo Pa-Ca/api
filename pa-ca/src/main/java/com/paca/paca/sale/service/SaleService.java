@@ -16,27 +16,37 @@ import com.paca.paca.sale.model.Tax;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.dto.SaleDTO;
+import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.branch.model.Table;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.utils.TaxMapper;
+import com.paca.paca.sale.model.OnlineSale;
+import com.paca.paca.sale.model.InsiteSale;
 import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.statics.SaleStatics;
-import com.paca.paca.branch.model.PaymentOption;
+import com.paca.paca.branch.utils.TableMapper;
+import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.utils.SaleProductMapper;
 import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.sale.repository.InsiteSaleRepository;
+import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
+import com.paca.paca.sale.repository.InsiteSaleTableRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
@@ -44,80 +54,108 @@ import com.paca.paca.reservation.repository.ReservationRepository;
 @RequiredArgsConstructor
 public class SaleService {
 
-    private final SaleRepository saleRepository;
+    private final TaxMapper taxMapper;
 
     private final SaleMapper saleMapper;
 
-    private final TaxMapper taxMapper;
-
-    private final BranchRepository branchRepository;
-
-    private final TableRepository tableRepository;
-
-    private final PaymentOptionRepository paymentOptionRepository;
-
-    private final ReservationRepository reservationRepository;
+    private final TableMapper tableMapper;
 
     private final TaxRepository taxRepository;
 
-    private final SaleProductRepository saleProductRepository;
+    private final SaleRepository saleRepository;
+
+    private final TableRepository tableRepository;
+
+    private final BranchRepository branchRepository;
+
+    private final SaleTaxRepository saleTaxRepository;
 
     private final SaleProductMapper saleProductMapper;
 
     private final DefaultTaxRepository defaultTaxRepository;
 
-    public List<TaxDTO> getTaxesBySaleId(Long saleId) throws NoContentException {
-        // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(saleId);
+    private final InsiteSaleRepository insiteSaleRepository;
+
+    private final OnlineSaleRepository onlineSaleRepository;
+
+    private final ReservationRepository reservationRepository;
+
+    private final SaleProductRepository saleProductRepository;
+
+    private final ClientGuestRepository clientGuestRepository;
+
+    private final InsiteSaleTableRepository insiteSaleTableRepository;
+
+    private Boolean isInsite(Long id) throws NoContentException {
+        Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
             throw new NoContentException(
-                    "Sale with id " + saleId + " does not exists",
+                    "Sale with id " + id + " does not exists",
                     42);
         }
 
-        // Get the taxes
-        List<Tax> taxes = taxRepository.findAllBySaleId(saleId);
+        return insiteSaleRepository.findBySaleId(id).isPresent();
+    }
+
+    private Reservation getReservationBySaleId(Long id) {
+        Optional<InsiteSale> sale = insiteSaleRepository.findBySaleId(id);
+        if (sale.isEmpty()) {
+            return null;
+        }
+
+        return sale.get().getReservation();
+    }
+
+    private List<TaxDTO> getTaxesBySaleId(Long id) throws NoContentException {
+        Optional<Sale> sale = saleRepository.findById(id);
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + id + " does not exists",
+                    42);
+        }
+
+        List<SaleTax> taxes = saleTaxRepository.findAllBySaleId(id);
 
         // Map the taxes to DTOs
         List<TaxDTO> response = new ArrayList<>();
-
-        for (Tax tax : taxes) {
-            TaxDTO dto = taxMapper.toDTO(tax);
+        for (SaleTax tax : taxes) {
+            TaxDTO dto = taxMapper.toDTO(tax.getTax());
             response.add(dto);
         }
 
-        // Return the DTOs
         return response;
     }
 
-    public void delete(Long saleId) throws NoContentException {
-
-        Optional<Sale> sale = saleRepository.findById(saleId);
+    private List<TableDTO> getTablesBySaleId(Long id) {
+        Optional<InsiteSale> sale = insiteSaleRepository.findBySaleId(id);
         if (sale.isEmpty()) {
-            throw new NoContentException(
-                    "Sale with id " + saleId + " does not exists",
-                    42);
+            return new ArrayList<>();
         }
 
-        saleRepository.deleteById(saleId);
+        List<InsiteSaleTable> tables = insiteSaleTableRepository.findAllByInsiteSaleId(id);
+
+        // Map the taxes to DTOs
+        List<TableDTO> response = new ArrayList<>();
+        for (InsiteSaleTable table : tables) {
+            TableDTO dto = tableMapper.toDTO(table.getTable());
+            response.add(dto);
+        }
+
+        return response;
     }
 
-    public List<SaleProductDTO> getSaleProductsbySaleId(long saleId)
+    private List<SaleProductDTO> getSaleProductsbySaleId(long id)
             throws NoContentException {
-
-        // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(saleId);
-        if (!sale.isPresent()) {
-            throw new NoContentException("Sale with id " + saleId + " does not exists", 42);
+        Optional<Sale> sale = saleRepository.findById(id);
+        if (sale.isEmpty()) {
+            throw new NoContentException("Sale with id " + id + " does not exists", 42);
         }
 
-        // Get the products
-        List<SaleProduct> saleProducts = saleProductRepository.findAllBySaleId(saleId);
+        List<SaleProduct> saleProducts = saleProductRepository.findAllBySaleId(id);
 
         // Map the products to DTOs
         List<SaleProductDTO> response = new ArrayList<>();
         for (SaleProduct saleProduct : saleProducts) {
-
             SaleProductDTO dto = saleProductMapper.toDTO(saleProduct);
             response.add(dto);
         }
@@ -126,230 +164,187 @@ public class SaleService {
         return response;
     }
 
-    public SaleInfoDTO save(SaleDTO dto) throws NoContentException {
-        Optional<Table> table = tableRepository.findById(dto.getTableId());
+    private SaleInfoDTO completeData(long id) {
+        Sale sale = saleRepository.findById(id)
+                .orElseThrow(() -> new NoContentException("Sale with id " + id + " does not exists", 42));
 
-        if (table.isEmpty()) {
+        SaleDTO dto = saleMapper.toDTO(sale);
+        Boolean insite = isInsite(sale.getId());
+        Reservation reservation = getReservationBySaleId(sale.getId());
+        List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
+        List<TableDTO> tableListDTO = getTablesBySaleId(sale.getId());
+        List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
+
+        // Create a SaleInfo DTO
+        return SaleInfoDTO.builder()
+                .sale(dto)
+                .insite(insite)
+                .reservationId(reservation.getId())
+                .taxes(taxListDTO)
+                .tables(tableListDTO)
+                .products(saleProductListDTO)
+                .build();
+    }
+
+    public SaleInfoDTO save(SaleInfoDTO dto) throws NoContentException {
+        Optional<Branch> branch = branchRepository.findById(dto.getSale().getBranchId());
+        if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Table with id " + dto.getTableId() + " does not exists", 49); // !
+                    "Branch with id " + dto.getSale().getBranchId() + " does not exists", 20);
         }
 
-        // Get the payment option from the paymento option id in the dto
-        PaymentOption paymentOption;
-        if (dto.getPaymentOptionId() == null) {
-            paymentOption = null;
-        } else {
-            paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId()).orElseThrow(
-                    () -> new NoContentException(
-                            "Payment option with id " + dto.getPaymentOptionId() + " does not exists", 58));
+        Optional<ClientGuest> clientGuest = clientGuestRepository.findById(dto.getSale().getClientGuestId());
+        if (clientGuest.isEmpty()) {
+            throw new NoContentException(
+                    "Client guest with id " + dto.getSale().getClientGuestId() + " does not exists", 59);
         }
 
-        // Get the reservation from the reservation id in the dto
-        Reservation reservation;
-        if (dto.getReservationId() == null) {
-            reservation = null;
-        } else {
-            reservation = reservationRepository.findById(dto.getReservationId()).orElseThrow(
-                    () -> new NoContentException(
-                            "Reservation with id " + dto.getReservationId() + " does not exists", 27));
-        }
-
-        Sale newSale_ = saleMapper.toEntity(dto, table.get(), reservation, paymentOption);
-
-        final Sale newSale = saleRepository.save(newSale_);
-
-        SaleDTO saleDTO = saleMapper.toDTO(newSale);
+        Sale sale = saleMapper.toEntity(dto.getSale(), branch.get(), null, clientGuest.get());
+        Sale newSale = saleRepository.save(sale);
 
         // Create taxes
-        defaultTaxRepository.findAllByBranchId(table.get().getBranch().getId()).forEach(tax -> {
+        defaultTaxRepository.findAllByBranchId(newSale.getBranch().getId()).forEach(tax -> {
             Tax newTax = Tax.builder()
-                    .sale(newSale)
                     .name(tax.getName())
                     .type(tax.getType())
                     .value(tax.getValue())
                     .build();
             taxRepository.save(newTax);
+
+            SaleTax saleTax = SaleTax.builder()
+                    .sale(newSale)
+                    .tax(newTax)
+                    .build();
+            saleTaxRepository.save(saleTax);
         });
 
-        List<TaxDTO> taxListDTO = getTaxesBySaleId(newSale.getId());
-        List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(newSale.getId());
+        if (dto.getInsite()) {
+            Reservation reservation;
+            if (dto.getReservationId() == null) {
+                reservation = null;
+            } else {
+                reservation = reservationRepository.findById(dto.getReservationId()).orElseThrow(
+                        () -> new NoContentException(
+                                "Reservation with id " + dto.getReservationId() + " does not exists", 27));
+            }
 
-        // Create a SaleInfo DTO
-        SaleInfoDTO dtoResponse = SaleInfoDTO.builder()
-                .sale(saleDTO)
-                .taxes(taxListDTO)
-                .products(saleProductListDTO)
-                .build();
+            InsiteSale insiteSale = InsiteSale.builder()
+                    .sale(newSale)
+                    .reservation(reservation)
+                    .build();
+            InsiteSale newInsiteSale = insiteSaleRepository.save(insiteSale);
 
-        return dtoResponse;
-    }
+            // Create tables
+            dto.getTables().forEach(tableDTO -> {
+                Optional<Table> table = tableRepository.findById(tableDTO.getId());
+                if (table.isEmpty()) {
+                    throw new NoContentException(
+                            "Table with id " + tableDTO.getId() + " does not exists", 49);
+                }
 
-    // Do not use this method (not tested)
-    public void cancel(Long id) throws NoContentException, BadRequestException {
-        Optional<Sale> sale = saleRepository.findById(id);
-
-        if (sale.isEmpty()) {
-            throw new NoContentException(
-                    "Sale with id " + id + " does not exists",
-                    42);
+                InsiteSaleTable insiteSaleTable = InsiteSaleTable.builder()
+                        .insiteSale(newInsiteSale)
+                        .table(table.get())
+                        .build();
+                insiteSaleTableRepository.save(insiteSaleTable);
+            });
+        } else {
+            OnlineSale onlineSale = OnlineSale.builder()
+                    .sale(sale)
+                    .build();
+            onlineSale = onlineSaleRepository.save(onlineSale);
         }
 
-        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
-            throw new BadRequestException(
-                    "Sale with id " + id + " can not be canceled because it is already closed", 43);
-        }
-
-        Long tableId = sale.get().getTable().getId();
-        Optional<Table> table = tableRepository.findById(tableId);
-        if (table.isEmpty()) {
-            throw new NoContentException(
-                    "Table with id " + tableId + " does not exists",
-                    49);
-        }
-
-        SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.cancelled).build();
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), null);
-        saleRepository.save(updatedSale);
-    }
-
-    // Do not use this method (not tested)
-    public void close(Long id) throws NoContentException, BadRequestException {
-        Optional<Sale> sale = saleRepository.findById(id);
-
-        if (sale.isEmpty()) {
-            throw new NoContentException(
-                    "Sale with id " + id + " does not exists",
-                    42);
-        }
-
-        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
-            throw new BadRequestException(
-                    "Sale with id " + id + " can not be closed because it is already closed", 43);
-        }
-
-        // add exception (user cannot close a canceled sale)
-
-        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
-            throw new BadRequestException(
-                    "Sale with id " + id + " can not be closed because it was canceled", 48);
-        }
-
-        Long tableId = sale.get().getTable().getId();
-        Optional<Table> table = tableRepository.findById(tableId);
-        if (table.isEmpty()) {
-            throw new NoContentException(
-                    "Table with id " + tableId + " does not exists", 49);
-        }
-
-        SaleDTO dto = SaleDTO.builder().status(SaleStatics.Status.closed).build();
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), null);
-        saleRepository.save(updatedSale);
+        return completeData(newSale.getId());
     }
 
     public SaleInfoDTO update(long id, SaleDTO dto) throws NoContentException, BadRequestException {
-
-        // Check if the sale exists
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
             throw new NoContentException(
                     "Sale with id " + id + " does not exists",
                     42);
         }
-
-        // Check if the sale is closed
-        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+        if (sale.get().getStatus().equals(SaleStatics.Status.CLOSED)) {
             throw new BadRequestException(
                     "Sale with id " + id + " is closed", 43);
         }
-
-        // Check if the sale is canceled
-        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
+        if (sale.get().getStatus().equals(SaleStatics.Status.CANCELLED)) {
             throw new BadRequestException(
-                    "Sale with id " + id + " is canceled", 48);
-        }
-
-        // Get the payment option from the paymento option id in the dto
-        PaymentOption paymentOption;
-        if (dto.getPaymentOptionId() == null) {
-            paymentOption = null;
-        } else {
-            paymentOption = paymentOptionRepository.findById(dto.getPaymentOptionId()).orElseThrow(
-                    () -> new NoContentException(
-                            "Payment option with id " + dto.getPaymentOptionId() + " does not exists", 58));
+                    "Sale with id " + id + " is cancelled", 48);
         }
 
         // Update the sale
-        Sale updatedSale = saleMapper.updateModel(dto, sale.get(), paymentOption);
+        Sale updatedSale = saleMapper.updateModel(dto, sale.get());
         updatedSale = saleRepository.save(updatedSale);
-        SaleDTO updatedSaleDTO = saleMapper.toDTO(updatedSale);
 
-        List<TaxDTO> taxListDTO = getTaxesBySaleId(updatedSale.getId());
-        List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(updatedSale.getId());
+        return completeData(updatedSale.getId());
+    }
 
-        // Create a SaleInfo DTO
-        SaleInfoDTO dtoResponse = SaleInfoDTO.builder()
-                .sale(updatedSaleDTO)
-                .taxes(taxListDTO)
-                .products(saleProductListDTO)
+    public TaxDTO addTax(Long id, TaxDTO dto) {
+        Optional<Sale> sale = saleRepository.findById(id);
+        if (sale.isEmpty()) {
+            throw new NoContentException(
+                    "Sale with id " + id + " does not exists",
+                    42);
+        }
+        if (sale.get().getStatus().equals(SaleStatics.Status.CLOSED)) {
+            throw new BadRequestException(
+                    "Sale with id " + id + " is closed", 43);
+        }
+        if (sale.get().getStatus().equals(SaleStatics.Status.CANCELLED)) {
+            throw new BadRequestException(
+                    "Sale with id " + id + " is cancelled", 48);
+        }
+
+        Tax tax = taxMapper.toEntity(dto);
+        tax = taxRepository.save(tax);
+        SaleTax saleTax = SaleTax.builder()
+                .sale(sale.get())
+                .tax(tax)
                 .build();
+        saleTaxRepository.save(saleTax);
 
-        return dtoResponse;
+        return taxMapper.toDTO(tax);
     }
 
-    public void clearSaleProducts(long saleId) throws NoContentException, BadRequestException {
-        // Deletes all the SaleProducts of a Sale given its id
-
-        // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(saleId);
+    public void delete(Long id) throws NoContentException {
+        Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
             throw new NoContentException(
-                    "Sale with id " + saleId + " does not exists",
+                    "Sale with id " + id + " does not exists",
                     42);
         }
-
-        // Check if the sale is closed
-        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+        if (sale.get().getStatus().equals(SaleStatics.Status.CLOSED)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " is closed",
-                    43); // No esta referenciado en docs
+                    "Sale with id " + id + " is closed", 43);
+        }
+        if (sale.get().getStatus().equals(SaleStatics.Status.CANCELLED)) {
+            throw new BadRequestException(
+                    "Sale with id " + id + " is cancelled", 48);
         }
 
-        // Check if the sale is canceled
-        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
-            throw new BadRequestException(
-                    "Sale with id " + saleId + " is canceled",
-                    48); // No esta referenciado en docs
-        }
-
-        // Delete all the SaleProducts of the Sale
-        saleProductRepository.deleteAllBySaleId(saleId);
+        saleRepository.deleteById(id);
     }
 
-    public void clearSaleTaxes(long saleId) throws NoContentException, BadRequestException {
-        // Deletes all the SaleProducts of a Sale given its id
-
-        // Check if the sale exists
-        Optional<Sale> sale = saleRepository.findById(saleId);
+    public void clearSaleProducts(long id) throws NoContentException, BadRequestException {
+        Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
             throw new NoContentException(
-                    "Sale with id " + saleId + " does not exists",
+                    "Sale with id " + id + " does not exists",
                     42);
         }
-
-        // Check if the sale is closed
-        if (sale.get().getStatus().equals(SaleStatics.Status.closed)) {
+        if (sale.get().getStatus().equals(SaleStatics.Status.CLOSED)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " is closed", 43); //
+                    "Sale with id " + id + " is closed",
+                    43);
         }
-
-        // Check if the sale is canceled
-        if (sale.get().getStatus().equals(SaleStatics.Status.cancelled)) {
+        if (sale.get().getStatus().equals(SaleStatics.Status.CANCELLED)) {
             throw new BadRequestException(
-                    "Sale with id " + saleId + " is canceled", 48);
+                    "Sale with id " + id + " is cancelled",
+                    48);
         }
-
-        // Delete all the SaleProducts of the Sale
-        taxRepository.deleteAllBySaleId(saleId);
+        saleProductRepository.deleteAllBySaleId(id);
     }
 
     public BranchSalesInfoDTO getBranchSales(
@@ -379,9 +374,9 @@ public class SaleService {
 
         // Apply filters to the historic sales
         Set<Sale> historicSalesConcat = new HashSet<>();
-        List<Sale> historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
+        List<Sale> historicSalesByWord = saleRepository.findAllByBranchIdAndFilters(
                 branchId,
-                List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                List.of(SaleStatics.Status.CANCELLED, SaleStatics.Status.CLOSED),
                 startTime,
                 endTime,
                 null,
@@ -392,17 +387,17 @@ public class SaleService {
         if (fullname != null) {
             // Separate the fullname in tokens to apply the filters dynamically
             for (String word : fullname.split(" ")) {
-                historicSalesByWord = saleRepository.findAllByTableBranchIdAndFilters(
+                historicSalesByWord = saleRepository.findAllByBranchIdAndFilters(
                         branchId,
-                        List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                        List.of(SaleStatics.Status.CANCELLED, SaleStatics.Status.CLOSED),
                         startTime,
                         endTime,
                         word,
                         null,
                         identityDocument);
-                historicSalesByWord.addAll(saleRepository.findAllByTableBranchIdAndFilters(
+                historicSalesByWord.addAll(saleRepository.findAllByBranchIdAndFilters(
                         branchId,
-                        List.of(SaleStatics.Status.cancelled, SaleStatics.Status.closed),
+                        List.of(SaleStatics.Status.CANCELLED, SaleStatics.Status.CLOSED),
                         startTime,
                         endTime,
                         word,
@@ -421,45 +416,24 @@ public class SaleService {
         historicSalesPage.setPageSize(size);
         historicSalesPage.setPage(page);
 
-        List<Sale> ongoingSales = saleRepository.findAllByTableBranchIdAndStatusOrderByStartTimeDesc(
+        List<Sale> ongoingSales = saleRepository.findAllByBranchIdAndStatusOrderByStartTimeDesc(
                 branchId,
-                SaleStatics.Status.ongoing);
+                SaleStatics.Status.ONGOING);
 
-        List<SaleInfoDTO> notOngoingSalesInfoDTO = new ArrayList<>();
+        List<SaleInfoDTO> historicSalesInfoDTO = new ArrayList<>();
         List<SaleInfoDTO> ongoingSalesInfoDTO = new ArrayList<>();
 
         historicSalesPage.getPageList().forEach(sale -> {
-            SaleDTO saleDTO = saleMapper.toDTO(sale);
-            List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
-            List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
-
-            // Create a SaleInfo DTO
-            SaleInfoDTO saleInfoDTO = SaleInfoDTO.builder()
-                    .sale(saleDTO)
-                    .taxes(taxListDTO)
-                    .products(saleProductListDTO)
-                    .build();
-
-            notOngoingSalesInfoDTO.add(saleInfoDTO);
+            historicSalesInfoDTO.add(completeData(sale.getId()));
         });
 
         ongoingSales.forEach(sale -> {
-            SaleDTO saleDTO = saleMapper.toDTO(sale);
-            List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
-            List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
-
-            // Create a SaleInfo DTO
-            SaleInfoDTO saleInfoDTO = SaleInfoDTO.builder()
-                    .sale(saleDTO)
-                    .taxes(taxListDTO)
-                    .products(saleProductListDTO)
-                    .build();
-            ongoingSalesInfoDTO.add(saleInfoDTO);
+            ongoingSalesInfoDTO.add(completeData(sale.getId()));
         });
 
         BranchSalesInfoDTO response = BranchSalesInfoDTO.builder()
                 .ongoingSalesInfo(ongoingSalesInfoDTO)
-                .historicSalesInfo(notOngoingSalesInfoDTO)
+                .historicSalesInfo(historicSalesInfoDTO)
                 .currentHistoricPage(page)
                 .totalHistoricPages(historicSalesPage.getPageCount())
                 .totalHistoricElements(historicSales.size())
