@@ -60,7 +60,7 @@ public class PaymentOptionMapperTest {
                 paymentOption.getBranch().getId() + 1,
                 paymentOption.getName() + ".",
                 paymentOption.getDescription() + ".");
-        PaymentOption response = paymentOptionMapper.toEntity(paymentOptionDTO, paymentOption.getBranch());
+        PaymentOption response = paymentOptionMapper.updateModel(paymentOptionDTO, paymentOption);
         PaymentOption expected = new PaymentOption(
                 paymentOption.getId(),
                 paymentOption.getBranch(),

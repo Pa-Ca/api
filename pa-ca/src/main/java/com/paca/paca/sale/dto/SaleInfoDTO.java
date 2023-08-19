@@ -6,9 +6,10 @@ import com.paca.paca.branch.dto.TableDTO;
 
 import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaleInfoDTO {

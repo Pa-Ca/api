@@ -2,9 +2,10 @@ package com.paca.paca.business.dto;
 
 import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class BusinessDTO {

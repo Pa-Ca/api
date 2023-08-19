@@ -1,16 +1,13 @@
 package com.paca.paca.branch.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import com.paca.paca.sale.dto.TaxDTO;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultTaxDTO {

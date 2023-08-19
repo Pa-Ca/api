@@ -68,7 +68,7 @@ public class ProductSubCategoryMapperTest {
                 branch.getId() + 1,
                 category.getId() + 1,
                 productSubCategory.getName() + ".");
-        ProductSubCategory response = productSubCategoryMapper.toEntity(dto, branch, category);
+        ProductSubCategory response = productSubCategoryMapper.updateModel(dto, productSubCategory);
         ProductSubCategory expected = new ProductSubCategory(
                 productSubCategory.getId(),
                 branch,
@@ -108,7 +108,7 @@ public class ProductSubCategoryMapperTest {
         ProductCategoryDTO dto = new ProductCategoryDTO(
                 productCategory.getId() + 1,
                 productCategory.getName() + ".");
-        ProductCategory response = productCategoryMapper.toEntity(dto);
+        ProductCategory response = productCategoryMapper.updateModel(dto, productCategory);
         ProductCategory expected = new ProductCategory(
                 productCategory.getId(),
                 dto.getName());

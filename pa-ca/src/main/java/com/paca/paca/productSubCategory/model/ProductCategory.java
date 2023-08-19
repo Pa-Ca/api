@@ -1,12 +1,13 @@
 package com.paca.paca.productSubCategory.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "product_category")

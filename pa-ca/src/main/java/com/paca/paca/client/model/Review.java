@@ -4,13 +4,15 @@ import java.util.Date;
 
 import com.paca.paca.branch.model.Branch;
 
-import jakarta.persistence.*;
 import lombok.*;
+
+import jakarta.persistence.*;
 
 @Entity
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "review")

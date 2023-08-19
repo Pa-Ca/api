@@ -14,10 +14,11 @@ import io.hypersistence.utils.hibernate.type.interval.PostgreSQLIntervalType;
 
 import lombok.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "branch")

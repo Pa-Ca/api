@@ -4,9 +4,10 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @Builder
-@jakarta.persistence.Entity
+@Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "table")

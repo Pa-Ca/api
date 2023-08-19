@@ -1,14 +1,16 @@
 package com.paca.paca.branch.model;
 
-import com.paca.paca.sale.model.Tax;
-
-import jakarta.persistence.*;
 import lombok.*;
 
-@Builder
+import jakarta.persistence.*;
+
+import com.paca.paca.sale.model.Tax;
+
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "tax")

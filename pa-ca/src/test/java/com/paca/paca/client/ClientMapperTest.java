@@ -78,6 +78,7 @@ public class ClientMapperTest {
     @Test
     void shouldPartiallyMapClientDTOtoClientEntity() {
         Client client = utils.createClient(null);
+
         ClientDTO dto = new ClientDTO(
                 client.getId() + 1,
                 client.getUser().getId() + 1,

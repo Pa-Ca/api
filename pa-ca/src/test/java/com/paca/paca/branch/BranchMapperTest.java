@@ -86,8 +86,8 @@ public class BranchMapperTest {
 
     @Test
     void shouldPartiallyMapBranchDTOtoBranchEntity() {
-        Branch branch = utils.createBranch(null);
         Business business = utils.createBusiness(null);
+        Branch branch = utils.createBranch(business);
 
         BranchDTO dto = new BranchDTO(
                 branch.getId() + 1,

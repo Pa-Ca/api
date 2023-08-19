@@ -6,10 +6,11 @@ import jakarta.persistence.*;
 
 import com.paca.paca.branch.model.Table;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "insite_sale_table")

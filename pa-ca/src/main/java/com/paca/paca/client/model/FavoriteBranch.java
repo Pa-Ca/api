@@ -1,19 +1,16 @@
 package com.paca.paca.client.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 import com.paca.paca.branch.model.Branch;
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-@Builder
 @Getter
 @Setter
+@Builder
 @Entity
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "\"favorite_branch\"")

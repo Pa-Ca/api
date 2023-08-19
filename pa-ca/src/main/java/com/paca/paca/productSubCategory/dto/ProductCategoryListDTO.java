@@ -1,16 +1,14 @@
 package com.paca.paca.productSubCategory.dto;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProductCategoryListDTO {
 
     List<ProductCategoryDTO> productCategories;

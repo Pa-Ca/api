@@ -78,7 +78,7 @@ public class SaleMapperTest {
                 new Date(),
                 sale.getDollarExchange() + 1,
                 sale.getNote() + ".");
-        Sale response = saleMapper.toEntity(saleDTO, sale.getBranch(), sale.getInvoice(), sale.getClientGuest());
+        Sale response = saleMapper.updateModel(saleDTO, sale);
         Sale expected = new Sale(
                 sale.getId(),
                 sale.getBranch(),

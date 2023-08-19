@@ -60,7 +60,7 @@ public class PromotionMapperTest {
                 branch.getId() + 1,
                 promotion.getText() + ".",
                 !promotion.getDisabled());
-        Promotion response = promotionMapper.toEntity(dto, branch);
+        Promotion response = promotionMapper.updateModel(dto, promotion);
         Promotion expected = new Promotion(
                 promotion.getId(),
                 branch,

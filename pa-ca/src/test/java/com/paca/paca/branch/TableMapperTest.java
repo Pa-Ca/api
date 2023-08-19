@@ -57,10 +57,9 @@ public class TableMapperTest {
                 table.getId() + 1,
                 table.getBranch().getId() + 1,
                 table.getName() + ".");
-
-        Table response = tableMapper.toEntity(tableDTO, table.getBranch());
+        Table response = tableMapper.updateModel(tableDTO, table);
         Table expected = new Table(
-                tableDTO.getId(),
+                table.getId(),
                 table.getBranch(),
                 tableDTO.getName());
 

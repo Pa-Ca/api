@@ -58,7 +58,7 @@ public class TaxMapperTest {
                 (short) (tax.getType() + 1),
                 tax.getName() + ".",
                 tax.getValue() + 1);
-        Tax response = taxMapper.toEntity(taxDTO);
+        Tax response = taxMapper.updateModel(taxDTO, tax);
         Tax expected = new Tax(
                 tax.getId(),
                 taxDTO.getType(),

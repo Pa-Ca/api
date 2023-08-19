@@ -1,6 +1,7 @@
 package com.paca.paca.business.model;
 
 import lombok.*;
+
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -8,9 +9,10 @@ import java.math.BigDecimal;
 import com.paca.paca.statics.BusinessTier;
 
 @Entity
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tier")

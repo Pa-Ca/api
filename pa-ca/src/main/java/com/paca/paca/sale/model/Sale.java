@@ -11,9 +11,10 @@ import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.model.Invoice;
 
 @Builder
-@jakarta.persistence.Entity
+@Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "sale")

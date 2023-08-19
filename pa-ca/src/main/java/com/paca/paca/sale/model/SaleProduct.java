@@ -8,10 +8,11 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sale_product")

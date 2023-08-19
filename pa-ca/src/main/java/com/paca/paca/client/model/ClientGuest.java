@@ -6,10 +6,11 @@ import com.paca.paca.reservation.model.Guest;
 
 import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "client_guest")

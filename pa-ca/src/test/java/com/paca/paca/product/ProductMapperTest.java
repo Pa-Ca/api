@@ -72,7 +72,7 @@ public class ProductMapperTest {
                 product.getPrice().add(BigDecimal.valueOf(1)),
                 product.getDescription() + ".",
                 !product.getDisabled());
-        Product response = productMapper.toEntity(dto, subCategory);
+        Product response = productMapper.updateModel(dto, product);
         Product expected = new Product(
                 product.getId(),
                 subCategory,

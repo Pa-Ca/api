@@ -3,10 +3,11 @@ package com.paca.paca.reservation.model;
 import lombok.*;
 import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "guest")

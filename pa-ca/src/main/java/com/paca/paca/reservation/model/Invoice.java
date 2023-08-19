@@ -1,17 +1,18 @@
 package com.paca.paca.reservation.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 
 import java.util.Date;
 import java.math.BigDecimal;
 
-@Builder
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "invoice")
 public class Invoice {
 

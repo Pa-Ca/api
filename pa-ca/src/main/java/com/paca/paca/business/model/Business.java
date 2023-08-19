@@ -2,11 +2,7 @@ package com.paca.paca.business.model;
 
 import com.paca.paca.user.model.User;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 
@@ -14,6 +10,7 @@ import jakarta.persistence.*;
 @Setter
 @Entity
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "`business`")

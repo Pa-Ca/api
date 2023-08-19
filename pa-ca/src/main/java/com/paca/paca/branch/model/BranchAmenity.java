@@ -1,12 +1,13 @@
 package com.paca.paca.branch.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "branch_amenity")

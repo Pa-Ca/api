@@ -69,17 +69,16 @@ public class SaleProductMapperTest {
                 saleProduct.getName() + "1",
                 saleProduct.getAmount() + 1,
                 saleProduct.getPrice().add(BigDecimal.ONE));
-        SaleProduct response = saleProductMapper.toEntity(
+        SaleProduct response = saleProductMapper.updateModel(
                 saleProductDTO,
-                saleProduct.getSale(),
-                saleProduct.getProduct());
+                saleProduct);
         SaleProduct expected = new SaleProduct(
                 saleProduct.getId(),
                 saleProduct.getSale(),
                 saleProduct.getProduct(),
                 saleProductDTO.getName(),
                 saleProductDTO.getAmount(),
-                saleProductDTO.getPrice());
+                saleProduct.getPrice());
 
         assertThat(response).isEqualTo(expected);
     }

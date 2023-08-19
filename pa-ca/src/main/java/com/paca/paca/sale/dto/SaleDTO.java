@@ -4,9 +4,10 @@ import java.util.Date;
 
 import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaleDTO {

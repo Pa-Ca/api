@@ -149,15 +149,12 @@ public class ReservationMapperTest {
     @Test
     void shouldPartiallyMapReservationDTOtoReservationEntity() {
         Reservation reservation = utils.createReservation(null, null, null);
-        Branch branch = utils.createBranch(null);
-        Guest guest = utils.createGuest();
-        Invoice invoice = utils.createInvoice();
 
         ReservationDTO dto = new ReservationDTO(
                 reservation.getId() + 1,
-                branch.getId() + 1,
-                guest.getId() + 1,
-                invoice.getId() + 1,
+                reservation.getBranch().getId() + 1,
+                reservation.getGuest().getId() + 1,
+                reservation.getInvoice().getId() + 1,
                 new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()),
@@ -167,13 +164,12 @@ public class ReservationMapperTest {
                 (short) (reservation.getClientNumber() + 1),
                 reservation.getOccasion() + ".",
                 !reservation.getByClient());
-
         Reservation response = reservationMapper.updateModel(dto, reservation);
         Reservation expected = new Reservation(
                 reservation.getId(),
-                branch,
-                guest,
-                invoice,
+                reservation.getBranch(),
+                reservation.getGuest(),
+                reservation.getInvoice(),
                 dto.getRequestDate(),
                 dto.getReservationDateIn(),
                 dto.getReservationDateOut(),

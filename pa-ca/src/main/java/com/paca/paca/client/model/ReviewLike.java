@@ -1,12 +1,13 @@
 package com.paca.paca.client.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "review_like")

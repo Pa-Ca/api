@@ -18,15 +18,12 @@ import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationInfoDTO {

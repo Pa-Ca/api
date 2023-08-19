@@ -8,10 +8,11 @@ import com.paca.paca.branch.model.Branch;
 import lombok.*;
 import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "reservation")

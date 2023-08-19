@@ -6,10 +6,11 @@ import com.paca.paca.client.model.Client;
 
 import jakarta.persistence.*;
 
-@Builder
 @Entity
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "client_group")

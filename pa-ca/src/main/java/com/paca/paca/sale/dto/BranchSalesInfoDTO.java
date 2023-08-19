@@ -1,17 +1,13 @@
 package com.paca.paca.sale.dto;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.util.List;
-
-import lombok.AllArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class BranchSalesInfoDTO {
 
     List<SaleInfoDTO> ongoingSalesInfo;
