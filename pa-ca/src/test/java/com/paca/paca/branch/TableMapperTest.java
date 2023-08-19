@@ -37,15 +37,16 @@ public class TableMapperTest {
     @Test
     void shouldMapTableDTOtoTableEntity() {
         Branch branch = utils.createBranch(null);
-        TableDTO tableDTO = utils.createTableDTO(branch);
+        Table table = utils.createTable(branch);
+        TableDTO tableDTO = utils.createTableDTO(table);
 
-        Table table = tableMapper.toEntity(tableDTO, branch);
+        Table response = tableMapper.toEntity(tableDTO, branch);
         Table expected = new Table(
                 tableDTO.getId(),
                 branch,
                 tableDTO.getName());
 
-        assertThat(table).isEqualTo(expected);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test

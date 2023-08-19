@@ -20,9 +20,9 @@ public class ClientDTO {
     private String email;
     private String name;
     private String surname;
-    private String stripeCustomerId;
-    private String phoneNumber;
-    private String address;
-    private Date dateOfBirth;
     private String identityDocument;
+    private String address;
+    private String phoneNumber;
+    private String stripeCustomerId;
+    private Date dateOfBirth;
 }

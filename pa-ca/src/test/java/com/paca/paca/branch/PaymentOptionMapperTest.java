@@ -38,7 +38,8 @@ public class PaymentOptionMapperTest {
     @Test
     void shouldMappaymentOptionDTOtopaymentOptionEntity() {
         Branch branch = utils.createBranch(null);
-        PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(branch);
+        PaymentOption paymentOption = utils.createPaymentOption(branch);
+        PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(paymentOption);
 
         PaymentOption response = paymentOptionMapper.toEntity(paymentOptionDTO, branch);
         PaymentOption expected = new PaymentOption(

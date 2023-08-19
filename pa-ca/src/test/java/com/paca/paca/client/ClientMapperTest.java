@@ -46,11 +46,11 @@ public class ClientMapperTest {
                 client.getUser().getEmail(),
                 client.getName(),
                 client.getSurname(),
-                client.getStripeCustomerId(),
-                client.getPhoneNumber(),
+                client.getIdentityDocument(),
                 client.getAddress(),
-                client.getDateOfBirth(),
-                client.getIdentityDocument());
+                client.getPhoneNumber(),
+                client.getStripeCustomerId(),
+                client.getDateOfBirth());
 
         assertThat(response).isEqualTo(expected);
     }
@@ -84,11 +84,11 @@ public class ClientMapperTest {
                 client.getUser().getEmail() + ".",
                 client.getName() + ".",
                 client.getSurname() + ".",
-                client.getStripeCustomerId() + ".",
-                client.getPhoneNumber() + ".",
+                client.getIdentityDocument() + ".",
                 client.getAddress() + ".",
-                new Date(System.currentTimeMillis()),
-                client.getIdentityDocument() + ".");
+                client.getPhoneNumber() + ".",
+                client.getStripeCustomerId() + ".",
+                new Date(System.currentTimeMillis()));
         Client response = clientMapper.updateModel(dto, client);
         Client expected = new Client(
                 client.getId(),

@@ -1,5 +1,5 @@
 package com.paca.paca.statics;
 
 public enum BusinessTier {
-    basic, premium, unlimited
+    BASIC, PREMIUM, UNLIMITED
 }

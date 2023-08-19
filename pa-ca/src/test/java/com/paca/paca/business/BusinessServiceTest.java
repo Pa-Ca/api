@@ -130,7 +130,7 @@ class BusinessServiceTest {
     @Test
     void shouldSave() {
         Business business = utils.createBusiness(null);
-        Tier tier = utils.createTier(BusinessTier.basic);
+        Tier tier = utils.createTier(BusinessTier.BASIC);
         BusinessDTO dto = utils.createBusinessDTO(business);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(business.getUser()));
@@ -166,7 +166,7 @@ class BusinessServiceTest {
     @Test
     void shouldUpdate() {
         Business business = utils.createBusiness(null);
-        Tier tier = utils.createTier(BusinessTier.basic);
+        Tier tier = utils.createTier(BusinessTier.BASIC);
         BusinessDTO dto = utils.createBusinessDTO(business);
 
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(business));
