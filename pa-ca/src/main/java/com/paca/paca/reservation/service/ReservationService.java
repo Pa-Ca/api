@@ -448,17 +448,17 @@ public class ReservationService {
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be rejected because it is already returned", 69);
+                    "Reservation with id " + id + " can't start because it is already returned", 69);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.CLOSED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be rejected because it is already closed", 70);
+                    "Reservation with id " + id + " can't start because it is already closed", 70);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.REJECTED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be rejected because it is already rejected", 71);
+                    "Reservation with id " + id + " can't start because it is already rejected", 71);
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.STARTED).build();
@@ -475,17 +475,17 @@ public class ReservationService {
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be rejected because it is already returned", 69);
+                    "Reservation with id " + id + " can't be retired because it is already returned", 69);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.CLOSED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be rejected because it is already closed", 70);
+                    "Reservation with id " + id + " can't be retired because it is already closed", 70);
         }
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.REJECTED)) {
             throw new BadRequestException(
-                    "Reservation with id " + id + " can't be rejected because it is already rejected", 71);
+                    "Reservation with id " + id + " can't be retired because it is already rejected", 71);
         }
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.RETIRED).build();

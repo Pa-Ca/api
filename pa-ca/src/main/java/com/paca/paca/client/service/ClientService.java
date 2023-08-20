@@ -316,7 +316,7 @@ public class ClientService {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -341,7 +341,7 @@ public class ClientService {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -359,14 +359,14 @@ public class ClientService {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + id + " does not exists",
+                    "Branch with id " + branchId + " does not exists",
                     20);
         }
 
@@ -391,7 +391,7 @@ public class ClientService {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -404,7 +404,7 @@ public class ClientService {
 
         Boolean favExists = favoriteBranchRepository.existsByClientIdAndBranchId(id, branchId);
         if (!favExists) {
-            throw new ConflictException("Favorite branch does not exists", 33);
+            throw new NoContentException("Favorite branch does not exists", 33);
         }
 
         FavoriteBranch fav = favoriteBranchRepository.findByClientIdAndBranchId(id, branchId).get();

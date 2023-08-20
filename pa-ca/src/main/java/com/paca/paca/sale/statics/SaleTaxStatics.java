@@ -1,8 +1,8 @@
-package com.paca.paca.branch.statics;
+package com.paca.paca.sale.statics;
 
-public interface DefaultTaxStatics {
+public interface SaleTaxStatics {
     interface Endpoint {
-        String PATH = "/api/v1/default-tax";
+        String PATH = "/api/v1/sale-tax";
 
         String SAVE = "";
         String UPDATE = "/{id}";

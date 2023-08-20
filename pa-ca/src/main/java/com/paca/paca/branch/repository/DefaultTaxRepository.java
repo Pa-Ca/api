@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface DefaultTaxRepository extends JpaRepository<DefaultTax, Long> {
 
-    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
+    Boolean existsByTaxIdAndBranch_Business_Id(Long id, Long businessId);
 
 }

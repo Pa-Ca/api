@@ -26,6 +26,7 @@ import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.sale.dto.SaleTaxDTO;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
@@ -35,6 +36,7 @@ import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.sale.model.InsiteSale;
+import com.paca.paca.sale.model.OnlineSale;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.sale.dto.SaleProductDTO;
@@ -53,7 +55,6 @@ import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
-import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
@@ -81,6 +82,7 @@ import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
@@ -91,6 +93,7 @@ import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.sale.repository.InsiteSaleTableRepository;
+import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
@@ -159,6 +162,8 @@ public class TestUtils {
     DefaultTaxRepository defaultTaxRepository;
 
     ReviewLikeRepository reviewLikeRepository;
+
+    OnlineSaleRepository onlineSaleRepository;
 
     SaleProductRepository saleProductRepository;
 
@@ -767,7 +772,7 @@ public class TestUtils {
                 new BigDecimal(Math.random()),
                 ReservationStatics.Status.PENDING,
                 (short) ThreadLocalRandom.current().nextInt(0, 1001),
-                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                (short) ThreadLocalRandom.current().nextInt(0, branch.getCapacity() + 1),
                 "occasion_" + UUID.randomUUID().toString(),
                 true);
 
@@ -1462,5 +1467,34 @@ public class TestUtils {
         }
 
         return saleTax;
+    }
+
+    public SaleTaxDTO createSaleTaxDTO(SaleTax saleTax) {
+        if (saleTax == null) {
+            saleTax = createSaleTax(null, null);
+        }
+
+        SaleTaxDTO dto = new SaleTaxDTO(
+                saleTax.getId(),
+                saleTax.getSale().getId(),
+                createTaxDTO(saleTax.getTax()));
+
+        return dto;
+    }
+
+    public OnlineSale createOnlineSale(Sale sale) {
+        if (sale == null) {
+            sale = createSale(null, null, null);
+        }
+
+        OnlineSale onlineSale = new OnlineSale(
+                ThreadLocalRandom.current().nextLong(999999999),
+                sale);
+
+        if (onlineSaleRepository != null) {
+            onlineSale = onlineSaleRepository.save(onlineSale);
+        }
+
+        return onlineSale;
     }
 }

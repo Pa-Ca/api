@@ -1,6 +1,5 @@
 package com.paca.paca.sale.controller;
 
-import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.statics.SaleStatics;
@@ -89,15 +88,6 @@ public class SaleController {
             @RequestBody SaleDTO dto)
             throws NoContentException, BadRequestException {
         return ResponseEntity.ok(saleService.update(id, dto));
-    }
-
-    @ValidateSaleOwner
-    @ValidateRoles({ "business" })
-    @PostMapping(SaleStatics.Endpoint.ADD_TAX)
-    @Operation(summary = "Create new tax", description = "Create a new tax")
-    public ResponseEntity<TaxDTO> addTax(@PathVariable("id") Long id, @RequestBody TaxDTO dto)
-            throws NoContentException, ForbiddenException {
-        return ResponseEntity.ok(saleService.addTax(id, dto));
     }
 
     @ValidateSaleOwner

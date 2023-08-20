@@ -22,12 +22,13 @@ import com.paca.paca.exception.exceptions.BadRequestException;
 @RequiredArgsConstructor
 public class SaleProductService {
 
-    private final SaleProductRepository saleProductRepository;
-    private final SaleProductMapper saleProductMapper;
-
     private final SaleRepository saleRepository;
 
+    private final SaleProductMapper saleProductMapper;
+
     private final ProductRepository productRepository;
+
+    private final SaleProductRepository saleProductRepository;
 
     public SaleProductDTO save(SaleProductDTO saleProductDTO) throws BadRequestException {
         Optional<Sale> sale = saleRepository.findById(saleProductDTO.getSaleId());

@@ -1,4 +1,4 @@
-package com.paca.paca.branch.utils;
+package com.paca.paca.sale.utils;
 
 import java.util.Map;
 import java.lang.reflect.Method;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.paca.paca.business.model.Business;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 
@@ -27,17 +27,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class ValidateDefaultTaxOwnerInterceptor implements HandlerInterceptor {
+public class ValidateSaleTaxOwnerInterceptor implements HandlerInterceptor {
 
     @Inherited
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
-    public @interface ValidateDefaultTaxOwner {
+    public @interface ValidateSaleTaxOwner {
     }
 
     @Autowired
-    private DefaultTaxRepository defaultTaxRepository;
+    private SaleTaxRepository saleTaxRepository;
 
     @Autowired
     private BusinessRepository businessRepository;
@@ -51,7 +51,7 @@ public class ValidateDefaultTaxOwnerInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             return true;
         }
-        ValidateDefaultTaxOwner annotation = AnnotationUtils.findAnnotation(method, ValidateDefaultTaxOwner.class);
+        ValidateSaleTaxOwner annotation = AnnotationUtils.findAnnotation(method, ValidateSaleTaxOwner.class);
         if (annotation != null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
@@ -60,9 +60,9 @@ public class ValidateDefaultTaxOwnerInterceptor implements HandlerInterceptor {
 
             Business business = businessRepository.findByUserEmail(auth.getName()).get();
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            Long defaultTaxId = Long.parseLong((String) pathVariables.get("id"));
+            Long taxId = Long.parseLong((String) pathVariables.get("id"));
 
-            if (!defaultTaxRepository.existsByTaxIdAndBranch_Business_Id(defaultTaxId, business.getId())) {
+            if (!saleTaxRepository.existsByTaxIdAndSale_Branch_Business_Id(taxId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

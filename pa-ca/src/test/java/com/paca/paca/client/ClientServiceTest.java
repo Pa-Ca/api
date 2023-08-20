@@ -20,6 +20,7 @@ import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.model.ReviewLike;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.utils.ClientMapper;
@@ -31,6 +32,7 @@ import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.service.ReviewService;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.user.repository.UserRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.FriendRepository;
@@ -73,6 +75,9 @@ public class ClientServiceTest {
 
     @Mock
     private ClientGroupRepository clientGroupRepository;
+
+    @Mock
+    private ClientGuestRepository clientGuestRepository;
 
     @Mock
     private FavoriteBranchRepository favoriteBranchRepository;
@@ -162,16 +167,18 @@ public class ClientServiceTest {
     void shouldSave() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
+        ClientGuest clientGuest = utils.createClientGuest(client);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(client.getUser()));
         when(clientRepository.existsByUserEmail(any(String.class))).thenReturn(false);
         when(clientRepository.save(any(Client.class))).thenReturn(client);
         when(clientMapper.toEntity(any(ClientDTO.class), any(User.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
+        when(clientGuestRepository.save(any(ClientGuest.class))).thenReturn(clientGuest);
 
         ClientDTO response = clientService.save(dto);
 
-        assertThat(response).isEqualTo(client);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -203,7 +210,7 @@ public class ClientServiceTest {
 
         ClientDTO response = clientService.update(client.getId(), dto);
 
-        assertThat(response).isEqualTo(client);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -248,7 +255,7 @@ public class ClientServiceTest {
 
         ClientDTO response = clientService.getByUserId(client.getUser().getId());
 
-        assertThat(response).isEqualTo(client);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -605,7 +612,7 @@ public class ClientServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Client with id: " + client.getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
         }
     }
@@ -639,7 +646,7 @@ public class ClientServiceTest {
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Client with id: " + client.getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
         }
     }
@@ -663,16 +670,14 @@ public class ClientServiceTest {
 
     @Test
     void shouldGetNoContentDueToMissingClientInAddFavoriteBranch() {
-        ClientDTO dto = utils.createClientDTO(null);
-
         when(clientRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
-            clientService.save(dto);
+            clientService.addFavoriteBranch(1L, 1L);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Client with id " + dto.getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(), "Client with id " + 1L + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
         }
     }
@@ -680,17 +685,16 @@ public class ClientServiceTest {
     @Test
     void shouldGetNoContentDueToMissingBranchInAddFavoriteBranch() {
         Client client = utils.createClient(null);
-        ClientDTO dto = utils.createClientDTO(client);
 
         when(clientRepository.findById(anyLong())).thenReturn(Optional.of(client));
         when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
-            clientService.save(dto);
+            clientService.addFavoriteBranch(client.getId(), 1L);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals(e.getMessage(), "Branch with id " + dto.getId() + " does not exists");
+            Assert.assertEquals(e.getMessage(), "Branch with id " + 1L + " does not exists");
             Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
         }
     }
@@ -699,14 +703,13 @@ public class ClientServiceTest {
     void shouldGetClientDueToExistingFavoriteBranchInAddFavoriteBranch() {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
-        ClientDTO dto = utils.createClientDTO(client);
 
         when(clientRepository.findById(anyLong())).thenReturn(Optional.of(client));
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(favoriteBranchRepository.existsByClientIdAndBranchId(anyLong(), anyLong())).thenReturn(true);
 
         try {
-            clientService.save(dto);
+            clientService.addFavoriteBranch(client.getId(), branch.getId());
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ConflictException);
@@ -719,7 +722,6 @@ public class ClientServiceTest {
     void shouldAddFavoriteBranch() {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
-        ClientDTO dto = utils.createClientDTO(client);
         FavoriteBranch fav = utils.createFavoriteBranch(client, branch);
         BranchDTO branchDTO = utils.createBranchDTO(branch);
 
@@ -729,7 +731,7 @@ public class ClientServiceTest {
         when(favoriteBranchRepository.save(any(FavoriteBranch.class))).thenReturn(fav);
         when(branchMapper.toDTO(any(Branch.class))).thenReturn(branchDTO);
 
-        ClientDTO response = clientService.save(dto);
+        BranchDTO response = clientService.addFavoriteBranch(client.getId(), branch.getId());
 
         assertThat(response).isEqualTo(branchDTO);
     }
@@ -812,7 +814,7 @@ public class ClientServiceTest {
 
         ReviewDTO response = reviewService.getById(review.getId());
 
-        assertThat(response).isEqualTo(review);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -885,7 +887,7 @@ public class ClientServiceTest {
 
         ReviewDTO response = reviewService.save(dto);
 
-        assertThat(response).isEqualTo(review);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -917,7 +919,7 @@ public class ClientServiceTest {
 
         ReviewDTO response = reviewService.update(review.getId(), dto);
 
-        assertThat(response).isEqualTo(review);
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test

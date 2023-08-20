@@ -12,6 +12,7 @@ import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.InsiteSale;
+import com.paca.paca.sale.model.OnlineSale;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.reservation.model.Guest;
@@ -28,6 +29,7 @@ import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.sale.repository.InsiteSaleRepository;
+import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
@@ -63,49 +65,52 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class SaleServiceTest {
 
     @Mock
-    private SaleRepository saleRepository;
+    private TaxMapper taxMapper;
 
     @Mock
     private SaleMapper saleMapper;
 
     @Mock
-    private TaxMapper taxMapper;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private TableRepository tableRepository;
+    private SaleProductMapper saleProductMapper;
 
     @Mock
     private TaxRepository taxRepository;
 
     @Mock
-    private SaleProductRepository saleProductRepository;
+    private SaleRepository saleRepository;
 
     @Mock
-    private SaleProductMapper saleProductMapper;
+    private TableRepository tableRepository;
 
     @Mock
-    private ClientGuestRepository clientGuestRepository;
+    private BranchRepository branchRepository;
+
+    @Mock
+    private SaleTaxRepository saleTaxRepository;
 
     @Mock
     private InsiteSaleRepository insiteSaleRepository;
+
+    @Mock
+    private OnlineSaleRepository onlineSaleRepository;
+
+    @Mock
+    private DefaultTaxRepository defaultTaxRepository;
+
+    @Mock
+    private SaleProductRepository saleProductRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
+
+    @Mock
+    private ClientGuestRepository clientGuestRepository;
 
     @Mock
     private PaymentOptionRepository paymentOptionRepository;
 
     @Mock
     private InsiteSaleTableRepository insiteSaleTableRepository;
-
-    @Mock
-    private SaleTaxRepository saleTaxRepository;
-
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private DefaultTaxRepository defaultTaxRepository;
 
     @InjectMocks
     private SaleService saleService;
@@ -121,6 +126,7 @@ public class SaleServiceTest {
         List<SaleProduct> products = TestUtils.castList(
                 SaleProduct.class,
                 Mockito.mock(List.class));
+        Reservation reservation = insite ? insiteSale.get().getReservation() : null;
 
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
@@ -139,7 +145,7 @@ public class SaleServiceTest {
         return SaleInfoDTO.builder()
                 .sale(saleDTO)
                 .insite(insite)
-                .reservationId(insite ? null : insiteSale.get().getReservation().getId())
+                .reservationId(reservation != null ? reservation.getId() : null)
                 .taxes(TestUtils.castList(TaxDTO.class, Mockito.mock(List.class)))
                 .tables(insite
                         ? TestUtils.castList(TableDTO.class, Mockito.mock(List.class))
@@ -157,6 +163,7 @@ public class SaleServiceTest {
         SaleDTO saleDTO = utils.createSaleDTO(sale);
         Reservation reservation = utils.createReservation(branch);
         List<Tax> defaultTaxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
+        InsiteSale insiteSale = utils.createInsiteSale(sale, reservation);
 
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(clientGuestRepository.findById(anyLong())).thenReturn(Optional.of(clientGuest));
@@ -165,8 +172,9 @@ public class SaleServiceTest {
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
         when(taxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
         when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
-        completeData(sale, insite);
+        when(insiteSaleRepository.save(any(InsiteSale.class))).thenReturn(insiteSale);
 
+        SaleInfoDTO expected = completeData(sale, insite);
         SaleInfoDTO dto = new SaleInfoDTO(
                 saleDTO,
                 insite,
@@ -175,7 +183,6 @@ public class SaleServiceTest {
                 new ArrayList<>(),
                 null);
         SaleInfoDTO response = saleService.save(dto);
-        SaleInfoDTO expected = completeData(sale, insite);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -188,6 +195,7 @@ public class SaleServiceTest {
         Branch branch = utils.createBranch(null);
         ClientGuest clientGuest = utils.createClientGuest((Guest) null);
         List<Tax> defaultTaxes = TestUtils.castList(Tax.class, Mockito.mock(List.class));
+        OnlineSale onlineSale = utils.createOnlineSale(sale);
 
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(clientGuestRepository.findById(anyLong())).thenReturn(Optional.of(clientGuest));
@@ -195,8 +203,9 @@ public class SaleServiceTest {
                 .thenReturn(sale);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
         when(taxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
-        completeData(sale, insite);
+        when(onlineSaleRepository.save(any(OnlineSale.class))).thenReturn(onlineSale);
 
+        SaleInfoDTO expected = completeData(sale, insite);
         SaleInfoDTO dto = new SaleInfoDTO(
                 saleDTO,
                 insite,
@@ -205,7 +214,6 @@ public class SaleServiceTest {
                 new ArrayList<>(),
                 null);
         SaleInfoDTO response = saleService.save(dto);
-        SaleInfoDTO expected = completeData(sale, insite);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -323,12 +331,11 @@ public class SaleServiceTest {
         Sale sale = utils.createSale(null, null, null);
         SaleDTO saleDTO = utils.createSaleDTO(sale);
 
-        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
         when(saleMapper.updateModel(any(SaleDTO.class), any(Sale.class))).thenReturn(sale);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
 
-        SaleInfoDTO response = saleService.update(sale.getId(), saleDTO);
         SaleInfoDTO expected = completeData(sale, true);
+        SaleInfoDTO response = saleService.update(sale.getId(), saleDTO);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -369,69 +376,6 @@ public class SaleServiceTest {
 
         try {
             saleService.update(sale.getId(), saleDTO);
-        } catch (BadRequestException e) {
-            Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals("Sale with id " + sale.getId() + " is cancelled", e.getMessage());
-            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 48);
-        }
-    }
-
-    @Test
-    void shouldAddTax() {
-        Tax tax = utils.createTax();
-        TaxDTO taxDTO = utils.createTaxDTO(tax);
-        Sale sale = utils.createSale(null, null, null);
-        SaleTax saleTax = utils.createSaleTax(sale, tax);
-
-        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
-        when(taxMapper.toEntity(any(TaxDTO.class))).thenReturn(tax);
-        when(taxRepository.save(any(Tax.class))).thenReturn(tax);
-        when(saleTaxRepository.save(any(SaleTax.class))).thenReturn(saleTax);
-        when(taxMapper.toDTO(any(Tax.class))).thenReturn(taxDTO);
-
-        TaxDTO response = saleService.addTax(sale.getId(), taxDTO);
-
-        assertThat(response).isEqualTo(taxDTO);
-    }
-
-    @Test
-    void shouldGetNoContentDueToMissingSaleInAddTax() {
-        Tax tax = utils.createTax();
-        TaxDTO taxDTO = utils.createTaxDTO(tax);
-
-        when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        try {
-            saleService.addTax(1L, taxDTO);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals("Sale with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
-        }
-    }
-
-    @Test
-    void shouldGetBadRequestDueToInvalidStatusInAddTax() {
-        Tax tax = utils.createTax();
-        TaxDTO taxDTO = utils.createTaxDTO(tax);
-        Sale sale = utils.createSale(null, null, null);
-
-        sale.setStatus(SaleStatics.Status.CLOSED);
-        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
-
-        try {
-            saleService.addTax(sale.getId(), taxDTO);
-        } catch (BadRequestException e) {
-            Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals("Sale with id " + sale.getId() + " is closed", e.getMessage());
-            Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 43);
-        }
-
-        sale.setStatus(SaleStatics.Status.CANCELLED);
-        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
-
-        try {
-            saleService.addTax(sale.getId(), taxDTO);
         } catch (BadRequestException e) {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals("Sale with id " + sale.getId() + " is cancelled", e.getMessage());

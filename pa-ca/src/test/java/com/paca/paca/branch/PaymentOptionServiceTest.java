@@ -62,7 +62,9 @@ public class PaymentOptionServiceTest {
     void shouldGetNoContentExceptionDueToBranchNotExistingInSave() {
         PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
         Long branchId = paymentOptionDTO.getBranchId();
+
         when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.save(paymentOptionDTO);
         } catch (Exception e) {
@@ -76,9 +78,7 @@ public class PaymentOptionServiceTest {
     void shouldUpdate() {
         PaymentOptionDTO dto = utils.createPaymentOptionDTO(null);
         PaymentOption paymentOption = utils.createPaymentOption(null);
-        Branch branch = utils.createBranch(null);
 
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.of(paymentOption));
         when(paymentOptionRepository.save(any())).thenReturn(paymentOption);
         when(paymentOptionMapper.toDTO(any())).thenReturn(dto);
@@ -93,8 +93,9 @@ public class PaymentOptionServiceTest {
     void shouldGetNoContentExceptionDueToBranchNotExistingInUpdate() {
         PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
         Long branchId = paymentOptionDTO.getBranchId();
+
         when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.of(new PaymentOption()));
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.update(1L, paymentOptionDTO);
         } catch (Exception e) {
@@ -107,8 +108,10 @@ public class PaymentOptionServiceTest {
     @Test
     void shouldGetNoContentExceptionDueToPaymentOptionNotExistingInUpdate() {
         PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
-        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());
         long paymentOptionId = paymentOptionDTO.getId();
+
+        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.update(paymentOptionId, paymentOptionDTO);
         } catch (Exception e) {
@@ -130,9 +133,11 @@ public class PaymentOptionServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToPaymentOptionNotExistingInDelete(){
-        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());  
+    void shouldGetNoContentExceptionDueToPaymentOptionNotExistingInDelete() {
         long paymentOptionId = 12L;
+
+        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.delete(paymentOptionId);
         } catch (Exception e) {

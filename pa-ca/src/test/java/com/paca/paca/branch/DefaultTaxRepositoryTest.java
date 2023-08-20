@@ -12,15 +12,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class DefaultTaxRepositoryTest extends RepositoryTest {
 
     @Test
-    void shouldCheckThatDefaultTaxExistsByIdAndBranch_Business_Id() {
+    void shouldCheckThatDefaultTaxExistsBySaleIdAndBranch_Business_Id() {
         Branch branch = utils.createBranch(null);
         Tax tax = utils.createTax();
-        DefaultTax defaultTax = defaultTaxRepository.save(DefaultTax.builder()
+        defaultTaxRepository.save(DefaultTax.builder()
                 .branch(branch)
                 .tax(tax)
                 .build());
 
-        Boolean exists = defaultTaxRepository.existsByIdAndBranch_Business_Id(defaultTax.getId(),
+        Boolean exists = defaultTaxRepository.existsByTaxIdAndBranch_Business_Id(
+                tax.getId(),
                 branch.getBusiness().getId());
 
         assertThat(exists).isTrue();
@@ -30,12 +31,13 @@ public class DefaultTaxRepositoryTest extends RepositoryTest {
     void shouldCheckThatDefaultTaxDoesNotExistsByIdAndBranch_Business_Id() {
         Branch branch = utils.createBranch(null);
         Tax tax = utils.createTax();
-        DefaultTax defaultTax = defaultTaxRepository.save(DefaultTax.builder()
+        defaultTaxRepository.save(DefaultTax.builder()
                 .branch(branch)
                 .tax(tax)
                 .build());
 
-        Boolean exists = defaultTaxRepository.existsByIdAndBranch_Business_Id(defaultTax.getId(),
+        Boolean exists = defaultTaxRepository.existsByTaxIdAndBranch_Business_Id(
+                tax.getId(),
                 branch.getBusiness().getId() + 1);
 
         assertThat(exists).isFalse();

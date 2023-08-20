@@ -7,6 +7,8 @@ import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.repository.ReservationRepository;
@@ -30,13 +32,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class GuestServiceTest {
 
     @Mock
-    private ReservationRepository reservationRepository;
+    private GuestMapper guestMapper;
 
     @Mock
     private GuestRepository guestRepository;
 
     @Mock
-    private GuestMapper guestMapper;
+    private ReservationRepository reservationRepository;
+
+    @Mock
+    private ClientGuestRepository clientGuestRepository;
 
     @InjectMocks
     private GuestService guestService;
@@ -123,11 +128,13 @@ public class GuestServiceTest {
     @Test
     void shouldSaveGuest() {
         Guest guest = utils.createGuest();
+        ClientGuest clientGuest = utils.createClientGuest(guest);
         GuestDTO dto = utils.createGuestDTO(guest);
 
         when(guestRepository.save(any(Guest.class))).thenReturn(guest);
         when(guestMapper.toEntity(any(GuestDTO.class))).thenReturn(guest);
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
+        when(clientGuestRepository.save(any(ClientGuest.class))).thenReturn(clientGuest);
 
         GuestDTO dtoResponse = guestService.save(dto);
 

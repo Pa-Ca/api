@@ -1,4 +1,4 @@
-package com.paca.paca.branch.service;
+package com.paca.paca.sale.service;
 
 import java.util.Optional;
 
@@ -8,39 +8,39 @@ import org.springframework.stereotype.Service;
 
 import com.paca.paca.sale.model.Tax;
 import com.paca.paca.sale.dto.TaxDTO;
-import com.paca.paca.branch.model.Branch;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.model.SaleTax;
+import com.paca.paca.sale.dto.SaleTaxDTO;
 import com.paca.paca.sale.utils.TaxMapper;
-import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.sale.statics.TaxStatics;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.sale.repository.TaxRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultTaxService {
+public class SaleTaxService {
 
     private final TaxMapper taxMapper;
 
     private final TaxRepository taxRepository;
 
-    private final BranchRepository branchRepository;
+    private final SaleRepository saleRepository;
 
-    private final DefaultTaxRepository defaultTaxRepository;
+    private final SaleTaxRepository saleTaxRepository;
 
-    public TaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NoContentException {
-        long branchId = defaultTaxDTO.getBranchId();
-        Optional<Branch> branch = branchRepository.findById(branchId);
-        if (branch.isEmpty()) {
+    public TaxDTO save(SaleTaxDTO saleTaxDTO) throws NoContentException {
+        long saleId = saleTaxDTO.getSaleId();
+        Optional<Sale> sale = saleRepository.findById(saleId);
+        if (sale.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + branchId + " does not exists",
-                    20);
+                    "Sale with id " + saleId + " does not exists",
+                    42);
         }
 
-        TaxDTO taxDTO = defaultTaxDTO.getTax();
+        TaxDTO taxDTO = saleTaxDTO.getTax();
         Short taxType = taxDTO.getType();
         if (!TaxStatics.Types.isTypeValid(taxType)) {
             throw new BadRequestException(
@@ -51,8 +51,8 @@ public class DefaultTaxService {
         Tax tax = taxMapper.toEntity(taxDTO);
 
         tax = taxRepository.save(tax);
-        defaultTaxRepository.save(DefaultTax.builder()
-                .branch(branch.get())
+        saleTaxRepository.save(SaleTax.builder()
+                .sale(sale.get())
                 .tax(tax)
                 .build());
 
@@ -73,7 +73,7 @@ public class DefaultTaxService {
         Short taxType = dto.getType();
         if (taxType != null && !TaxStatics.Types.isTypeValid(taxType)) {
             throw new BadRequestException(
-                    "Invalid tax type: " + taxType,
+                    "Invalid tax type:" + taxType,
                     51);
         }
 
@@ -97,5 +97,4 @@ public class DefaultTaxService {
         // Delete the default tax
         taxRepository.deleteById(taxId);
     }
-
 }

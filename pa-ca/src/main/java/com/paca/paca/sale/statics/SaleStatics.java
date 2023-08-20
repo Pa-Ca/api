@@ -11,7 +11,6 @@ public interface SaleStatics {
         String SAVE = "";
         String UPDATE = "/{id}";
         String DELETE = "/{id}";
-        String ADD_TAX = "/{id}/tax";
         String CLEAR = "/{id}/clear";
     }
 

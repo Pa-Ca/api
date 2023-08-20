@@ -162,11 +162,11 @@ public class TableServiceTest {
     void shouldDelete() {
         Table table = utils.createTable(null);
 
-        when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
+        when(tableRepository.findById(anyLong())).thenReturn(Optional.of(table));
 
-        tableService.delete(1L);
+        tableService.delete(table.getId());
 
-        verify(tableRepository, times(1)).save(table);
+        verify(tableRepository, times(1)).deleteById(table.getId());
     }
 
     @Test

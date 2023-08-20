@@ -1,13 +1,18 @@
-package com.paca.paca.branch;
+package com.paca.paca.sale;
 
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import java.util.Optional;
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.utils.TestUtils;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.TaxDTO;
+import com.paca.paca.sale.model.SaleTax;
+import com.paca.paca.sale.dto.SaleTaxDTO;
+import com.paca.paca.sale.utils.TaxMapper;
+import com.paca.paca.sale.service.SaleTaxService;
+import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.sale.repository.SaleRepository;
+import com.paca.paca.sale.repository.SaleTaxRepository;
+import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
 
 import org.junit.Assert;
 import org.mockito.Mock;
@@ -16,83 +21,77 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.paca.paca.sale.model.Tax;
-import com.paca.paca.utils.TestUtils;
-import com.paca.paca.sale.dto.TaxDTO;
-import com.paca.paca.branch.model.Branch;
-import com.paca.paca.sale.utils.TaxMapper;
-import com.paca.paca.branch.model.DefaultTax;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
-import com.paca.paca.sale.repository.TaxRepository;
-import com.paca.paca.branch.service.DefaultTaxService;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.exception.exceptions.BadRequestException;
+import java.util.Optional;
+
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultTaxServiceTest {
+
+public class SaleTaxServiceTest {
 
     @Mock
     private TaxRepository taxRepository;
 
     @Mock
-    private BranchRepository branchRepository;
+    private SaleRepository saleRepository;
 
     @Mock
-    private DefaultTaxRepository defaultTaxRepository;
+    private SaleTaxRepository saleTaxRepository;
 
     @Mock
     private TaxMapper taxMapper;
 
     @InjectMocks
-    private DefaultTaxService defaultTaxService;
+    private SaleTaxService saleTaxService;
 
     private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldSave() {
         Tax tax = utils.createTax();
-        Branch branch = utils.createBranch(null);
-        DefaultTax defaultTax = utils.createDefaultTax(tax, branch);
-        DefaultTaxDTO defaultTaxDTO = utils.createDefaultTaxDTO(defaultTax);
+        Sale sale = utils.createSale(null, null, null);
+        SaleTax saleTax = utils.createSaleTax(sale, tax);
+        SaleTaxDTO saleTaxDTO = utils.createSaleTaxDTO(saleTax);
 
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
+        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
         when(taxMapper.toEntity(any(TaxDTO.class))).thenReturn(tax);
         when(taxRepository.save(any(Tax.class))).thenReturn(tax);
-        when(defaultTaxRepository.save(any(DefaultTax.class))).thenReturn(defaultTax);
-        when(taxMapper.toDTO(any(Tax.class))).thenReturn(defaultTaxDTO.getTax());
+        when(saleTaxRepository.save(any(SaleTax.class))).thenReturn(saleTax);
+        when(taxMapper.toDTO(any(Tax.class))).thenReturn(saleTaxDTO.getTax());
 
-        TaxDTO response = defaultTaxService.save(defaultTaxDTO);
+        TaxDTO response = saleTaxService.save(saleTaxDTO);
 
-        assertThat(response).isEqualTo(defaultTaxDTO.getTax());
+        assertThat(response).isEqualTo(saleTaxDTO.getTax());
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToBranchNotExistingInSave() {
-        DefaultTaxDTO defaultTaxDTO = utils.createDefaultTaxDTO(null);
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
+    void shouldGetNoContentExceptionDueToSaleNotExistingInSave() {
+        SaleTaxDTO saleTaxDTO = utils.createSaleTaxDTO(null);
+        when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
         try {
-            defaultTaxService.save(defaultTaxDTO);
+            saleTaxService.save(saleTaxDTO);
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
-            Assert.assertEquals("Branch with id " + defaultTaxDTO.getBranchId() + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals("Sale with id " + saleTaxDTO.getSaleId() + " does not exists", e.getMessage());
+            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
         }
 
     }
 
     @Test
     void shouldGetBadRequestExceptionDueToInvalidTaxTypeInSave() {
-        Branch branch = utils.createBranch(null);
-        DefaultTaxDTO defaultTaxDTO = utils.createDefaultTaxDTO(null);
+        Sale sale = utils.createSale(null, null, null);
+        SaleTaxDTO saleTaxDTO = utils.createSaleTaxDTO(null);
         Short invalidTaxType = 1000;
-        defaultTaxDTO.getTax().setType(invalidTaxType);
+        saleTaxDTO.getTax().setType(invalidTaxType);
 
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
+        when(saleRepository.findById(anyLong())).thenReturn(Optional.of(sale));
 
         try {
-            defaultTaxService.save(defaultTaxDTO);
+            saleTaxService.save(saleTaxDTO);
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals("Invalid tax type: " + invalidTaxType, e.getMessage());
@@ -110,19 +109,19 @@ public class DefaultTaxServiceTest {
         when(taxRepository.save(any(Tax.class))).thenReturn(tax);
         when(taxMapper.toDTO(any(Tax.class))).thenReturn(dto);
 
-        TaxDTO response = defaultTaxService.update(tax.getId(), dto);
+        TaxDTO response = saleTaxService.update(tax.getId(), dto);
 
         assertThat(response).isEqualTo(dto);
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToDefaultTaxNotExistingInUpdate() {
+    void shouldGetNoContentExceptionDueToSaleTaxNotExistingInUpdate() {
         TaxDTO dto = utils.createTaxDTO(null);
 
         when(taxRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
-            defaultTaxService.update(1L, dto);
+            saleTaxService.update(1L, dto);
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals("Tax with id " + 1L + " does not exists", e.getMessage());
@@ -140,10 +139,10 @@ public class DefaultTaxServiceTest {
         when(taxRepository.findById(anyLong())).thenReturn(Optional.of(tax));
 
         try {
-            defaultTaxService.update(1L, taxDTO);
+            saleTaxService.update(1L, taxDTO);
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
-            Assert.assertEquals("Invalid tax type: " + invalidTaxType, e.getMessage());
+            Assert.assertEquals("Invalid tax type:" + invalidTaxType, e.getMessage());
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 51);
         }
     }
@@ -154,17 +153,17 @@ public class DefaultTaxServiceTest {
 
         when(taxRepository.findById(anyLong())).thenReturn(Optional.of(tax));
 
-        defaultTaxService.delete(tax.getId());
+        saleTaxService.delete(tax.getId());
 
         verify(taxRepository, times(1)).deleteById(tax.getId());
     }
 
     @Test
-    void shouldGetNoContentExcepetionDueToDefaultTaxNotExistingInDelete(){
+    void shouldGetNoContentExceptionDueToSaleTaxNotExistingInDelete(){
         when(taxRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
-            defaultTaxService.delete(1L);
+            saleTaxService.delete(1L);
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NoContentException);
             Assert.assertEquals("Tax with id " + 1L + " does not exists", e.getMessage());

@@ -20,11 +20,12 @@ import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
 import com.paca.paca.client.repository.ReviewRepository;
-import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
+import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -109,6 +110,9 @@ public class RepositoryTest extends PacaTest {
     protected ReviewLikeRepository reviewLikeRepository;
 
     @Autowired
+    protected OnlineSaleRepository onlineSaleRepository;
+
+    @Autowired
     protected ClientGuestRepository clientGuestRepository;
 
     @Autowired
@@ -166,6 +170,7 @@ public class RepositoryTest extends PacaTest {
                 insiteSaleRepository,
                 defaultTaxRepository,
                 reviewLikeRepository,
+                onlineSaleRepository,
                 saleProductRepository,
                 clientGroupRepository,
                 clientGuestRepository,

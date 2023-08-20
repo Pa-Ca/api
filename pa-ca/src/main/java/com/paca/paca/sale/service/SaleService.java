@@ -176,7 +176,7 @@ public class SaleService {
         return SaleInfoDTO.builder()
                 .sale(dto)
                 .insite(insite)
-                .reservationId(reservation.getId())
+                .reservationId(reservation == null ? null : reservation.getId())
                 .taxes(taxListDTO)
                 .tables(tableListDTO)
                 .products(saleProductListDTO)
@@ -276,33 +276,6 @@ public class SaleService {
         updatedSale = saleRepository.save(updatedSale);
 
         return completeData(updatedSale.getId());
-    }
-
-    public TaxDTO addTax(Long id, TaxDTO dto) {
-        Optional<Sale> sale = saleRepository.findById(id);
-        if (sale.isEmpty()) {
-            throw new NoContentException(
-                    "Sale with id " + id + " does not exists",
-                    42);
-        }
-        if (sale.get().getStatus().equals(SaleStatics.Status.CLOSED)) {
-            throw new BadRequestException(
-                    "Sale with id " + id + " is closed", 43);
-        }
-        if (sale.get().getStatus().equals(SaleStatics.Status.CANCELLED)) {
-            throw new BadRequestException(
-                    "Sale with id " + id + " is cancelled", 48);
-        }
-
-        Tax tax = taxMapper.toEntity(dto);
-        tax = taxRepository.save(tax);
-        SaleTax saleTax = SaleTax.builder()
-                .sale(sale.get())
-                .tax(tax)
-                .build();
-        saleTaxRepository.save(saleTax);
-
-        return taxMapper.toDTO(tax);
     }
 
     public void delete(Long id) throws NoContentException {

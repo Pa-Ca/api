@@ -26,6 +26,7 @@ import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
+import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
@@ -107,10 +108,10 @@ public class ReservationServiceTest {
 
     @Test
     void shouldGetReservationWithGuestById() {
-        Reservation reservation = utils.createReservation(null, null);
-        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
         Invoice invoice = utils.createInvoice();
         InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
+        Reservation reservation = utils.createReservation(null, null, invoice);
+        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
         GuestDTO guestDTO = utils.createGuestDTO(reservation.getGuest());
 
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
@@ -130,22 +131,18 @@ public class ReservationServiceTest {
     void shouldGetReservationWithClientById() {
         Reservation reservation = utils.createReservation(null);
         ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
-        Invoice invoice = utils.createInvoice();
-        InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
         Client client = utils.createClient(null);
         ClientDTO clientDTO = utils.createClientDTO(client);
         ClientGroup clientGroup = utils.createClientGroup(client, reservation);
 
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(reservationDTO);
-        when(invoiceRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(invoice));
-        when(invoiceMapper.toDTO(any(Invoice.class))).thenReturn(invoiceDTO);
         when(clientGroupRepository.findAllByReservationId(any(Long.class))).thenReturn(List.of(clientGroup));
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(clientDTO);
 
         ReservationInfoDTO response = reservationService.getById(reservation.getId());
-        ReservationInfoDTO expected = new ReservationInfoDTO(reservationDTO, invoiceDTO, null, clientDTO);
+        ReservationInfoDTO expected = new ReservationInfoDTO(reservationDTO, null, null, clientDTO);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -191,10 +188,10 @@ public class ReservationServiceTest {
 
     @Test
     void shouldSaveReservationWithGuest() {
-        Reservation reservation = utils.createReservation(null, null);
-        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
         Invoice invoice = utils.createInvoice();
         InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
+        Reservation reservation = utils.createReservation(null, null, invoice);
+        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
         GuestDTO guestDTO = utils.createGuestDTO(reservation.getGuest());
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
@@ -224,8 +221,6 @@ public class ReservationServiceTest {
     void shouldSaveReservationWithClient() {
         Reservation reservation = utils.createReservation(null);
         ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
-        Invoice invoice = utils.createInvoice();
-        InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
         Client client = utils.createClient(null);
         ClientDTO clientDTO = utils.createClientDTO(client);
         ClientGroup clientGroup = utils.createClientGroup(client, reservation);
@@ -234,13 +229,11 @@ public class ReservationServiceTest {
         when(reservationMapper.toEntity(any(ReservationDTO.class), any(Branch.class))).thenReturn(reservation);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(reservationDTO);
-        when(invoiceRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(invoice));
-        when(invoiceMapper.toDTO(any(Invoice.class))).thenReturn(invoiceDTO);
         when(clientGroupRepository.findAllByReservationId(any(Long.class))).thenReturn(List.of(clientGroup));
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(clientDTO);
 
-        ReservationInfoDTO expected = new ReservationInfoDTO(reservationDTO, invoiceDTO, null, clientDTO);
+        ReservationInfoDTO expected = new ReservationInfoDTO(reservationDTO, null, null, clientDTO);
         ReservationInfoDTO response = reservationService.save(expected);
 
         assertThat(response).isEqualTo(expected);
@@ -265,16 +258,15 @@ public class ReservationServiceTest {
 
     @Test
     void shouldUpdateReservationWithGuest() {
-        Reservation reservation = utils.createReservation(null, null);
-        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
         Invoice invoice = utils.createInvoice();
         InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
+        Reservation reservation = utils.createReservation(null, null, invoice);
+        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
         GuestDTO guestDTO = utils.createGuestDTO(reservation.getGuest());
 
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
         when(reservationMapper.updateModel(any(ReservationDTO.class), any(Reservation.class))).thenReturn(reservation);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
-        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(reservationDTO);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(reservationDTO);
         when(invoiceRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(invoice));
         when(invoiceMapper.toDTO(any(Invoice.class))).thenReturn(invoiceDTO);
@@ -291,8 +283,6 @@ public class ReservationServiceTest {
     void shouldUpdateReservationWithClient() {
         Reservation reservation = utils.createReservation(null);
         ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
-        Invoice invoice = utils.createInvoice();
-        InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
         Client client = utils.createClient(null);
         ClientDTO clientDTO = utils.createClientDTO(client);
         ClientGroup clientGroup = utils.createClientGroup(client, reservation);
@@ -301,14 +291,12 @@ public class ReservationServiceTest {
         when(reservationMapper.updateModel(any(ReservationDTO.class), any(Reservation.class))).thenReturn(reservation);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
         when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(reservationDTO);
-        when(reservationMapper.toDTO(any(Reservation.class))).thenReturn(reservationDTO);
-        when(invoiceRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(invoice));
         when(clientGroupRepository.findAllByReservationId(any(Long.class))).thenReturn(List.of(clientGroup));
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(clientDTO);
 
         ReservationInfoDTO response = reservationService.update(reservation.getId(), reservationDTO);
-        ReservationInfoDTO expected = new ReservationInfoDTO(reservationDTO, invoiceDTO, null, clientDTO);
+        ReservationInfoDTO expected = new ReservationInfoDTO(reservationDTO, null, null, clientDTO);
 
         assertThat(response).isEqualTo(expected);
     }
@@ -371,9 +359,9 @@ public class ReservationServiceTest {
                     null);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page number cannot be less than zero");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 44);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 44);
         }
     }
 
@@ -395,9 +383,9 @@ public class ReservationServiceTest {
                     null);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof UnprocessableException);
             Assert.assertEquals(e.getMessage(), "Page size cannot be less than one");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 45);
+            Assert.assertEquals(((UnprocessableException) e).getCode(), (Integer) 45);
         }
     }
 
@@ -453,8 +441,8 @@ public class ReservationServiceTest {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                0,
-                0,
+                1,
+                1,
                 0);
 
         assertThat(response).isEqualTo(expected);
@@ -719,7 +707,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already returned");
+                            " can't start because it is already returned");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
         }
 
@@ -734,7 +722,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already closed");
+                            " can't start because it is already closed");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
         }
 
@@ -749,7 +737,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already rejected");
+                            " can't start because it is already rejected");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
         }
     }
@@ -785,7 +773,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already returned");
+                            " can't be retired because it is already returned");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
         }
 
@@ -800,7 +788,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already closed");
+                            " can't be retired because it is already closed");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
         }
 
@@ -815,7 +803,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already rejected");
+                            " can't be retired because it is already rejected");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
         }
     }
@@ -851,7 +839,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already returned");
+                            " can't be closed because it is already returned");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 69);
         }
 
@@ -866,7 +854,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already closed");
+                            " can't be closed because it is already closed");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 70);
         }
 
@@ -881,7 +869,7 @@ public class ReservationServiceTest {
             Assert.assertTrue(e instanceof BadRequestException);
             Assert.assertEquals(e.getMessage(),
                     "Reservation with id " + reservation.getId() +
-                            " can't be accepted because it is already rejected");
+                            " can't be closed because it is already rejected");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
         }
     }
