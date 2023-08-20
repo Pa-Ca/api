@@ -30,6 +30,7 @@ import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.branch.service.BranchService;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.branch.dto.PaymentOptionListDTO;
 import com.paca.paca.branch.repository.TableRepository;
@@ -38,7 +39,6 @@ import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -70,16 +70,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class BranchServiceTest {
 
     @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private ReviewRepository reviewRepository;
+    private TaxRepository taxRepository;
 
     @Mock
     private TableRepository tableRepository;
 
     @Mock
-    private ReviewLikeRepository reviewLikeRepository;
+    private BranchRepository branchRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @Mock
     private AmenityRepository amenityRepository;
@@ -94,7 +94,7 @@ public class BranchServiceTest {
     private PromotionRepository promotionRepository;
 
     @Mock
-    private DefaultTaxRepository defaultTaxRepository;
+    private ReviewLikeRepository reviewLikeRepository;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -493,7 +493,7 @@ public class BranchServiceTest {
                 Mockito.mock(List.class));
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
-        when(defaultTaxRepository.findAllByBranchId(any(Long.class))).thenReturn(taxes);
+        when(taxRepository.findAllByBranchId(any(Long.class))).thenReturn(taxes);
 
         TaxListDTO dtoResponse = branchService.getDefaultTaxesByBranchId(branch.getId());
 

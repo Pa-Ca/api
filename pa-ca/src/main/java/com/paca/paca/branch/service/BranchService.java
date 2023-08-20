@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.model.Branch;
@@ -43,7 +44,6 @@ import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
@@ -82,6 +82,8 @@ public class BranchService {
 
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
+    private final TaxRepository taxRepository;
+
     private final TableRepository tableRepository;
 
     private final ReviewRepository reviewRepository;
@@ -95,8 +97,6 @@ public class BranchService {
     private final PromotionRepository promotionRepository;
 
     private final ReviewLikeRepository reviewLikeRepository;
-
-    private final DefaultTaxRepository defaultTaxRepository;
 
     private final PaymentOptionRepository paymentOptionRepository;
 
@@ -285,7 +285,7 @@ public class BranchService {
                     20);
         }
 
-        List<Tax> defaultTaxes = defaultTaxRepository.findAllByBranchId(branchId);
+        List<Tax> defaultTaxes = taxRepository.findAllByBranchId(branchId);
         List<TaxDTO> defaultTaxesDTO = new ArrayList<>();
         for (Tax defaultTax : defaultTaxes) {
             defaultTaxesDTO.add(defaultTaxMapper.toDTO(defaultTax));

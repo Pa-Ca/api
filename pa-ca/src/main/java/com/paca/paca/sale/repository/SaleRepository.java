@@ -25,7 +25,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             + "        AND :surname IS NULL "
             + "        AND :identityDocument IS NULL) "
             + "        OR EXISTS ( "
-            + "            SELECT r "
+            + "            SELECT cg "
             + "            FROM ClientGuest cg, Client c, Guest g "
             + "            WHERE s.clientGuest.id = cg.id "
             + "                AND ( "
@@ -37,7 +37,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             + "                        (cg.client.id = c.id "
             + "                        AND (:name IS NULL OR c.name ILIKE CONCAT('%', :name, '%')) "
             + "                        AND (:surname IS NULL OR c.surname ILIKE CONCAT('%', :surname, '%')) "
-            + "                        AND (:identityDocument IS NULL OR c.identityDocument ILIKE CONCAT('%', :identityDocument, '%'))))) "
+            + "                        AND (:identityDocument IS NULL OR c.identityDocument ILIKE CONCAT('%', :identityDocument, '%')))))) "
             + "ORDER BY s.startTime DESC")
     List<Sale> findAllByBranchIdAndFilters(
             @Param("branchId") Long branchId,

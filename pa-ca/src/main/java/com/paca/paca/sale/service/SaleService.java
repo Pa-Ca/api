@@ -42,7 +42,6 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
@@ -71,8 +70,6 @@ public class SaleService {
     private final SaleTaxRepository saleTaxRepository;
 
     private final SaleProductMapper saleProductMapper;
-
-    private final DefaultTaxRepository defaultTaxRepository;
 
     private final InsiteSaleRepository insiteSaleRepository;
 
@@ -203,7 +200,7 @@ public class SaleService {
         Sale newSale = saleRepository.save(sale);
 
         // Create taxes
-        defaultTaxRepository.findAllByBranchId(newSale.getBranch().getId()).forEach(tax -> {
+        taxRepository.findAllByBranchId(newSale.getBranch().getId()).forEach(tax -> {
             Tax newTax = Tax.builder()
                     .name(tax.getName())
                     .type(tax.getType())

@@ -10,11 +10,11 @@ import com.paca.paca.branch.dto.BranchInfoDTO;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -37,6 +37,8 @@ public class BusinessService {
 
     private final BusinessMapper businessMapper;
 
+    private final TaxRepository taxRepository;
+
     private final TierRepository tierRepository;
 
     private final UserRepository userRepository;
@@ -44,8 +46,6 @@ public class BusinessService {
     private final BranchRepository branchRepository;
 
     private final BusinessRepository businessRepository;
-
-    private final DefaultTaxRepository defaultTaxRepository;
 
     private void validateTier(String tier) throws BadRequestException {
         if (tier.isEmpty())
@@ -162,7 +162,7 @@ public class BusinessService {
 
             // Get default taxes info
             List<TaxDTO> defaultTaxes = new ArrayList<>();
-            defaultTaxRepository.findAllByBranchId(branch.getId()).forEach(defaultTax -> {
+            taxRepository.findAllByBranchId(branch.getId()).forEach(defaultTax -> {
                 TaxDTO defaultTaxDTO = defaultTaxMapper.toDTO(defaultTax);
                 defaultTaxes.add(defaultTaxDTO);
             });

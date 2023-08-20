@@ -1,114 +1,24 @@
 package com.paca.paca.client;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 
-import com.paca.paca.PacaTest;
+import com.paca.paca.RepositoryTest;
 import com.paca.paca.user.model.User;
-import com.paca.paca.utils.TestUtils;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.client.model.FavoriteBranch;
-import com.paca.paca.user.repository.RoleRepository;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.client.repository.ClientRepository;
-import com.paca.paca.client.repository.FriendRepository;
-import com.paca.paca.client.repository.ReviewRepository;
-import com.paca.paca.reservation.model.Guest;
-import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.client.repository.ReviewLikeRepository;
-import com.paca.paca.client.repository.ClientGuestRepository;
-import com.paca.paca.client.repository.FavoriteBranchRepository;
-
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@DataJpaTest
-@Testcontainers
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ClientRepositoryTest extends PacaTest {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private ClientRepository clientRepository;
-
-    @Autowired
-    private ReviewRepository reviewRepository;
-
-    @Autowired
-    private FriendRepository friendRepository;
-
-    @Autowired
-    private BranchRepository branchRepository;
-
-    @Autowired
-    private BusinessRepository businessRepository;
-
-    @Autowired
-    private ReviewLikeRepository reviewLikeRepository;
-
-    @Autowired
-    private ClientGuestRepository clientGuestRepository;
-
-    @Autowired
-    private FavoriteBranchRepository favoriteBranchRepository;
-
-    private TestUtils utils;
-
-    @BeforeAll
-    void initUtils() {
-        utils = TestUtils.builder()
-                .roleRepository(roleRepository)
-                .userRepository(userRepository)
-                .clientRepository(clientRepository)
-                .reviewRepository(reviewRepository)
-                .friendRepository(friendRepository)
-                .branchRepository(branchRepository)
-                .businessRepository(businessRepository)
-                .reviewLikeRepository(reviewLikeRepository)
-                .favoriteBranchRepository(favoriteBranchRepository)
-                .build();
-    }
-
-    @BeforeEach
-    void restoreClientDB() {
-        clientRepository.deleteAll();
-    }
-
-    @AfterEach
-    void restoreTest() {
-        favoriteBranchRepository.deleteAll();
-        reviewLikeRepository.deleteAll();
-        reviewRepository.deleteAll();
-        branchRepository.deleteAll();
-        clientRepository.deleteAll();
-        businessRepository.deleteAll();
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
-    }
+public class ClientRepositoryTest extends RepositoryTest {
 
     @Test
     void shouldCheckThatClientExistsByUserEmail() {
@@ -119,7 +29,7 @@ public class ClientRepositoryTest extends PacaTest {
         Optional<Client> expectedClient = clientRepository.findByUserEmail(user.getEmail());
 
         assertThat(expected).isTrue();
-        assertThat(expectedClient).isEqualTo(client);
+        assertThat(expectedClient.get()).isEqualTo(client);
     }
 
     @Test
@@ -146,7 +56,7 @@ public class ClientRepositoryTest extends PacaTest {
                 request.getAddresser().getId());
 
         assertThat(expected).isTrue();
-        assertThat(expectedRequest).isEqualTo(request);
+        assertThat(expectedRequest.get()).isEqualTo(request);
     }
 
     @Test
@@ -424,7 +334,7 @@ public class ClientRepositoryTest extends PacaTest {
         Client client = utils.createClient(null);
         ClientGuest clientGuest = utils.createClientGuest(client);
 
-        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByClientId(clientGuest.getId());
+        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByClientId(client.getId());
 
         assertThat(expectedGuest.get()).isEqualTo(clientGuest);
     }
@@ -444,9 +354,9 @@ public class ClientRepositoryTest extends PacaTest {
         Guest guest = utils.createGuest();
         ClientGuest clientGuest = utils.createClientGuest(guest);
 
-        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByGuestId(clientGuest.getId());
+        Optional<ClientGuest> expectedGuest = clientGuestRepository.findByGuestId(guest.getId());
 
-        assertThat(expectedGuest.get()).isEqualTo(guest);
+        assertThat(expectedGuest.get()).isEqualTo(clientGuest);
     }
 
     @Test

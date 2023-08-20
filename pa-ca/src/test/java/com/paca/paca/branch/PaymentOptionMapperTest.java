@@ -16,6 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(SpringExtension.class)
 
 public class PaymentOptionMapperTest {
+
     @InjectMocks
     private PaymentOptionMapperImpl paymentOptionMapper;
 

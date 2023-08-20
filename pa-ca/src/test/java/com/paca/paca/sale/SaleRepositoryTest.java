@@ -1,30 +1,11 @@
 package com.paca.paca.sale;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
-import com.paca.paca.PacaTest;
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.RepositoryTest;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.sale.statics.SaleStatics;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.user.repository.RoleRepository;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.reservation.repository.GuestRepository;
-import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
-import com.paca.paca.reservation.repository.ReservationRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -37,81 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DataJpaTest
-@Testcontainers
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class SaleRepositoryTest extends PacaTest {
-
-    @Autowired
-    private BranchRepository branchRepository;
-
-    @Autowired
-    private TableRepository tableRepository;
-
-    @Autowired
-    private SaleRepository saleRepository;
-
-    @Autowired
-    private BusinessRepository businessRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private GuestRepository guestRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private PaymentOptionRepository paymentOptionRepository;
-
-    private TestUtils utils;
-
-    @BeforeAll
-    void initUtils() {
-        utils = TestUtils.builder()
-                .roleRepository(roleRepository)
-                .userRepository(userRepository)
-                .reservationRepository(reservationRepository)
-                .businessRepository(businessRepository)
-                .branchRepository(branchRepository)
-                .paymentOptionRepository(paymentOptionRepository)
-                .tableRepository(tableRepository)
-                .saleRepository(saleRepository)
-                .guestRepository(guestRepository)
-                .build();
-    }
-
-    @BeforeEach
-    void restoreBranchDB() {
-        guestRepository.deleteAll();
-        saleRepository.deleteAll();
-        tableRepository.deleteAll();
-        paymentOptionRepository.deleteAll();
-        reservationRepository.deleteAll();
-        branchRepository.deleteAll();
-
-    }
-
-    @AfterEach
-    void restoreTest() {
-        guestRepository.deleteAll();
-        reservationRepository.deleteAll();
-        saleRepository.deleteAll();
-        tableRepository.deleteAll();
-        paymentOptionRepository.deleteAll();
-        roleRepository.deleteAll();
-        userRepository.deleteAll();
-        businessRepository.deleteAll();
-        branchRepository.deleteAll();
-
-    }
+public class SaleRepositoryTest extends RepositoryTest {
 
     @Test
     void shouldGetAllSalesByTableBranchIdAndFilters() {
@@ -126,19 +33,19 @@ public class SaleRepositoryTest extends PacaTest {
         // Create random names
         List<String> names = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            names.add("Test name " + i);
+            names.add("name_" + i + " ");
         }
 
         // Create random surnames
         List<String> surnames = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            surnames.add("Test surname " + i);
+            surnames.add("surname_" + i + " ");
         }
 
         // Create random identity documents
         List<String> identityDocuments = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            identityDocuments.add("Test identity document " + i);
+            identityDocuments.add("V" + i);
         }
 
         // Min and max dates

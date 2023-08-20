@@ -53,6 +53,7 @@ import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
@@ -111,13 +112,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 @Setter
 @Getter
 @Builder
+@AllArgsConstructor
 public class TestUtils {
 
     TaxRepository taxRepository;
@@ -167,6 +167,8 @@ public class TestUtils {
     ClientGuestRepository clientGuestRepository;
 
     ReservationRepository reservationRepository;
+
+    JwtBlackListRepository jwtBlackListRepository;
 
     BranchAmenityRepository branchAmenityRepository;
 
@@ -280,9 +282,9 @@ public class TestUtils {
         Client client = new Client(
                 ThreadLocalRandom.current().nextLong(999999999),
                 user,
-                "name_" + UUID.randomUUID().toString(),
-                "surname_" + UUID.randomUUID().toString(),
-                "identity_document_" + UUID.randomUUID().toString(),
+                "name_" + UUID.randomUUID().toString().substring(0, 25),
+                "surname_" + UUID.randomUUID().toString().substring(0, 25),
+                "V" + ThreadLocalRandom.current().nextLong(999999999),
                 "address_" + UUID.randomUUID().toString(),
                 "+58" + ThreadLocalRandom.current().nextLong(9999999),
                 "stripe_customer_id_" + UUID.randomUUID().toString(),
@@ -384,7 +386,7 @@ public class TestUtils {
         Business business = new Business(
                 ThreadLocalRandom.current().nextLong(999999999),
                 user,
-                createTier(BusinessTier.BASIC),
+                createTier(BusinessTier.basic),
                 "name_" + UUID.randomUUID().toString(),
                 false,
                 "+58" + ThreadLocalRandom.current().nextLong(9999999));
@@ -720,11 +722,11 @@ public class TestUtils {
     public Guest createGuest() {
         Guest guest = new Guest(
                 ThreadLocalRandom.current().nextLong(999999999),
-                "name_" + UUID.randomUUID().toString(),
-                "surname_" + UUID.randomUUID().toString(),
+                "name_" + UUID.randomUUID().toString().substring(0, 25),
+                "surname_" + UUID.randomUUID().toString().substring(0, 25),
                 "email_" + UUID.randomUUID().toString(),
                 "+58" + ThreadLocalRandom.current().nextLong(9999999),
-                "identity_document_" + UUID.randomUUID().toString());
+                "V" + ThreadLocalRandom.current().nextLong(999999999));
 
         if (guestRepository != null) {
             guest = guestRepository.save(guest);
@@ -761,7 +763,7 @@ public class TestUtils {
                 null,
                 new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()),
-                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
                 new BigDecimal(Math.random()),
                 ReservationStatics.Status.PENDING,
                 (short) ThreadLocalRandom.current().nextInt(0, 1001),
@@ -791,7 +793,7 @@ public class TestUtils {
                 null,
                 new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()),
-                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
                 new BigDecimal(Math.random()),
                 ReservationStatics.Status.PENDING,
                 (short) ThreadLocalRandom.current().nextInt(0, 1001),
@@ -824,7 +826,7 @@ public class TestUtils {
                 invoice,
                 new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis()),
-                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
                 new BigDecimal(Math.random()),
                 ReservationStatics.Status.PENDING,
                 (short) ThreadLocalRandom.current().nextInt(0, 1001),
@@ -876,11 +878,12 @@ public class TestUtils {
         for (int i = 0; i < 10; i++) {
             Guest guest = new Guest(
                     ThreadLocalRandom.current().nextLong(999999999),
-                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
-                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
                     "email_test_" + UUID.randomUUID().toString(),
-                    "phone_number_test_" + UUID.randomUUID().toString(),
-                    identityDocuments.get(rand.nextInt(names.size())) + UUID.randomUUID().toString());
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10));
             if (guestRepository != null) {
                 guest = guestRepository.save(guest);
             }
@@ -894,11 +897,12 @@ public class TestUtils {
             Client client = new Client(
                     ThreadLocalRandom.current().nextLong(999999999),
                     user,
-                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
-                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
-                    identityDocuments.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10),
                     "address_test_" + UUID.randomUUID().toString(),
-                    "phone_number_test_" + UUID.randomUUID().toString(),
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
                     "stripe_id_test_" + UUID.randomUUID().toString(),
                     new Date(System.currentTimeMillis()));
             if (clientRepository != null) {
@@ -932,7 +936,15 @@ public class TestUtils {
                 // Reservation with guest
                 reservation.setGuest(guests.get(rand.nextInt(guests.size())));
                 reservation.setByClient(Boolean.FALSE);
+
+                if (reservationRepository != null) {
+                    reservation = reservationRepository.save(reservation);
+                }
             } else {
+                if (reservationRepository != null) {
+                    reservation = reservationRepository.save(reservation);
+                }
+
                 // Reservation with client
                 ClientGroup owner = new ClientGroup(
                         ThreadLocalRandom.current().nextLong(999999999),
@@ -944,9 +956,6 @@ public class TestUtils {
                 }
             }
 
-            if (reservationRepository != null) {
-                reservation = reservationRepository.save(reservation);
-            }
             reservations.add(reservation);
         }
 
@@ -998,6 +1007,26 @@ public class TestUtils {
                 client,
                 reservation,
                 true);
+
+        if (clientGroupRepository != null) {
+            clientGroup = clientGroupRepository.save(clientGroup);
+        }
+        return clientGroup;
+    }
+
+    public ClientGroup createClientGroup(Client client, Reservation reservation, Boolean owner) {
+        if (client == null) {
+            client = createClient(null);
+        }
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        ClientGroup clientGroup = new ClientGroup(
+                ThreadLocalRandom.current().nextLong(999999999),
+                client,
+                reservation,
+                owner);
 
         if (clientGroupRepository != null) {
             clientGroup = clientGroupRepository.save(clientGroup);
@@ -1147,7 +1176,7 @@ public class TestUtils {
                 (short) ThreadLocalRandom.current().nextInt(0, 1001),
                 SaleStatics.Status.ONGOING,
                 new Date(System.currentTimeMillis()),
-                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
                 ThreadLocalRandom.current().nextFloat() * 100,
                 "note_" + UUID.randomUUID().toString());
 
@@ -1231,11 +1260,12 @@ public class TestUtils {
         for (int i = 0; i < 10; i++) {
             Guest guest = new Guest(
                     ThreadLocalRandom.current().nextLong(999999999),
-                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
-                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
                     "email_test_" + UUID.randomUUID().toString(),
-                    "phone_number_test_" + UUID.randomUUID().toString(),
-                    identityDocuments.get(rand.nextInt(names.size())) + UUID.randomUUID().toString());
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10));
             if (guestRepository != null) {
                 guest = guestRepository.save(guest);
             }
@@ -1249,11 +1279,12 @@ public class TestUtils {
             Client client = new Client(
                     ThreadLocalRandom.current().nextLong(999999999),
                     user,
-                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
-                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
-                    identityDocuments.get(rand.nextInt(names.size())) + UUID.randomUUID().toString(),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10),
                     "address_test_" + UUID.randomUUID().toString(),
-                    "phone_number_test_" + UUID.randomUUID().toString(),
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
                     "stripe_id_test_" + UUID.randomUUID().toString(),
                     new Date(System.currentTimeMillis()));
             if (clientRepository != null) {
@@ -1294,11 +1325,11 @@ public class TestUtils {
                 clientGuest.setClient(clients.get(rand.nextInt(clients.size())));
                 clientGuest.setHaveGuest(Boolean.FALSE);
             }
-            sale.setClientGuest(clientGuest);
 
             if (clientGuestRepository != null) {
                 clientGuest = clientGuestRepository.save(clientGuest);
             }
+            sale.setClientGuest(clientGuest);
             if (saleRepository != null) {
                 sale = saleRepository.save(sale);
             }

@@ -13,7 +13,7 @@ import com.paca.paca.sale.model.Tax;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@jakarta.persistence.Table(name = "tax")
+@jakarta.persistence.Table(name = "default_tax")
 public class DefaultTax {
 
     @Id

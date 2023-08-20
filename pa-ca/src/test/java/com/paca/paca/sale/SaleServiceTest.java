@@ -163,7 +163,7 @@ public class SaleServiceTest {
         when(saleMapper.toEntity(any(SaleDTO.class), any(Branch.class), isNull(), any(ClientGuest.class)))
                 .thenReturn(sale);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(defaultTaxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
+        when(taxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
         when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
         completeData(sale, insite);
 
@@ -194,7 +194,7 @@ public class SaleServiceTest {
         when(saleMapper.toEntity(any(SaleDTO.class), any(Branch.class), isNull(), any(ClientGuest.class)))
                 .thenReturn(sale);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(defaultTaxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
+        when(taxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
         completeData(sale, insite);
 
         SaleInfoDTO dto = new SaleInfoDTO(
@@ -261,7 +261,7 @@ public class SaleServiceTest {
         when(saleMapper.toEntity(any(SaleDTO.class), any(Branch.class), isNull(), any(ClientGuest.class)))
                 .thenReturn(sale);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(defaultTaxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
+        when(taxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
         when(reservationRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         SaleInfoDTO dto = new SaleInfoDTO(
@@ -297,7 +297,7 @@ public class SaleServiceTest {
         when(saleMapper.toEntity(any(SaleDTO.class), any(Branch.class), isNull(), any(ClientGuest.class)))
                 .thenReturn(sale);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
-        when(defaultTaxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
+        when(taxRepository.findAllByBranchId(anyLong())).thenReturn(defaultTaxes);
         when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
         when(tableRepository.findById(anyLong())).thenReturn(Optional.empty());
 

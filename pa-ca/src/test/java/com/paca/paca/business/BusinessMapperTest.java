@@ -43,7 +43,7 @@ public class BusinessMapperTest {
     @Test
     void shouldMapBusinessDTOtoBusinessEntity() {
         User user = utils.createUser();
-        Tier tier = utils.createTier(BusinessTier.BASIC);
+        Tier tier = utils.createTier(BusinessTier.basic);
         BusinessDTO dto = utils.createBusinessDTO(utils.createBusiness(user, tier));
 
         Business entity = businessMapper.toEntity(dto, tier, user);
@@ -61,13 +61,13 @@ public class BusinessMapperTest {
     @Test
     void shouldPartiallyMapBusinessDTOtoBusinessEntity() {
         Business business = utils.createBusiness(null);
-        Tier tier = utils.createTier(BusinessTier.BASIC);
+        Tier tier = utils.createTier(BusinessTier.basic);
 
         BusinessDTO dto = new BusinessDTO(
                 business.getId() + 1,
                 business.getUser().getId() + 1,
                 business.getUser().getEmail() + ".",
-                BusinessTier.PREMIUM.name(),
+                BusinessTier.premium.name(),
                 business.getName() + ".",
                 !business.getVerified(),
                 business.getPhoneNumber() + ".");

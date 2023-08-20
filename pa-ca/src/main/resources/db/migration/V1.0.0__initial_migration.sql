@@ -1,18 +1,14 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2023-08-10 23:17:51.21
+-- Last modification date: 2023-08-20 14:31:04.212
 
 -- tables
 -- Table: amenity
 CREATE TABLE public.amenity (
     id int  NOT NULL,
     name varchar(100)  NOT NULL,
+    CONSTRAINT amenity_unique_name UNIQUE (name) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT amenity_pk PRIMARY KEY (id)
 );
-
-CREATE SEQUENCE amenity_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: branch
 CREATE TABLE public.branch (
@@ -28,7 +24,7 @@ CREATE TABLE public.branch (
     visibility boolean  NOT NULL,
     reserve_off boolean  NULL,
     phone_number varchar(31)  NULL,
-    type smallint  NULL,
+    type varchar(100)  NULL,
     hour_in time  NULL,
     hour_out time  NULL,
     average_reserve_time interval  NULL,
@@ -38,11 +34,6 @@ CREATE TABLE public.branch (
 );
 
 CREATE INDEX branch_index_business_id on public.branch (business_id ASC);
-
-CREATE SEQUENCE branch_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: branch_amenity
 CREATE TABLE public.branch_amenity (
@@ -55,11 +46,6 @@ CREATE TABLE public.branch_amenity (
 CREATE INDEX branch_amenity_index_branch_id on public.branch_amenity (branch_id ASC);
 
 CREATE INDEX branch_amenity_index_amenity_id on public.branch_amenity (amenity_id ASC);
-
-CREATE SEQUENCE branch_amenity_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: business
 CREATE TABLE public.business (
@@ -77,11 +63,6 @@ CREATE INDEX business_index_tier_id on public.business (tier_id ASC);
 CREATE INDEX business_index_user_id on public.business (user_id ASC);
 
 CREATE INDEX business_index_name on public.business (name ASC);
-
-CREATE SEQUENCE business_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: client
 CREATE TABLE public.client (
@@ -108,11 +89,6 @@ CREATE INDEX client_index_surname on public.client (surname ASC);
 
 CREATE INDEX client_index_identity_document on public.client (identity_document ASC);
 
-CREATE SEQUENCE client_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: client_group
 CREATE TABLE public.client_group (
     id int  NOT NULL,
@@ -128,13 +104,8 @@ CREATE INDEX client_group_index_reservation_id on public.client_group (reservati
 
 -- Only one owner per reservation
 CREATE UNIQUE INDEX client_group_unique_owner
-    ON "client_group" (reservation_id)
-    WHERE is_owner = TRUE;
-
-CREATE SEQUENCE client_group_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
+ON "client_group" (reservation_id)
+WHERE is_owner = TRUE;;
 
 -- Table: client_guest
 CREATE TABLE client_guest (
@@ -150,11 +121,6 @@ CREATE INDEX client_guest_index_client_id on client_guest (client_id ASC);
 
 CREATE INDEX client_guest_index_guest_id on client_guest (guest_id ASC);
 
-CREATE SEQUENCE client_guest_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: default_tax
 CREATE TABLE default_tax (
     id int  NOT NULL,
@@ -166,11 +132,6 @@ CREATE TABLE default_tax (
 CREATE INDEX default_tax_index_branch_id on default_tax (branch_id ASC);
 
 CREATE INDEX default_tax_index_tax_id on default_tax (tax_id ASC);
-
-CREATE SEQUENCE default_tax_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: favorite_branch
 CREATE TABLE public.favorite_branch (
@@ -184,11 +145,6 @@ CREATE INDEX favorite_branch_index_client_id on public.favorite_branch (client_i
 
 CREATE INDEX favorite_branch_index_branch_id on public.favorite_branch (branch_id ASC);
 
-CREATE SEQUENCE favorite_branch_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: friend
 CREATE TABLE public.friend (
     id int  NOT NULL,
@@ -196,6 +152,7 @@ CREATE TABLE public.friend (
     client_addresser_id int  NOT NULL,
     accepted boolean  NOT NULL DEFAULT false,
     rejected boolean  NOT NULL DEFAULT false,
+    CONSTRAINT friend_unique_requester_and_addresser UNIQUE (client_requester_id, client_addresser_id) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT friend_check_requester_not_equal_to_addresser CHECK (client_requester_id != client_addresser_id) NOT DEFERRABLE INITIALLY IMMEDIATE,
     CONSTRAINT friend_check_accepted_nor_rejected CHECK (NOT accepted OR NOT rejected) NOT DEFERRABLE INITIALLY IMMEDIATE,
     CONSTRAINT friend_pk PRIMARY KEY (id)
@@ -204,11 +161,6 @@ CREATE TABLE public.friend (
 CREATE INDEX friend_index_client_requester_id on public.friend (client_requester_id ASC);
 
 CREATE INDEX friend_index_client_addresser_id on public.friend (client_addresser_id ASC);
-
-CREATE SEQUENCE friend_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: guest
 CREATE TABLE public.guest (
@@ -230,11 +182,6 @@ CREATE INDEX guest_index_name on public.guest (name ASC);
 
 CREATE INDEX guest_index_surname on public.guest (surname ASC);
 
-CREATE SEQUENCE guest_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: insite_sale
 CREATE TABLE insite_sale (
     id int  NOT NULL,
@@ -247,11 +194,6 @@ CREATE INDEX insite_sale_index_sale_id on insite_sale (sale_id ASC);
 
 CREATE INDEX insite_sale_index_reservation_id on insite_sale (reservation_id ASC);
 
-CREATE SEQUENCE insite_sale_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: insite_sale_table
 CREATE TABLE insite_sale_table (
     id int  NOT NULL,
@@ -262,33 +204,18 @@ CREATE TABLE insite_sale_table (
 
 CREATE INDEX insite_sale_table_index_insite_sale_id on insite_sale_table (insite_sale_id ASC);
 
-CREATE INDEX insite_sale_table_index_table_id on insite_sale_table (table_id ASC);
-
-CREATE SEQUENCE insite_sale_table_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
+CREATE INDEX insite_sale_table_idex_table_id on insite_sale_table (table_id ASC);
 
 -- Table: invoice
 CREATE TABLE public.invoice (
     id int  NOT NULL,
-    reservation_id int  NOT NULL,
     pay_date timestamp  NOT NULL,
     price money  NOT NULL DEFAULT 0.0,
-    client_number smallint  NOT NULL DEFAULT 0,
     payment varchar(100)  NOT NULL,
     payment_code varchar(64)  NOT NULL,
     CONSTRAINT invoice_unique_payment_code UNIQUE (payment_code) NOT DEFERRABLE  INITIALLY IMMEDIATE,
-    CONSTRAINT invoice_unique_reservation_id UNIQUE (reservation_id) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT invoice_pk PRIMARY KEY (id)
 );
-
-CREATE INDEX invoice_index_reservation_id on public.invoice (reservation_id ASC);
-
-CREATE SEQUENCE invoice_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: jwt_black_list
 CREATE TABLE public.jwt_black_list (
@@ -297,11 +224,6 @@ CREATE TABLE public.jwt_black_list (
     expiration timestamp  NOT NULL,
     CONSTRAINT jwt_black_list_pk PRIMARY KEY (id)
 );
-
-CREATE SEQUENCE jwt_black_list_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: online_sale
 CREATE TABLE online_sale (
@@ -312,40 +234,23 @@ CREATE TABLE online_sale (
 
 CREATE INDEX online_sale_index_sale_id on online_sale (sale_id ASC);
 
-CREATE SEQUENCE online_sale_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: payment_option
 CREATE TABLE payment_option (
     id int  NOT NULL,
     branch_id int  NOT NULL,
     name varchar(100)  NOT NULL,
     description text  NOT NULL,
-    deleted boolean  NOT NULL,
     CONSTRAINT payment_option_pk PRIMARY KEY (id)
 );
 
 CREATE INDEX payment_option_index_branch_id on payment_option (branch_id ASC);
 
--- Payment option name is unique between non-deleted
--- options
-CREATE UNIQUE INDEX payment_option_unique_name
-    ON "table" (branch_id, name)
-    WHERE deleted = FALSE;
-
-CREATE SEQUENCE payment_option_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: product
 CREATE TABLE public.product (
     id int  NOT NULL,
     product_sub_category_id int  NOT NULL,
-    price money  NOT NULL,
     name varchar(100)  NOT NULL,
+    price money  NOT NULL,
     description varchar(256)  NULL,
     disabled boolean  NOT NULL,
     CONSTRAINT product_unique_name UNIQUE (product_sub_category_id, name) NOT DEFERRABLE  INITIALLY IMMEDIATE,
@@ -354,29 +259,19 @@ CREATE TABLE public.product (
 
 CREATE INDEX product_index_product_sub_category_id on public.product (product_sub_category_id ASC);
 
-CREATE SEQUENCE product_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: product_category
 CREATE TABLE public.product_category (
     id int  NOT NULL,
     name varchar(100)  NOT NULL,
-    CONSTRAINT product_category_ak_name UNIQUE (name) NOT DEFERRABLE  INITIALLY IMMEDIATE,
+    CONSTRAINT product_category_unique_name UNIQUE (name) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT product_category_pk PRIMARY KEY (id)
 );
-
-CREATE SEQUENCE product_category_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: product_sub_category
 CREATE TABLE public.product_sub_category (
     id int  NOT NULL,
     branch_id int  NOT NULL,
-    product_category_id integer  NOT NULL,
+    product_category_id int  NOT NULL,
     name varchar(100)  NOT NULL,
     CONSTRAINT product_sub_category_unique_name UNIQUE (branch_id, product_category_id, name) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT product_sub_category_pk PRIMARY KEY (id)
@@ -385,11 +280,6 @@ CREATE TABLE public.product_sub_category (
 CREATE INDEX product_sub_category_index_branch_id on public.product_sub_category (branch_id ASC);
 
 CREATE INDEX product_sub_category_index_product_category_id on public.product_sub_category (product_category_id ASC);
-
-CREATE SEQUENCE product_sub_category_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: promotion
 CREATE TABLE public.promotion (
@@ -402,16 +292,12 @@ CREATE TABLE public.promotion (
 
 CREATE INDEX promotion_index_branch_id on public.promotion (branch_id ASC);
 
-CREATE SEQUENCE promotion_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: reservation
 CREATE TABLE public.reservation (
     id int  NOT NULL,
     branch_id int  NOT NULL,
     guest_id int  NULL,
+    invoice_id int  NULL,
     request_date timestamp  NOT NULL,
     reservation_date_in timestamp  NOT NULL,
     reservation_date_out timestamp  NULL,
@@ -421,8 +307,9 @@ CREATE TABLE public.reservation (
     client_number smallint  NOT NULL,
     occasion text  NOT NULL,
     by_client boolean  NOT NULL DEFAULT true,
+    CONSTRAINT reservation_unique_invoice_id UNIQUE (invoice_id) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT reservation_check_by_client_and_guest_id CHECK ((by_client = TRUE AND guest_id IS NULL) OR  (by_client = FALSE AND guest_id IS NOT NULL)) NOT DEFERRABLE INITIALLY IMMEDIATE,
-    CONSTRAINT reservation_check_date_in_less_than_dat_out CHECK (reservation_date_in < reservation_date_out) NOT DEFERRABLE INITIALLY IMMEDIATE,
+    CONSTRAINT reservation_check_date_in_less_than_dat_out CHECK ((reservation_date_out IS NULL) OR (reservation_date_in < reservation_date_out)) NOT DEFERRABLE INITIALLY IMMEDIATE,
     CONSTRAINT reservation_pk PRIMARY KEY (id)
 );
 
@@ -430,10 +317,7 @@ CREATE INDEX reservation_index_branch_id on public.reservation (branch_id ASC);
 
 CREATE INDEX reservation_index_guest_id on public.reservation (guest_id ASC);
 
-CREATE SEQUENCE reservation_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
+CREATE INDEX reservation_index_invoice_id on public.reservation (invoice_id ASC);
 
 -- Table: review
 CREATE TABLE public.review (
@@ -449,11 +333,6 @@ CREATE INDEX review_index_client_id on public.review (client_id ASC);
 
 CREATE INDEX review_index_branch_id on public.review (branch_id ASC);
 
-CREATE SEQUENCE review_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: review_like
 CREATE TABLE public.review_like (
     id int  NOT NULL,
@@ -466,11 +345,6 @@ CREATE INDEX review_like_index_client_id on public.review_like (client_id ASC);
 
 CREATE INDEX review_like_index_review_id on public.review_like (review_id ASC);
 
-CREATE SEQUENCE review_like_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: role
 CREATE TABLE public.role (
     id int  NOT NULL,
@@ -478,54 +352,42 @@ CREATE TABLE public.role (
     CONSTRAINT role_pk PRIMARY KEY (id)
 );
 
-CREATE SEQUENCE role_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: sale
 CREATE TABLE sale (
     id int  NOT NULL,
-    client_guest_id int  NULL,
-    payment_option_id int  NULL,
+    branch_id int  NOT NULL,
+    client_guest_id int  NOT NULL,
+    invoice_id int  NULL,
     client_quantity int  NOT NULL,
     status int  NOT NULL,
-    start_date timestamp  NOT NULL,
-    end_date timestamp  NULL,
+    start_time timestamp  NOT NULL,
+    end_time timestamp  NULL,
     dollar_exchange decimal(16,4)  NOT NULL,
     note text  NOT NULL,
-    CONSTRAINT sale_check_start_date_less_than_end_date CHECK (start_date < end_date) NOT DEFERRABLE INITIALLY IMMEDIATE,
+    CONSTRAINT sale_check_start_time_less_than_end_time CHECK (start_time < end_time) NOT DEFERRABLE INITIALLY IMMEDIATE,
     CONSTRAINT sale_pk PRIMARY KEY (id)
 );
 
-CREATE INDEX sale_index_payment_option_id on sale (payment_option_id ASC);
-
 CREATE INDEX sale_index_client_guest_id on sale (client_guest_id ASC);
 
-CREATE SEQUENCE sale_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
+CREATE INDEX sale_index_branch_id on sale (branch_id ASC);
+
+CREATE INDEX sale_index_invoice_id on sale (invoice_id ASC);
 
 -- Table: sale_product
 CREATE TABLE sale_product (
     id int  NOT NULL,
     sale_id int  NOT NULL,
     product_id int  NULL,
+    name varchar(100)  NOT NULL,
     amount int  NOT NULL,
     price money  NOT NULL,
-    nombre varchar(100)  NOT NULL,
     CONSTRAINT sale_product_pk PRIMARY KEY (id)
 );
 
 CREATE INDEX sale_product_index_product_id on sale_product (product_id ASC);
 
 CREATE INDEX sale_product_index_sale_id on sale_product (sale_id ASC);
-
-CREATE SEQUENCE sale_product_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: sale_tax
 CREATE TABLE sale_tax (
@@ -539,45 +401,24 @@ CREATE INDEX sale_tax_index_sale_id on sale_tax (sale_id ASC);
 
 CREATE INDEX sale_tax_index_tax_id on sale_tax (tax_id ASC);
 
-CREATE SEQUENCE sale_tax_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: table
 CREATE TABLE "table" (
     id int  NOT NULL,
     name varchar(100)  NOT NULL,
     branch_id int  NOT NULL,
-    deleted boolean  NOT NULL,
     CONSTRAINT table_pk PRIMARY KEY (id)
 );
 
 CREATE INDEX table_index_branch_id on "table" (branch_id ASC);
 
--- Table name is unique between non-deleted tables
-CREATE UNIQUE INDEX table_unique_name
-    ON "table" (branch_id, name)
-    WHERE deleted = FALSE;
-
-CREATE SEQUENCE table_seq 
-    MINVALUE 1 5
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: tax
 CREATE TABLE tax (
     id int  NOT NULL,
-    type int  NOT NULL,
+    type smallint  NOT NULL,
     name varchar(128)  NOT NULL,
     value decimal(16,4)  NOT NULL,
     CONSTRAINT tax_pk PRIMARY KEY (id)
 );
-
-CREATE SEQUENCE tax_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- Table: tier
 CREATE TABLE public.tier (
@@ -588,11 +429,6 @@ CREATE TABLE public.tier (
     CONSTRAINT tier_pk PRIMARY KEY (id)
 );
 
-CREATE SEQUENCE tier_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
-
 -- Table: user
 CREATE TABLE public."user" (
     id int  NOT NULL,
@@ -600,8 +436,6 @@ CREATE TABLE public."user" (
     email varchar(320)  NOT NULL,
     password varchar(64)  NOT NULL,
     verified boolean  NOT NULL,
-    logged_in boolean  NOT NULL,
-    registration_status smallint  NOT NULL,
     provider varchar(64)  NULL,
     provider_id varchar(64)  NULL,
     CONSTRAINT user_unique_email UNIQUE (email) NOT DEFERRABLE  INITIALLY IMMEDIATE,
@@ -612,11 +446,6 @@ CREATE TABLE public."user" (
 CREATE INDEX user_index_role_id on public."user" (role_id ASC);
 
 CREATE INDEX user_index_email on public."user" (email ASC);
-
-CREATE SEQUENCE user_seq 
-    MINVALUE 1 
-    START WITH 1000 
-    INCREMENT BY 1;;
 
 -- foreign keys
 -- Reference: business_tier (table: business)
@@ -722,7 +551,7 @@ ALTER TABLE public.friend ADD CONSTRAINT friend_client_requester
 ALTER TABLE insite_sale_table ADD CONSTRAINT insite_sale_table_insite_sale
     FOREIGN KEY (insite_sale_id)
     REFERENCES insite_sale (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -731,16 +560,7 @@ ALTER TABLE insite_sale_table ADD CONSTRAINT insite_sale_table_insite_sale
 ALTER TABLE insite_sale_table ADD CONSTRAINT insite_sale_table_table
     FOREIGN KEY (table_id)
     REFERENCES "table" (id)
-    ON DELETE  RESTRICT  
-    NOT DEFERRABLE 
-    INITIALLY IMMEDIATE
-;
-
--- Reference: invoice_reservation (table: invoice)
-ALTER TABLE public.invoice ADD CONSTRAINT invoice_reservation
-    FOREIGN KEY (reservation_id)
-    REFERENCES public.reservation (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -826,6 +646,14 @@ ALTER TABLE public.reservation ADD CONSTRAINT reservation_guest
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: reservation_invoice (table: reservation)
+ALTER TABLE public.reservation ADD CONSTRAINT reservation_invoice
+    FOREIGN KEY (invoice_id)
+    REFERENCES public.invoice (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: reservation_sede (table: reservation)
 ALTER TABLE public.reservation ADD CONSTRAINT reservation_sede
     FOREIGN KEY (branch_id)
@@ -880,6 +708,14 @@ ALTER TABLE public."user" ADD CONSTRAINT role_user
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: sale_branch (table: sale)
+ALTER TABLE sale ADD CONSTRAINT sale_branch
+    FOREIGN KEY (branch_id)
+    REFERENCES public.branch (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: sale_client_guest (table: sale)
 ALTER TABLE sale ADD CONSTRAINT sale_client_guest
     FOREIGN KEY (client_guest_id)
@@ -889,11 +725,10 @@ ALTER TABLE sale ADD CONSTRAINT sale_client_guest
     INITIALLY IMMEDIATE
 ;
 
--- Reference: sale_payment_option (table: sale)
-ALTER TABLE sale ADD CONSTRAINT sale_payment_option
-    FOREIGN KEY (payment_option_id)
-    REFERENCES payment_option (id)
-    ON DELETE  RESTRICT  
+-- Reference: sale_invoice (table: sale)
+ALTER TABLE sale ADD CONSTRAINT sale_invoice
+    FOREIGN KEY (invoice_id)
+    REFERENCES public.invoice (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -920,7 +755,7 @@ ALTER TABLE sale_product ADD CONSTRAINT sale_product_sale
 ALTER TABLE sale_tax ADD CONSTRAINT sale_tax_tax
     FOREIGN KEY (tax_id)
     REFERENCES tax (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -991,212 +826,342 @@ ALTER TABLE public.business ADD CONSTRAINT user_business
 -- sequences
 -- Sequence: amenity_seq
 CREATE SEQUENCE public.amenity_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: branch_amenity_seq
 CREATE SEQUENCE public.branch_amenity_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: branch_seq
 CREATE SEQUENCE public.branch_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: business_seq
 CREATE SEQUENCE public.business_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: client_group_seq
 CREATE SEQUENCE public.client_group_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
+;
+
+-- Sequence: client_guest_seq
+CREATE SEQUENCE client_guest_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
 ;
 
 -- Sequence: client_seq
 CREATE SEQUENCE public.client_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
+;
+
+-- Sequence: default_tax_seq
+CREATE SEQUENCE default_tax_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
 ;
 
 -- Sequence: favorite_branch_seq
 CREATE SEQUENCE public.favorite_branch_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: friend_seq
 CREATE SEQUENCE public.friend_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: guest_seq
 CREATE SEQUENCE public.guest_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
+;
+
+-- Sequence: insite_sale_seq
+CREATE SEQUENCE insite_sale_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: insite_sale_table_seq
+CREATE SEQUENCE insite_sale_table_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
 ;
 
 -- Sequence: invoice_seq
 CREATE SEQUENCE public.invoice_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: jwt_black_list_seq
 CREATE SEQUENCE public.jwt_black_list_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      CYCLE
+      AS bigint
+;
+
+-- Sequence: online_sale_seq
+CREATE SEQUENCE online_sale_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: payment_option_seq
+CREATE SEQUENCE payment_option_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
 ;
 
 -- Sequence: product_category_seq
 CREATE SEQUENCE public.product_category_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: product_seq
 CREATE SEQUENCE public.product_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: product_sub_category_seq
 CREATE SEQUENCE public.product_sub_category_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: promotion_seq
 CREATE SEQUENCE public.promotion_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: reservation_seq
 CREATE SEQUENCE public.reservation_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: review_like_seq
 CREATE SEQUENCE public.review_like_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: review_seq
 CREATE SEQUENCE public.review_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
 
 -- Sequence: role_seq
 CREATE SEQUENCE public.role_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1000
-    CACHE 1
-    NO CYCLE
-    AS bigint
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+      AS bigint
 ;
+
+-- Sequence: sale_product_seq
+CREATE SEQUENCE sale_product_seq
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: sale_seq
+CREATE SEQUENCE sale_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: sale_tax_seq
+CREATE SEQUENCE sale_tax_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: table_seq
+CREATE SEQUENCE table_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: tax_seq
+CREATE SEQUENCE tax_seq
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: tier_seq
+CREATE SEQUENCE tier_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+-- Sequence: user_seq
+CREATE SEQUENCE user_seq
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      START WITH 1000
+      CACHE 1
+      NO CYCLE
+;
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm;;
 
 -- End of file.
 
