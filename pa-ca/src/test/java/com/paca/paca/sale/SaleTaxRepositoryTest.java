@@ -50,7 +50,7 @@ public class SaleTaxRepositoryTest extends RepositoryTest {
         SaleTax tax = utils.createSaleTax(sale, null);
 
         Boolean exists = saleTaxRepository.existsByTaxIdAndSale_Branch_Business_Id(
-                tax.getId(),
+                tax.getTax().getId(),
                 sale.getBranch().getBusiness().getId());
 
         assertThat(exists).isTrue();
