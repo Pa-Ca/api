@@ -1,25 +1,18 @@
 package com.paca.paca.sale;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.sale.model.Tax;
-import com.paca.paca.utils.TestUtils;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.sale.dto.SaleTaxDTO;
-import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.sale.service.SaleTaxService;
-import com.paca.paca.sale.repository.TaxRepository;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -28,26 +21,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-
-public class SaleTaxServiceTest {
-
-    @Mock
-    private TaxRepository taxRepository;
-
-    @Mock
-    private SaleRepository saleRepository;
-
-    @Mock
-    private SaleTaxRepository saleTaxRepository;
-
-    @Mock
-    private TaxMapper taxMapper;
+public class SaleTaxServiceTest extends ServiceTest {
 
     @InjectMocks
     private SaleTaxService saleTaxService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldSave() {
@@ -70,7 +47,9 @@ public class SaleTaxServiceTest {
     @Test
     void shouldGetNoContentExceptionDueToSaleNotExistingInSave() {
         SaleTaxDTO saleTaxDTO = utils.createSaleTaxDTO(null);
+
         when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             saleTaxService.save(saleTaxDTO);
         } catch (Exception e) {

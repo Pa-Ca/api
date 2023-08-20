@@ -1,14 +1,12 @@
 package com.paca.paca.branch;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import junit.framework.TestCase;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.sale.model.Tax;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Table;
@@ -16,43 +14,23 @@ import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.sale.dto.TaxListDTO;
 import com.paca.paca.branch.dto.BranchDTO;
-import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
-import com.paca.paca.client.utils.ReviewMapper;
-import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.promotion.model.Promotion;
-import com.paca.paca.branch.utils.AmenityMapper;
 import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.branch.service.BranchService;
-import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.branch.dto.PaymentOptionListDTO;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.client.repository.ReviewRepository;
-import com.paca.paca.branch.repository.AmenityRepository;
-import com.paca.paca.reservation.utils.ReservationMapper;
-import com.paca.paca.product.repository.ProductRepository;
-import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.promotion.repository.PromotionRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
-import com.paca.paca.branch.repository.BranchAmenityRepository;
-import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
-import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
-import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -66,73 +44,10 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class BranchServiceTest {
-
-    @Mock
-    private TaxRepository taxRepository;
-
-    @Mock
-    private TableRepository tableRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private ReviewRepository reviewRepository;
-
-    @Mock
-    private AmenityRepository amenityRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @Mock
-    private BusinessRepository businessRepository;
-
-    @Mock
-    private PromotionRepository promotionRepository;
-
-    @Mock
-    private ReviewLikeRepository reviewLikeRepository;
-
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private BranchAmenityRepository branchAmenityRepository;
-
-    @Mock
-    private PaymentOptionRepository paymentOptionRepository;
-
-    @Mock
-    private FavoriteBranchRepository favoriteBranchRepository;
-
-    @Mock
-    private ProductCategoryRepository productCategoryRepository;
-
-    @Mock
-    private ProductSubCategoryRepository productSubCategoryRepository;
-
-    @Mock
-    private BranchMapper branchMapper;
-
-    @Mock
-    private ReviewMapper reviewMapper;
-
-    @Mock
-    private TaxMapper defaultTaxMapper;
-
-    @Mock
-    private AmenityMapper amenityMapper;
-
-    @Mock
-    private ReservationMapper reservationMapper;
+public class BranchServiceTest extends ServiceTest {
 
     @InjectMocks
     private BranchService branchService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test 
     void shouldGetNoContentDueToMissingBranchInGetBranchById() {

@@ -10,39 +10,21 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.Optional;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
-import com.paca.paca.branch.utils.TableMapper;
 import com.paca.paca.branch.service.TableService;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
-@ExtendWith(MockitoExtension.class)
-public class TableServiceTest {
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private TableRepository tableRepository;
-
-    @Mock
-    private TableMapper tableMapper;
+public class TableServiceTest extends ServiceTest {
 
     @InjectMocks
     private TableService tableService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldSave() {

@@ -1,33 +1,24 @@
 package com.paca.paca.business;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
-import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
-import com.paca.paca.business.utils.BusinessMapper;
-import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.business.service.BusinessService;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,34 +28,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-class BusinessServiceTest {
-
-    @Mock
-    private TaxMapper defaultTaxMapper;
-
-    @Mock
-    private BusinessMapper businessMapper;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private TierRepository tierRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private BusinessRepository businessRepository;
-
-    @Mock
-    private DefaultTaxRepository defaultTaxRepository;
+class BusinessServiceTest extends ServiceTest {
 
     @InjectMocks
     private BusinessService businessService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldGetNoContentDueToMissingBusinessInGetBusinessById() {

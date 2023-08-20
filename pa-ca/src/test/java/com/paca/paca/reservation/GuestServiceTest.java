@@ -1,26 +1,19 @@
 package com.paca.paca.reservation;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.dto.GuestDTO;
-import com.paca.paca.reservation.model.Reservation;
-import com.paca.paca.reservation.utils.GuestMapper;
-import com.paca.paca.reservation.service.GuestService;
-import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.model.ClientGuest;
-import com.paca.paca.client.repository.ClientGuestRepository;
+import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.reservation.repository.ReservationRepository;
 
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -28,25 +21,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class GuestServiceTest {
-
-    @Mock
-    private GuestMapper guestMapper;
-
-    @Mock
-    private GuestRepository guestRepository;
-
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private ClientGuestRepository clientGuestRepository;
+public class GuestServiceTest extends ServiceTest {
 
     @InjectMocks
     private GuestService guestService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldGetNoContentDueToMissingGuestInGetGuestById() {

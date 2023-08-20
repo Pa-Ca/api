@@ -1,14 +1,12 @@
 package com.paca.paca.client;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import junit.framework.TestCase;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.user.model.User;
 import com.paca.paca.client.model.Client;
@@ -23,26 +21,13 @@ import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
-import com.paca.paca.client.utils.ClientMapper;
-import com.paca.paca.client.utils.FriendMapper;
-import com.paca.paca.client.utils.ReviewMapper;
-import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.service.ReviewService;
 import com.paca.paca.reservation.model.ClientGroup;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.client.repository.ClientGuestRepository;
-import com.paca.paca.client.repository.ClientRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.client.repository.FriendRepository;
-import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.reservation.dto.ReservationInfoListDTO;
-import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.client.repository.FavoriteBranchRepository;
-import com.paca.paca.reservation.repository.ClientGroupRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,55 +37,13 @@ import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class ClientServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private ClientRepository clientRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private FriendRepository friendRepository;
-
-    @Mock
-    private ReviewRepository reviewRepository;
-
-    @Mock
-    private ReviewLikeRepository reviewLikeRepository;
-
-    @Mock
-    private ClientGroupRepository clientGroupRepository;
-
-    @Mock
-    private ClientGuestRepository clientGuestRepository;
-
-    @Mock
-    private FavoriteBranchRepository favoriteBranchRepository;
-
-    @Mock
-    private BranchMapper branchMapper;
-
-    @Mock
-    private ClientMapper clientMapper;
-
-    @Mock
-    private FriendMapper friendMapper;
-
-    @Mock
-    private ReviewMapper reviewMapper;
+public class ClientServiceTest extends ServiceTest {
 
     @InjectMocks
     private ClientService clientService;
 
     @InjectMocks
     private ReviewService reviewService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test 
     void shouldGetNoContentDueToMissingClientInGetClientById() {

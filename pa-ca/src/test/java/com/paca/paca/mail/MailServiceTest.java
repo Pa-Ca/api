@@ -1,5 +1,6 @@
 package com.paca.paca.mail;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.mail.service.MailService;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -8,14 +9,11 @@ import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
-public class MailServiceTest {
+public class MailServiceTest extends ServiceTest {
 
     @InjectMocks
     private MailService mailService;

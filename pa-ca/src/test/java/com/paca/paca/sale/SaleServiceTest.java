@@ -1,5 +1,6 @@
 package com.paca.paca.sale;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.sale.model.Tax;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.sale.dto.TaxDTO;
@@ -9,8 +10,6 @@ import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.sale.dto.SaleInfoDTO;
-import com.paca.paca.sale.utils.TaxMapper;
-import com.paca.paca.sale.utils.SaleMapper;
 import com.paca.paca.sale.model.InsiteSale;
 import com.paca.paca.sale.model.OnlineSale;
 import com.paca.paca.sale.model.SaleProduct;
@@ -21,32 +20,15 @@ import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
-import com.paca.paca.sale.utils.SaleProductMapper;
-import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.reservation.model.Reservation;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.sale.repository.SaleTaxRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.sale.repository.InsiteSaleRepository;
-import com.paca.paca.sale.repository.OnlineSaleRepository;
-import com.paca.paca.sale.repository.SaleProductRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.sale.repository.InsiteSaleTableRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.reservation.repository.ReservationRepository;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Date;
@@ -61,61 +43,10 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class SaleServiceTest {
-
-    @Mock
-    private TaxMapper taxMapper;
-
-    @Mock
-    private SaleMapper saleMapper;
-
-    @Mock
-    private SaleProductMapper saleProductMapper;
-
-    @Mock
-    private TaxRepository taxRepository;
-
-    @Mock
-    private SaleRepository saleRepository;
-
-    @Mock
-    private TableRepository tableRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private SaleTaxRepository saleTaxRepository;
-
-    @Mock
-    private InsiteSaleRepository insiteSaleRepository;
-
-    @Mock
-    private OnlineSaleRepository onlineSaleRepository;
-
-    @Mock
-    private DefaultTaxRepository defaultTaxRepository;
-
-    @Mock
-    private SaleProductRepository saleProductRepository;
-
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private ClientGuestRepository clientGuestRepository;
-
-    @Mock
-    private PaymentOptionRepository paymentOptionRepository;
-
-    @Mock
-    private InsiteSaleTableRepository insiteSaleTableRepository;
+public class SaleServiceTest extends ServiceTest {
 
     @InjectMocks
     private SaleService saleService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     private SaleInfoDTO completeData(Sale sale, Boolean insite) {
         SaleDTO saleDTO = utils.createSaleDTO(sale);

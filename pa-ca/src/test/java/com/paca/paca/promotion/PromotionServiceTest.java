@@ -1,22 +1,16 @@
 package com.paca.paca.promotion;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import junit.framework.TestCase;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.promotion.dto.PromotionDTO;
-import com.paca.paca.promotion.utils.PromotionMapper;
-import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.promotion.service.PromotionService;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.promotion.repository.PromotionRepository;
 
 import java.util.Optional;
 
@@ -24,22 +18,10 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class PromotionServiceTest {
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private PromotionRepository promotionRepository;
-
-    @Mock
-    private PromotionMapper promotionMapper;
+public class PromotionServiceTest extends ServiceTest {
 
     @InjectMocks
     private PromotionService promotionService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test 
     void shouldGetNoContentDueToMissingPromotionInGetPromotionById() {

@@ -1,28 +1,18 @@
 package com.paca.paca.sale;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.statics.SaleStatics;
-import com.paca.paca.sale.utils.SaleProductMapper;
-import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.sale.service.SaleProductService;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.product.repository.ProductRepository;
-import com.paca.paca.sale.repository.SaleProductRepository;
-import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -31,35 +21,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-
-public class SaleProductServiceTest {
-
-    @Mock
-    private SaleProductRepository saleProductRepository;
-
-    @Mock
-    private SaleRepository saleRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private BusinessRepository businessRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private SaleProductMapper saleProductMapper;
+public class SaleProductServiceTest extends ServiceTest {
 
     @InjectMocks
     private SaleProductService saleProductService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldSave() throws Exception {

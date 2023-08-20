@@ -1,63 +1,29 @@
 package com.paca.paca.product;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
-import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.product.service.ProductService;
-import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
-import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
-import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @Mock
-    private BusinessRepository businessRepository;
-
-    @Mock
-    private ProductCategoryRepository productCategoryRepository;
-
-    @Mock
-    private ProductSubCategoryRepository productSubCategoryRepository;
-
-    @Mock
-    private ProductMapper productMapper;
+public class ProductServiceTest extends ServiceTest {
 
     @InjectMocks
     private ProductService productService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldGetNoContentDueToMissingProductInGetProductById() {

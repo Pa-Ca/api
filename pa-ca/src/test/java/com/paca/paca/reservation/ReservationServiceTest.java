@@ -1,43 +1,29 @@
 package com.paca.paca.reservation;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.model.Invoice;
-import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
-import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.dto.ReservationDTO;
-import com.paca.paca.reservation.utils.InvoiceMapper;
 import com.paca.paca.reservation.dto.ReservationInfoDTO;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.client.repository.ClientRepository;
-import com.paca.paca.reservation.utils.ReservationMapper;
-import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
-import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.reservation.repository.ClientGroupRepository;
-import com.paca.paca.reservation.repository.ReservationRepository;
 
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 import java.util.List;
@@ -51,46 +37,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class ReservationServiceTest {
-
-    @Mock
-    private ClientGroupRepository clientGroupRepository;
-
-    @Mock
-    private BusinessRepository businessRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private ClientRepository clientRepository;
-
-    @Mock
-    private InvoiceRepository invoiceRepository;
-
-    @Mock
-    private GuestRepository guestRepository;
-
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private ReservationMapper reservationMapper;
-
-    @Mock
-    private InvoiceMapper invoiceMapper;
-
-    @Mock
-    private ClientMapper clientMapper;
-
-    @Mock
-    private GuestMapper guestMapper;
+public class ReservationServiceTest extends ServiceTest {
 
     @InjectMocks
     private ReservationService reservationService;
-
-    private TestUtils utils = TestUtils.builder().build();
 
     @Test
     void shouldGetNoContentDueToMissingReservationInGetReservationById() {
