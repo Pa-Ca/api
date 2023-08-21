@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.client.dto.ClientInfoDTO;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.service.ClientService;
@@ -35,7 +36,7 @@ public class ClientController {
     @PostMapping(ClientStatics.Endpoint.SAVE)
     @ValidateRoles({ "client" })
     @Operation(summary = "Create new client", description = "Register a new client in the app")
-    public ResponseEntity<ClientDTO> save(@RequestBody ClientDTO client)
+    public ResponseEntity<ClientInfoDTO> save(@RequestBody ClientDTO client)
             throws NoContentException, ConflictException {
         return ResponseEntity.ok(clientService.save(client));
     }
@@ -47,17 +48,17 @@ public class ClientController {
     }
 
     @ValidateClient
-    @PutMapping(ClientStatics.Endpoint.UPDATE)
     @ValidateRoles({ "client" })
+    @PutMapping(ClientStatics.Endpoint.UPDATE)
     @Operation(summary = "Update client", description = "Updates the data of a client given its ID")
-    public ResponseEntity<ClientDTO> update(@PathVariable("id") Long id, @RequestBody ClientDTO client)
+    public ResponseEntity<ClientInfoDTO> update(@PathVariable("id") Long id, @RequestBody ClientDTO client)
             throws NoContentException {
         return ResponseEntity.ok(clientService.update(id, client));
     }
 
     @ValidateClient
-    @DeleteMapping(ClientStatics.Endpoint.DELETE)
     @ValidateRoles({ "client" })
+    @DeleteMapping(ClientStatics.Endpoint.DELETE)
     @Operation(summary = "Delete client", description = "Delete the data of a client given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         clientService.delete(id);
@@ -65,7 +66,7 @@ public class ClientController {
 
     @GetMapping(ClientStatics.Endpoint.GET_BY_USER_ID)
     @Operation(summary = "Get client by user ID", description = "Gets the data of a client given its user ID")
-    public ResponseEntity<ClientDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientInfoDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(clientService.getByUserId(id));
     }
 

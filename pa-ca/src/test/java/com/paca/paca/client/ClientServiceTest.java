@@ -18,6 +18,7 @@ import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.model.ReviewLike;
+import com.paca.paca.client.dto.ClientInfoDTO;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
@@ -114,14 +115,15 @@ public class ClientServiceTest extends ServiceTest {
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(client.getUser()));
         when(clientRepository.existsByUserEmail(any(String.class))).thenReturn(false);
-        when(clientRepository.save(any(Client.class))).thenReturn(client);
         when(clientMapper.toEntity(any(ClientDTO.class), any(User.class))).thenReturn(client);
-        when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
+        when(clientRepository.save(any(Client.class))).thenReturn(client);
         when(clientGuestRepository.save(any(ClientGuest.class))).thenReturn(clientGuest);
+        when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
 
-        ClientDTO response = clientService.save(dto);
+        ClientInfoDTO response = clientService.save(dto);
+        ClientInfoDTO expected = new ClientInfoDTO(dto, clientGuest.getId());
 
-        assertThat(response).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -145,15 +147,18 @@ public class ClientServiceTest extends ServiceTest {
     void shouldUpdate() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
+        ClientGuest clientGuest = utils.createClientGuest(client);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientRepository.save(any(Client.class))).thenReturn(client);
         when(clientMapper.updateModel(any(ClientDTO.class), any(Client.class))).thenReturn(client);
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
+        when(clientGuestRepository.findByClientId(anyLong())).thenReturn(Optional.of(clientGuest));
 
-        ClientDTO response = clientService.update(client.getId(), dto);
+        ClientInfoDTO response = clientService.update(client.getId(), dto);
+        ClientInfoDTO expected = new ClientInfoDTO(dto, clientGuest.getId());
 
-        assertThat(response).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -192,13 +197,16 @@ public class ClientServiceTest extends ServiceTest {
     void shouldGetClientByUserId() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
+        ClientGuest clientGuest = utils.createClientGuest(client);
 
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.ofNullable(client));
         when(clientMapper.toDTO(any(Client.class))).thenReturn(dto);
+        when(clientGuestRepository.findByClientId(anyLong())).thenReturn(Optional.of(clientGuest));
 
-        ClientDTO response = clientService.getByUserId(client.getUser().getId());
+        ClientInfoDTO response = clientService.getByUserId(client.getUser().getId());
+        ClientInfoDTO expected = new ClientInfoDTO(dto, clientGuest.getId());
 
-        assertThat(response).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test

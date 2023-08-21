@@ -11,6 +11,7 @@ import com.paca.paca.client.model.Friend;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.client.dto.ClientInfoDTO;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
@@ -83,7 +84,7 @@ public class ClientService {
         return dto;
     }
 
-    public ClientDTO save(ClientDTO dto) throws NoContentException, ConflictException {
+    public ClientInfoDTO save(ClientDTO dto) throws NoContentException, ConflictException {
         String email = dto.getEmail();
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
@@ -108,14 +109,13 @@ public class ClientService {
                 .guest(null)
                 .haveGuest(false)
                 .build();
-        clientGuestRepository.save(clientGuest);
+        clientGuest = clientGuestRepository.save(clientGuest);
+        ClientDTO response = clientMapper.toDTO(newClient);
 
-        ClientDTO dtoResponse = clientMapper.toDTO(newClient);
-
-        return dtoResponse;
+        return new ClientInfoDTO(response, clientGuest.getId());
     }
 
-    public ClientDTO update(Long id, ClientDTO dto) throws NoContentException {
+    public ClientInfoDTO update(Long id, ClientDTO dto) throws NoContentException {
         Optional<Client> current = clientRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
@@ -125,9 +125,10 @@ public class ClientService {
 
         Client newClient = clientMapper.updateModel(dto, current.get());
         newClient = clientRepository.save(newClient);
-        ClientDTO dtoResponse = clientMapper.toDTO(newClient);
+        ClientDTO response = clientMapper.toDTO(newClient);
+        ClientGuest clientGuest = clientGuestRepository.findByClientId(id).get();
 
-        return dtoResponse;
+        return new ClientInfoDTO(response, clientGuest.getId());
     }
 
     public void delete(Long id) throws NoContentException {
@@ -141,15 +142,16 @@ public class ClientService {
 
     }
 
-    public ClientDTO getByUserId(Long id) throws NoContentException {
+    public ClientInfoDTO getByUserId(Long id) throws NoContentException {
         Client client = clientRepository.findByUserId(id)
                 .orElseThrow(() -> new NoContentException(
                         "User with id " + id + " does not exists",
                         12));
 
         ClientDTO dto = clientMapper.toDTO(client);
+        ClientGuest clientGuest = clientGuestRepository.findByClientId(client.getId()).get();
 
-        return dto;
+        return new ClientInfoDTO(dto, clientGuest.getId());
     }
 
     public ClientListDTO getPendingFriends(Long id) throws NoContentException {
@@ -244,9 +246,9 @@ public class ClientService {
                 .build();
         request = friendRepository.save(request);
 
-        FriendDTO dtoResponse = friendMapper.toDTO(request);
+        FriendDTO response = friendMapper.toDTO(request);
 
-        return dtoResponse;
+        return response;
     }
 
     public FriendDTO acceptFriendRequest(Long requesterId, Long addresserId)
@@ -270,9 +272,9 @@ public class ClientService {
         newRequest.setAccepted(true);
         newRequest = friendRepository.save(newRequest);
 
-        FriendDTO dtoResponse = friendMapper.toDTO(newRequest);
+        FriendDTO response = friendMapper.toDTO(newRequest);
 
-        return dtoResponse;
+        return response;
     }
 
     public FriendDTO rejectFriendRequest(Long requesterId, Long addresserId)
@@ -296,9 +298,9 @@ public class ClientService {
         newRequest.setRejected(true);
         newRequest = friendRepository.save(newRequest);
 
-        FriendDTO dtoResponse = friendMapper.toDTO(newRequest);
+        FriendDTO response = friendMapper.toDTO(newRequest);
 
-        return dtoResponse;
+        return response;
     }
 
     public void deleteFriendRequest(Long requesterId, Long addresserId)
