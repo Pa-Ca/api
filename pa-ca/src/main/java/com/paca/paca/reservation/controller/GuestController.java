@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.paca.paca.business.model.Business;
 import com.paca.paca.reservation.dto.GuestDTO;
+import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.reservation.statics.GuestStatics;
 import com.paca.paca.business.repository.BusinessRepository;
@@ -40,14 +41,14 @@ public class GuestController {
 
     @GetMapping(GuestStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get user guest by ID", description = "Gets the data of a user guest given its ID")
-    public ResponseEntity<GuestDTO> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<GuestInfoDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(guestService.getById(id));
     }
 
     @ValidateRoles({ "business" })
     @GetMapping(GuestStatics.Endpoint.GET_BY_IDENTITY_DOCUMENT)
     @Operation(summary = "Get user guest by identity document", description = "Gets the data of a user guest given its identity document")
-    public ResponseEntity<GuestDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument)
+    public ResponseEntity<GuestInfoDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument)
             throws NoContentException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Business business = businessRepository.findByUserEmail(auth.getName()).get();
@@ -57,14 +58,14 @@ public class GuestController {
     @ValidateRoles({})
     @PostMapping(GuestStatics.Endpoint.SAVE)
     @Operation(summary = "Create new user guest", description = "Create a new user guest in the app")
-    public ResponseEntity<GuestDTO> save(@RequestBody GuestDTO dto) {
+    public ResponseEntity<GuestInfoDTO> save(@RequestBody GuestDTO dto) {
         return ResponseEntity.ok(guestService.save(dto));
     }
 
     @ValidateRoles({})
     @PutMapping(GuestStatics.Endpoint.UPDATE)
     @Operation(summary = "Update user guest", description = "Updates the data of a user guest given its ID")
-    public ResponseEntity<GuestDTO> update(
+    public ResponseEntity<GuestInfoDTO> update(
             @PathVariable("id") Long id,
             @RequestBody GuestDTO dto)
             throws NoContentException {

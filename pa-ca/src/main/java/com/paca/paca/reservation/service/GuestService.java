@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
@@ -27,17 +28,19 @@ public class GuestService {
 
     private final ReservationRepository reservationRepository;
 
-    public GuestDTO getById(Long id) throws NoContentException {
+    public GuestInfoDTO getById(Long id) throws NoContentException {
         Guest guest = guestRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
                         "Guest with id " + id + " does not exists",
                         54));
 
         GuestDTO dto = guestMapper.toDTO(guest);
-        return dto;
+        ClientGuest clientGuest = clientGuestRepository.findByGuestId(guest.getId()).get();
+
+        return new GuestInfoDTO(dto, clientGuest.getId());
     }
 
-    public GuestDTO getByIdentityDocument(Long businessId, String identityDocument)
+    public GuestInfoDTO getByIdentityDocument(Long businessId, String identityDocument)
             throws NoContentException, ForbiddenException {
 
         Guest guest = guestRepository.findByIdentityDocument(identityDocument)
@@ -52,26 +55,28 @@ public class GuestService {
                     40);
         }
         GuestDTO dto = guestMapper.toDTO(guest);
-        return dto;
+        ClientGuest clientGuest = clientGuestRepository.findByGuestId(guest.getId()).get();
+
+        return new GuestInfoDTO(dto, clientGuest.getId());
     }
 
-    public GuestDTO save(GuestDTO dto) throws NoContentException {
+    public GuestInfoDTO save(GuestDTO dto) throws NoContentException {
         Guest newGuest = guestMapper.toEntity(dto);
         newGuest = guestRepository.save(newGuest);
 
-        GuestDTO dtoResponse = guestMapper.toDTO(newGuest);
+        GuestDTO response = guestMapper.toDTO(newGuest);
 
         ClientGuest clientGuest = ClientGuest.builder()
                 .client(null)
                 .guest(newGuest)
                 .haveGuest(true)
                 .build();
-        clientGuestRepository.save(clientGuest);
+        clientGuest = clientGuestRepository.save(clientGuest);
 
-        return dtoResponse;
+        return new GuestInfoDTO(response, clientGuest.getId());
     }
 
-    public GuestDTO update(Long id, GuestDTO dto) throws NoContentException {
+    public GuestInfoDTO update(Long id, GuestDTO dto) throws NoContentException {
         Optional<Guest> current = guestRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
@@ -82,8 +87,9 @@ public class GuestService {
         Guest newGuest = guestMapper.updateModel(dto, current.get());
         newGuest = guestRepository.save(newGuest);
         GuestDTO dtoResponse = guestMapper.toDTO(newGuest);
+        ClientGuest clientGuest = clientGuestRepository.findByGuestId(id).get();
 
-        return dtoResponse;
+        return new GuestInfoDTO(dtoResponse, clientGuest.getId());
     }
 
     public void delete(Long id) throws NoContentException {

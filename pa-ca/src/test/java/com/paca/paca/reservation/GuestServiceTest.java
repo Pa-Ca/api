@@ -4,6 +4,7 @@ import com.paca.paca.ServiceTest;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.exception.exceptions.ForbiddenException;
@@ -44,13 +45,16 @@ public class GuestServiceTest extends ServiceTest {
     void shouldGetGuestById() {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
+        ClientGuest clientGuest = utils.createClientGuest(guest);
 
         when(guestRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(guest));
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
+        when(clientGuestRepository.findByGuestId(any(Long.class))).thenReturn(Optional.ofNullable(clientGuest));
 
-        GuestDTO dtoResponse = guestService.getById(guest.getId());
+        GuestInfoDTO response = guestService.getById(guest.getId());
+        GuestInfoDTO expected = new GuestInfoDTO(dto, clientGuest.getId());
 
-        assertThat(dtoResponse).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -90,17 +94,20 @@ public class GuestServiceTest extends ServiceTest {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
         Reservation reservation = utils.createReservation(null, guest);
+        ClientGuest clientGuest = utils.createClientGuest(guest);
 
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
         when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class), any(Long.class)))
                 .thenReturn(true);
+        when(clientGuestRepository.findByGuestId(any(Long.class))).thenReturn(Optional.ofNullable(clientGuest));
 
-        GuestDTO dtoResponse = guestService.getByIdentityDocument(
+        GuestInfoDTO response = guestService.getByIdentityDocument(
                 reservation.getBranch().getBusiness().getId(),
                 guest.getIdentityDocument());
+        GuestInfoDTO expected = new GuestInfoDTO(dto, clientGuest.getId());
 
-        assertThat(dtoResponse).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -114,9 +121,10 @@ public class GuestServiceTest extends ServiceTest {
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
         when(clientGuestRepository.save(any(ClientGuest.class))).thenReturn(clientGuest);
 
-        GuestDTO dtoResponse = guestService.save(dto);
+        GuestInfoDTO response = guestService.save(dto);
+        GuestInfoDTO expected = new GuestInfoDTO(dto, clientGuest.getId());
 
-        assertThat(dtoResponse).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -140,15 +148,18 @@ public class GuestServiceTest extends ServiceTest {
     void shouldUpdateGuest() {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
+        ClientGuest clientGuest = utils.createClientGuest(guest);
 
         when(guestRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(guest));
         when(guestRepository.save(any(Guest.class))).thenReturn(guest);
         when(guestMapper.updateModel(any(GuestDTO.class), any(Guest.class))).thenReturn(guest);
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
+        when(clientGuestRepository.findByGuestId(any(Long.class))).thenReturn(Optional.ofNullable(clientGuest));
 
-        GuestDTO dtoResponse = guestService.update(guest.getId(), dto);
+        GuestInfoDTO response = guestService.update(guest.getId(), dto);
+        GuestInfoDTO expected = new GuestInfoDTO(dto, clientGuest.getId());
 
-        assertThat(dtoResponse).isEqualTo(dto);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
