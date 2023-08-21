@@ -1,5 +1,6 @@
 package com.paca.paca.mail;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.mail.utils.MailUtils;
 import com.paca.paca.exception.exceptions.IOException;
 
@@ -10,8 +11,6 @@ import org.junit.Assert;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
@@ -19,8 +18,8 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-@ExtendWith(MockitoExtension.class)
-public class MailUtilsTest {
+public class MailUtilsTest extends ServiceTest {
+
     @InjectMocks
     private MailUtils mailUtils;
 

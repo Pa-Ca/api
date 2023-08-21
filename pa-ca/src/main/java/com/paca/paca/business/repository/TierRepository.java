@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface TierRepository extends JpaRepository<Tier, Long> {
-    Optional<Tier> findByName(BusinessTier name);
 
-    Boolean existsByName(BusinessTier name);
+    Optional<Tier> findByName(BusinessTier name);
 }

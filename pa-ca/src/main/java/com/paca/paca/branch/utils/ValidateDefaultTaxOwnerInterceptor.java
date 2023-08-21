@@ -62,7 +62,7 @@ public class ValidateDefaultTaxOwnerInterceptor implements HandlerInterceptor {
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long defaultTaxId = Long.parseLong((String) pathVariables.get("id"));
 
-            if (!defaultTaxRepository.existsByIdAndBranch_Business_Id(defaultTaxId, business.getId())) {
+            if (!defaultTaxRepository.existsByTaxIdAndBranch_Business_Id(defaultTaxId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

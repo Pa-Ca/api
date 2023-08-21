@@ -5,7 +5,6 @@ import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.client.model.ReviewLike;
-import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.ReviewRepository;
@@ -14,15 +13,11 @@ import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
-
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -38,32 +33,10 @@ public class ReviewService {
 
     private final ReviewLikeRepository reviewLikeRepository;
 
-    public ReviewListDTO getAll() {
-        List<ReviewDTO> response = new ArrayList<>();
-        reviewRepository.findAll().forEach(review -> {
-            ReviewDTO dto = reviewMapper.toDTO(review);
-            dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
-            response.add(dto);
-        });
-
-        return ReviewListDTO.builder().reviews(response).build();
-    }
-
     public ReviewDTO getById(Long id) throws NoContentException {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NoContentException(
                         "Review with id " + id + " does not exists",
-                        35));
-
-        ReviewDTO dto = reviewMapper.toDTO(review);
-        dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
-        return dto;
-    }
-
-    public ReviewDTO getByClientIdAndBranchId(Long clientId, Long branchId) throws NoContentException {
-        Review review = reviewRepository.findByClientIdAndBranchId(clientId, branchId)
-                .orElseThrow(() -> new NoContentException(
-                        "Review does not exists",
                         35));
 
         ReviewDTO dto = reviewMapper.toDTO(review);
@@ -181,5 +154,5 @@ public class ReviewService {
         dto.setLikes(reviewLikeRepository.findAllByReviewId(review.get().getId()).size());
         return dto;
     }
-    
+
 }

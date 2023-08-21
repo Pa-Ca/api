@@ -6,7 +6,6 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 import java.security.SecureRandom;
 
-import com.paca.paca.statics.UserRole;
 import org.passay.LengthRule;
 import org.passay.RuleResult;
 import org.passay.PasswordData;
@@ -15,6 +14,7 @@ import org.passay.PropertiesMessageResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.paca.paca.statics.UserRole;
 import com.paca.paca.auth.statics.AuthenticationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;

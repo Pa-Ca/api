@@ -6,31 +6,32 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import com.paca.paca.branch.model.DefaultTax;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-// import the mapper
-import com.paca.paca.branch.utils.DefaultTaxMapper;
-import com.paca.paca.exception.exceptions.BadRequestException;
-import com.paca.paca.exception.exceptions.NoContentException;
-// import the DTO's
-import com.paca.paca.branch.dto.DefaultTaxDTO;
-// Import the statics
-import com.paca.paca.branch.statics.DefaultTaxStatics;
-
-// Import branch and the branch repository
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.sale.utils.TaxMapper;
+import com.paca.paca.branch.model.DefaultTax;
+import com.paca.paca.sale.statics.TaxStatics;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.branch.repository.BranchRepository;
+import com.paca.paca.branch.repository.DefaultTaxRepository;
+import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.BadRequestException;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultTaxService {
 
+    private final TaxMapper taxMapper;
+
+    private final TaxRepository taxRepository;
+
     private final BranchRepository branchRepository;
-    private final DefaultTaxMapper defaultTaxMapper;
+
     private final DefaultTaxRepository defaultTaxRepository;
 
-    public DefaultTaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NoContentException {
-        // Check if the branch exists
+    public TaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NoContentException {
         long branchId = defaultTaxDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
@@ -38,54 +39,63 @@ public class DefaultTaxService {
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
-        // Create a default tax
-        DefaultTax defaultTax = defaultTaxMapper.toEntity(defaultTaxDTO, branch.get());
-        // Save the default tax
-        defaultTax = defaultTaxRepository.save(defaultTax);
-        // Return the default tax
-        return defaultTaxMapper.toDTO(defaultTax);
+
+        TaxDTO taxDTO = defaultTaxDTO.getTax();
+        Short taxType = taxDTO.getType();
+        if (!TaxStatics.Types.isTypeValid(taxType)) {
+            throw new BadRequestException(
+                    "Invalid tax type: " + taxType,
+                    51);
+        }
+
+        Tax tax = taxMapper.toEntity(taxDTO);
+
+        tax = taxRepository.save(tax);
+        defaultTaxRepository.save(DefaultTax.builder()
+                .branch(branch.get())
+                .tax(tax)
+                .build());
+
+        return taxMapper.toDTO(tax);
     }
 
-    public DefaultTaxDTO update(long id, DefaultTaxDTO defaultTaxDTO)
+    public TaxDTO update(long id, TaxDTO dto)
             throws NoContentException, BadRequestException {
 
         // Check if the default tax exists
-        Optional<DefaultTax> defaultTax = defaultTaxRepository.findById(id);
-        if (defaultTax.isEmpty()) {
+        Optional<Tax> tax = taxRepository.findById(id);
+        if (tax.isEmpty()) {
             throw new NoContentException(
-                    "Default tax with id " + id + " does not exists",
-                    50);
+                    "Tax with id " + id + " does not exists",
+                    52);
         }
         // Check that the defautl tax type belongs to the enum from the statics
-        Integer defaultTaxType = defaultTaxDTO.getType();
-        if (defaultTaxType != null && !DefaultTaxStatics.Types.isTypeValid(defaultTaxType)) {
+        Short taxType = dto.getType();
+        if (taxType != null && !TaxStatics.Types.isTypeValid(taxType)) {
             throw new BadRequestException(
-                    "Invalid default tax type:" + defaultTaxType,
+                    "Invalid tax type: " + taxType,
                     51);
         }
 
         // Update the default tax
-        DefaultTax defaultTaxToUpdate = defaultTax.get();
-        defaultTaxToUpdate = defaultTaxMapper.updateModel(defaultTaxDTO, defaultTaxToUpdate);
-
-        // Save the default tax
-        defaultTaxToUpdate = defaultTaxRepository.save(defaultTaxToUpdate);
+        Tax taxToUpdate = tax.get();
+        taxToUpdate = taxMapper.updateModel(dto, taxToUpdate);
+        taxToUpdate = taxRepository.save(taxToUpdate);
 
         // Return the default tax
-        return defaultTaxMapper.toDTO(defaultTaxToUpdate);
-
+        return taxMapper.toDTO(taxToUpdate);
     }
 
-    public void delete(Long defaultTaxId) throws NoContentException {
+    public void delete(Long taxId) throws NoContentException {
         // Check if the default tax exists
-        Optional<DefaultTax> defaultTax = defaultTaxRepository.findById(defaultTaxId);
-        if (defaultTax.isEmpty()) {
+        Optional<Tax> tax = taxRepository.findById(taxId);
+        if (tax.isEmpty()) {
             throw new NoContentException(
-                    "Default tax with id " + defaultTaxId + " does not exists",
-                    50);
+                    "Tax with id " + taxId + " does not exists",
+                    52);
         }
         // Delete the default tax
-        defaultTaxRepository.deleteById(defaultTaxId);
+        taxRepository.deleteById(taxId);
     }
 
 }

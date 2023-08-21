@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paca.paca.promotion.dto.PromotionDTO;
-import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.promotion.service.PromotionService;
 import com.paca.paca.promotion.statics.PromotionStatics;
 import com.paca.paca.exception.exceptions.NoContentException;
@@ -35,29 +34,22 @@ public class PromotionController {
 
     private final PromotionService promotionService;
 
-    @GetMapping
-    @ValidateRoles({})
-    @Operation(summary = "Get all promotions", description = "Returns a list with all promotions")
-    public ResponseEntity<PromotionListDTO> getAll() {
-        return ResponseEntity.ok(promotionService.getAll());
-    }
-
-    @PostMapping
     @ValidateRoles({ "business" })
+    @PostMapping(PromotionStatics.Endpoint.SAVE)
     @Operation(summary = "Create new promotion", description = "Create a new promotion in the app")
     public ResponseEntity<PromotionDTO> save(@RequestBody PromotionDTO dto) throws NoContentException {
         return ResponseEntity.ok(promotionService.save(dto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(PromotionStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get promotion by ID", description = "Gets the data of a promotion given its ID")
     public ResponseEntity<PromotionDTO> getById(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(promotionService.getById(id));
     }
 
-    @PutMapping("/{id}")
     @ValidatePromotionOwner
     @ValidateRoles({ "business" })
+    @PutMapping(PromotionStatics.Endpoint.UPDATE)
     @Operation(summary = "Update promotion", description = "Updates the data of a promotion given its ID")
     public ResponseEntity<PromotionDTO> update(
             @PathVariable("id") Long id,
@@ -67,8 +59,8 @@ public class PromotionController {
     }
 
     @ValidatePromotionOwner
-    @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
+    @DeleteMapping(PromotionStatics.Endpoint.DELETE)
     @Operation(summary = "Delete promotion", description = "Delete the data of a promotion given its ID")
     public void delete(@PathVariable("id") Long id) throws NoContentException {
         promotionService.delete(id);

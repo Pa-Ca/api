@@ -3,29 +3,28 @@ package com.paca.paca.branch.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.math.BigDecimal;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.sale.dto.TaxListDTO;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ReviewDTO;
+import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.product.dto.ProductDTO;
-import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.dto.ReviewListDTO;
-import com.paca.paca.branch.dto.BranchListDTO;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.branch.utils.TableMapper;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.client.utils.ClientMapper;
@@ -35,33 +34,22 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.dto.PaymentOptionDTO;
 import com.paca.paca.product.utils.ProductMapper;
-import com.paca.paca.branch.statics.BranchStatics;
-import com.paca.paca.branch.dto.DefaultTaxListDTO;
-import com.paca.paca.branch.utils.DefaultTaxMapper;
 import com.paca.paca.promotion.dto.PromotionListDTO;
-import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.branch.dto.PaymentOptionListDTO;
 import com.paca.paca.promotion.utils.PromotionMapper;
 import com.paca.paca.branch.utils.PaymentOptionMapper;
 import com.paca.paca.branch.repository.TableRepository;
-import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ReviewRepository;
-import com.paca.paca.client.repository.ClientRepository;
-import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.reservation.repository.GuestRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
-import com.paca.paca.reservation.repository.ClientGroupRepository;
-import com.paca.paca.reservation.repository.ReservationRepository;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
@@ -76,33 +64,29 @@ import org.springframework.data.domain.PageRequest;
 @RequiredArgsConstructor
 public class BranchService {
 
+    private final TableMapper tableMapper;
+
+    private final ClientMapper clientMapper;
+
     private final BranchMapper branchMapper;
 
     private final ReviewMapper reviewMapper;
+
+    private final TaxMapper defaultTaxMapper;
 
     private final ProductMapper productMapper;
 
     private final PromotionMapper promotionMapper;
 
-    private final ReservationMapper reservationMapper;
-
-    private final DefaultTaxMapper defaultTaxMapper;
-
-    private final TableMapper tableMapper;
-
     private final PaymentOptionMapper paymentOptionMapper;
 
     private final ProductSubCategoryMapper productSubCategoryMapper;
 
-    private final ClientMapper clientMapper;
+    private final TaxRepository taxRepository;
+
+    private final TableRepository tableRepository;
 
     private final ReviewRepository reviewRepository;
-
-    private final ReviewLikeRepository reviewLikeRepository;
-
-    private final GuestRepository guestRepository;
-
-    private final ClientRepository clientRepository;
 
     private final BranchRepository branchRepository;
 
@@ -112,29 +96,13 @@ public class BranchService {
 
     private final PromotionRepository promotionRepository;
 
-    private final ReservationRepository reservationRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
-    private final ClientGroupRepository clientGroupRepository;
+    private final PaymentOptionRepository paymentOptionRepository;
 
     private final FavoriteBranchRepository favoriteBranchRepository;
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
-
-    private final DefaultTaxRepository defaultTaxRepository;
-
-    private final TableRepository tableRepository;
-
-    private final PaymentOptionRepository paymentOptionRepository;
-
-    public BranchListDTO getAll() {
-        List<BranchDTO> response = new ArrayList<>();
-        branchRepository.findAll().forEach(branch -> {
-            BranchDTO dto = branchMapper.toDTO(branch);
-            response.add(dto);
-        });
-
-        return BranchListDTO.builder().branches(response).build();
-    }
 
     public BranchDTO getById(Long id) throws NoContentException {
         Branch branch = branchRepository.findById(id)
@@ -196,7 +164,10 @@ public class BranchService {
                     "Branch with id " + id + " does not exists",
                     20);
         }
-        branchRepository.deleteById(id);
+
+        Branch branch = current.get();
+        branch.setDeleted(true);
+        branchRepository.save(branch);
     }
 
     public ProductSubCategoryListDTO getProductSubCategories(Long branchId) throws NoContentException {
@@ -252,31 +223,6 @@ public class BranchService {
         return PromotionListDTO.builder().promotions(response).build();
     }
 
-    public ReservationListDTO getReservations(Long id) throws NoContentException {
-        Optional<Branch> branch = branchRepository.findById(id);
-        if (branch.isEmpty()) {
-            throw new NoContentException(
-                    "Branch with id " + id + " does not exists",
-                    20);
-        }
-
-        List<ReservationDTO> response = new ArrayList<>();
-        reservationRepository.findAllByBranchId(id).forEach(reservation -> {
-            ReservationDTO dto = reservationMapper.toDTO(reservation);
-            response.add(dto);
-        });
-        // Sort reservations by date
-        response.sort(Comparator.comparing(ReservationDTO::getReservationDateIn));
-
-        // Complete reservations
-        List<ReservationDTO> result = response.stream().map(reservation -> {
-            reservation.completeData(guestRepository, clientGroupRepository, clientRepository);
-            return reservation;
-        }).collect(Collectors.toList());
-
-        return ReservationListDTO.builder().reservations(result).build();
-    }
-
     public ClientListDTO getFavoriteClients(Long id) throws NoContentException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
@@ -295,104 +241,6 @@ public class BranchService {
         return ClientListDTO.builder().clients(response).build();
     }
 
-    public ReviewListDTO getReviews(Long id) {
-        Optional<Branch> branch = branchRepository.findById(id);
-        if (branch.isEmpty()) {
-            throw new NoContentException(
-                    "Branch with id " + id + " does not exists",
-                    20);
-        }
-
-        List<ReviewDTO> response = new ArrayList<>();
-        reviewRepository.findAllByBranchId(id)
-                .forEach(review -> {
-                    ReviewDTO dto = reviewMapper.toDTO(review);
-                    response.add(dto);
-                });
-
-        return ReviewListDTO.builder().reviews(response).build();
-    }
-
-    // Nows lets make the pagination of branches
-    // This method returns a list of branches with pagination
-    public BranchListDTO getBranchesPage(
-            int page,
-            int size,
-            String sorting_by,
-            boolean ascending,
-            BigDecimal min_reservation_price,
-            BigDecimal max_reservation_price,
-            Float min_score,
-            int min_capacity) throws UnprocessableException, NoContentException {
-
-        // Now lets add the exeption handling
-        if (page < 0) {
-            throw new UnprocessableException(
-                    "Page number cannot be less than zero",
-                    44); // Listo en docs
-        }
-        if (size < 1) {
-            throw new UnprocessableException(
-                    "Page size cannot be less than one",
-                    45); // Listo en docs
-        }
-
-        // Check if sorting_by is in BranchStatics.BranchSortingKeys
-        if (!BranchStatics.BranchSortingKeys.contains(sorting_by)) {
-            throw new UnprocessableException(
-                    "Sorting key is not valid",
-                    46); // Listo en docs
-        }
-
-        // Create a Pageable object that specifies the page and size parameters as well
-        // as a sort
-        // order for the results
-        Pageable paging;
-        if (ascending) {
-            paging = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by(sorting_by).ascending());
-        } else {
-            paging = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by(sorting_by).descending());
-        }
-
-        if (min_reservation_price == null) {
-            min_reservation_price = BigDecimal.valueOf(0L);
-        }
-        if (max_reservation_price == null) {
-            max_reservation_price = BigDecimal.valueOf(Long.MAX_VALUE);
-        }
-        if (min_score == null) {
-            min_score = 0.0f;
-        }
-        if (min_capacity == 0) {
-            min_capacity = 1;
-        }
-
-        // Lets apply the filters
-        Page<Branch> pagedResult = branchRepository
-                .findAllByReservationPriceBetweenAndScoreGreaterThanEqualAndCapacityGreaterThanEqual(
-                        min_reservation_price,
-                        max_reservation_price,
-                        min_score,
-                        min_capacity,
-                        paging);
-
-        List<BranchDTO> response = new ArrayList<>();
-
-        pagedResult.forEach(branch -> {
-            BranchDTO dto = branchMapper.toDTO(branch);
-            response.add(dto);
-        });
-
-        return BranchListDTO.builder().branches(response).build();
-    }
-
-    // This method returns a list of reviews with pagination
     public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NoContentException {
         if (page < 0) {
             throw new UnprocessableException(
@@ -412,24 +260,13 @@ public class BranchService {
                     20);
         }
 
-        // Create a Pageable object that specifies the page and size parameters as well
-        // as a sort
-        // order for the results
         Pageable paging = PageRequest.of(
                 page,
                 size,
-                // Sort by id descending
-                // TODO: Add more ways to sort
                 Sort.by("id").descending());
+        Page<Review> pagedResult = reviewRepository.findAllByBranchId(id, paging);
 
-        // Query the database for the appropriate page of results using the findAll
-        // method of the
-        // reviewRepository
-        Page<Review> pagedResult = reviewRepository.findAllByBranchId(id, paging);// .findAll(paging);
-
-        // Map the results to a list of ReviewDTO objects using the reviewMapper
         List<ReviewDTO> response = new ArrayList<>();
-
         pagedResult.forEach(review -> {
             ReviewDTO dto = reviewMapper.toDTO(review);
             dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
@@ -440,8 +277,7 @@ public class BranchService {
         return ReviewListDTO.builder().reviews(response).build();
     }
 
-    public DefaultTaxListDTO getDefaultTaxesByBranchId(Long branchId) {
-        // Check if the branch exists
+    public TaxListDTO getDefaultTaxesByBranchId(Long branchId) {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
@@ -449,22 +285,18 @@ public class BranchService {
                     20);
         }
 
-        // Get the default taxes
-        List<DefaultTax> defaultTaxes = defaultTaxRepository.findAllByBranchId(branchId);
-
-        List<DefaultTaxDTO> defaultTaxesDTO = new ArrayList<>();
-
-        for (DefaultTax defaultTax : defaultTaxes) {
+        List<Tax> defaultTaxes = taxRepository.findAllByBranchId(branchId);
+        List<TaxDTO> defaultTaxesDTO = new ArrayList<>();
+        for (Tax defaultTax : defaultTaxes) {
             defaultTaxesDTO.add(defaultTaxMapper.toDTO(defaultTax));
         }
 
-        return DefaultTaxListDTO.builder()
-                .defaultTaxes(defaultTaxesDTO)
+        return TaxListDTO.builder()
+                .taxes(defaultTaxesDTO)
                 .build();
     }
 
-    public TableListDTO getTablesbyBranchId(Long branchId) {
-        // Check if the branch exists
+    public TableListDTO getTablesByBranchId(Long branchId) {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
@@ -473,7 +305,7 @@ public class BranchService {
         }
 
         // Get the tables
-        List<Table> tables = tableRepository.findAllByBranchIdAndDeletedFalse(branchId);
+        List<Table> tables = tableRepository.findAllByBranchId(branchId);
 
         List<TableDTO> tablesDTO = new ArrayList<>();
 
@@ -488,7 +320,6 @@ public class BranchService {
     }
 
     public PaymentOptionListDTO getPaymentOptionsByBranchId(Long branchId) {
-        // Check if the branch exists
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
             throw new NoContentException(
@@ -496,11 +327,9 @@ public class BranchService {
                     20);
         }
 
-        // Get the tables
         List<PaymentOption> paymentOptions = paymentOptionRepository.findAllByBranchId(branchId);
 
         List<PaymentOptionDTO> paymentOptionsDTO = new ArrayList<>();
-
         for (PaymentOption paymentOption : paymentOptions) {
             paymentOptionsDTO.add(paymentOptionMapper.toDTO(paymentOption));
         }

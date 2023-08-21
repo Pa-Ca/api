@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.paca.paca.business.model.Business;
-import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 
@@ -37,7 +37,7 @@ public class ValidateTaxOwnerInterceptor implements HandlerInterceptor {
     }
 
     @Autowired
-    private TaxRepository taxRepository;
+    private SaleTaxRepository saleTaxRepository;
 
     @Autowired
     private BusinessRepository businessRepository;
@@ -62,7 +62,7 @@ public class ValidateTaxOwnerInterceptor implements HandlerInterceptor {
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long taxId = Long.parseLong((String) pathVariables.get("id"));
 
-            if (!taxRepository.existsByIdAndSale_Table_Branch_Business_Id(taxId, business.getId())) {
+            if (!saleTaxRepository.existsByTaxIdAndSale_Branch_Business_Id(taxId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }

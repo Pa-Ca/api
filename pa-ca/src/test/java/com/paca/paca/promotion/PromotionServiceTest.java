@@ -1,58 +1,27 @@
 package com.paca.paca.promotion;
 
 import org.junit.Assert;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import junit.framework.TestCase;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.promotion.dto.PromotionDTO;
-import com.paca.paca.promotion.dto.PromotionListDTO;
-import com.paca.paca.promotion.utils.PromotionMapper;
-import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.promotion.service.PromotionService;
 import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.promotion.repository.PromotionRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class PromotionServiceTest {
-    
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private PromotionRepository promotionRepository;
-
-    @Mock
-    private PromotionMapper promotionMapper;
+public class PromotionServiceTest extends ServiceTest {
 
     @InjectMocks
     private PromotionService promotionService;
-
-    private TestUtils utils = TestUtils.builder().build();
-
-    @Test
-    void shouldGetAllPromotions() {
-        List<Promotion> promotions = TestUtils.castList(Promotion.class, Mockito.mock(List.class));
-
-        when(promotionRepository.findAll()).thenReturn(promotions);
-        PromotionListDTO responseDTO = promotionService.getAll();
-
-        assertThat(responseDTO).isNotNull();
-    }
 
     @Test 
     void shouldGetNoContentDueToMissingPromotionInGetPromotionById() {
@@ -76,11 +45,9 @@ public class PromotionServiceTest {
         when(promotionRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(promotion));
         when(promotionMapper.toDTO(any(Promotion.class))).thenReturn(dto);
 
-        PromotionDTO dtoResponse = promotionService.getById(promotion.getId());
+        PromotionDTO response = promotionService.getById(promotion.getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(promotion.getId());
-        assertThat(dtoResponse.getBranchId()).isEqualTo(promotion.getBranch().getId());
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -109,11 +76,9 @@ public class PromotionServiceTest {
         when(promotionMapper.toEntity(any(PromotionDTO.class), any(Branch.class))).thenReturn(promotion);
         when(promotionMapper.toDTO(any(Promotion.class))).thenReturn(dto);
 
-        PromotionDTO dtoResponse = promotionService.save(dto);
+        PromotionDTO response = promotionService.save(dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(promotion.getId());
-        assertThat(dtoResponse.getBranchId()).isEqualTo(promotion.getBranch().getId());
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
@@ -143,11 +108,9 @@ public class PromotionServiceTest {
         when(promotionMapper.updateModel(any(PromotionDTO.class), any(Promotion.class))).thenReturn(promotion);
         when(promotionMapper.toDTO(any(Promotion.class))).thenReturn(dto);
 
-        PromotionDTO dtoResponse = promotionService.update(promotion.getId(), dto);
+        PromotionDTO response = promotionService.update(promotion.getId(), dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(promotion.getId());
-        assertThat(dtoResponse.getBranchId()).isEqualTo(promotion.getBranch().getId());
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test

@@ -1,28 +1,26 @@
 package com.paca.paca.business.service;
 
 import com.paca.paca.user.model.User;
+import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
+import com.paca.paca.sale.utils.TaxMapper;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.branch.dto.BranchInfoDTO;
 import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
-import com.paca.paca.business.dto.BusinessListDTO;
-import com.paca.paca.branch.utils.DefaultTaxMapper;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.business.utils.BusinessMapper;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
-import com.paca.paca.user.statics.UserStatics;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,21 +31,21 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class BusinessService {
 
-    private final DefaultTaxRepository defaultTaxRepository;
-
-    private final BusinessRepository businessRepository;
-
-    private final BranchRepository branchRepository;
-
-    private final TierRepository tierRepository;
-
     private final BranchMapper branchMapper;
+
+    private final TaxMapper defaultTaxMapper;
 
     private final BusinessMapper businessMapper;
 
+    private final TaxRepository taxRepository;
+
+    private final TierRepository tierRepository;
+
     private final UserRepository userRepository;
 
-    private final DefaultTaxMapper defaultTaxMapper;
+    private final BranchRepository branchRepository;
+
+    private final BusinessRepository businessRepository;
 
     private void validateTier(String tier) throws BadRequestException {
         if (tier.isEmpty())
@@ -58,17 +56,6 @@ public class BusinessService {
         } catch (Exception e) {
             throw new BadRequestException("The tier given is not valid");
         }
-    }
-
-    public BusinessListDTO getAll() {
-        List<BusinessDTO> response = new ArrayList<>();
-        businessRepository.findAll().forEach(business -> {
-            BusinessDTO dto = businessMapper.toDTO(business);
-            dto.setUserId(business.getUser().getId());
-            response.add(dto);
-        });
-
-        return BusinessListDTO.builder().business(response).build();
     }
 
     public BusinessDTO getById(Long id) throws NoContentException {
@@ -111,11 +98,6 @@ public class BusinessService {
         }
         Business newBusiness = businessMapper.toEntity(dto, tier.get(), user.get());
         newBusiness = businessRepository.save(newBusiness);
-
-        // Change user status to fully registered
-        user.get().setRegistrationStatus(UserStatics.RegistrationStatus.registered);
-        userRepository.save(user.get());
-
         BusinessDTO dtoResponse = businessMapper.toDTO(newBusiness);
 
         return dtoResponse;
@@ -174,12 +156,14 @@ public class BusinessService {
         List<BranchInfoDTO> response = new ArrayList<>();
         branchRepository.findAllByBusinessId(id).forEach(branch -> {
             // Get branch info
-            BranchInfoDTO dto = new BranchInfoDTO(branchMapper.toDTO(branch));
+            BranchInfoDTO dto = BranchInfoDTO.builder()
+                    .branch(branchMapper.toDTO(branch))
+                    .build();
 
             // Get default taxes info
-            List<DefaultTaxDTO> defaultTaxes = new ArrayList<>();
-            defaultTaxRepository.findAllByBranchId(branch.getId()).forEach(defaultTax -> {
-                DefaultTaxDTO defaultTaxDTO = defaultTaxMapper.toDTO(defaultTax);
+            List<TaxDTO> defaultTaxes = new ArrayList<>();
+            taxRepository.findAllByBranchId(branch.getId()).forEach(defaultTax -> {
+                TaxDTO defaultTaxDTO = defaultTaxMapper.toDTO(defaultTax);
                 defaultTaxes.add(defaultTaxDTO);
             });
             dto.setDefaultTaxes(defaultTaxes);

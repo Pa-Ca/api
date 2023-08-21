@@ -1,25 +1,25 @@
 package com.paca.paca.sale.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
-
-import com.paca.paca.reservation.model.Reservation;
 
 import lombok.*;
 
 import jakarta.persistence.*;
 
-import com.paca.paca.branch.model.PaymentOption;
-import com.paca.paca.branch.model.Table;
+import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.reservation.model.Invoice;
 
 @Builder
-@jakarta.persistence.Entity
+@Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Table(name = "sale")
 public class Sale {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sale_seq")
     @SequenceGenerator(name = "sale_seq", sequenceName = "sale_seq", allocationSize = 1)
@@ -27,13 +27,24 @@ public class Sale {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "table_id")
-    private Table table;
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
 
-    @Column(name = "client_quantity")
-    private Integer clientQuantity;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "client_guest_id", nullable = false)
+    private ClientGuest clientGuest;
 
-    @Column(name = "start_time")
+    @OneToOne
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
+
+    @Column(name = "client_quantity", nullable = false)
+    private Short clientQuantity;
+
+    @Column(name = "status", nullable = false)
+    private Short status;
+
+    @Column(name = "start_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
 
@@ -41,23 +52,9 @@ public class Sale {
     @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;
 
-    @Column(name = "status")
-    private Integer status;
+    @Column(name = "dollar_exchange", nullable = false)
+    private Float dollarExchange;
 
-    @Column(name = "table_name")
-    private String tableName;
-
-    @Column(name = "dollar_to_local_currency_exchange")
-    private BigDecimal dollarToLocalCurrencyExchange;
-
-    @OneToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservation;
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "payment_option_id")
-    private PaymentOption paymentOption;
-
-    @Column(name = "note")
+    @Column(name = "note", nullable = false)
     private String note;
 }

@@ -1,25 +1,25 @@
 package com.paca.paca.sale.dto;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaleDTO {
+
     private Long id;
-    private Integer clientQuantity;
+    private Long branchId;
+    private Long clientGuestId;
+    private Long invoiceId;
+    private Short clientQuantity;
+    private Short status;
     private Date startTime;
     private Date endTime;
-    private Integer status;
-    private Long tableId;
-    private String tableName;
+    private Float dollarExchange;
     private String note;
-    private BigDecimal dollarToLocalCurrencyExchange;
-    private Long reservationId;
-    private Long paymentOptionId;
 }

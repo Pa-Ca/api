@@ -13,5 +13,5 @@ public interface SaleProductRepository extends JpaRepository<SaleProduct, Long> 
 
     void deleteAllBySaleId(long saleId);
 
-    Boolean existsByIdAndSale_Table_Branch_Business_Id(Long id, Long businessId); // Needs to be tested
+    Boolean existsByIdAndSale_Branch_Business_Id(Long id, Long businessId);
 }

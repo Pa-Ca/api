@@ -11,26 +11,32 @@ import com.paca.paca.client.model.Friend;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.client.dto.FriendDTO;
+import com.paca.paca.client.dto.ClientInfoDTO;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.client.dto.ClientListDTO;
 import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.client.utils.FriendMapper;
 import com.paca.paca.branch.utils.BranchMapper;
 import com.paca.paca.client.model.FavoriteBranch;
+import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.reservation.dto.ReservationDTO;
+import com.paca.paca.reservation.utils.InvoiceMapper;
+import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.FriendRepository;
-import com.paca.paca.reservation.dto.ReservationListDTO;
 import com.paca.paca.reservation.utils.ReservationMapper;
+import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.reservation.repository.GuestRepository;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 
 import java.util.List;
-import java.util.Date;
 import java.util.Optional;
 import java.util.ArrayList;
 
@@ -42,31 +48,31 @@ public class ClientService {
 
     private final FriendMapper friendMapper;
 
-    private final ReservationMapper reservationMapper;
+    private final GuestMapper guestMapper;
 
     private final BranchMapper branchMapper;
 
+    private final InvoiceMapper invoiceMapper;
+
+    private final ReservationMapper reservationMapper;
+
     private final UserRepository userRepository;
+
+    private final GuestRepository guestRepository;
 
     private final ClientRepository clientRepository;
 
     private final FriendRepository friendRepository;
 
+    private final BranchRepository branchRepository;
+
+    private final InvoiceRepository invoiceRepository;
+
+    private final ClientGuestRepository clientGuestRepository;
+
     private final ClientGroupRepository clientGroupRepository;
 
-    private final BranchRepository branchRepository;
-    
     private final FavoriteBranchRepository favoriteBranchRepository;
-    
-    public ClientListDTO getAll() {
-        List<ClientDTO> response = new ArrayList<>();
-        clientRepository.findAll().forEach(client -> {
-            ClientDTO dto = clientMapper.toDTO(client);
-            response.add(dto);
-        });
-
-        return ClientListDTO.builder().clients(response).build();
-    }
 
     public ClientDTO getById(Long id) throws NoContentException {
         Client client = clientRepository.findById(id)
@@ -78,7 +84,7 @@ public class ClientService {
         return dto;
     }
 
-    public ClientDTO save(ClientDTO dto) throws NoContentException, ConflictException {
+    public ClientInfoDTO save(ClientDTO dto) throws NoContentException, ConflictException {
         String email = dto.getEmail();
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
@@ -98,12 +104,18 @@ public class ClientService {
         Client newClient = clientMapper.toEntity(dto, user.get());
         newClient = clientRepository.save(newClient);
 
-        ClientDTO dtoResponse = clientMapper.toDTO(newClient);
+        ClientGuest clientGuest = ClientGuest.builder()
+                .client(newClient)
+                .guest(null)
+                .haveGuest(false)
+                .build();
+        clientGuest = clientGuestRepository.save(clientGuest);
+        ClientDTO response = clientMapper.toDTO(newClient);
 
-        return dtoResponse;
+        return new ClientInfoDTO(response, clientGuest.getId());
     }
 
-    public ClientDTO update(Long id, ClientDTO dto) throws NoContentException {
+    public ClientInfoDTO update(Long id, ClientDTO dto) throws NoContentException {
         Optional<Client> current = clientRepository.findById(id);
         if (current.isEmpty()) {
             throw new NoContentException(
@@ -113,9 +125,10 @@ public class ClientService {
 
         Client newClient = clientMapper.updateModel(dto, current.get());
         newClient = clientRepository.save(newClient);
-        ClientDTO dtoResponse = clientMapper.toDTO(newClient);
+        ClientDTO response = clientMapper.toDTO(newClient);
+        ClientGuest clientGuest = clientGuestRepository.findByClientId(id).get();
 
-        return dtoResponse;
+        return new ClientInfoDTO(response, clientGuest.getId());
     }
 
     public void delete(Long id) throws NoContentException {
@@ -129,15 +142,16 @@ public class ClientService {
 
     }
 
-    public ClientDTO getByUserId(Long id) throws NoContentException {
+    public ClientInfoDTO getByUserId(Long id) throws NoContentException {
         Client client = clientRepository.findByUserId(id)
                 .orElseThrow(() -> new NoContentException(
                         "User with id " + id + " does not exists",
                         12));
 
         ClientDTO dto = clientMapper.toDTO(client);
+        ClientGuest clientGuest = clientGuestRepository.findByClientId(client.getId()).get();
 
-        return dto;
+        return new ClientInfoDTO(dto, clientGuest.getId());
     }
 
     public ClientListDTO getPendingFriends(Long id) throws NoContentException {
@@ -232,9 +246,9 @@ public class ClientService {
                 .build();
         request = friendRepository.save(request);
 
-        FriendDTO dtoResponse = friendMapper.toDTO(request);
+        FriendDTO response = friendMapper.toDTO(request);
 
-        return dtoResponse;
+        return response;
     }
 
     public FriendDTO acceptFriendRequest(Long requesterId, Long addresserId)
@@ -258,9 +272,9 @@ public class ClientService {
         newRequest.setAccepted(true);
         newRequest = friendRepository.save(newRequest);
 
-        FriendDTO dtoResponse = friendMapper.toDTO(newRequest);
+        FriendDTO response = friendMapper.toDTO(newRequest);
 
-        return dtoResponse;
+        return response;
     }
 
     public FriendDTO rejectFriendRequest(Long requesterId, Long addresserId)
@@ -284,9 +298,9 @@ public class ClientService {
         newRequest.setRejected(true);
         newRequest = friendRepository.save(newRequest);
 
-        FriendDTO dtoResponse = friendMapper.toDTO(newRequest);
+        FriendDTO response = friendMapper.toDTO(newRequest);
 
-        return dtoResponse;
+        return response;
     }
 
     public void deleteFriendRequest(Long requesterId, Long addresserId)
@@ -300,47 +314,36 @@ public class ClientService {
         friendRepository.deleteById(request.get().getId());
     }
 
-    public ReservationListDTO getReservations(Long id) throws NoContentException {
+    public ReservationInfoListDTO getReservations(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
-        List<ReservationDTO> response = new ArrayList<>();
+        List<ReservationInfoDTO> response = new ArrayList<>();
         clientGroupRepository.findAllByClientId(id).forEach(group -> {
-            ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
-            response.add(dto);
+            response.add(new ReservationInfoDTO(
+                    group.getReservation(),
+                    guestRepository,
+                    clientRepository,
+                    invoiceRepository,
+                    clientGroupRepository,
+                    guestMapper,
+                    clientMapper,
+                    invoiceMapper,
+                    reservationMapper));
         });
 
-        return ReservationListDTO.builder().reservations(response).build();
-    }
-
-    public ReservationListDTO getReservationsByDate(Long id, Date reservationDateIn)
-            throws NoContentException {
-        Optional<Client> client = clientRepository.findById(id);
-        if (client.isEmpty()) {
-            throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
-                    28);
-        }
-
-        List<ReservationDTO> response = new ArrayList<>();
-        clientGroupRepository.findAllByClientIdAndReservationReservationDateInGreaterThanEqual(id, reservationDateIn)
-                .forEach(group -> {
-                    ReservationDTO dto = reservationMapper.toDTO(group.getReservation());
-                    response.add(dto);
-                });
-
-        return ReservationListDTO.builder().reservations(response).build();
+        return ReservationInfoListDTO.builder().reservations(response).build();
     }
 
     public BranchListDTO getFavoriteBranches(Long id) throws NoContentException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -358,14 +361,14 @@ public class ClientService {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
             throw new NoContentException(
-                    "Branch with id " + id + " does not exists",
+                    "Branch with id " + branchId + " does not exists",
                     20);
         }
 
@@ -390,7 +393,7 @@ public class ClientService {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
             throw new NoContentException(
-                    "Client with id: " + id + " does not exists",
+                    "Client with id " + id + " does not exists",
                     28);
         }
 
@@ -403,9 +406,10 @@ public class ClientService {
 
         Boolean favExists = favoriteBranchRepository.existsByClientIdAndBranchId(id, branchId);
         if (!favExists) {
-            throw new ConflictException("Favorite branch does not exists", 33);
+            throw new NoContentException("Favorite branch does not exists", 33);
         }
-        
+
         FavoriteBranch fav = favoriteBranchRepository.findByClientIdAndBranchId(id, branchId).get();
         favoriteBranchRepository.deleteById(fav.getId());
-    }}
+    }
+}

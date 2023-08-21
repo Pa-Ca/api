@@ -26,12 +26,13 @@ public class PromotionMapperTest {
         Promotion promotion = utils.createPromotion(null);
 
         PromotionDTO response = promotionMapper.toDTO(promotion);
+        PromotionDTO expected = new PromotionDTO(
+                promotion.getId(),
+                promotion.getBranch().getId(),
+                promotion.getText(),
+                promotion.getDisabled());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(promotion.getId());
-        assertThat(response.getBranchId()).isEqualTo(promotion.getBranch().getId());
-        assertThat(response.getDisabled()).isEqualTo(promotion.getDisabled());
-        assertThat(response.getText()).isEqualTo(promotion.getText());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -40,49 +41,33 @@ public class PromotionMapperTest {
         PromotionDTO dto = utils.createPromotionDTO(utils.createPromotion(branch));
 
         Promotion promotion = promotionMapper.toEntity(dto, branch);
+        Promotion expected = new Promotion(
+                dto.getId(),
+                branch,
+                dto.getText(),
+                dto.getDisabled());
 
-        assertThat(promotion).isNotNull();
-        assertThat(promotion.getId()).isEqualTo(dto.getId());
-        assertThat(promotion.getBranch().getId()).isEqualTo(branch.getId());
-        assertThat(promotion.getDisabled()).isEqualTo(dto.getDisabled());
-        assertThat(promotion.getText()).isEqualTo(dto.getText());
+        assertThat(promotion).isEqualTo(expected);
     }
 
     @Test
     void shouldPartiallyMapPromotionDTOtoPromotionEntity() {
-        Promotion promotion = utils.createPromotion(null);
+        Branch branch = utils.createBranch(null);
+        Promotion promotion = utils.createPromotion(branch);
 
-        // Not changing ID
-        PromotionDTO dto = PromotionDTO.builder()
-                .id(promotion.getId() + 1)
-                .build();
-        Promotion updatedPromotion = promotionMapper.updateModel(dto, promotion);
-        assertThat(updatedPromotion).isNotNull();
-        assertThat(updatedPromotion.getId()).isEqualTo(promotion.getId());
+        PromotionDTO dto = new PromotionDTO(
+                promotion.getId() + 1,
+                branch.getId() + 1,
+                promotion.getText() + ".",
+                !promotion.getDisabled());
+        Promotion response = promotionMapper.updateModel(dto, promotion);
+        Promotion expected = new Promotion(
+                promotion.getId(),
+                branch,
+                dto.getText(),
+                dto.getDisabled());
 
-        // Not changing Branch ID
-        dto = PromotionDTO.builder()
-                .branchId(promotion.getBranch().getId() + 1)
-                .build();
-        updatedPromotion = promotionMapper.updateModel(dto, promotion);
-        assertThat(updatedPromotion).isNotNull();
-        assertThat(updatedPromotion.getBranch().getId()).isEqualTo(promotion.getBranch().getId());
-
-        // Changing disabled
-        dto = PromotionDTO.builder()
-                .disabled(!promotion.getDisabled())
-                .build();
-        updatedPromotion = promotionMapper.updateModel(dto, promotion);
-        assertThat(updatedPromotion).isNotNull();
-        assertThat(updatedPromotion.getDisabled()).isEqualTo(dto.getDisabled());
-
-        // Changing text
-        dto = PromotionDTO.builder()
-                .text("new text_test")
-                .build();
-        updatedPromotion = promotionMapper.updateModel(dto, promotion);
-        assertThat(updatedPromotion).isNotNull();
-        assertThat(updatedPromotion.getText()).isEqualTo(dto.getText());
+        assertThat(response).isEqualTo(expected);
     }
 
 }

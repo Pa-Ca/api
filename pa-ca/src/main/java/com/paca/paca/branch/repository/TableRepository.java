@@ -10,9 +10,9 @@ import java.util.List;
 @Repository
 public interface TableRepository extends JpaRepository<Table, Long> {
 
-    List<Table> findAllByBranchIdAndDeletedFalse(long branchId);
+    List<Table> findAllByBranchId(long branchId);
 
-    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId); // Needs to be tested
+    Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
 
-    Boolean existsByBranchIdAndNameAndDeletedFalse(long branchId, String name);
+    Boolean existsByBranchIdAndName(long branchId, String name);
 }

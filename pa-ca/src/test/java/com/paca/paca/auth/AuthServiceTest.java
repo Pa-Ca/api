@@ -6,48 +6,26 @@ import org.junit.Assert;
 import org.mockito.Mock;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.auth.dto.*;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.utils.UserMapper;
 import com.paca.paca.exception.exceptions.*;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.mail.service.MailService;
-import com.paca.paca.user.repository.RoleRepository;
-import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.auth.service.AuthenticationService;
-import com.paca.paca.auth.repository.JwtBlackListRepository;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
-
-    @Mock
-    private JwtBlackListRepository jwtBlackListRepository;
-
-    @Mock
-    private RoleRepository roleRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private UserMapper userMapper;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
+public class AuthServiceTest extends ServiceTest {
 
     @Mock
     private JwtService jwtService;
@@ -190,8 +168,13 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
+                .build();
+        LoginResponseDTO expected = LoginResponseDTO.builder()
+                .id(id)
+                .role(role.getName().name())
+                .token(token)
+                .refresh(token)
                 .build();
 
         when(userRepository.existsByEmail(any(String.class)))
@@ -212,11 +195,7 @@ public class AuthServiceTest {
                 .build();
         LoginResponseDTO response = authenticationService.signup(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(user.getId());
-        assertThat(response.getRole()).isEqualTo(user.getRole().getName().name());
-        assertThat(response.getToken()).isEqualTo(token);
-        assertThat(response.getRefresh()).isEqualTo(token);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -255,7 +234,6 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -295,10 +273,15 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
         Authentication auth = new UsernamePasswordAuthenticationToken(email, password);
+        LoginResponseDTO expected = LoginResponseDTO.builder()
+                .id(id)
+                .role(role.getName().name())
+                .token(token)
+                .refresh(token)
+                .build();
 
         when(userRepository.existsByEmail(any(String.class)))
                 .thenReturn(true);
@@ -315,11 +298,7 @@ public class AuthServiceTest {
                 .build();
         LoginResponseDTO response = authenticationService.login(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(user.getId());
-        assertThat(response.getRole()).isEqualTo(user.getRole().getName().name());
-        assertThat(response.getToken()).isEqualTo(token);
-        assertThat(response.getRefresh()).isEqualTo(token);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -381,7 +360,6 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -420,7 +398,6 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -462,8 +439,10 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
+                .build();
+        RefreshResponseDTO expected = RefreshResponseDTO.builder()
+                .token(token)
                 .build();
 
         when(jwtService.extractEmail(any(String.class)))
@@ -482,8 +461,7 @@ public class AuthServiceTest {
                 .build();
         RefreshResponseDTO response = authenticationService.refresh(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo(token);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -533,8 +511,10 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
+                .build();
+        ResetPasswordResponseDTO expected = ResetPasswordResponseDTO.builder()
+                .token(token)
                 .build();
 
         ResetPasswordRequestDTO request = ResetPasswordRequestDTO.builder()
@@ -547,8 +527,7 @@ public class AuthServiceTest {
 
         ResetPasswordResponseDTO response = authenticationService.resetPasswordRequest(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo(token);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -732,7 +711,6 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -810,8 +788,10 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
+                .build();
+        VerifyEmailResponseDTO expected = VerifyEmailResponseDTO.builder()
+                .token(token)
                 .build();
 
         VerifyEmailRequestDTO request = VerifyEmailRequestDTO.builder()
@@ -824,8 +804,7 @@ public class AuthServiceTest {
 
         VerifyEmailResponseDTO response = authenticationService.verifyEmailRequest(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo(token);
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -898,7 +877,6 @@ public class AuthServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -912,5 +890,4 @@ public class AuthServiceTest {
 
         authenticationService.verifyEmail(token);
     }
-
 }

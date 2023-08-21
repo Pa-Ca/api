@@ -19,25 +19,25 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-@RequestMapping(AmenityStatics.Endpoint.AMENITY_PATH)
+@RequestMapping(AmenityStatics.Endpoint.PATH)
 @Tag(name = "09. Amenity", description = "Amenity Management Controller")
 public class AmenityController {
 
     private final AmenityService amenityService;
 
-    @GetMapping
+    @GetMapping(AmenityStatics.Endpoint.GET_ALL)
     @Operation(summary = "Get all amenities", description = "Returns a list with all amenities")
     public ResponseEntity<AmenityListDTO> getAll() {
         return ResponseEntity.ok(amenityService.getAll());
     }
 
-    @GetMapping(AmenityStatics.Endpoint.AMENITY_SEARCH_PATH)
+    @GetMapping(AmenityStatics.Endpoint.SEARCH)
     @Operation(summary = "Get all amenities by word", description = "Gets all amenities whose names are syntactically similar to a word")
     public ResponseEntity<AmenityListDTO> getBySearchWord(@PathVariable("word") String word) {
         return ResponseEntity.ok(amenityService.getBySearchWord(word));
     }
 
-    @GetMapping(AmenityStatics.Endpoint.AMENITY_BRANCHES)
+    @GetMapping(AmenityStatics.Endpoint.GET_BRANCHES)
     @Operation(summary = "Gets all branches associated with an amenity", description = "Gets the data of all the branches associated with an amenity given its ID")
     public ResponseEntity<BranchListDTO> getAllBranches(@PathVariable("id") Long id) throws NoContentException {
         return ResponseEntity.ok(amenityService.getAllBranches(id));

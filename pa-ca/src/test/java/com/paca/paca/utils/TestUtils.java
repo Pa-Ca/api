@@ -3,10 +3,10 @@ package com.paca.paca.utils;
 import java.util.List;
 import java.util.Date;
 import java.util.UUID;
+import java.util.Random;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.math.BigDecimal;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -19,12 +19,14 @@ import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.auth.dto.LogoutDTO;
 import com.paca.paca.branch.model.Table;
+import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.business.model.Tier;
 import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Friend;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.sale.dto.SaleTaxDTO;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.branch.dto.BranchDTO;
 import com.paca.paca.branch.model.Amenity;
@@ -33,38 +35,43 @@ import com.paca.paca.client.dto.FriendDTO;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.branch.dto.AmenityDTO;
 import com.paca.paca.product.model.Product;
+import com.paca.paca.sale.model.InsiteSale;
+import com.paca.paca.sale.model.OnlineSale;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.client.model.ReviewLike;
 import com.paca.paca.business.model.Business;
-import com.paca.paca.user.dto.UserRequestDTO;
-import com.paca.paca.branch.model.DefaultTax;
-import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.sale.statics.TaxStatics;
+import com.paca.paca.branch.model.DefaultTax;
 import com.paca.paca.sale.statics.SaleStatics;
+import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.auth.dto.LoginRequestDTO;
-import com.paca.paca.user.dto.UserResponseDTO;
-import com.paca.paca.branch.dto.DefaultTaxDTO;
-import com.paca.paca.branch.dto.PaymentOptionDTO;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.dto.GuestDTO;
+import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.auth.dto.LoginResponseDTO;
 import com.paca.paca.auth.dto.SignupRequestDTO;
+import com.paca.paca.reservation.dto.InvoiceDTO;
+import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.auth.dto.RefreshRequestDTO;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.branch.model.BranchAmenity;
+import com.paca.paca.branch.model.PaymentOption;
+import com.paca.paca.branch.dto.PaymentOptionDTO;
 import com.paca.paca.auth.dto.RefreshResponseDTO;
 import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.user.repository.RoleRepository;
 import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.sale.repository.SaleRepository;
-import com.paca.paca.branch.statics.DefaultTaxStatics;
+import com.paca.paca.sale.repository.SaleTaxRepository;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.client.repository.ClientRepository;
@@ -73,16 +80,22 @@ import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
 import com.paca.paca.product.repository.ProductRepository;
-import com.paca.paca.reservation.dto.ReservationPaymentDTO;
+import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
+import com.paca.paca.auth.repository.JwtBlackListRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
+import com.paca.paca.reservation.statics.ReservationStatics;
+import com.paca.paca.client.repository.ClientGuestRepository;
+import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.promotion.repository.PromotionRepository;
+import com.paca.paca.sale.repository.InsiteSaleTableRepository;
+import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
+import com.paca.paca.branch.repository.PaymentOptionRepository;
 import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
@@ -102,20 +115,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 @Setter
 @Getter
 @Builder
+@AllArgsConstructor
 public class TestUtils {
+
+    TaxRepository taxRepository;
 
     RoleRepository roleRepository;
 
     UserRepository userRepository;
 
     TierRepository tierRepository;
+
+    SaleRepository saleRepository;
+
+    TableRepository tableRepository;
 
     GuestRepository guestRepository;
 
@@ -127,37 +145,47 @@ public class TestUtils {
 
     ReviewRepository reviewRepository;
 
+    InvoiceRepository invoiceRepository;
+
     AmenityRepository amenityRepository;
+
+    SaleTaxRepository saleTaxRepository;
 
     ProductRepository productRepository;
 
     BusinessRepository businessRepository;
 
-    TableRepository tableRepository;
+    PromotionRepository promotionRepository;
+
+    InsiteSaleRepository insiteSaleRepository;
 
     DefaultTaxRepository defaultTaxRepository;
 
-    SaleRepository saleRepository;
+    ReviewLikeRepository reviewLikeRepository;
+
+    OnlineSaleRepository onlineSaleRepository;
 
     SaleProductRepository saleProductRepository;
 
-    PromotionRepository promotionRepository;
-
-    ReviewLikeRepository reviewLikeRepository;
-
     ClientGroupRepository clientGroupRepository;
+
+    ClientGuestRepository clientGuestRepository;
 
     ReservationRepository reservationRepository;
 
+    JwtBlackListRepository jwtBlackListRepository;
+
     BranchAmenityRepository branchAmenityRepository;
 
+    PaymentOptionRepository paymentOptionRepository;
+
     FavoriteBranchRepository favoriteBranchRepository;
+
+    InsiteSaleTableRepository insiteSaleTableRepository;
 
     ProductCategoryRepository productCategoryRepository;
 
     ProductSubCategoryRepository productSubCategoryRepository;
-
-    PaymentOptionRepository paymentOptionRepository;
 
     public static <T> List<T> castList(Class<? extends T> clazz, List<?> rawCollection) {
         List<T> result = new ArrayList<>(rawCollection.size());
@@ -192,61 +220,54 @@ public class TestUtils {
     }
 
     public SignupRequestDTO createSignupRequestDTO() {
-        return SignupRequestDTO.builder()
-                .email("test@test.com")
-                .password("123456789aA#$")
-                .role(UserRole.client.name())
-                .build();
+        return new SignupRequestDTO(
+                UUID.randomUUID().toString() + "@test.com",
+                UUID.randomUUID().toString(),
+                UserRole.client.name());
     }
 
     public LoginRequestDTO createLoginRequestDTO() {
-        return LoginRequestDTO.builder()
-                .email("test@test.com")
-                .password("123456789aA#$")
-                .build();
+        return new LoginRequestDTO(
+                UUID.randomUUID().toString() + "@test.com",
+                UUID.randomUUID().toString());
     }
 
     public RefreshRequestDTO createRefreshRequestDTO() {
-        return RefreshRequestDTO.builder()
-                .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
-                .build();
+        return new RefreshRequestDTO(
+                UUID.randomUUID().toString());
     }
 
     public LoginResponseDTO createLoginResponseDTO() {
-        return LoginResponseDTO.builder()
-                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
-                .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
-                .id(1L)
-                .role(UserRole.client.name())
-                .build();
+        return new LoginResponseDTO(
+                ThreadLocalRandom.current().nextLong(999999999),
+                UserRole.client.name(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString());
     }
 
     public RefreshResponseDTO createRefreshResponseDTO() {
-        return RefreshResponseDTO.builder()
-                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
-                .build();
+        return new RefreshResponseDTO(
+                UUID.randomUUID().toString());
     }
 
     public LogoutDTO createLogoutDTO() {
-        return LogoutDTO.builder()
-                .token("eyJhbGciOiJIUzI1NiJ9..._9L5L9hJXCX4WPgpks")
-                .refresh("eyJHbHJnbfjbsdfjsdf..._NV787nv_458nf83_4")
-                .build();
+        return new LogoutDTO(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString());
     }
 
     public User createUser() {
-        Role role = Role.builder()
-                .id((long) UserRole.client.ordinal())
-                .name(UserRole.client)
-                .build();
-        User user = User.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .email("test@test.com")
-                .password("123456789aA#")
-                .verified(false)
-                .loggedIn(false)
-                .role(role)
-                .build();
+        Role role = new Role(
+                (long) UserRole.client.ordinal(),
+                UserRole.client);
+        User user = new User(
+                ThreadLocalRandom.current().nextLong(999999999),
+                role,
+                UUID.randomUUID().toString() + "@test.com",
+                UUID.randomUUID().toString(),
+                false,
+                "provider_" + UUID.randomUUID().toString(),
+                "provider_id_" + UUID.randomUUID().toString());
 
         if (roleRepository != null) {
             roleRepository.save(user.getRole());
@@ -258,55 +279,26 @@ public class TestUtils {
         return user;
     }
 
-    public UserRequestDTO createUserRequestDTO(User user) {
-        if (user == null) {
-            user = createUser();
-        }
-        UserRequestDTO dto = UserRequestDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .verified(user.getVerified())
-                .loggedIn(user.getLoggedIn())
-                .role(user.getRole().getName().name())
-                .build();
-
-        return dto;
-    }
-
-    public UserResponseDTO createUserResponseDTO(User user) {
-        if (user == null) {
-            user = createUser();
-        }
-        UserResponseDTO dto = UserResponseDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .verified(user.getVerified())
-                .loggedIn(user.getLoggedIn())
-                .role(user.getRole().getName().name())
-                .build();
-
-        return dto;
-    }
-
     public Client createClient(User user) {
         if (user == null) {
             user = createUser();
         }
-        Client client = Client.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .user(user)
-                .name("test")
-                .surname("Test")
-                .stripeCustomerId("stripe_id_test")
-                .phoneNumber("+580000000")
-                .address("Test address")
-                .dateOfBirth(new java.sql.Date(System.currentTimeMillis()))
-                .identityDocument("V" + ThreadLocalRandom.current().nextLong(99999999))
-                .build();
+
+        Client client = new Client(
+                ThreadLocalRandom.current().nextLong(999999999),
+                user,
+                "name_" + UUID.randomUUID().toString().substring(0, 25),
+                "surname_" + UUID.randomUUID().toString().substring(0, 25),
+                "V" + ThreadLocalRandom.current().nextLong(999999999),
+                "address_" + UUID.randomUUID().toString(),
+                "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                "stripe_customer_id_" + UUID.randomUUID().toString(),
+                new java.util.Date(System.currentTimeMillis()));
+
         if (clientRepository != null) {
             client = clientRepository.save(client);
         }
+
         return client;
     }
 
@@ -314,18 +306,18 @@ public class TestUtils {
         if (client == null) {
             client = createClient(null);
         }
-        ClientDTO dto = ClientDTO.builder()
-                .id(client.getId())
-                .userId(client.getUser().getId())
-                .email(client.getUser().getEmail())
-                .name(client.getName())
-                .surname(client.getSurname())
-                .stripeCustomerId(client.getStripeCustomerId())
-                .phoneNumber(client.getPhoneNumber())
-                .address(client.getAddress())
-                .dateOfBirth(client.getDateOfBirth())
-                .identityDocument(client.getIdentityDocument())
-                .build();
+
+        ClientDTO dto = new ClientDTO(
+                client.getId(),
+                client.getUser().getId(),
+                client.getUser().getEmail(),
+                client.getName(),
+                client.getSurname(),
+                client.getIdentityDocument(),
+                client.getAddress(),
+                client.getPhoneNumber(),
+                client.getStripeCustomerId(),
+                client.getDateOfBirth());
 
         return dto;
     }
@@ -342,13 +334,12 @@ public class TestUtils {
             addresser = createClient(null);
         }
 
-        Friend request = Friend.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .requester(requester)
-                .addresser(addresser)
-                .accepted(accepted)
-                .rejected(rejected)
-                .build();
+        Friend request = new Friend(
+                ThreadLocalRandom.current().nextLong(999999999),
+                requester,
+                addresser,
+                accepted,
+                rejected);
 
         if (friendRepository != null) {
             request = friendRepository.save(request);
@@ -361,34 +352,34 @@ public class TestUtils {
         if (request == null) {
             request = createFriendRequest(null, null, false, false);
         }
-        FriendDTO dto = FriendDTO.builder()
-                .id(request.getId())
-                .requesterId(request.getRequester().getId())
-                .addresserId(request.getAddresser().getId())
-                .accepted(request.getAccepted())
-                .rejected(request.getRejected())
-                .build();
+
+        FriendDTO dto = new FriendDTO(
+                request.getId(),
+                request.getRequester().getId(),
+                request.getAddresser().getId(),
+                request.getAccepted(),
+                request.getRejected());
 
         return dto;
     }
 
     public Tier createTier(BusinessTier businessTier) {
-        Tier tier = Tier.builder()
-                .id((long) businessTier.ordinal())
-                .name(businessTier)
-                .reservationLimit(1)
-                .tierCost(BigDecimal.valueOf(1f))
-                .build();
+        Tier tier = new Tier(
+                (long) businessTier.ordinal(),
+                businessTier,
+                1,
+                BigDecimal.valueOf(1f));
+
         return tier;
     }
 
     public Tier createTier(BusinessTier businessTier, int reservationLimit, BigDecimal tierCost) {
-        Tier tier = Tier.builder()
-                .id((long) businessTier.ordinal())
-                .name(businessTier)
-                .reservationLimit(reservationLimit)
-                .tierCost(tierCost)
-                .build();
+        Tier tier = new Tier(
+                (long) businessTier.ordinal(),
+                businessTier,
+                reservationLimit,
+                tierCost);
+
         return tier;
     }
 
@@ -397,14 +388,13 @@ public class TestUtils {
             user = createUser();
         }
 
-        Business business = Business.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .user(user)
-                .name("Test")
-                .verified(false)
-                .tier(createTier(BusinessTier.basic))
-                .phoneNumber("test phone")
-                .build();
+        Business business = new Business(
+                ThreadLocalRandom.current().nextLong(999999999),
+                user,
+                createTier(BusinessTier.basic),
+                "name_" + UUID.randomUUID().toString(),
+                false,
+                "+58" + ThreadLocalRandom.current().nextLong(9999999));
 
         if (businessRepository != null) {
             business = businessRepository.save(business);
@@ -417,14 +407,13 @@ public class TestUtils {
             user = createUser();
         }
 
-        Business business = Business.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .user(user)
-                .name("Test")
-                .verified(false)
-                .tier(tier)
-                .phoneNumber("test phone")
-                .build();
+        Business business = new Business(
+                ThreadLocalRandom.current().nextLong(999999999),
+                user,
+                tier,
+                "name_" + UUID.randomUUID().toString(),
+                false,
+                "+58" + ThreadLocalRandom.current().nextLong(9999999));
 
         if (businessRepository != null) {
             business = businessRepository.save(business);
@@ -436,15 +425,16 @@ public class TestUtils {
         if (business == null) {
             business = createBusiness(null);
         }
-        BusinessDTO dto = BusinessDTO.builder()
-                .id(business.getId())
-                .userId(business.getUser().getId())
-                .email(business.getUser().getEmail())
-                .name(business.getName())
-                .verified(business.getVerified())
-                .tier(BusinessTier.basic.name())
-                .phoneNumber(business.getPhoneNumber())
-                .build();
+
+        BusinessDTO dto = new BusinessDTO(
+                business.getId(),
+                business.getUser().getId(),
+                business.getUser().getEmail(),
+                business.getTier().getName().name(),
+                business.getName(),
+                business.getVerified(),
+                business.getPhoneNumber());
+
         return dto;
     }
 
@@ -452,26 +442,34 @@ public class TestUtils {
         if (business == null) {
             business = createBusiness(null);
         }
-        Branch branch = Branch.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .business(business)
-                .location("location test")
-                .mapsLink("mapsLink test")
-                .name("name_test_" + UUID.randomUUID().toString())
-                .overview("overview test")
-                .score(4.0F)
-                .capacity(42)
-                .reservationPrice(BigDecimal.valueOf(37.0F))
-                .reserveOff(false)
-                .averageReserveTime(Duration.ofHours(2).plusMinutes(45))
-                .visibility(true)
-                .phoneNumber("test phone")
-                .type("test type")
-                .hourIn(LocalTime.of(8, 5, 1))
-                .hourOut(LocalTime.of(8, 5, 1))
-                .deleted(false)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
-                .build();
+
+        Branch branch = new Branch(
+                ThreadLocalRandom.current().nextLong(999999999),
+                business,
+                "name_" + UUID.randomUUID().toString(),
+                ThreadLocalRandom.current().nextFloat() * 5,
+                (short) ThreadLocalRandom.current().nextInt(1, 1000 + 1),
+                new BigDecimal(Math.random()),
+                "maps_link_" + UUID.randomUUID().toString(),
+                "location_" + UUID.randomUUID().toString(),
+                "overview_" + UUID.randomUUID().toString(),
+                true,
+                false,
+                "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                "type_" + UUID.randomUUID().toString(),
+                LocalTime.of(
+                        ThreadLocalRandom.current().nextInt(0, 23 + 1),
+                        ThreadLocalRandom.current().nextInt(0, 59 + 1),
+                        ThreadLocalRandom.current().nextInt(0, 59 + 1)),
+                LocalTime.of(
+                        ThreadLocalRandom.current().nextInt(0, 23 + 1),
+                        ThreadLocalRandom.current().nextInt(0, 59 + 1),
+                        ThreadLocalRandom.current().nextInt(0, 59 + 1)),
+                Duration.ofHours(ThreadLocalRandom.current().nextInt(0, 23 + 1))
+                        .plusMinutes(ThreadLocalRandom.current().nextInt(0, 59 + 1))
+                        .plusSeconds(ThreadLocalRandom.current().nextInt(0, 59 + 1)),
+                ThreadLocalRandom.current().nextFloat() * 100,
+                false);
 
         if (branchRepository != null) {
             branch = branchRepository.save(branch);
@@ -480,97 +478,30 @@ public class TestUtils {
         return branch;
     }
 
-    public List<Branch> createTestBranches(Business business) {
-        if (business == null) {
-            business = createBusiness(null);
-        }
-
-        List<Float> scores = new ArrayList<>();
-        scores.add(1.0F);
-        scores.add(2.0F);
-        scores.add(3.5F);
-        scores.add(4.2F);
-        scores.add(5.0F);
-
-        List<BigDecimal> reservation_prices = new ArrayList<>();
-        reservation_prices.add(BigDecimal.valueOf(2.0F));
-        reservation_prices.add(BigDecimal.valueOf(20.0F));
-        reservation_prices.add(BigDecimal.valueOf(31.0F));
-        reservation_prices.add(BigDecimal.valueOf(40.5F));
-        reservation_prices.add(BigDecimal.valueOf(49.0F));
-
-        List<String> names = new ArrayList<>();
-        names.add("name test 1");
-        names.add("name test 2");
-        names.add("name test 3");
-        names.add("name test 4");
-        names.add("name test 5");
-
-        List<Integer> capacities = new ArrayList<>();
-        capacities.add(5);
-        capacities.add(10);
-        capacities.add(15);
-        capacities.add(20);
-        capacities.add(25);
-
-        List<Branch> branches = new ArrayList<>();
-
-        // Lop through the lists and create branches
-        for (int i = 0; i < 5; i++) {
-            Branch branch = Branch.builder()
-                    .id(ThreadLocalRandom.current().nextLong(999999999))
-                    .business(business)
-                    .location("location test")
-                    .mapsLink("mapsLink test")
-                    .name(names.get(i))
-                    .overview("overview test")
-                    .score(scores.get(i))
-                    .capacity(capacities.get(i))
-                    .reservationPrice(reservation_prices.get(i))
-                    .reserveOff(false)
-                    .averageReserveTime(Duration.ofHours(2).plusMinutes(45))
-                    .visibility(true)
-                    .phoneNumber("test phone")
-                    .type("test type")
-                    .hourIn(LocalTime.of(8, 5, 1))
-                    .hourOut(LocalTime.of(8, 5, 1))
-                    .deleted(false)
-                    .dollarToLocalCurrencyExchange(BigDecimal.valueOf(1.0F))
-                    .build();
-
-            if (branchRepository != null) {
-                branch = branchRepository.save(branch);
-            }
-
-            branches.add(branch);
-        }
-
-        return branches;
-    }
-
     public BranchDTO createBranchDTO(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
         }
-        BranchDTO dto = BranchDTO.builder()
-                .id(branch.getId())
-                .businessId(branch.getBusiness().getId())
-                .location(branch.getLocation())
-                .mapsLink(branch.getMapsLink())
-                .name(branch.getName())
-                .overview(branch.getOverview())
-                .score(branch.getScore())
-                .capacity(branch.getCapacity())
-                .reservationPrice(branch.getReservationPrice())
-                .reserveOff(branch.getReserveOff())
-                .averageReserveTime(branch.getAverageReserveTime())
-                .visibility(branch.getVisibility())
-                .phoneNumber(branch.getPhoneNumber())
-                .type(branch.getType())
-                .hourIn(branch.getHourIn())
-                .hourOut(branch.getHourOut())
-                .deleted(branch.getDeleted())
-                .build();
+
+        BranchDTO dto = new BranchDTO(
+                branch.getId(),
+                branch.getBusiness().getId(),
+                branch.getName(),
+                branch.getScore(),
+                branch.getCapacity(),
+                branch.getReservationPrice(),
+                branch.getMapsLink(),
+                branch.getLocation(),
+                branch.getOverview(),
+                branch.getVisibility(),
+                branch.getReserveOff(),
+                branch.getPhoneNumber(),
+                branch.getType(),
+                branch.getHourIn(),
+                branch.getHourOut(),
+                branch.getAverageReserveTime(),
+                branch.getDollarExchange(),
+                branch.getDeleted());
 
         return dto;
     }
@@ -583,11 +514,10 @@ public class TestUtils {
             branch = createBranch(null);
         }
 
-        FavoriteBranch favoriteBranch = FavoriteBranch.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .client(client)
-                .branch(branch)
-                .build();
+        FavoriteBranch favoriteBranch = new FavoriteBranch(
+                ThreadLocalRandom.current().nextLong(999999999),
+                client,
+                branch);
 
         if (favoriteBranchRepository != null) {
             favoriteBranch = favoriteBranchRepository.save(favoriteBranch);
@@ -597,10 +527,9 @@ public class TestUtils {
     }
 
     public Amenity createAmenity() {
-        Amenity amenity = Amenity.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .name("test")
-                .build();
+        Amenity amenity = new Amenity(
+                ThreadLocalRandom.current().nextLong(999999999),
+                "name_" + UUID.randomUUID().toString());
 
         if (amenityRepository != null) {
             amenity = amenityRepository.save(amenity);
@@ -613,10 +542,10 @@ public class TestUtils {
         if (amenity == null) {
             amenity = createAmenity();
         }
-        AmenityDTO dto = AmenityDTO.builder()
-                .id(amenity.getId())
-                .name(amenity.getName())
-                .build();
+
+        AmenityDTO dto = new AmenityDTO(
+                amenity.getId(),
+                amenity.getName());
 
         return dto;
     }
@@ -629,11 +558,10 @@ public class TestUtils {
             amenity = createAmenity();
         }
 
-        BranchAmenity branchAmenity = BranchAmenity.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .amenity(amenity)
-                .build();
+        BranchAmenity branchAmenity = new BranchAmenity(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                amenity);
 
         if (branchAmenityRepository != null) {
             branchAmenity = branchAmenityRepository.save(branchAmenity);
@@ -646,14 +574,14 @@ public class TestUtils {
         if (subCategory == null) {
             subCategory = createProductSubCategory(null, null);
         }
-        Product product = Product.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .subCategory(subCategory)
-                .disabled(false)
-                .name("test_name_" + UUID.randomUUID().toString())
-                .price(BigDecimal.valueOf(10.0f))
-                .description("test description")
-                .build();
+
+        Product product = new Product(
+                ThreadLocalRandom.current().nextLong(999999999),
+                subCategory,
+                "name_" + UUID.randomUUID().toString(),
+                BigDecimal.valueOf(ThreadLocalRandom.current().nextFloat() * 100),
+                "description_" + UUID.randomUUID().toString(),
+                false);
 
         if (productRepository != null) {
             product = productRepository.save(product);
@@ -666,23 +594,22 @@ public class TestUtils {
         if (product == null) {
             product = createProduct(null);
         }
-        ProductDTO dto = ProductDTO.builder()
-                .id(product.getId())
-                .subCategoryId(product.getSubCategory().getId())
-                .disabled(product.getDisabled())
-                .name(product.getName())
-                .price(product.getPrice())
-                .description(product.getDescription())
-                .build();
+
+        ProductDTO dto = new ProductDTO(
+                product.getId(),
+                product.getSubCategory().getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getDescription(),
+                product.getDisabled());
 
         return dto;
     }
 
     public ProductCategory createProductCategory() {
-        ProductCategory category = ProductCategory.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .name("test")
-                .build();
+        ProductCategory category = new ProductCategory(
+                ThreadLocalRandom.current().nextLong(999999999),
+                "name_" + UUID.randomUUID().toString());
 
         if (productCategoryRepository != null) {
             category = productCategoryRepository.save(category);
@@ -695,10 +622,10 @@ public class TestUtils {
         if (category == null) {
             category = createProductCategory();
         }
-        ProductCategoryDTO dto = ProductCategoryDTO.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
+
+        ProductCategoryDTO dto = new ProductCategoryDTO(
+                category.getId(),
+                category.getName());
 
         return dto;
 
@@ -712,12 +639,11 @@ public class TestUtils {
             category = createProductCategory();
         }
 
-        ProductSubCategory subCategory = ProductSubCategory.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .category(category)
-                .name("test_" + UUID.randomUUID().toString())
-                .build();
+        ProductSubCategory subCategory = new ProductSubCategory(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                category,
+                "name_" + UUID.randomUUID().toString());
 
         if (productSubCategoryRepository != null) {
             subCategory = productSubCategoryRepository.save(subCategory);
@@ -730,12 +656,12 @@ public class TestUtils {
         if (subCategory == null) {
             subCategory = createProductSubCategory(null, null);
         }
-        ProductSubCategoryDTO dto = ProductSubCategoryDTO.builder()
-                .id(subCategory.getId())
-                .branchId(subCategory.getBranch().getId())
-                .categoryId(subCategory.getCategory().getId())
-                .name(subCategory.getName())
-                .build();
+
+        ProductSubCategoryDTO dto = new ProductSubCategoryDTO(
+                subCategory.getId(),
+                subCategory.getBranch().getId(),
+                subCategory.getCategory().getId(),
+                subCategory.getName());
 
         return dto;
     }
@@ -748,13 +674,12 @@ public class TestUtils {
             branch = createBranch(null);
         }
 
-        Review review = Review.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .client(client)
-                .branch(branch)
-                .text("test text")
-                .date(new Date())
-                .build();
+        Review review = new Review(
+                ThreadLocalRandom.current().nextLong(999999999),
+                client,
+                branch,
+                "text_" + UUID.randomUUID().toString(),
+                new Date(System.currentTimeMillis()));
 
         if (reviewRepository != null) {
             review = reviewRepository.save(review);
@@ -767,13 +692,14 @@ public class TestUtils {
         if (review == null) {
             review = createReview(null, null);
         }
-        ReviewDTO dto = ReviewDTO.builder()
-                .id(review.getId())
-                .clientId(review.getClient().getId())
-                .branchId(review.getBranch().getId())
-                .text(review.getText())
-                .date(review.getDate())
-                .build();
+
+        ReviewDTO dto = new ReviewDTO(
+                review.getId(),
+                review.getClient().getId(),
+                review.getBranch().getId(),
+                review.getText(),
+                review.getDate(),
+                ThreadLocalRandom.current().nextInt(0, 1001));
 
         return dto;
     }
@@ -786,11 +712,10 @@ public class TestUtils {
             review = createReview(null, null);
         }
 
-        ReviewLike like = ReviewLike.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .client(client)
-                .review(review)
-                .build();
+        ReviewLike like = new ReviewLike(
+                ThreadLocalRandom.current().nextLong(999999999),
+                review,
+                client);
 
         if (reviewLikeRepository != null) {
             like = reviewLikeRepository.save(like);
@@ -800,14 +725,13 @@ public class TestUtils {
     }
 
     public Guest createGuest() {
-        Guest guest = Guest.builder()
-                .id(ThreadLocalRandom.current().nextLong(9999999))
-                .name("name_test")
-                .surname("surname_test")
-                .email("email_test")
-                .phoneNumber("phone_number_test")
-                .identityDocument("iden_doc_test")
-                .build();
+        Guest guest = new Guest(
+                ThreadLocalRandom.current().nextLong(999999999),
+                "name_" + UUID.randomUUID().toString().substring(0, 25),
+                "surname_" + UUID.randomUUID().toString().substring(0, 25),
+                "email_" + UUID.randomUUID().toString(),
+                "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                "V" + ThreadLocalRandom.current().nextLong(999999999));
 
         if (guestRepository != null) {
             guest = guestRepository.save(guest);
@@ -820,16 +744,43 @@ public class TestUtils {
         if (guest == null) {
             guest = createGuest();
         }
-        GuestDTO dto = GuestDTO.builder()
-                .id(guest.getId())
-                .name(guest.getName())
-                .surname(guest.getSurname())
-                .email(guest.getEmail())
-                .phoneNumber(guest.getPhoneNumber())
-                .identityDocument(guest.getIdentityDocument())
-                .build();
+
+        GuestDTO dto = new GuestDTO(
+                guest.getId(),
+                guest.getName(),
+                guest.getSurname(),
+                guest.getEmail(),
+                guest.getPhoneNumber(),
+                guest.getIdentityDocument());
 
         return dto;
+    }
+
+    public Reservation createReservation(Branch branch) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+
+        Reservation reservation = new Reservation(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                null,
+                null,
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
+                new BigDecimal(Math.random()),
+                ReservationStatics.Status.PENDING,
+                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                (short) ThreadLocalRandom.current().nextInt(0, branch.getCapacity() + 1),
+                "occasion_" + UUID.randomUUID().toString(),
+                true);
+
+        if (reservationRepository != null) {
+            reservation = reservationRepository.save(reservation);
+        }
+
+        return reservation;
     }
 
     public Reservation createReservation(Branch branch, Guest guest) {
@@ -840,22 +791,20 @@ public class TestUtils {
             guest = createGuest();
         }
 
-        Reservation reservation = Reservation.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .guest(guest)
-                .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDateIn(new Date(System.currentTimeMillis()))
-                .reservationDateOut(new Date(System.currentTimeMillis()))
-                .clientNumber(5)
-                .tableNumber(2)
-                .payment("payment_test")
-                .status(0)
-                .payDate(new Date(System.currentTimeMillis()))
-                .price(BigDecimal.valueOf(5.0f))
-                .occasion("Anniversary")
-                .byClient(Boolean.TRUE)
-                .build();
+        Reservation reservation = new Reservation(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                guest,
+                null,
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
+                new BigDecimal(Math.random()),
+                ReservationStatics.Status.PENDING,
+                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                "occasion_" + UUID.randomUUID().toString(),
+                false);
 
         if (reservationRepository != null) {
             reservation = reservationRepository.save(reservation);
@@ -864,27 +813,31 @@ public class TestUtils {
         return reservation;
     }
 
-    public Reservation createReservation(Branch branch) {
+    public Reservation createReservation(Branch branch, Guest guest, Invoice invoice) {
         if (branch == null) {
             branch = createBranch(null);
         }
+        if (guest == null) {
+            guest = createGuest();
+        }
+        if (invoice == null) {
+            invoice = createInvoice();
+        }
 
-        Reservation reservation = Reservation.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .guest(null)
-                .requestDate(new Date(System.currentTimeMillis()))
-                .reservationDateIn(new Date(System.currentTimeMillis()))
-                .reservationDateOut(new Date(System.currentTimeMillis()))
-                .clientNumber(5)
-                .tableNumber(2)
-                .payment("payment_test")
-                .status(0)
-                .payDate(new Date(System.currentTimeMillis()))
-                .price(BigDecimal.valueOf(5.0f))
-                .occasion("Anniversary")
-                .byClient(Boolean.TRUE)
-                .build();
+        Reservation reservation = new Reservation(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                guest,
+                invoice,
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
+                new BigDecimal(Math.random()),
+                ReservationStatics.Status.PENDING,
+                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                "occasion_" + UUID.randomUUID().toString(),
+                false);
 
         if (reservationRepository != null) {
             reservation = reservationRepository.save(reservation);
@@ -898,30 +851,120 @@ public class TestUtils {
             reservation = createReservation(null);
         }
 
-        ReservationDTO dto = ReservationDTO.builder()
-                .id(reservation.getId())
-                .branchId(reservation.getBranch().getId())
-                .guestId(reservation.getGuest() == null ? null : reservation.getGuest().getId())
-                .requestDate(reservation.getRequestDate())
-                .reservationDateIn(reservation.getReservationDateIn())
-                .reservationDateOut(reservation.getReservationDateOut())
-                .clientNumber(reservation.getClientNumber())
-                .tableNumber(reservation.getTableNumber())
-                .payment(reservation.getPayment())
-                .status(reservation.getStatus())
-                .payDate(reservation.getPayDate())
-                .price(reservation.getPrice())
-                .occasion(reservation.getOccasion())
-                .byClient(reservation.getByClient())
-                .haveGuest(reservation.getGuest() != null)
-                .name(reservation.getGuest() == null ? null : reservation.getGuest().getName())
-                .surname(reservation.getGuest() == null ? null : reservation.getGuest().getSurname())
-                .email(reservation.getGuest() == null ? null : reservation.getGuest().getEmail())
-                .phoneNumber(reservation.getGuest() == null ? null : reservation.getGuest().getPhoneNumber())
-                .identityDocument(reservation.getGuest() == null ? null : reservation.getGuest().getIdentityDocument())
-                .build();
+        ReservationDTO dto = new ReservationDTO(
+                reservation.getId(),
+                reservation.getBranch().getId(),
+                reservation.getGuest() != null ? reservation.getGuest().getId() : null,
+                reservation.getInvoice() != null ? reservation.getInvoice().getId() : null,
+                reservation.getRequestDate(),
+                reservation.getReservationDateIn(),
+                reservation.getReservationDateOut(),
+                reservation.getPrice(),
+                reservation.getStatus(),
+                reservation.getTableNumber(),
+                reservation.getClientNumber(),
+                reservation.getOccasion(),
+                reservation.getByClient());
 
         return dto;
+    }
+
+    public List<Reservation> createTestReservations(
+            List<Branch> branches,
+            Date minDate,
+            Date maxDate,
+            List<String> names,
+            List<String> surnames,
+            List<String> identityDocuments) {
+        Random rand = new Random();
+
+        // Create random guests
+        List<Guest> guests = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Guest guest = new Guest(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    "email_test_" + UUID.randomUUID().toString(),
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10));
+            if (guestRepository != null) {
+                guest = guestRepository.save(guest);
+            }
+            guests.add(guest);
+        }
+
+        // Create random clients
+        List<Client> clients = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            User user = createUser();
+            Client client = new Client(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    user,
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10),
+                    "address_test_" + UUID.randomUUID().toString(),
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                    "stripe_id_test_" + UUID.randomUUID().toString(),
+                    new Date(System.currentTimeMillis()));
+            if (clientRepository != null) {
+                client = clientRepository.save(client);
+            }
+            clients.add(client);
+        }
+
+        // Create random reservations
+        List<Reservation> reservations = new ArrayList<>();
+        for (int i = 0; i < 5000; i++) {
+            Date date = new Date(ThreadLocalRandom.current().nextLong(
+                    minDate.getTime(),
+                    maxDate.getTime()));
+            Reservation reservation = new Reservation(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    branches.get(rand.nextInt(branches.size())),
+                    null,
+                    null,
+                    new Date(System.currentTimeMillis()),
+                    date,
+                    new Date(date.getTime() + 1000 * 60 * 60),
+                    BigDecimal.valueOf(5.0f),
+                    ReservationStatics.Status.ALL.get(rand.nextInt(ReservationStatics.Status.ALL.size())),
+                    Short.valueOf("1"),
+                    Short.valueOf("5"),
+                    "occasion_test_" + UUID.randomUUID().toString(),
+                    Boolean.TRUE);
+
+            if (rand.nextDouble() < 0.5) {
+                // Reservation with guest
+                reservation.setGuest(guests.get(rand.nextInt(guests.size())));
+                reservation.setByClient(Boolean.FALSE);
+
+                if (reservationRepository != null) {
+                    reservation = reservationRepository.save(reservation);
+                }
+            } else {
+                if (reservationRepository != null) {
+                    reservation = reservationRepository.save(reservation);
+                }
+
+                // Reservation with client
+                ClientGroup owner = new ClientGroup(
+                        ThreadLocalRandom.current().nextLong(999999999),
+                        clients.get(rand.nextInt(clients.size())),
+                        reservation,
+                        true);
+                if (clientGroupRepository != null) {
+                    owner = clientGroupRepository.save(owner);
+                }
+            }
+
+            reservations.add(reservation);
+        }
+
+        return reservations;
     }
 
     public Promotion createPromotion(Branch branch) {
@@ -929,12 +972,11 @@ public class TestUtils {
             branch = createBranch(null);
         }
 
-        Promotion promotion = Promotion.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .disabled(false)
-                .text("text test")
-                .build();
+        Promotion promotion = new Promotion(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                "text_" + UUID.randomUUID().toString(),
+                false);
 
         if (promotionRepository != null) {
             promotion = promotionRepository.save(promotion);
@@ -948,12 +990,12 @@ public class TestUtils {
             promotion = createPromotion(null);
         }
 
-        PromotionDTO dto = PromotionDTO.builder()
-                .id(promotion.getId())
-                .branchId(promotion.getBranch().getId())
-                .disabled(promotion.getDisabled())
-                .text(promotion.getText())
-                .build();
+        PromotionDTO dto = new PromotionDTO(
+                promotion.getId(),
+                promotion.getBranch().getId(),
+                promotion.getText(),
+                promotion.getDisabled());
+
         return dto;
     }
 
@@ -964,13 +1006,12 @@ public class TestUtils {
         if (reservation == null) {
             reservation = createReservation(null);
         }
-        ClientGroup clientGroup = ClientGroup.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .client(client)
-                .reservation(reservation)
-                .name("Community")
-                .isOwner(true)
-                .build();
+
+        ClientGroup clientGroup = new ClientGroup(
+                ThreadLocalRandom.current().nextLong(999999999),
+                client,
+                reservation,
+                true);
 
         if (clientGroupRepository != null) {
             clientGroup = clientGroupRepository.save(clientGroup);
@@ -978,97 +1019,66 @@ public class TestUtils {
         return clientGroup;
     }
 
-    public ReservationPaymentDTO createReservationPaymentDTO(String paymentCode) {
-        if (paymentCode == null) {
-            paymentCode = "paymentCode69";
+    public ClientGroup createClientGroup(Client client, Reservation reservation, Boolean owner) {
+        if (client == null) {
+            client = createClient(null);
         }
-        ReservationPaymentDTO dto = ReservationPaymentDTO.builder()
-                .paymentCode(paymentCode)
-                .build();
-        return dto;
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        ClientGroup clientGroup = new ClientGroup(
+                ThreadLocalRandom.current().nextLong(999999999),
+                client,
+                reservation,
+                owner);
+
+        if (clientGroupRepository != null) {
+            clientGroup = clientGroupRepository.save(clientGroup);
+        }
+        return clientGroup;
     }
 
-    public List<Reservation> createTestReservations(Branch branch_1,
-            Branch branch_2,
-            Date date_1,
-            Date date_2) {
-        /*
-         * Creates test reservations for testing the ReservationService
-         * It creates two branches, two dates, and 10 reservations for each branch and
-         * date
-         */
-        //
-        List<Reservation> reservations = new ArrayList<>();
+    public Tax createTax() {
+        Tax tax = new Tax(
+                ThreadLocalRandom.current().nextLong(999999999),
+                TaxStatics.Types.PERCENTAGE,
+                "name_" + UUID.randomUUID().toString(),
+                ThreadLocalRandom.current().nextFloat() * 100);
 
-        for (int i = 0; i < 20; i++) {
-            Branch branch;
-            Date date;
-            if (i % 2 == 0) {
-                branch = branch_1;
-                date = date_1;
-            } else {
-                branch = branch_2;
-                date = date_2;
-            }
-            Reservation reservation = Reservation.builder()
-                    .id(ThreadLocalRandom.current().nextLong(999999999))
-                    .branch(branch)
-                    .guest(null)
-                    .requestDate(new Date(System.currentTimeMillis()))
-                    .reservationDateIn(date)
-                    .reservationDateOut(date)
-                    .clientNumber(5)
-                    .tableNumber(2)
-                    .payment("payment_test")
-                    .status(0)
-                    .payDate(new Date(System.currentTimeMillis()))
-                    .price(BigDecimal.valueOf(5.0f))
-                    .occasion("Anniversary")
-                    .byClient(Boolean.TRUE)
-                    .build();
-
-            if (branchRepository != null) {
-                reservation = reservationRepository.save(reservation);
-            }
-
-            reservations.add(reservation);
+        if (taxRepository != null) {
+            tax = taxRepository.save(tax);
         }
-
-        return reservations;
-    }
-
-    // Create a new Tax
-    public Tax createTax(Sale sale) {
-
-        if (sale == null) {
-            sale = createSale(null, null, null);
-        }
-
-        Tax tax = Tax.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .sale(sale)
-                .name("Tax")
-                .type(TaxStatics.Types.PERCENTAGE)
-                .value(50.f)
-                .build();
 
         return tax;
     }
 
-    // Create a new DefaultTax
-    public DefaultTax createDefaultTax(Branch branch) {
+    public TaxDTO createTaxDTO(Tax tax) {
+        if (tax == null) {
+            tax = createTax();
+        }
 
-        // If the branch is null, create a new one
+        TaxDTO dto = new TaxDTO(
+                tax.getId(),
+                tax.getType(),
+                tax.getName(),
+                tax.getValue());
+
+        return dto;
+    }
+
+    public DefaultTax createDefaultTax(Tax tax, Branch branch) {
+        if (tax == null) {
+            tax = createTax();
+        }
         if (branch == null) {
             branch = createBranch(null);
         }
 
-        DefaultTax defaultTax = DefaultTax.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .name("Default Tax")
-                .type(DefaultTaxStatics.Types.PERCENTAGE)
-                .build();
+        DefaultTax defaultTax = new DefaultTax(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                tax);
 
         if (defaultTaxRepository != null) {
             defaultTax = defaultTaxRepository.save(defaultTax);
@@ -1077,17 +1087,28 @@ public class TestUtils {
         return defaultTax;
     }
 
+    public DefaultTaxDTO createDefaultTaxDTO(DefaultTax defaultTax) {
+        if (defaultTax == null) {
+            defaultTax = createDefaultTax(null, null);
+        }
+
+        DefaultTaxDTO dto = new DefaultTaxDTO(
+                defaultTax.getId(),
+                defaultTax.getBranch().getId(),
+                createTaxDTO(defaultTax.getTax()));
+
+        return dto;
+    }
+
     public Table createTable(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
         }
 
-        Table table = Table.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .name("Table_" + UUID.randomUUID().toString())
-                .deleted(false)
-                .build();
+        Table table = new Table(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                "Table_" + UUID.randomUUID().toString());
 
         if (tableRepository != null) {
             table = tableRepository.save(table);
@@ -1096,17 +1117,30 @@ public class TestUtils {
         return table;
     }
 
-    public PaymentOption createPaymentOption(Branch branch){
+    public TableDTO createTableDTO(Table table) {
+        if (table == null) {
+            table = createTable(null);
+        }
+
+        TableDTO dto = new TableDTO(
+                table.getId(),
+                table.getBranch().getId(),
+                table.getName());
+
+        return dto;
+    }
+
+    public PaymentOption createPaymentOption(Branch branch) {
         if (branch == null) {
             branch = createBranch(null);
         }
 
-        PaymentOption paymentOption = PaymentOption.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branch(branch)
-                .name("PaymentOption_" + UUID.randomUUID().toString())
-                .build();
-        
+        PaymentOption paymentOption = new PaymentOption(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                "name_" + UUID.randomUUID().toString(),
+                "description_" + UUID.randomUUID().toString());
+
         if (paymentOptionRepository != null) {
             paymentOption = paymentOptionRepository.save(paymentOption);
         }
@@ -1114,56 +1148,85 @@ public class TestUtils {
         return paymentOption;
     }
 
-    public Sale createSale(Table table, Reservation reservation, PaymentOption paymentOption) {
-
-        // If the table is null, create a new one
-        if (table == null) {
-            table = createTable(null);
-        }
-
-        // If the reservation is null, create a new one
-        if (reservation == null) {
-            reservation = createReservation(null);
-        }
-
+    public PaymentOptionDTO createPaymentOptionDTO(PaymentOption paymentOption) {
         if (paymentOption == null) {
             paymentOption = createPaymentOption(null);
         }
 
-        Sale sale = Sale.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .table(table)
-                .tableName(table.getName())
-                .startTime(new Date(System.currentTimeMillis()))
-                .status(SaleStatics.Status.ongoing)
-                .clientQuantity(ThreadLocalRandom.current().nextInt(1, 10))
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(1, 10)))
-                .reservation(reservation)
-                .build();
+        PaymentOptionDTO dto = new PaymentOptionDTO(
+                paymentOption.getId(),
+                paymentOption.getBranch().getId(),
+                paymentOption.getName(),
+                paymentOption.getDescription());
+
+        return dto;
+    }
+
+    public Sale createSale(Branch branch, ClientGuest clientGuest, Invoice invoice) {
+        if (branch == null) {
+            branch = createBranch(null);
+        }
+        if (clientGuest == null) {
+            clientGuest = createClientGuest((Client) null);
+        }
+        if (invoice == null) {
+            invoice = createInvoice();
+        }
+
+        Sale sale = new Sale(
+                ThreadLocalRandom.current().nextLong(999999999),
+                branch,
+                clientGuest,
+                invoice,
+                (short) ThreadLocalRandom.current().nextInt(0, 1001),
+                SaleStatics.Status.ONGOING,
+                new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60),
+                ThreadLocalRandom.current().nextFloat() * 100,
+                "note_" + UUID.randomUUID().toString());
 
         if (saleRepository != null) {
             sale = saleRepository.save(sale);
         }
+
         return sale;
+    }
+
+    public SaleDTO createSaleDTO(Sale sale) {
+        if (sale == null) {
+            sale = createSale(null, null, null);
+        }
+
+        SaleDTO dto = new SaleDTO(
+                sale.getId(),
+                sale.getBranch().getId(),
+                sale.getClientGuest() != null ? sale.getClientGuest().getId() : null,
+                sale.getInvoice() != null ? sale.getInvoice().getId() : null,
+                sale.getClientQuantity(),
+                sale.getStatus(),
+                sale.getStartTime(),
+                sale.getEndTime(),
+                sale.getDollarExchange(),
+                sale.getNote());
+
+        return dto;
     }
 
     public SaleProduct createSaleProduct(Sale sale, Product product) {
         if (sale == null) {
             sale = createSale(null, null, null);
         }
-
         if (product == null) {
             product = createProduct(null);
         }
 
-        SaleProduct saleProduct = SaleProduct.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .sale(sale)
-                .name(product.getName())
-                .price(BigDecimal.valueOf(5.0f))
-                .amount(5)
-                .product(product)
-                .build();
+        SaleProduct saleProduct = new SaleProduct(
+                ThreadLocalRandom.current().nextLong(999999999),
+                sale,
+                product,
+                "name_" + UUID.randomUUID().toString(),
+                ThreadLocalRandom.current().nextInt(0, 1001),
+                BigDecimal.valueOf(ThreadLocalRandom.current().nextFloat() * 100));
 
         if (saleProductRepository != null) {
             saleProduct = saleProductRepository.save(saleProduct);
@@ -1172,351 +1235,266 @@ public class TestUtils {
         return saleProduct;
     }
 
-    public SaleDTO createSaleDTO(Table table, Reservation reservation) {
-
-        // If the table is null, create a new one
-        if (table == null) {
-            table = createTable(null);
+    public SaleProductDTO createSaleProductDTO(SaleProduct saleProduct) {
+        if (saleProduct == null) {
+            saleProduct = createSaleProduct(null, null);
         }
 
-        // If the reservation is null, create a new one
-        if (reservation == null) {
-            reservation = createReservation(null);
-        }
-
-        SaleDTO dto = SaleDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .tableId(table.getId())
-                .tableName(table.getName())
-                .startTime(new Date(System.currentTimeMillis()))
-                .status(SaleStatics.Status.ongoing)
-                .reservationId(reservation.getId())
-                .build();
+        SaleProductDTO dto = new SaleProductDTO(
+                saleProduct.getId(),
+                saleProduct.getSale().getId(),
+                saleProduct.getProduct().getId(),
+                saleProduct.getName(),
+                saleProduct.getAmount(),
+                saleProduct.getPrice());
 
         return dto;
     }
 
-    public SaleProductDTO createSaleProductDTO(Sale sale, Product product) {
-        if (sale == null) {
-            sale = createSale(null, null, null);
+    public List<Sale> createTestSales(
+            List<Branch> branches,
+            Date minDate,
+            Date maxDate,
+            List<String> names,
+            List<String> surnames,
+            List<String> identityDocuments) {
+        Random rand = new Random();
+
+        // Create random guests
+        List<Guest> guests = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Guest guest = new Guest(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    "email_test_" + UUID.randomUUID().toString(),
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10));
+            if (guestRepository != null) {
+                guest = guestRepository.save(guest);
+            }
+            guests.add(guest);
         }
 
-        if (product == null) {
-            product = createProduct(null);
+        // Create random clients
+        List<Client> clients = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            User user = createUser();
+            Client client = new Client(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    user,
+                    names.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    surnames.get(rand.nextInt(names.size())) + UUID.randomUUID().toString().substring(0, 25),
+                    identityDocuments.get(rand.nextInt(identityDocuments.size()))
+                            + UUID.randomUUID().toString().substring(0, 10),
+                    "address_test_" + UUID.randomUUID().toString(),
+                    "+58" + ThreadLocalRandom.current().nextLong(9999999),
+                    "stripe_id_test_" + UUID.randomUUID().toString(),
+                    new Date(System.currentTimeMillis()));
+            if (clientRepository != null) {
+                client = clientRepository.save(client);
+            }
+            clients.add(client);
         }
 
-        SaleProductDTO dto = SaleProductDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .saleId(sale.getId())
-                .name(product.getName())
-                .price(BigDecimal.valueOf(5.0f))
-                .amount(5)
-                .productId(product.getId())
-                .build();
-
-        return dto;
-    }
-
-    public TableDTO createTableDTO(Branch branch) {
-        if (branch == null) {
-            branch = createBranch(null);
-        }
-
-        TableDTO dto = TableDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branchId(branch.getId())
-                .name("Table 1")
-                .deleted(false)
-                .build();
-
-        return dto;
-    }
-
-    public PaymentOptionDTO createPaymentOptionDTO(Branch branch){
-        if (branch == null) {
-            branch = createBranch(null);
-        }
-
-        PaymentOptionDTO dto = PaymentOptionDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branchId(branch.getId())
-                .name("PaymentOption 1")
-                .build();
-
-        return dto;
-    }
-
-    public DefaultTaxDTO createDefaultTaxDTO(Branch branch) {
-
-        // If the branch is null, create a new one
-        if (branch == null) {
-            branch = createBranch(null);
-        }
-
-        DefaultTaxDTO dto = DefaultTaxDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .branchId(branch.getId())
-                .name("Default Tax")
-                .type(DefaultTaxStatics.Types.PERCENTAGE)
-                .value(5.0f)
-                .build();
-
-        return dto;
-    }
-
-    public TaxDTO createTaxDTO(Sale sale) {
-
-        // If the branch is null, create a new one
-        if (sale == null) {
-            sale = createSale(null, null, null);
-        }
-
-        TaxDTO dto = TaxDTO.builder()
-                .id(ThreadLocalRandom.current().nextLong(999999999))
-                .saleId(sale.getId())
-                .name("Tax")
-                .type(TaxStatics.Types.PERCENTAGE)
-                .value(5.0f)
-                .build();
-
-        return dto;
-    }
-
-    public List<Sale> createTestSales(Branch branchA, Branch branchB) {
-        // Create reservations
-        Reservation reservationA1 = createReservation(branchA, null);
-        Reservation reservationA2 = createReservation(branchA);
-
-        // Create three tables in branchA
-        Table tableAA = createTable(branchA);
-        Table tableAB = createTable(branchA);
-        Table tableAC = createTable(branchA);
-
-        // Create two tables in branchB
-        Table tableBA = createTable(branchB);
-        Table tableBB = createTable(branchB);
-
-        Calendar calendar = Calendar.getInstance();
-        // Get now
-        Date now = calendar.getTime();
-        // Get an hour after now
-        calendar.add(Calendar.HOUR_OF_DAY, 1);
-        Date oneHourAfterNow = calendar.getTime();
-        // Get two hours after now
-        calendar.add(Calendar.HOUR_OF_DAY, 1);
-        Date twoHoursAfterNow = calendar.getTime();
-        // Get two hours before now
-        calendar.add(Calendar.HOUR_OF_DAY, -4);
-        Date twoHoursBeforeNow = calendar.getTime();
-        // Get four hours before now
-        calendar.add(Calendar.HOUR_OF_DAY, -2);
-        Date fourHoursBeforeNow = calendar.getTime();
-
-        // For each table create a sale
-        // Have the sales vary status and time
-        // If the sales status is ongoing then the endTime nowtus is closed then the
-        // endTime now status is cancelled then the endTime now
-        Sale saleAA1 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .note("Nota de prueba 1")
-                .startTime(fourHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(reservationA1)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableAA.getName())
-                .build();
-        Sale saleAA2 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .note("Nota de prueba 2")
-                .startTime(twoHoursBeforeNow)
-                .endTime(now)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.cancelled)
-                .reservation(reservationA2)
-                .tableName(tableAA.getName())
-                .build();
-
-        Sale saleAA3 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(reservationA1)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableAA.getName())
-                .endTime(oneHourAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-
-        Sale saleAA4 = Sale.builder()
-                .table(tableAA)
-                .tableName(tableAA.getName())
-                .startTime(fourHoursBeforeNow)
-                .note("Nota de prueba 4")
-                .reservation(null)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.cancelled)
-                .tableName(tableAA.getName())
-                .endTime(oneHourAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-        // Now do the rest of the tables
-        // TableAB
-        Sale saleAB1 = Sale.builder()
-                .table(tableAB)
-                .tableName(tableAB.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableAB.getName())
-                .build();
-        Sale saleAB2 = Sale.builder()
-                .table(tableAB)
-                .tableName(tableAB.getName())
-                .note("Nota de prueba 2")
-                .startTime(fourHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.ongoing)
-                .reservation(null)
-                .tableName(tableAB.getName())
-                .build();
-
-        Sale saleAB3 = Sale.builder()
-                .table(tableAB)
-                .tableName(tableAB.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(reservationA1)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableAB.getName())
-                .endTime(twoHoursAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-
-        // TableAC
-        Sale saleAC1 = Sale.builder()
-                .table(tableAC)
-                .tableName(tableAC.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(reservationA2)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableAC.getName())
-                .build();
-
-        Sale saleAC2 = Sale.builder()
-                .table(tableAC)
-                .tableName(tableAC.getName())
-                .note("Nota de prueba 2")
-                .startTime(twoHoursBeforeNow)
-                .endTime(now)
-                .clientQuantity(3)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.closed)
-                .reservation(reservationA1)
-                .tableName(tableAC.getName())
-                .build();
-
-        Sale saleAC3 = Sale.builder()
-                .table(tableAC)
-                .tableName(tableAC.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(reservationA2)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableAC.getName())
-                .endTime(oneHourAfterNow)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-
-        // TableBA
-        Sale saleBA1 = Sale.builder()
-                .table(tableBA)
-                .tableName(tableBA.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableBA.getName())
-                .build();
-
-        Sale saleBA2 = Sale.builder()
-                .table(tableBA)
-                .tableName(tableBA.getName())
-                .note("Nota de prueba 2")
-                .startTime(fourHoursBeforeNow)
-                .endTime(now)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(23.0))
-                .status(SaleStatics.Status.cancelled)
-                .reservation(null)
-                .tableName(tableBA.getName())
-                .build();
-
-        Sale saleBA3 = Sale.builder()
-                .table(tableBA)
-                .tableName(tableBA.getName())
-                .startTime(twoHoursBeforeNow)
-                .note("Nota de prueba 3")
-                .reservation(null)
-                .clientQuantity(2)
-                .status(SaleStatics.Status.closed)
-                .tableName(tableBA.getName())
-                .endTime(now)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(25.0))
-                .build();
-        // TableBB
-
-        Sale saleBB1 = Sale.builder()
-                .table(tableBB)
-                .tableName(tableBB.getName())
-                .note("Nota de prueba 1")
-                .startTime(twoHoursBeforeNow)
-                .clientQuantity(2)
-                .dollarToLocalCurrencyExchange(BigDecimal.valueOf(20.0))
-                .reservation(null)
-                .status(SaleStatics.Status.ongoing)
-                .tableName(tableBB.getName())
-                .build();
-
-        // Now create a list of sales
+        // Create random sales
         List<Sale> sales = new ArrayList<>();
-        sales.add(saleAA1);
-        sales.add(saleAA2);
-        sales.add(saleAA3);
-        sales.add(saleAA4);
-        sales.add(saleAB1);
-        sales.add(saleAB2);
-        sales.add(saleAB3);
-        sales.add(saleAC1);
-        sales.add(saleAC2);
-        sales.add(saleAC3);
-        sales.add(saleBA1);
-        sales.add(saleBA2);
-        sales.add(saleBA3);
-        sales.add(saleBB1);
+        for (int i = 0; i < 5000; i++) {
+            Date date = new Date(ThreadLocalRandom.current().nextLong(
+                    minDate.getTime(),
+                    maxDate.getTime()));
+            Sale sale = new Sale(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    branches.get(rand.nextInt(branches.size())),
+                    null,
+                    null,
+                    Short.valueOf("1"),
+                    SaleStatics.Status.ALL.get(rand.nextInt(SaleStatics.Status.ALL.size())),
+                    date,
+                    new Date(date.getTime() + 1000 * 60 * 60),
+                    1.0F,
+                    "note_test_" + UUID.randomUUID().toString());
 
-        // Now save the sales
-        for (Sale sale : sales) {
-            saleRepository.save(sale);
+            ClientGuest clientGuest = new ClientGuest(
+                    ThreadLocalRandom.current().nextLong(999999999),
+                    null,
+                    null,
+                    null);
+            if (rand.nextDouble() < 0.5) {
+                // Sale with guest
+                clientGuest.setGuest(guests.get(rand.nextInt(guests.size())));
+                clientGuest.setHaveGuest(Boolean.TRUE);
+            } else {
+                // Sale with client
+                clientGuest.setClient(clients.get(rand.nextInt(clients.size())));
+                clientGuest.setHaveGuest(Boolean.FALSE);
+            }
+
+            if (clientGuestRepository != null) {
+                clientGuest = clientGuestRepository.save(clientGuest);
+            }
+            sale.setClientGuest(clientGuest);
+            if (saleRepository != null) {
+                sale = saleRepository.save(sale);
+            }
+            sales.add(sale);
         }
 
         return sales;
     }
 
+    public Invoice createInvoice() {
+        Invoice invoice = new Invoice(
+                ThreadLocalRandom.current().nextLong(999999999),
+                new Date(System.currentTimeMillis()),
+                BigDecimal.valueOf(10.0f),
+                "payment test",
+                UUID.randomUUID().toString());
+
+        if (invoiceRepository != null) {
+            invoice = invoiceRepository.save(invoice);
+        }
+        return invoice;
+    }
+
+    public InvoiceDTO createInvoiceDTO(Invoice invoice) {
+        if (invoice == null) {
+            invoice = createInvoice();
+        }
+
+        InvoiceDTO dto = new InvoiceDTO(
+                invoice.getId(),
+                invoice.getPayDate(),
+                invoice.getPrice(),
+                invoice.getPayment(),
+                invoice.getPaymentCode());
+
+        return dto;
+    }
+
+    public ClientGuest createClientGuest(Client client) {
+        if (client == null) {
+            client = createClient(null);
+        }
+
+        ClientGuest clientGuest = new ClientGuest(
+                ThreadLocalRandom.current().nextLong(999999999),
+                client,
+                null,
+                false);
+
+        if (clientGuestRepository != null) {
+            clientGuest = clientGuestRepository.save(clientGuest);
+        }
+
+        return clientGuest;
+    }
+
+    public ClientGuest createClientGuest(Guest guest) {
+        if (guest == null) {
+            guest = createGuest();
+        }
+
+        ClientGuest clientGuest = new ClientGuest(
+                ThreadLocalRandom.current().nextLong(999999999),
+                null,
+                guest,
+                true);
+
+        if (clientGuestRepository != null) {
+            clientGuest = clientGuestRepository.save(clientGuest);
+        }
+
+        return clientGuest;
+    }
+
+    public InsiteSale createInsiteSale(Sale sale, Reservation reservation) {
+        if (sale == null) {
+            sale = createSale(null, null, null);
+        }
+        if (reservation == null) {
+            reservation = createReservation(null);
+        }
+
+        InsiteSale insiteSale = new InsiteSale(
+                ThreadLocalRandom.current().nextLong(999999999),
+                sale,
+                reservation);
+
+        if (insiteSaleRepository != null) {
+            insiteSale = insiteSaleRepository.save(insiteSale);
+        }
+
+        return insiteSale;
+    }
+
+    public InsiteSaleTable createInsiteSaleTable(InsiteSale sale, Table table) {
+        if (sale == null) {
+            sale = createInsiteSale(null, null);
+        }
+        if (table == null) {
+            table = createTable(null);
+        }
+
+        InsiteSaleTable insiteSaleTable = new InsiteSaleTable(
+                ThreadLocalRandom.current().nextLong(999999999),
+                sale,
+                table);
+
+        if (insiteSaleTableRepository != null) {
+            insiteSaleTable = insiteSaleTableRepository.save(insiteSaleTable);
+        }
+
+        return insiteSaleTable;
+    }
+
+    public SaleTax createSaleTax(Sale sale, Tax tax) {
+        if (sale == null) {
+            sale = createSale(null, null, null);
+        }
+        if (tax == null) {
+            tax = createTax();
+        }
+
+        SaleTax saleTax = new SaleTax(
+                ThreadLocalRandom.current().nextLong(999999999),
+                sale,
+                tax);
+
+        if (saleTaxRepository != null) {
+            saleTax = saleTaxRepository.save(saleTax);
+        }
+
+        return saleTax;
+    }
+
+    public SaleTaxDTO createSaleTaxDTO(SaleTax saleTax) {
+        if (saleTax == null) {
+            saleTax = createSaleTax(null, null);
+        }
+
+        SaleTaxDTO dto = new SaleTaxDTO(
+                saleTax.getId(),
+                saleTax.getSale().getId(),
+                createTaxDTO(saleTax.getTax()));
+
+        return dto;
+    }
+
+    public OnlineSale createOnlineSale(Sale sale) {
+        if (sale == null) {
+            sale = createSale(null, null, null);
+        }
+
+        OnlineSale onlineSale = new OnlineSale(
+                ThreadLocalRandom.current().nextLong(999999999),
+                sale);
+
+        if (onlineSaleRepository != null) {
+            onlineSale = onlineSaleRepository.save(onlineSale);
+        }
+
+        return onlineSale;
+    }
 }

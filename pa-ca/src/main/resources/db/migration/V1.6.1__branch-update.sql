@@ -1,4 +1,0 @@
--- -- Date: 2023-05-14
-
-ALTER TABLE branch ADD COLUMN phone_number VARCHAR(20);
-ALTER TABLE branch ADD COLUMN "type" VARCHAR(64);

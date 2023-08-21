@@ -1,34 +1,16 @@
 package com.paca.paca.auth;
 
-import com.paca.paca.PacaTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
+
+import com.paca.paca.RepositoryTest;
 import com.paca.paca.auth.model.JwtBlackList;
-import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import com.paca.paca.auth.repository.JwtBlackListRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@DataJpaTest
-@Testcontainers
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class AuthRepositoryTest extends PacaTest {
-
-    @Autowired
-    private JwtBlackListRepository jwtBlackListRepository;
-
-    @AfterEach
-    void restoreTest() {
-        jwtBlackListRepository.deleteAll();
-    }
+public class AuthRepositoryTest extends RepositoryTest {
 
     @Test
     void shouldCheckThatJwtExistsByToken() {

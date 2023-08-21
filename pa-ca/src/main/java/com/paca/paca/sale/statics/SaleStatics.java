@@ -1,28 +1,24 @@
 package com.paca.paca.sale.statics;
 
+import java.util.List;
+import java.util.Arrays;
+
 public interface SaleStatics {
 
     interface Endpoint {
         String PATH = "/api/v1/sale";
 
         String SAVE = "";
-    }
-
-    interface SaleSortingKeys {
-        String ENDTIME = "endTime";
-        String STARTTIME = "startTime";
-
-        static boolean contains(String sorting_key) {
-            return sorting_key.equals(ENDTIME) ||
-                    sorting_key.equals(STARTTIME);
-        }
+        String UPDATE = "/{id}";
+        String DELETE = "/{id}";
+        String CLEAR = "/{id}/clear";
     }
 
     interface Status {
-        Integer canceled = 0;
-        Integer cancelled = 0;
-        Integer ongoing = 1;
-        Integer closed = 2;    
+        Short CANCELLED = 0;
+        Short ONGOING = 1;
+        Short CLOSED = 2;
+
+        List<Short> ALL = Arrays.asList(CANCELLED, ONGOING, CLOSED);
     }
 }
-

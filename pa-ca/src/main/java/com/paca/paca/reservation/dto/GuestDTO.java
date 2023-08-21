@@ -1,14 +1,11 @@
 package com.paca.paca.reservation.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class GuestDTO {
@@ -19,15 +16,4 @@ public class GuestDTO {
     private String email;
     private String phoneNumber;
     private String identityDocument;
-
-
-    public static GuestDTO fromReservationDTO(ReservationDTO dto) {
-        return GuestDTO.builder()
-                .name(dto.getName())
-                .surname(dto.getSurname())
-                .email(dto.getEmail())
-                .phoneNumber(dto.getPhoneNumber())
-                .identityDocument(dto.getIdentityDocument())
-                .build();
-    }
 }

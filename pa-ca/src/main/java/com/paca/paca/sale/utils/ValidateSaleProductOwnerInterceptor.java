@@ -1,6 +1,5 @@
 package com.paca.paca.sale.utils;
 
-
 import java.util.Map;
 import java.lang.reflect.Method;
 import java.lang.annotation.Target;
@@ -63,7 +62,7 @@ public class ValidateSaleProductOwnerInterceptor implements HandlerInterceptor {
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long saleProductId = Long.parseLong((String) pathVariables.get("id"));
 
-            if (!saleProductRepository.existsByIdAndSale_Table_Branch_Business_Id(saleProductId, business.getId())) {
+            if (!saleProductRepository.existsByIdAndSale_Branch_Business_Id(saleProductId, business.getId())) {
                 throw new ForbiddenException("Unauthorized access for this operation");
             }
         }
