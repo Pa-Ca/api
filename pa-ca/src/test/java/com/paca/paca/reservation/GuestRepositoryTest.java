@@ -28,4 +28,38 @@ class GuestRepositoryTest extends RepositoryTest {
         assertThat(expectedGuest.isEmpty()).isTrue();
     }
 
+    @Test
+    void shouldCheckThatGuestExistsByEmail() {
+        Guest guest = utils.createGuest();
+
+        Optional<Guest> expectedGuest = guestRepository.findByEmail(guest.getEmail());
+
+        assertThat(expectedGuest.isPresent()).isTrue();
+        assertThat(expectedGuest.get()).isEqualTo(guest);
+    }
+
+    @Test
+    void shouldCheckThatGuestDoesNotExistsByEmail() {
+        Optional<Guest> expectedGuest = guestRepository.findByEmail("@gmail.com");
+
+        assertThat(expectedGuest.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldCheckThatGuestExistsByPhoneNumber() {
+        Guest guest = utils.createGuest();
+
+        Optional<Guest> expectedGuest = guestRepository.findByPhoneNumber(guest.getPhoneNumber());
+
+        assertThat(expectedGuest.isPresent()).isTrue();
+        assertThat(expectedGuest.get()).isEqualTo(guest);
+    }
+
+    @Test
+    void shouldCheckThatGuestDoesNotExistsByPhoneNumber() {
+        Optional<Guest> expectedGuest = guestRepository.findByPhoneNumber("+58");
+
+        assertThat(expectedGuest.isEmpty()).isTrue();
+    }
+
 }

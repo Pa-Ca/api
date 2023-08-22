@@ -9,20 +9,23 @@ import java.util.ArrayList;
 
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.dto.GuestDTO;
-import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.client.utils.ClientMapper;
+import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.utils.GuestMapper;
-import com.paca.paca.reservation.utils.InvoiceMapper;
 import com.paca.paca.reservation.dto.ReservationDTO;
+import com.paca.paca.reservation.utils.InvoiceMapper;
 import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.statics.ReservationStatics;
+import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.BadRequestException;
@@ -60,6 +63,8 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     private final ClientGroupRepository clientGroupRepository;
+
+    private final ClientGuestRepository clientGuestRepository;
 
     public ReservationInfoDTO getById(Long id) throws NoContentException {
         Reservation reservation = reservationRepository.findById(id)
@@ -101,12 +106,34 @@ public class ReservationService {
             Optional<Guest> guestDB = guestRepository.findByIdentityDocument(
                     guestDTO.getIdentityDocument());
             Guest guest;
+
             if (guestDB.isPresent()) {
                 guest = guestMapper.updateModel(guestDTO, guestDB.get());
+                guest = guestRepository.save(guest);
             } else {
+                Optional<Guest> current = guestRepository.findByEmail(guestDTO.getEmail());
+                if (current.isPresent()) {
+                    throw new ConflictException(
+                            "Guest with email " + guestDTO.getEmail() + " already exists",
+                            61);
+                }
+
+                current = guestRepository.findByPhoneNumber(guestDTO.getPhoneNumber());
+                if (current.isPresent()) {
+                    throw new ConflictException(
+                            "Guest with phone number " + guestDTO.getPhoneNumber() + " already exists",
+                            62);
+                }
+
                 guest = guestMapper.toEntity(guestDTO);
+                guest = guestRepository.save(guest);
+                ClientGuest clientGuest = ClientGuest.builder()
+                        .client(null)
+                        .guest(guest)
+                        .haveGuest(true)
+                        .build();
+                clientGuest = clientGuestRepository.save(clientGuest);
             }
-            guest = guestRepository.save(guest);
             newReservation = reservationMapper.toEntity(reservationDTO, branch.get(), guest);
         } else {
             newReservation = reservationMapper.toEntity(reservationDTO, branch.get());

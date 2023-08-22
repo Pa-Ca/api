@@ -9,6 +9,7 @@ import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.reservation.repository.ReservationRepository;
@@ -60,7 +61,28 @@ public class GuestService {
         return new GuestInfoDTO(dto, clientGuest.getId());
     }
 
-    public GuestInfoDTO save(GuestDTO dto) throws NoContentException {
+    public GuestInfoDTO save(GuestDTO dto) throws ConflictException {
+        Optional<Guest> current = guestRepository.findByIdentityDocument(dto.getIdentityDocument());
+        if (current.isPresent()) {
+            throw new ConflictException(
+                    "Guest with identity document " + dto.getIdentityDocument() + " already exists",
+                    60);
+        }
+
+        current = guestRepository.findByEmail(dto.getEmail());
+        if (current.isPresent()) {
+            throw new ConflictException(
+                    "Guest with email " + dto.getEmail() + " already exists",
+                    61);
+        }
+
+        current = guestRepository.findByPhoneNumber(dto.getPhoneNumber());
+        if (current.isPresent()) {
+            throw new ConflictException(
+                    "Guest with phone number " + dto.getPhoneNumber() + " already exists",
+                    62);
+        }
+
         Guest newGuest = guestMapper.toEntity(dto);
         newGuest = guestRepository.save(newGuest);
 
