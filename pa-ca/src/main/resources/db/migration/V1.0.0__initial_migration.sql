@@ -404,7 +404,7 @@ CREATE INDEX sale_tax_index_tax_id on sale_tax (tax_id ASC);
 -- Table: table
 CREATE TABLE "table" (
     id int  NOT NULL,
-    name varchar(100)  NOT NULL,
+    name varchar(4)  NOT NULL,
     branch_id int  NOT NULL,
     CONSTRAINT table_pk PRIMARY KEY (id)
 );
