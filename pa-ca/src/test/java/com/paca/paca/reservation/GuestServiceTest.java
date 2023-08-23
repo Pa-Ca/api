@@ -7,6 +7,7 @@ import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.service.GuestService;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NoContentException;
 
@@ -116,6 +117,9 @@ public class GuestServiceTest extends ServiceTest {
         ClientGuest clientGuest = utils.createClientGuest(guest);
         GuestDTO dto = utils.createGuestDTO(guest);
 
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.empty());
+        when(guestRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+        when(guestRepository.findByPhoneNumber(any(String.class))).thenReturn(Optional.empty());
         when(guestRepository.save(any(Guest.class))).thenReturn(guest);
         when(guestMapper.toEntity(any(GuestDTO.class))).thenReturn(guest);
         when(guestMapper.toDTO(any(Guest.class))).thenReturn(dto);
@@ -125,6 +129,61 @@ public class GuestServiceTest extends ServiceTest {
         GuestInfoDTO expected = new GuestInfoDTO(dto, clientGuest.getId());
 
         assertThat(response).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldGetConflictDueToIdentityDocumentAlreadyExists() {
+        Guest guest = utils.createGuest();
+        GuestDTO dto = utils.createGuestDTO(guest);
+
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
+
+        try {
+            guestService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(), "Guest with identity document " + dto.getIdentityDocument() +
+                    " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 60);
+        }
+    }
+
+    @Test
+    void shouldGetConflictDueToEmailAlreadyExists() {
+        Guest guest = utils.createGuest();
+        GuestDTO dto = utils.createGuestDTO(guest);
+
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.empty());
+        when(guestRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(guest));
+
+        try {
+            guestService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(), "Guest with email " + dto.getEmail() + " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 61);
+        }
+    }
+
+    @Test
+    void shouldGetConflictDueToPhoneNumberAlreadyExists() {
+        Guest guest = utils.createGuest();
+        GuestDTO dto = utils.createGuestDTO(guest);
+
+        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.empty());
+        when(guestRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
+        when(guestRepository.findByPhoneNumber(any(String.class))).thenReturn(Optional.ofNullable(guest));
+
+        try {
+            guestService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(), "Guest with phone number " + dto.getPhoneNumber() + " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 62);
+        }
     }
 
     @Test

@@ -1108,7 +1108,7 @@ public class TestUtils {
         Table table = new Table(
                 ThreadLocalRandom.current().nextLong(999999999),
                 branch,
-                "Table_" + UUID.randomUUID().toString());
+                UUID.randomUUID().toString().substring(0, 4));
 
         if (tableRepository != null) {
             table = tableRepository.save(table);

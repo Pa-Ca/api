@@ -14,6 +14,7 @@ import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
+import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.NoContentException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
@@ -133,6 +134,62 @@ public class ReservationServiceTest extends ServiceTest {
             Assert.assertEquals(e.getMessage(),
                     "Requested number of client surpass branch " + dto.getBranchId() + " capacity");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 20);
+        }
+    }
+
+    @Test
+    void shouldGetConflictDueToGuestWithEmailAlreadyExistsInSaveReservationWithGuest() {
+        Invoice invoice = utils.createInvoice();
+        InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
+        Reservation reservation = utils.createReservation(null, null, invoice);
+        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
+        GuestDTO guestDTO = utils.createGuestDTO(reservation.getGuest());
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+        when(guestRepository.findByIdentityDocument(any(String.class)))
+                .thenReturn(Optional.empty());
+        when(guestRepository.findByEmail(any(String.class)))
+                .thenReturn(Optional.ofNullable(reservation.getGuest()));
+
+        ReservationInfoDTO dto = new ReservationInfoDTO(reservationDTO, invoiceDTO, guestDTO, null);
+
+        try {
+            reservationService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(),
+                    "Guest with email " + guestDTO.getEmail() + " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 61);
+        }
+    }
+
+    @Test
+    void shouldGetConflictDueToGuestWithPhoneNumberAlreadyExistsInSaveReservationWithGuest() {
+        Invoice invoice = utils.createInvoice();
+        InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
+        Reservation reservation = utils.createReservation(null, null, invoice);
+        ReservationDTO reservationDTO = utils.createReservationDTO(reservation);
+        GuestDTO guestDTO = utils.createGuestDTO(reservation.getGuest());
+
+        when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation.getBranch()));
+        when(guestRepository.findByIdentityDocument(any(String.class)))
+                .thenReturn(Optional.empty());
+        when(guestRepository.findByEmail(any(String.class)))
+                .thenReturn(Optional.empty());
+        when(guestRepository.findByPhoneNumber(any(String.class)))
+                .thenReturn(Optional.ofNullable(reservation.getGuest()));
+
+        ReservationInfoDTO dto = new ReservationInfoDTO(reservationDTO, invoiceDTO, guestDTO, null);
+
+        try {
+            reservationService.save(dto);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof ConflictException);
+            Assert.assertEquals(e.getMessage(),
+                    "Guest with phone number " + guestDTO.getPhoneNumber() + " already exists");
+            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 62);
         }
     }
 
