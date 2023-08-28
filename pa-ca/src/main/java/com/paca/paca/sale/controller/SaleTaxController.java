@@ -7,7 +7,7 @@ import com.paca.paca.sale.service.SaleTaxService;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.sale.utils.ValidateSaleTaxOwnerInterceptor.ValidateSaleTaxOwner;
@@ -48,7 +48,7 @@ public class SaleTaxController {
     @PostMapping(SaleTaxStatics.Endpoint.SAVE)
     @Operation(summary = "Create new Sale tax", description = "Create a new Sale tax")
     public ResponseEntity<TaxDTO> save(@RequestBody SaleTaxDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
@@ -71,7 +71,7 @@ public class SaleTaxController {
     public ResponseEntity<TaxDTO> update(
             @PathVariable("id") Long id,
             @RequestBody TaxDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(saleTaxService.update(id, dto));
     }
 
@@ -79,7 +79,7 @@ public class SaleTaxController {
     @ValidateRoles({ "business" })
     @DeleteMapping(SaleTaxStatics.Endpoint.DELETE)
     @Operation(summary = "Delete Defaulttax", description = "Delete the data of a Defaulttax given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         saleTaxService.delete(id);
     }
 }

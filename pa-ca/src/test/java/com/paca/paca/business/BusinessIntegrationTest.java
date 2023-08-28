@@ -45,517 +45,519 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BusinessIntegrationTest extends PacaTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
-    private String adminToken;
+        private String adminToken;
 
-    private String businessToken;
+        private String businessToken;
 
-    private TestUtils utils = TestUtils.builder().build();
+        private TestUtils utils = TestUtils.builder().build();
 
-    @BeforeAll
-    public void createAdminUser() throws Exception {
-        String email = UUID.randomUUID().toString() + "_test@test.com";
-        String password = "12345678";
+        @BeforeAll
+        public void createAdminUser() throws Exception {
+                String email = UUID.randomUUID().toString() + "_test@test.com";
+                String password = "12345678";
 
-        userRepository.save(User.builder()
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .role(Role.builder()
-                        .id((long) UserRole.admin.ordinal())
-                        .name(UserRole.admin)
-                        .build())
-                .verified(false)
-                .build());
+                userRepository.save(User.builder()
+                                .email(email)
+                                .password(passwordEncoder.encode(password))
+                                .role(Role.builder()
+                                                .id((long) UserRole.admin.ordinal())
+                                                .name(UserRole.admin)
+                                                .build())
+                                .verified(false)
+                                .build());
 
-        LoginRequestDTO loginRequest = LoginRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .build();
-        MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
-                        + AuthenticationStatics.Endpoint.LOGIN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String responseJson = response.getResponse().getContentAsString();
-        JsonNode responseNode = objectMapper.readTree(responseJson);
+                LoginRequestDTO loginRequest = LoginRequestDTO.builder()
+                                .email(email)
+                                .password(password)
+                                .build();
+                MvcResult response = mockMvc
+                                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                                                + AuthenticationStatics.Endpoint.LOGIN)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(loginRequest)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                String responseJson = response.getResponse().getContentAsString();
+                JsonNode responseNode = objectMapper.readTree(responseJson);
 
-        this.adminToken = responseNode.get("token").asText();
-    }
+                this.adminToken = responseNode.get("token").asText();
+        }
 
-    @BeforeAll
-    public void createBusinessUser() throws Exception {
-        String email = UUID.randomUUID().toString() + "_test@test.com";
-        String password = "123456789";
+        @BeforeAll
+        public void createBusinessUser() throws Exception {
+                String email = UUID.randomUUID().toString() + "_test@test.com";
+                String password = "123456789";
 
-        SignupRequestDTO signupRequest = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role("business")
-                .build();
-        MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
-                        + AuthenticationStatics.Endpoint.SIGNUP)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String responseJson = response.getResponse().getContentAsString();
-        JsonNode responseNode = objectMapper.readTree(responseJson);
+                SignupRequestDTO signupRequest = SignupRequestDTO.builder()
+                                .email(email)
+                                .password(password)
+                                .role("business")
+                                .build();
+                MvcResult response = mockMvc
+                                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                                                + AuthenticationStatics.Endpoint.SIGNUP)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(signupRequest)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                String responseJson = response.getResponse().getContentAsString();
+                JsonNode responseNode = objectMapper.readTree(responseJson);
 
-        this.businessToken = responseNode.get("token").asText();
-    }
+                this.businessToken = responseNode.get("token").asText();
+        }
 
-    @BeforeAll
-    public void registerModules() {
-        objectMapper.registerModule(new JavaTimeModule());
-    }
+        @BeforeAll
+        public void registerModules() {
+                objectMapper.registerModule(new JavaTimeModule());
+        }
 
-    @Test
-    public void should_Save_GetByID_GetByUserID_GetAllBranches_Update_And_Delete() throws Exception {
-        // Create user
-        String email = UUID.randomUUID().toString() + "_test@test.com";
-        String password = "123456789";
-        SignupRequestDTO signupRequest = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role("business")
-                .build();
-        MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
-                        + AuthenticationStatics.Endpoint.SIGNUP)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String responseJson = response.getResponse().getContentAsString();
-        JsonNode responseNode = objectMapper.readTree(responseJson);
-        Integer userId = Integer.parseInt(responseNode.get("id").asText());
-        String token = responseNode.get("token").asText();
+        @Test
+        public void should_Save_GetByID_GetByUserID_GetAllBranches_Update_And_Delete() throws Exception {
+                // Create user
+                String email = UUID.randomUUID().toString() + "_test@test.com";
+                String password = "123456789";
+                SignupRequestDTO signupRequest = SignupRequestDTO.builder()
+                                .email(email)
+                                .password(password)
+                                .role("business")
+                                .build();
+                MvcResult response = mockMvc
+                                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                                                + AuthenticationStatics.Endpoint.SIGNUP)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(signupRequest)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                String responseJson = response.getResponse().getContentAsString();
+                JsonNode responseNode = objectMapper.readTree(responseJson);
+                Integer userId = Integer.parseInt(responseNode.get("id").asText());
+                String token = responseNode.get("token").asText();
 
-        // Create business
-        BusinessDTO dto = BusinessDTO.builder()
-                .email(email)
-                .name("Test name")
-                .verified(false)
-                .tier("basic")
-                .phoneNumber("Test phone")
-                .build();
-        response = mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        responseJson = response.getResponse().getContentAsString();
-        responseNode = objectMapper.readTree(responseJson);
-        Integer id = Integer.parseInt(responseNode.get("id").asText());
-        BusinessDTO dtoResponse = objectMapper.readValue(responseJson, BusinessDTO.class);
-        dto.setId(dtoResponse.getId());
-        dto.setUserId(dtoResponse.getUserId());
-        assertEquals(dtoResponse, dto);
+                // Create business
+                BusinessDTO dto = BusinessDTO.builder()
+                                .email(email)
+                                .name("Test name")
+                                .verified(false)
+                                .tier("basic")
+                                .phoneNumber("Test phone")
+                                .build();
+                response = mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                responseJson = response.getResponse().getContentAsString();
+                responseNode = objectMapper.readTree(responseJson);
+                Integer id = Integer.parseInt(responseNode.get("id").asText());
+                BusinessDTO dtoResponse = objectMapper.readValue(responseJson, BusinessDTO.class);
+                dto.setId(dtoResponse.getId());
+                dto.setUserId(dtoResponse.getUserId());
+                assertEquals(dtoResponse, dto);
 
-        // Get business by id
-        response = mockMvc
-                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
-                        id.toString()))
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        responseJson = response.getResponse().getContentAsString();
-        dtoResponse = objectMapper.readValue(responseJson, BusinessDTO.class);
-        assertEquals(dtoResponse, dto);
+                // Get business by id
+                response = mockMvc
+                                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID)
+                                                .replace("{id}",
+                                                                id.toString()))
+                                                .header("Authorization", "Bearer " + token)
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                responseJson = response.getResponse().getContentAsString();
+                dtoResponse = objectMapper.readValue(responseJson, BusinessDTO.class);
+                assertEquals(dtoResponse, dto);
 
-        // Get business by user id
-        response = mockMvc
-                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID).replace(
-                        "{id}",
-                        userId.toString()))
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        responseJson = response.getResponse().getContentAsString();
-        dtoResponse = objectMapper.readValue(responseJson, BusinessDTO.class);
-        assertEquals(dtoResponse, dto);
+                // Get business by user id
+                response = mockMvc
+                                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                                                .replace(
+                                                                "{id}",
+                                                                userId.toString()))
+                                                .header("Authorization", "Bearer " + token)
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                responseJson = response.getResponse().getContentAsString();
+                dtoResponse = objectMapper.readValue(responseJson, BusinessDTO.class);
+                assertEquals(dtoResponse, dto);
 
-        // Create branches
-        BranchDTO branchDTO = utils.createBranchDTO(null);
-        branchDTO.setBusinessId(id.longValue());
-        mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(branchDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(branchDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                // Create branches
+                BranchDTO branchDTO = utils.createBranchDTO(null);
+                branchDTO.setBusinessId(id.longValue());
+                mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(branchDTO))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+                mockMvc.perform(post(BranchStatics.Endpoint.PATH + BranchStatics.Endpoint.SAVE)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(branchDTO))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        // Get all branches
-        response = mockMvc
-                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES)
-                        .replace("{id}",
+                // Get all branches
+                response = mockMvc
+                                .perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BRANCHES)
+                                                .replace("{id}",
+                                                                id.toString()))
+                                                .header("Authorization", "Bearer " + this.adminToken)
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                String content = response.getResponse().getContentAsString();
+                JsonNode jsonNode = objectMapper.readTree(content);
+                JsonNode listNode = jsonNode.get("branches");
+                List<BranchDTO> list = objectMapper.convertValue(
+                                listNode,
+                                new TypeReference<List<BranchDTO>>() {
+                                });
+                assertEquals(list.size(), 2);
+
+                // Update business
+                String fakeEmail = UUID.randomUUID().toString() + "_test@fake.com";
+                dto = BusinessDTO.builder()
+                                .id(1L)
+                                .userId(1L)
+                                .email(fakeEmail)
+                                .name("New name")
+                                .verified(true)
+                                .tier("premium")
+                                .phoneNumber("new phone")
+                                .build();
+                response = mockMvc
+                                .perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace(
+                                                "{id}",
+                                                id.toString()))
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .header("Authorization", "Bearer " + token)
+                                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(id)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(email)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("New name")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(true)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("premium")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
+                                                CoreMatchers.is("new phone")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)))
+                                .andReturn();
+                responseJson = response.getResponse().getContentAsString();
+                responseNode = objectMapper.readTree(responseJson);
+
+                // Cannot get business by id
+                id += 1;
+                mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
                                 id.toString()))
-                        .header("Authorization", "Bearer " + this.adminToken)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String content = response.getResponse().getContentAsString();
-        JsonNode jsonNode = objectMapper.readTree(content);
-        JsonNode listNode = jsonNode.get("branches");
-        List<BranchDTO> list = objectMapper.convertValue(
-                listNode,
-                new TypeReference<List<BranchDTO>>() {
-                });
-        assertEquals(list.size(), 2);
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Business with id " + id + " does not exists")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(28)));
+        }
 
-        // Update business
-        String fakeEmail = UUID.randomUUID().toString() + "_test@fake.com";
-        dto = BusinessDTO.builder()
-                .id(1L)
-                .userId(1L)
-                .email(fakeEmail)
-                .name("New name")
-                .verified(true)
-                .tier("premium")
-                .phoneNumber("new phone")
-                .build();
-        response = mockMvc
-                .perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace(
-                        "{id}",
-                        id.toString()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", CoreMatchers.is(id)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(email)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is("New name")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verified", CoreMatchers.is(true)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tier", CoreMatchers.is("premium")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber",
-                        CoreMatchers.is("new phone")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", CoreMatchers.is(userId)))
-                .andReturn();
-        responseJson = response.getResponse().getContentAsString();
-        responseNode = objectMapper.readTree(responseJson);
+        @Test
+        public void saveExceptions() throws Exception {
+                String email = UUID.randomUUID().toString() + "_test@test.com";
+                String password = "123456789";
+                BusinessDTO dto = BusinessDTO.builder()
+                                .email(email)
+                                .name("Test name")
+                                .verified(false)
+                                .tier("basic")
+                                .phoneNumber("Test phone")
+                                .build();
 
-        // Cannot get business by id
-        id += 1;
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
-                id.toString()))
-                .header("Authorization", "Bearer " + token)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Business with id " + id + " does not exists")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(28)));
-    }
+                // No token exception
+                mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-    @Test
-    public void saveExceptions() throws Exception {
-        String email = UUID.randomUUID().toString() + "_test@test.com";
-        String password = "123456789";
-        BusinessDTO dto = BusinessDTO.builder()
-                .email(email)
-                .name("Test name")
-                .verified(false)
-                .tier("basic")
-                .phoneNumber("Test phone")
-                .build();
+                // Invalid token
+                mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .header("Authorization", "Bearer a")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-        // No token exception
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+                // Create client user
+                SignupRequestDTO signupRequest = SignupRequestDTO.builder()
+                                .email(UUID.randomUUID().toString() + "_test@test.com")
+                                .password("123456789")
+                                .role("client")
+                                .build();
+                MvcResult response = mockMvc
+                                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                                                + AuthenticationStatics.Endpoint.SIGNUP)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(signupRequest)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                String responseJson = response.getResponse().getContentAsString();
+                JsonNode responseNode = objectMapper.readTree(responseJson);
 
-        // Invalid token
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .header("Authorization", "Bearer a")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+                // No user exception
+                mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + businessToken)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("User with email " + dto.getEmail()
+                                                                + " does not exists")));
 
-        // Create client user
-        SignupRequestDTO signupRequest = SignupRequestDTO.builder()
-                .email(UUID.randomUUID().toString() + "_test@test.com")
-                .password("123456789")
-                .role("client")
-                .build();
-        MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
-                        + AuthenticationStatics.Endpoint.SIGNUP)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String responseJson = response.getResponse().getContentAsString();
-        JsonNode responseNode = objectMapper.readTree(responseJson);
+                // Create valid user
+                signupRequest = SignupRequestDTO.builder()
+                                .email(email)
+                                .password(password)
+                                .role("business")
+                                .build();
+                response = mockMvc
+                                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                                                + AuthenticationStatics.Endpoint.SIGNUP)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(signupRequest)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                responseJson = response.getResponse().getContentAsString();
+                responseNode = objectMapper.readTree(responseJson);
+                String token = responseNode.get("token").asText();
 
-        // No user exception
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + businessToken)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("User with email " + dto.getEmail()
-                                + " does not exists")));
+                // Invalid tier
+                dto.setTier("fake_tier");
+                mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("The tier given is not valid")));
 
-        // Create valid user
-        signupRequest = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role("business")
-                .build();
-        response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
-                        + AuthenticationStatics.Endpoint.SIGNUP)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        responseJson = response.getResponse().getContentAsString();
-        responseNode = objectMapper.readTree(responseJson);
-        String token = responseNode.get("token").asText();
+                // Create business
+                dto.setTier("basic");
+                mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        // Invalid tier
-        dto.setTier("fake_tier");
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("The tier given is not valid")));
+                // Business already exists
+                mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isConflict())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(12)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Business with email " + dto.getEmail()
+                                                                + " already exists")));
+        }
 
-        // Create business
-        dto.setTier("basic");
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        @Test
+        public void getByIdExceptions() throws Exception {
+                // No token exception
+                mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                                "1"))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-        // Business already exists
-        mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(12)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Business with email " + dto.getEmail()
-                                + " already exists")));
-    }
+                // Invalid token
+                mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                                "1"))
+                                .header("Authorization", "Bearer a")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-    @Test
-    public void getByIdExceptions() throws Exception {
-        // No token exception
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
-                "1"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+                // Business don't exists
+                mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
+                                "0"))
+                                .header("Authorization", "Bearer " + businessToken)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(28)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Business with id 0 does not exists")));
+        }
 
-        // Invalid token
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
-                "1"))
-                .header("Authorization", "Bearer a")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+        @Test
+        public void updateExceptions() throws Exception {
+                // No token exception
+                mockMvc.perform(put(
+                                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-        // Business don't exists
-        mockMvc.perform(get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_ID).replace("{id}",
-                "0"))
-                .header("Authorization", "Bearer " + businessToken)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(28)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Business with id 0 does not exists")));
-    }
+                // Invalid token
+                mockMvc.perform(put(
+                                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
+                                .header("Authorization", "Bearer a")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-    @Test
-    public void updateExceptions() throws Exception {
-        // No token exception
-        mockMvc.perform(put(
-                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+                String email = UUID.randomUUID().toString() + "_test@test.com";
+                String password = "123456789";
+                BusinessDTO dto = BusinessDTO.builder()
+                                .email(email)
+                                .name("Test name")
+                                .verified(true)
+                                .tier("basic")
+                                .build();
 
-        // Invalid token
-        mockMvc.perform(put(
-                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "1"))
-                .header("Authorization", "Bearer a")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+                // Token don't match with the business to edit
+                mockMvc.perform(put(
+                                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "0"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + businessToken)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
 
-        String email = UUID.randomUUID().toString() + "_test@test.com";
-        String password = "123456789";
-        BusinessDTO dto = BusinessDTO.builder()
-                .email(email)
-                .name("Test name")
-                .verified(true)
-                .tier("basic")
-                .build();
+                // Create user
+                SignupRequestDTO signupRequest = SignupRequestDTO.builder()
+                                .email(email)
+                                .password(password)
+                                .role("business")
+                                .build();
+                MvcResult response = mockMvc
+                                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
+                                                + AuthenticationStatics.Endpoint.SIGNUP)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(signupRequest)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                String responseJson = response.getResponse().getContentAsString();
+                JsonNode responseNode = objectMapper.readTree(responseJson);
+                String token = responseNode.get("token").asText();
 
-        // Token don't match with the business to edit
-        mockMvc.perform(put(
-                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}", "0"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + businessToken)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
+                // Create business
+                response = mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+                responseJson = response.getResponse().getContentAsString();
+                responseNode = objectMapper.readTree(responseJson);
+                Integer id = Integer.parseInt(responseNode.get("id").asText());
 
-        // Create user
-        SignupRequestDTO signupRequest = SignupRequestDTO.builder()
-                .email(email)
-                .password(password)
-                .role("business")
-                .build();
-        MvcResult response = mockMvc
-                .perform(post(AuthenticationStatics.Endpoint.AUTH_PATH
-                        + AuthenticationStatics.Endpoint.SIGNUP)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String responseJson = response.getResponse().getContentAsString();
-        JsonNode responseNode = objectMapper.readTree(responseJson);
-        String token = responseNode.get("token").asText();
+                // Invalid role
+                dto.setTier("fake_tier");
+                mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
+                                id.toString()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("The tier given is not valid")));
+        }
 
-        // Create business
-        response = mockMvc.perform(post(BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.SAVE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        responseJson = response.getResponse().getContentAsString();
-        responseNode = objectMapper.readTree(responseJson);
-        Integer id = Integer.parseInt(responseNode.get("id").asText());
+        @Test
+        public void deleteExceptions() throws Exception {
+                // No token exception
+                mockMvc.perform(put(
+                                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
+                                .header("Authorization", "Bearer a")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-        // Invalid role
-        dto.setTier("fake_tier");
-        mockMvc.perform(put((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.UPDATE).replace("{id}",
-                id.toString()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("The tier given is not valid")));
-    }
+                // Invalid token
+                mockMvc.perform(put(
+                                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
+                                .header("Authorization", "Bearer a")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-    @Test
-    public void deleteExceptions() throws Exception {
-        // No token exception
-        mockMvc.perform(put(
-                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
-                .header("Authorization", "Bearer a")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+                // Token dont match with business to edit
+                mockMvc.perform(put(
+                                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "0"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + businessToken))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Unauthorized access for this operation")));
+        }
 
-        // Invalid token
-        mockMvc.perform(put(
-                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "1"))
-                .header("Authorization", "Bearer a")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
+        @Test
+        public void getByUserIdExceptions() throws Exception {
+                // No token exception
+                mockMvc.perform(
+                                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                                                .replace("{id}", "1"))
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-        // Token dont match with business to edit
-        mockMvc.perform(put(
-                (BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.DELETE).replace("{id}", "0"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + businessToken))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Unauthorized access for this operation")));
-    }
+                // Invalid token
+                mockMvc.perform(
+                                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                                                .replace("{id}", "1"))
+                                                .header("Authorization", "Bearer a")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("Authentication failed")))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
+                                                CoreMatchers.is(9)));
 
-    @Test
-    public void getByUserIdExceptions() throws Exception {
-        // No token exception
-        mockMvc.perform(
-                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
-                        .replace("{id}", "1"))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
-
-        // Invalid token
-        mockMvc.perform(
-                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
-                        .replace("{id}", "1"))
-                        .header("Authorization", "Bearer a")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("Authentication failed")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code",
-                        CoreMatchers.is(9)));
-
-        // Business don't exists
-        mockMvc.perform(
-                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
-                        .replace("{id}", "0"))
-                        .header("Authorization", "Bearer " + businessToken)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(12)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                        CoreMatchers.is("User with id 0 does not exists")));
-    }
+                // Business don't exists
+                mockMvc.perform(
+                                get((BusinessStatics.Endpoint.PATH + BusinessStatics.Endpoint.GET_BY_USER_ID)
+                                                .replace("{id}", "0"))
+                                                .header("Authorization", "Bearer " + businessToken)
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(12)))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
+                                                CoreMatchers.is("User with id 0 does not exists")));
+        }
 }

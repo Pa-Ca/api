@@ -17,7 +17,7 @@ import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor.ValidateReservationOwner;
@@ -40,14 +40,14 @@ public class ReservationController {
 
     @GetMapping(ReservationStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get reservation by ID", description = "Gets the data of a reservation given its ID")
-    public ResponseEntity<ReservationInfoDTO> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ReservationInfoDTO> getById(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(reservationService.getById(id));
     }
 
     @PostMapping(ReservationStatics.Endpoint.SAVE)
     @Operation(summary = "Create new reservation", description = "Create a new reservation in the app")
     public ResponseEntity<ReservationInfoDTO> save(@RequestBody ReservationInfoDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(reservationService.save(dto));
     }
 
@@ -55,7 +55,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = true)
     @PostMapping(ReservationStatics.Endpoint.CANCEL)
     @Operation(summary = "Cancel a reservation", description = "Cancel a reservation given your id")
-    public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+    public void cancel(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.cancel(id);
     }
 
@@ -63,7 +63,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @PostMapping(ReservationStatics.Endpoint.REJECT)
     @Operation(summary = "Reject a reservation", description = "Reject a reservation given your id")
-    public void reject(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+    public void reject(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.reject(id);
     }
 
@@ -71,7 +71,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @PostMapping(ReservationStatics.Endpoint.ACCEPT)
     @Operation(summary = "Accept a reservation", description = "Accept a reservation given your id")
-    public void accept(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+    public void accept(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.accept(id);
     }
 
@@ -79,7 +79,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @PostMapping(ReservationStatics.Endpoint.RETIRE)
     @Operation(summary = "Retire a reservation", description = "Retire a reservation given your id")
-    public void retire(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+    public void retire(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.retire(id);
     }
 
@@ -87,7 +87,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @PostMapping(ReservationStatics.Endpoint.START)
     @Operation(summary = "Start a reservation", description = "Start a reservation given your id")
-    public void start(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+    public void start(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.start(id);
     }
 
@@ -95,7 +95,7 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @PostMapping(ReservationStatics.Endpoint.CLOSE)
     @Operation(summary = "Close a reservation", description = "Close a reservation given your id")
-    public void close(@PathVariable("id") Long id) throws ForbiddenException, NoContentException, BadRequestException {
+    public void close(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.close(id);
     }
 
@@ -104,7 +104,7 @@ public class ReservationController {
     @PostMapping(ReservationStatics.Endpoint.PAY)
     @Operation(summary = "Pay a reservation", description = "Send the payment details of a reservation")
     public void pay(@PathVariable("id") Long id, @RequestBody InvoiceDTO dto)
-            throws ForbiddenException, NoContentException, BadRequestException {
+            throws ForbiddenException, NotFoundException, BadRequestException {
         reservationService.pay(id, dto);
     }
 
@@ -115,14 +115,14 @@ public class ReservationController {
     public ResponseEntity<ReservationInfoDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ReservationDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(reservationService.update(id, dto));
     }
 
     @ValidateRoles({ "business" })
     @DeleteMapping(ReservationStatics.Endpoint.DELETE)
     @Operation(summary = "Delete reservation", description = "Delete the data of a reservation given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         reservationService.delete(id);
     }
 }

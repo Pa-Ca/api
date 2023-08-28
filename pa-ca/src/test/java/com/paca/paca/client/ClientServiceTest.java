@@ -28,7 +28,7 @@ import com.paca.paca.client.service.ReviewService;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,16 +47,16 @@ public class ClientServiceTest extends ServiceTest {
     private ReviewService reviewService;
 
     @Test 
-    void shouldGetNoContentDueToMissingClientInGetClientById() {
+    void shouldGetNotFoundDueToMissingClientInGetClientById() {
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             clientService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -74,7 +74,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingUserInSave() {
+    void shouldGetNotFoundDueToMissingUserInSave() {
         ClientDTO dto = utils.createClientDTO(null);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
@@ -83,9 +83,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "User with email " + dto.getEmail() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 30);
         }
     }
 
@@ -127,7 +127,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInUpdate() {
+    void shouldGetNotFoundDueToMissingClientInUpdate() {
         Client client = utils.createClient(null);
         ClientDTO dto = utils.createClientDTO(client);
 
@@ -137,9 +137,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.update(client.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -162,7 +162,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInDelete() {
+    void shouldGetNotFoundDueToMissingClientInDelete() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -171,14 +171,14 @@ public class ClientServiceTest extends ServiceTest {
             clientService.delete(client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetClientByUserId() {
+    void shouldGetNotFoundDueToMissingClientInGetClientByUserId() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findByUserId(any(Long.class))).thenReturn(Optional.empty());
@@ -187,9 +187,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.getByUserId(client.getUser().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "User with id " + client.getUser().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 12);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 12);
         }
     }
 
@@ -210,7 +210,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetPendingRequestById() {
+    void shouldGetNotFoundDueToMissingClientInGetPendingRequestById() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -219,9 +219,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.getPendingFriends(client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -243,7 +243,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetAcceptedRequestById() {
+    void shouldGetNotFoundDueToMissingClientInGetAcceptedRequestById() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -252,9 +252,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.getAcceptedFriends(client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -278,7 +278,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetRejectedRequestById() {
+    void shouldGetNotFoundDueToMissingClientInGetRejectedRequestById() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -287,9 +287,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.getRejectedFriends(client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -325,7 +325,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingRequestInCreateFriendRequest() {
+    void shouldGetNotFoundDueToMissingRequestInCreateFriendRequest() {
         Client client = utils.createClient(null);
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -333,9 +333,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.friendRequest(client.getId(), client.getId() + 1);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Requester with id: " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 13);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 13);
         }
     }
 
@@ -382,7 +382,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFriendRequestInAcceptFriendRequest() {
+    void shouldGetNotFoundDueToMissingFriendRequestInAcceptFriendRequest() {
         Client client = utils.createClient(null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -393,9 +393,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.acceptFriendRequest(client.getId(), client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Friend request does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 16);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 16);
         }
     }
 
@@ -458,7 +458,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFriendRequestInRejectFriendRequest() {
+    void shouldGetNotFoundDueToMissingFriendRequestInRejectFriendRequest() {
         Client client = utils.createClient(null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -469,9 +469,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.rejectFriendRequest(client.getId(), client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Friend request does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 16);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 16);
         }
     }
 
@@ -534,7 +534,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFriendRequestInDeleteFriendRequest() {
+    void shouldGetNotFoundDueToMissingFriendRequestInDeleteFriendRequest() {
         Client client = utils.createClient(null);
 
         when(friendRepository.findByRequesterIdAndAddresserId(
@@ -545,14 +545,14 @@ public class ClientServiceTest extends ServiceTest {
             clientService.deleteFriendRequest(client.getId(), client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Friend request does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 16);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 16);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetReservations() {
+    void shouldGetNotFoundDueToMissingClientInGetReservations() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class)))
@@ -562,9 +562,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.getReservations(client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -586,7 +586,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInGetFavoriteBranchs() {
+    void shouldGetNotFoundDueToMissingClientInGetFavoriteBranchs() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(any(Long.class)))
@@ -596,9 +596,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.getFavoriteBranches(client.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -620,21 +620,21 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInAddFavoriteBranch() {
+    void shouldGetNotFoundDueToMissingClientInAddFavoriteBranch() {
         when(clientRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
             clientService.addFavoriteBranch(1L, 1L);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + 1L + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInAddFavoriteBranch() {
+    void shouldGetNotFoundDueToMissingBranchInAddFavoriteBranch() {
         Client client = utils.createClient(null);
 
         when(clientRepository.findById(anyLong())).thenReturn(Optional.of(client));
@@ -644,9 +644,9 @@ public class ClientServiceTest extends ServiceTest {
             clientService.addFavoriteBranch(client.getId(), 1L);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + 1L + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -688,7 +688,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInDeleteFavoriteBranch() {
+    void shouldGetNotFoundDueToMissingClientInDeleteFavoriteBranch() {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
 
@@ -698,14 +698,14 @@ public class ClientServiceTest extends ServiceTest {
             clientService.deleteFavoriteBranch(client.getId(), branch.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInDeleteFavoriteBranch() {
+    void shouldGetNotFoundDueToMissingBranchInDeleteFavoriteBranch() {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
 
@@ -716,14 +716,14 @@ public class ClientServiceTest extends ServiceTest {
             clientService.deleteFavoriteBranch(client.getId(), branch.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + client.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingFavortieBranchInDeleteFavoriteBranch() {
+    void shouldGetNotFoundDueToMissingFavortieBranchInDeleteFavoriteBranch() {
         Client client = utils.createClient(null);
         Branch branch = utils.createBranch(null);
 
@@ -735,23 +735,23 @@ public class ClientServiceTest extends ServiceTest {
             clientService.deleteFavoriteBranch(client.getId(), branch.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Favorite branch does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 33);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 33);
         }
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingReviewInGetReviewById() {
+    void shouldGetNotFoundDueToMissingReviewInGetReviewById() {
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             reviewService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Review with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 35);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 35);
         }
     }
 
@@ -769,7 +769,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInSaveReview() {
+    void shouldGetNotFoundDueToMissingClientInSaveReview() {
         Review review = utils.createReview(null, null);
         ReviewDTO dto = utils.createReviewDTO(review);
 
@@ -779,14 +779,14 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + dto.getClientId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInSaveReview() {
+    void shouldGetNotFoundDueToMissingBranchInSaveReview() {
         Review review = utils.createReview(null, null);
         ReviewDTO dto = utils.createReviewDTO(review);
 
@@ -797,9 +797,9 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + dto.getBranchId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -842,7 +842,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReviewInUpdateReview() {
+    void shouldGetNotFoundDueToMissingReviewInUpdateReview() {
         Review review = utils.createReview(null, null);
         ReviewDTO dto = utils.createReviewDTO(review);
 
@@ -852,9 +852,9 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.update(review.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Review with id " + review.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 35);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 35);
         }
     }
 
@@ -874,7 +874,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReviewInDeleteReview() {
+    void shouldGetNotFoundDueToMissingReviewInDeleteReview() {
         Review review = utils.createReview(null, null);
 
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -883,14 +883,14 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.delete(review.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Review with id " + review.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 35);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 35);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReviewInSetLikeToReview() {
+    void shouldGetNotFoundDueToMissingReviewInSetLikeToReview() {
         ReviewLike like = utils.createReviewLike(null, null);
 
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -899,14 +899,14 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.like(like.getReview().getId(), like.getClient().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Review with id " + like.getReview().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 35);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 35);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInSetLikeToReview() {
+    void shouldGetNotFoundDueToMissingClientInSetLikeToReview() {
         ReviewLike like = utils.createReviewLike(null, null);
 
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(like.getReview()));
@@ -916,9 +916,9 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.like(like.getReview().getId(), like.getClient().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + like.getClient().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -960,7 +960,7 @@ public class ClientServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReviewInSetDislikeToReview() {
+    void shouldGetNotFoundDueToMissingReviewInSetDislikeToReview() {
         ReviewLike like = utils.createReviewLike(null, null);
 
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -969,14 +969,14 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.dislike(like.getReview().getId(), like.getClient().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Review with id " + like.getReview().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 35);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 35);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientInSetDislikeToReview() {
+    void shouldGetNotFoundDueToMissingClientInSetDislikeToReview() {
         ReviewLike like = utils.createReviewLike(null, null);
 
         when(reviewRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(like.getReview()));
@@ -986,14 +986,14 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.dislike(like.getReview().getId(), like.getClient().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Client with id " + like.getClient().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReviewLikeDoesInSetDislikeToReview() {
+    void shouldGetNotFoundDueToMissingReviewLikeDoesInSetDislikeToReview() {
         ReviewLike like = utils.createReviewLike(null, null);
 
         when(clientRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(like.getClient()));
@@ -1005,9 +1005,9 @@ public class ClientServiceTest extends ServiceTest {
             reviewService.dislike(like.getReview().getId(), like.getClient().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Review like does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 38);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 38);
         }
     }
 

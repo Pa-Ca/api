@@ -442,7 +442,7 @@ public class AuthIntegrationTest extends PacaTest {
                 + AuthenticationStatics.Endpoint.RESET_PASSWORD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(resetPasswordRequest)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("User with email " + email + " does not exists")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)));
@@ -628,7 +628,7 @@ public class AuthIntegrationTest extends PacaTest {
                 + AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(verifyEmailRequest)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("User with email " + email + " does not exists")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)));

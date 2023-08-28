@@ -44,7 +44,7 @@ import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.promotion.repository.PromotionRepository;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
@@ -104,9 +104,9 @@ public class BranchService {
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
 
-    public BranchDTO getById(Long id) throws NoContentException {
+    public BranchDTO getById(Long id) throws NotFoundException {
         Branch branch = branchRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Branch with id " + id + " does not exists",
                         20));
 
@@ -114,10 +114,10 @@ public class BranchService {
         return dto;
     }
 
-    public BranchDTO save(BranchDTO dto) throws NoContentException, BadRequestException {
+    public BranchDTO save(BranchDTO dto) throws NotFoundException, BadRequestException {
         Optional<Business> business = businessRepository.findById(dto.getBusinessId());
         if (business.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Business with id " + dto.getBusinessId() + " does not exists",
                     21);
         }
@@ -136,10 +136,10 @@ public class BranchService {
     }
 
     public BranchDTO update(Long id, BranchDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         Optional<Branch> current = branchRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
@@ -157,10 +157,10 @@ public class BranchService {
         return dtoResponse;
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Branch> current = branchRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
@@ -170,10 +170,10 @@ public class BranchService {
         branchRepository.save(branch);
     }
 
-    public ProductSubCategoryListDTO getProductSubCategories(Long branchId) throws NoContentException {
+    public ProductSubCategoryListDTO getProductSubCategories(Long branchId) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -188,10 +188,10 @@ public class BranchService {
         return ProductSubCategoryListDTO.builder().productSubCategories(response).build();
     }
 
-    public ProductListDTO getProducts(Long id) throws NoContentException {
+    public ProductListDTO getProducts(Long id) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
@@ -206,10 +206,10 @@ public class BranchService {
         return ProductListDTO.builder().products(response).build();
     }
 
-    public PromotionListDTO getPromotions(Long id) throws NoContentException {
+    public PromotionListDTO getPromotions(Long id) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
@@ -223,10 +223,10 @@ public class BranchService {
         return PromotionListDTO.builder().promotions(response).build();
     }
 
-    public ClientListDTO getFavoriteClients(Long id) throws NoContentException {
+    public ClientListDTO getFavoriteClients(Long id) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
@@ -241,7 +241,7 @@ public class BranchService {
         return ClientListDTO.builder().clients(response).build();
     }
 
-    public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NoContentException {
+    public ReviewListDTO getReviewsPage(Long id, int page, int size) throws UnprocessableException, NotFoundException {
         if (page < 0) {
             throw new UnprocessableException(
                     "Page number cannot be less than zero",
@@ -255,7 +255,7 @@ public class BranchService {
 
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
@@ -280,7 +280,7 @@ public class BranchService {
     public TaxListDTO getDefaultTaxesByBranchId(Long branchId) {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -299,7 +299,7 @@ public class BranchService {
     public TableListDTO getTablesByBranchId(Long branchId) {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -322,7 +322,7 @@ public class BranchService {
     public PaymentOptionListDTO getPaymentOptionsByBranchId(Long branchId) {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }

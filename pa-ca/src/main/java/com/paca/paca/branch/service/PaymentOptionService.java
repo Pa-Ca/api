@@ -11,7 +11,7 @@ import com.paca.paca.branch.model.PaymentOption;
 import com.paca.paca.branch.dto.PaymentOptionDTO;
 import com.paca.paca.branch.utils.PaymentOptionMapper;
 import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.branch.repository.PaymentOptionRepository;
 
 @Service
@@ -24,11 +24,11 @@ public class PaymentOptionService {
 
     private final PaymentOptionRepository paymentOptionRepository;
 
-    public PaymentOptionDTO save(PaymentOptionDTO paymentOptionDTO) throws NoContentException {
+    public PaymentOptionDTO save(PaymentOptionDTO paymentOptionDTO) throws NotFoundException {
         long branchId = paymentOptionDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -38,10 +38,10 @@ public class PaymentOptionService {
         return paymentOptionMapper.toDTO(paymentOption);
     }
 
-    public PaymentOptionDTO update(long id, PaymentOptionDTO paymentOptionDTO) throws NoContentException {
+    public PaymentOptionDTO update(long id, PaymentOptionDTO paymentOptionDTO) throws NotFoundException {
         Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(id);
         if (paymentOption.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Payment option with id " + id + " does not exists",
                     58);
         }
@@ -54,10 +54,10 @@ public class PaymentOptionService {
 
     }
 
-    public void delete(Long paymentOptionId) throws NoContentException {
+    public void delete(Long paymentOptionId) throws NotFoundException {
         Optional<PaymentOption> paymentOption = paymentOptionRepository.findById(paymentOptionId);
         if (paymentOption.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Payment option with id " + paymentOptionId + " does not exists",
                     58);
         }

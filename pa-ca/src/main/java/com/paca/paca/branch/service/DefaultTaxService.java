@@ -16,7 +16,7 @@ import com.paca.paca.branch.dto.DefaultTaxDTO;
 import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 @Service
@@ -31,11 +31,11 @@ public class DefaultTaxService {
 
     private final DefaultTaxRepository defaultTaxRepository;
 
-    public TaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NoContentException {
+    public TaxDTO save(DefaultTaxDTO defaultTaxDTO) throws NotFoundException {
         long branchId = defaultTaxDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -60,12 +60,12 @@ public class DefaultTaxService {
     }
 
     public TaxDTO update(long id, TaxDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
 
         // Check if the default tax exists
         Optional<Tax> tax = taxRepository.findById(id);
         if (tax.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Tax with id " + id + " does not exists",
                     52);
         }
@@ -86,11 +86,11 @@ public class DefaultTaxService {
         return taxMapper.toDTO(taxToUpdate);
     }
 
-    public void delete(Long taxId) throws NoContentException {
+    public void delete(Long taxId) throws NotFoundException {
         // Check if the default tax exists
         Optional<Tax> tax = taxRepository.findById(taxId);
         if (tax.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Tax with id " + taxId + " does not exists",
                     52);
         }

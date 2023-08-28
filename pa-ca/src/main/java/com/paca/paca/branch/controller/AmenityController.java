@@ -4,7 +4,7 @@ import com.paca.paca.branch.dto.BranchListDTO;
 import com.paca.paca.branch.dto.AmenityListDTO;
 import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.branch.statics.AmenityStatics;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public class AmenityController {
 
     @GetMapping(AmenityStatics.Endpoint.GET_BRANCHES)
     @Operation(summary = "Gets all branches associated with an amenity", description = "Gets the data of all the branches associated with an amenity given its ID")
-    public ResponseEntity<BranchListDTO> getAllBranches(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<BranchListDTO> getAllBranches(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(amenityService.getAllBranches(id));
     }
 }

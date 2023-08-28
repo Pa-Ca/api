@@ -52,4 +52,6 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     Boolean existsByIdAndBranch_Business_Id(Long id, Long businessId);
 
+    Boolean existsByBranchBusinessIdAndClientGuestGuestId(Long branchId, Long GuestId);
+
 }

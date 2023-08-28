@@ -11,7 +11,7 @@ import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.branch.utils.AmenityMapper;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.branch.repository.AmenityRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.branch.repository.BranchAmenityRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -72,26 +72,26 @@ public class AmenityService {
         return AmenityListDTO.builder().amenities(response).build();
     }
 
-    public AmenityListDTO getAllByBranchId(Long id) throws NoContentException {
+    public AmenityListDTO getAllByBranchId(Long id) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException("Branch does not exists", 12);
+            throw new NotFoundException("Branch does not exists", 12);
         }
 
         return getAmenitiesByBranch(branch);
     }
 
-    public AmenityListDTO saveAllByBranchId(Long id, AmenityListDTO dto) throws NoContentException {
+    public AmenityListDTO saveAllByBranchId(Long id, AmenityListDTO dto) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty())
-            throw new NoContentException("Branch does not exists", 12);
+            throw new NotFoundException("Branch does not exists", 12);
 
         dto.getAmenities().forEach(amenityDTO -> {
             Long amenityId = amenityMapper.toEntity(amenityDTO).getId();
             Optional<Amenity> amenity = amenityRepository.findById(amenityId);
 
             if (amenity.isEmpty()) {
-                throw new NoContentException("Amenity does not exists", 20);
+                throw new NotFoundException("Amenity does not exists", 20);
             }
         });
 
@@ -115,11 +115,11 @@ public class AmenityService {
     }
 
     public AmenityListDTO deleteAllByBranchId(Long id, AmenityListDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(id);
 
         if (branch.isEmpty()) {
-            throw new NoContentException("Branch does not exists", 12);
+            throw new NotFoundException("Branch does not exists", 12);
         }
 
         dto.getAmenities().forEach(amenityDTO -> {
@@ -127,7 +127,7 @@ public class AmenityService {
             Optional<Amenity> amenity = amenityRepository.findById(amenityId);
 
             if (amenity.isEmpty()) {
-                throw new NoContentException("Amenity does not exists", 20);
+                throw new NotFoundException("Amenity does not exists", 20);
             }
         });
 
@@ -142,9 +142,9 @@ public class AmenityService {
         return getAmenitiesByBranch(branch);
     }
 
-    public BranchListDTO getAllBranches(Long id) throws NoContentException {
+    public BranchListDTO getAllBranches(Long id) throws NotFoundException {
         if (!amenityRepository.existsById(id)) {
-            throw new NoContentException("Amenity with id " + id + " does not exists", 34);
+            throw new NotFoundException("Amenity with id " + id + " does not exists", 34);
         }
 
         List<BranchDTO> response = new ArrayList<>();

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import com.paca.paca.RepositoryTest;
 import com.paca.paca.sale.model.Sale;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.reservation.model.Guest;
 import com.paca.paca.sale.statics.SaleStatics;
 
 import java.util.Date;
@@ -155,4 +157,31 @@ public class SaleRepositoryTest extends RepositoryTest {
 
         assertThat(exists).isFalse();
     }
+
+    @Test
+    void shouldCheckThatExistsByBranchBusinessIdAndClientGuestGuestId() {
+        Branch branch = utils.createBranch(null);
+        ClientGuest clientGuest = utils.createClientGuest((Guest) null);
+        utils.createSale(branch, clientGuest, null);
+
+        boolean exists = saleRepository.existsByBranchBusinessIdAndClientGuestGuestId(
+                branch.getBusiness().getId(),
+                clientGuest.getGuest().getId());
+
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void shouldCheckThatDoesNotExistsByBranchBusinessIdAndClientGuestGuestId() {
+        Branch branch = utils.createBranch(null);
+        ClientGuest clientGuest = utils.createClientGuest((Guest) null);
+        utils.createSale(branch, clientGuest, null);
+
+        boolean exists = saleRepository.existsByBranchBusinessIdAndClientGuestGuestId(
+                branch.getBusiness().getId(),
+                clientGuest.getGuest().getId() + 1);
+
+        assertThat(exists).isFalse();
+    }
+
 }

@@ -22,6 +22,7 @@ import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.utils.TaxMapper;
+import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.sale.model.OnlineSale;
 import com.paca.paca.sale.model.InsiteSale;
 import com.paca.paca.sale.utils.SaleMapper;
@@ -30,10 +31,13 @@ import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.branch.utils.TableMapper;
 import com.paca.paca.client.model.ClientGuest;
+import com.paca.paca.reservation.dto.GuestDTO;
+import com.paca.paca.client.utils.ClientMapper;
 import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.sale.utils.SaleProductMapper;
 import com.paca.paca.sale.repository.TaxRepository;
+import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.sale.repository.SaleTaxRepository;
@@ -43,7 +47,7 @@ import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.sale.repository.OnlineSaleRepository;
 import com.paca.paca.sale.repository.SaleProductRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.sale.repository.InsiteSaleTableRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -59,6 +63,12 @@ public class SaleService {
 
     private final TableMapper tableMapper;
 
+    private final GuestMapper guestMapper;
+
+    private final ClientMapper clientMapper;
+
+    private final SaleProductMapper saleProductMapper;
+
     private final TaxRepository taxRepository;
 
     private final SaleRepository saleRepository;
@@ -68,8 +78,6 @@ public class SaleService {
     private final BranchRepository branchRepository;
 
     private final SaleTaxRepository saleTaxRepository;
-
-    private final SaleProductMapper saleProductMapper;
 
     private final InsiteSaleRepository insiteSaleRepository;
 
@@ -83,10 +91,10 @@ public class SaleService {
 
     private final InsiteSaleTableRepository insiteSaleTableRepository;
 
-    private Boolean isInsite(Long id) throws NoContentException {
+    private Boolean isInsite(Long id) throws NotFoundException {
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Sale with id " + id + " does not exists",
                     42);
         }
@@ -103,10 +111,10 @@ public class SaleService {
         return sale.get().getReservation();
     }
 
-    private List<TaxDTO> getTaxesBySaleId(Long id) throws NoContentException {
+    private List<TaxDTO> getTaxesBySaleId(Long id) throws NotFoundException {
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Sale with id " + id + " does not exists",
                     42);
         }
@@ -129,7 +137,7 @@ public class SaleService {
             return new ArrayList<>();
         }
 
-        List<InsiteSaleTable> tables = insiteSaleTableRepository.findAllByInsiteSaleId(id);
+        List<InsiteSaleTable> tables = insiteSaleTableRepository.findAllByInsiteSaleId(sale.get().getId());
 
         // Map the taxes to DTOs
         List<TableDTO> response = new ArrayList<>();
@@ -142,10 +150,10 @@ public class SaleService {
     }
 
     private List<SaleProductDTO> getSaleProductsbySaleId(long id)
-            throws NoContentException {
+            throws NotFoundException {
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
-            throw new NoContentException("Sale with id " + id + " does not exists", 42);
+            throw new NotFoundException("Sale with id " + id + " does not exists", 42);
         }
 
         List<SaleProduct> saleProducts = saleProductRepository.findAllBySaleId(id);
@@ -163,7 +171,7 @@ public class SaleService {
 
     private SaleInfoDTO completeData(long id) {
         Sale sale = saleRepository.findById(id)
-                .orElseThrow(() -> new NoContentException("Sale with id " + id + " does not exists", 42));
+                .orElseThrow(() -> new NotFoundException("Sale with id " + id + " does not exists", 42));
 
         SaleDTO dto = saleMapper.toDTO(sale);
         Boolean insite = isInsite(sale.getId());
@@ -171,31 +179,38 @@ public class SaleService {
         List<TaxDTO> taxListDTO = getTaxesBySaleId(sale.getId());
         List<TableDTO> tableListDTO = getTablesBySaleId(sale.getId());
         List<SaleProductDTO> saleProductListDTO = getSaleProductsbySaleId(sale.getId());
+        GuestDTO guestDTO = sale.getClientGuest().getHaveGuest() ? guestMapper.toDTO(sale.getClientGuest().getGuest())
+                : null;
+        ClientDTO clientDTO = !sale.getClientGuest().getHaveGuest()
+                ? clientMapper.toDTO(sale.getClientGuest().getClient())
+                : null;
 
         // Create a SaleInfo DTO
-        return SaleInfoDTO.builder()
-                .sale(dto)
-                .insite(insite)
-                .reservationId(reservation == null ? null : reservation.getId())
-                .taxes(taxListDTO)
-                .tables(tableListDTO)
-                .products(saleProductListDTO)
-                .build();
+        return new SaleInfoDTO(
+                dto,
+                insite,
+                guestDTO,
+                clientDTO,
+                reservation == null ? null : reservation.getId(),
+                taxListDTO,
+                tableListDTO,
+                saleProductListDTO);
     }
 
-    public SaleInfoDTO save(SaleInfoDTO dto) throws NoContentException {
+    public SaleInfoDTO save(SaleInfoDTO dto) throws NotFoundException {
         Optional<Branch> branch = branchRepository.findById(dto.getSale().getBranchId());
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + dto.getSale().getBranchId() + " does not exists", 20);
         }
 
         Optional<ClientGuest> clientGuest = clientGuestRepository.findById(dto.getSale().getClientGuestId());
         if (clientGuest.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client guest with id " + dto.getSale().getClientGuestId() + " does not exists", 59);
         }
 
+        dto.getSale().setStartTime(new Date());
         Sale sale = saleMapper.toEntity(dto.getSale(), branch.get(), null, clientGuest.get());
         Sale newSale = saleRepository.save(sale);
 
@@ -221,7 +236,7 @@ public class SaleService {
                 reservation = null;
             } else {
                 reservation = reservationRepository.findById(dto.getReservationId()).orElseThrow(
-                        () -> new NoContentException(
+                        () -> new NotFoundException(
                                 "Reservation with id " + dto.getReservationId() + " does not exists", 27));
             }
 
@@ -235,7 +250,7 @@ public class SaleService {
             dto.getTables().forEach(tableDTO -> {
                 Optional<Table> table = tableRepository.findById(tableDTO.getId());
                 if (table.isEmpty()) {
-                    throw new NoContentException(
+                    throw new NotFoundException(
                             "Table with id " + tableDTO.getId() + " does not exists", 49);
                 }
 
@@ -255,10 +270,10 @@ public class SaleService {
         return completeData(newSale.getId());
     }
 
-    public SaleInfoDTO update(long id, SaleDTO dto) throws NoContentException, BadRequestException {
+    public SaleInfoDTO update(long id, SaleDTO dto) throws NotFoundException, BadRequestException {
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Sale with id " + id + " does not exists",
                     42);
         }
@@ -278,10 +293,10 @@ public class SaleService {
         return completeData(updatedSale.getId());
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Sale with id " + id + " does not exists",
                     42);
         }
@@ -297,10 +312,10 @@ public class SaleService {
         saleRepository.deleteById(id);
     }
 
-    public void clearSaleProducts(long id) throws NoContentException, BadRequestException {
+    public void clearSaleProducts(long id) throws NotFoundException, BadRequestException {
         Optional<Sale> sale = saleRepository.findById(id);
         if (sale.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Sale with id " + id + " does not exists",
                     42);
         }
@@ -324,10 +339,10 @@ public class SaleService {
             Date startTime,
             Date endTime,
             String fullname,
-            String identityDocument) throws UnprocessableException, NoContentException {
+            String identityDocument) throws UnprocessableException, NotFoundException {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     21);
         }

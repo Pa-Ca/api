@@ -19,7 +19,7 @@ import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.reservation.statics.GuestStatics;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +41,7 @@ public class GuestController {
 
     @GetMapping(GuestStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get user guest by ID", description = "Gets the data of a user guest given its ID")
-    public ResponseEntity<GuestInfoDTO> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<GuestInfoDTO> getById(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(guestService.getById(id));
     }
 
@@ -49,13 +49,12 @@ public class GuestController {
     @GetMapping(GuestStatics.Endpoint.GET_BY_IDENTITY_DOCUMENT)
     @Operation(summary = "Get user guest by identity document", description = "Gets the data of a user guest given its identity document")
     public ResponseEntity<GuestInfoDTO> getByIdentityDocument(@PathVariable("identityDocument") String identityDocument)
-            throws NoContentException {
+            throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Business business = businessRepository.findByUserEmail(auth.getName()).get();
         return ResponseEntity.ok(guestService.getByIdentityDocument(business.getId(), identityDocument));
     }
 
-    @ValidateRoles({})
     @PostMapping(GuestStatics.Endpoint.SAVE)
     @Operation(summary = "Create new user guest", description = "Create a new user guest in the app")
     public ResponseEntity<GuestInfoDTO> save(@RequestBody GuestDTO dto) {
@@ -68,14 +67,14 @@ public class GuestController {
     public ResponseEntity<GuestInfoDTO> update(
             @PathVariable("id") Long id,
             @RequestBody GuestDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(guestService.update(id, dto));
     }
 
     @ValidateRoles({})
     @DeleteMapping(GuestStatics.Endpoint.DELETE)
     @Operation(summary = "Delete user guest", description = "Delete the data of a user guest given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         guestService.delete(id);
     }
 }

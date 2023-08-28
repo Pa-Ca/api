@@ -13,7 +13,7 @@ import com.paca.paca.branch.utils.TableMapper;
 import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +25,11 @@ public class TableService {
 
     private final BranchRepository branchRepository;
 
-    public TableDTO save(TableDTO tableDTO) throws NoContentException, ConflictException {
+    public TableDTO save(TableDTO tableDTO) throws NotFoundException, ConflictException {
         long branchId = tableDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -44,10 +44,10 @@ public class TableService {
         return tableMapper.toDTO(table);
     }
 
-    public TableDTO update(long id, TableDTO tableDTO) throws NoContentException, ConflictException {
+    public TableDTO update(long id, TableDTO tableDTO) throws NotFoundException, ConflictException {
         Optional<Table> table = tableRepository.findById(id);
         if (table.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Table with id " + id + " does not exists",
                     49);
         }
@@ -55,7 +55,7 @@ public class TableService {
         long branchId = tableDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -73,10 +73,10 @@ public class TableService {
         return tableMapper.toDTO(tableToUpdate);
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Table> table = tableRepository.findById(id);
         if (table.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Table with id " + id + " does not exists",
                     49);
         }

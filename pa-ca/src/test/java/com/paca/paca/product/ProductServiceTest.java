@@ -5,7 +5,7 @@ import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 
 import junit.framework.TestCase;
@@ -26,16 +26,16 @@ public class ProductServiceTest extends ServiceTest {
     private ProductService productService;
 
     @Test
-    void shouldGetNoContentDueToMissingProductInGetProductById() {
+    void shouldGetNotFoundDueToMissingProductInGetProductById() {
         when(productRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             productService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Product with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 25);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 25);
         }
     }
 
@@ -53,7 +53,7 @@ public class ProductServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductSubCategoryInSave() {
+    void shouldGetNotFoundDueToMissingProductSubCategoryInSave() {
         ProductDTO dto = utils.createProductDTO(null);
 
         when(productSubCategoryRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -62,10 +62,10 @@ public class ProductServiceTest extends ServiceTest {
             productService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(),
                     "Product sub-category with id " + dto.getSubCategoryId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 23);
         }
     }
 
@@ -105,7 +105,7 @@ public class ProductServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductInUpdate() {
+    void shouldGetNotFoundDueToMissingProductInUpdate() {
         Product product = utils.createProduct(null);
         ProductDTO dto = utils.createProductDTO(product);
 
@@ -115,9 +115,9 @@ public class ProductServiceTest extends ServiceTest {
             productService.update(product.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Product with id: " + dto.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 25);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 25);
         }
     }
 
@@ -155,7 +155,7 @@ public class ProductServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductInDelete() {
+    void shouldGetNotFoundDueToMissingProductInDelete() {
         Product product = utils.createProduct(null);
         ProductDTO dto = utils.createProductDTO(product);
 
@@ -165,9 +165,9 @@ public class ProductServiceTest extends ServiceTest {
             productService.delete(product.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Product with id: " + dto.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 25);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 25);
         }
     }
 

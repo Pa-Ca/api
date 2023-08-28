@@ -87,7 +87,7 @@ public class GoogleAuthenticationService {
         AuthUtils.validateRole(request.getRole());
         Optional<Role> role = roleRepository.findByName(UserRole.valueOf(request.getRole()));
         if (role.isEmpty()) {
-            throw new NoContentException("Role " + request.getRole() + " does not exists");
+            throw new NotFoundException("Role " + request.getRole() + " does not exists");
         }
 
         // Create and save new User

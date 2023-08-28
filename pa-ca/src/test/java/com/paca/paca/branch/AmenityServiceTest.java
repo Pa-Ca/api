@@ -16,7 +16,7 @@ import com.paca.paca.branch.dto.AmenityListDTO;
 import com.paca.paca.branch.model.BranchAmenity;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.branch.service.AmenityService;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,16 +55,16 @@ public class AmenityServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInAllAmenitiesByBranchId() {
+    void shouldGetNotFoundDueToMissingBranchInAllAmenitiesByBranchId() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             amenityService.getAllByBranchId(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 12);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 12);
         }
     }
 
@@ -82,7 +82,7 @@ public class AmenityServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInSaveAllAmenitiesByBranchId() {
+    void shouldGetNotFoundDueToMissingBranchInSaveAllAmenitiesByBranchId() {
         AmenityListDTO amenitiesDTO = AmenityListDTO.builder().build();
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -91,14 +91,14 @@ public class AmenityServiceTest extends ServiceTest {
             amenityService.saveAllByBranchId(1L, amenitiesDTO);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 12);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 12);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingAmenityInSaveAllAmenitiesByBranchId() {
+    void shouldGetNotFoundDueToMissingAmenityInSaveAllAmenitiesByBranchId() {
         Branch branch = utils.createBranch(null);
         Amenity amenity = utils.createAmenity();
         List<AmenityDTO> amenities = new ArrayList<AmenityDTO>();
@@ -113,9 +113,9 @@ public class AmenityServiceTest extends ServiceTest {
             amenityService.saveAllByBranchId(1L, amenitiesDTO);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Amenity does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -148,7 +148,7 @@ public class AmenityServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInDeleteAllAmenitiesByBranchId() {
+    void shouldGetNotFoundDueToMissingBranchInDeleteAllAmenitiesByBranchId() {
         AmenityListDTO amenitiesDTO = AmenityListDTO.builder().build();
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -157,14 +157,14 @@ public class AmenityServiceTest extends ServiceTest {
             amenityService.deleteAllByBranchId(1L, amenitiesDTO);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 12);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 12);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingAmenityInDeleteAllAmenitiesByBranchId() {
+    void shouldGetNotFoundDueToMissingAmenityInDeleteAllAmenitiesByBranchId() {
         Branch branch = utils.createBranch(null);
         Amenity amenity = utils.createAmenity();
         List<AmenityDTO> amenities = new ArrayList<AmenityDTO>();
@@ -179,9 +179,9 @@ public class AmenityServiceTest extends ServiceTest {
             amenityService.deleteAllByBranchId(1L, amenitiesDTO);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Amenity does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -212,16 +212,16 @@ public class AmenityServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingAmenityInGetAllBranchesByAmenityId() {
+    void shouldGetNotFoundDueToMissingAmenityInGetAllBranchesByAmenityId() {
         when(amenityRepository.existsById(any(Long.class))).thenReturn(false);
 
         try {
             amenityService.getAllBranches(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Amenity with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 34);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 34);
         }
     }
 

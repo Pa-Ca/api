@@ -16,7 +16,7 @@ import com.paca.paca.sale.statics.TaxStatics;
 import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.sale.repository.SaleTaxRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 @Service
@@ -31,11 +31,11 @@ public class SaleTaxService {
 
     private final SaleTaxRepository saleTaxRepository;
 
-    public TaxDTO save(SaleTaxDTO saleTaxDTO) throws NoContentException {
+    public TaxDTO save(SaleTaxDTO saleTaxDTO) throws NotFoundException {
         long saleId = saleTaxDTO.getSaleId();
         Optional<Sale> sale = saleRepository.findById(saleId);
         if (sale.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Sale with id " + saleId + " does not exists",
                     42);
         }
@@ -60,12 +60,12 @@ public class SaleTaxService {
     }
 
     public TaxDTO update(long id, TaxDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
 
         // Check if the default tax exists
         Optional<Tax> tax = taxRepository.findById(id);
         if (tax.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Tax with id " + id + " does not exists",
                     52);
         }
@@ -86,11 +86,11 @@ public class SaleTaxService {
         return taxMapper.toDTO(taxToUpdate);
     }
 
-    public void delete(Long taxId) throws NoContentException {
+    public void delete(Long taxId) throws NotFoundException {
         // Check if the default tax exists
         Optional<Tax> tax = taxRepository.findById(taxId);
         if (tax.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Tax with id " + taxId + " does not exists",
                     52);
         }

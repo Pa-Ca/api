@@ -578,7 +578,7 @@ ALTER TABLE insite_sale ADD CONSTRAINT offline_sale_reservation
 ALTER TABLE insite_sale ADD CONSTRAINT offline_sale_sale
     FOREIGN KEY (sale_id)
     REFERENCES sale (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -587,7 +587,7 @@ ALTER TABLE insite_sale ADD CONSTRAINT offline_sale_sale
 ALTER TABLE online_sale ADD CONSTRAINT online_sale_sale
     FOREIGN KEY (sale_id)
     REFERENCES sale (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -800,7 +800,7 @@ ALTER TABLE public.promotion ADD CONSTRAINT sede_promotion
 ALTER TABLE "table" ADD CONSTRAINT table_branch
     FOREIGN KEY (branch_id)
     REFERENCES public.branch (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;

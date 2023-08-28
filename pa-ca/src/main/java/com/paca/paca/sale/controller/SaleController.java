@@ -6,13 +6,12 @@ import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
-import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor.ValidateSaleOwner;
-
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
+import com.paca.paca.sale.utils.ValidateSaleOwnerInterceptor.ValidateSaleOwner;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -53,7 +52,7 @@ public class SaleController {
     @PostMapping(SaleStatics.Endpoint.SAVE)
     @Operation(summary = "Create new sale", description = "Create a new sale")
     public ResponseEntity<SaleInfoDTO> save(@RequestBody SaleInfoDTO dto)
-            throws NoContentException, BadRequestException, ForbiddenException {
+            throws NotFoundException, BadRequestException, ForbiddenException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
@@ -86,7 +85,7 @@ public class SaleController {
     public ResponseEntity<SaleInfoDTO> update(
             @PathVariable("id") Long id,
             @RequestBody SaleDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(saleService.update(id, dto));
     }
 
@@ -94,7 +93,7 @@ public class SaleController {
     @ValidateRoles({ "business" })
     @DeleteMapping(SaleStatics.Endpoint.DELETE)
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         saleService.delete(id);
     }
 
@@ -103,7 +102,7 @@ public class SaleController {
     @ValidateRoles({ "business" })
     @DeleteMapping(SaleStatics.Endpoint.CLEAR)
     @Operation(summary = "Delete sale products form a sale", description = "Deletes all the sales products of a sale givent the slae ID")
-    public void clearSaleProducts(@PathVariable("id") Long id) throws NoContentException, BadRequestException {
+    public void clearSaleProducts(@PathVariable("id") Long id) throws NotFoundException, BadRequestException {
         saleService.clearSaleProducts(id);
     }
 

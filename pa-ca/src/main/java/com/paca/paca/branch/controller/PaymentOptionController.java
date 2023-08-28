@@ -6,7 +6,7 @@ import com.paca.paca.branch.statics.PaymentOptionStatics;
 import com.paca.paca.branch.service.PaymentOptionService;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.utils.ValidatePaymentOptionOwnerInterceptor.ValidatePaymentOptionOwner;
 
@@ -46,7 +46,7 @@ public class PaymentOptionController {
     @PostMapping(PaymentOptionStatics.Endpoint.SAVE)
     @Operation(summary = "Create new payment option", description = "Create a new payment option")
     public ResponseEntity<PaymentOptionDTO> save(@RequestBody PaymentOptionDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
             return ResponseEntity.ok(paymentOptionService.save(dto));
@@ -68,7 +68,7 @@ public class PaymentOptionController {
     public ResponseEntity<PaymentOptionDTO> update(
             @PathVariable("id") Long id,
             @RequestBody PaymentOptionDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(paymentOptionService.update(id, dto));
     }
 
@@ -76,7 +76,7 @@ public class PaymentOptionController {
     @ValidatePaymentOptionOwner
     @DeleteMapping(PaymentOptionStatics.Endpoint.DELETE)
     @Operation(summary = "Delete a payment option", description = "Delete the data of a payment option given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         paymentOptionService.delete(id);
     }
 }

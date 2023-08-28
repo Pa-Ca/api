@@ -15,7 +15,7 @@ import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -44,16 +44,16 @@ public class ReservationServiceTest extends ServiceTest {
     private ReservationService reservationService;
 
     @Test
-    void shouldGetNoContentDueToMissingReservationInGetReservationById() {
+    void shouldGetNotFoundDueToMissingReservationInGetReservationById() {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             reservationService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -99,7 +99,7 @@ public class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInSaveReservation() {
+    void shouldGetNotFoundDueToMissingBranchInSaveReservation() {
         ReservationDTO dto = utils.createReservationDTO(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -108,9 +108,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.save(new ReservationInfoDTO(dto, null, null, null));
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + dto.getBranchId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -247,7 +247,7 @@ public class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReservationInUpdateReservation() {
+    void shouldGetNotFoundDueToMissingReservationInUpdateReservation() {
         Reservation reservation = utils.createReservation(null);
         ReservationDTO dto = utils.createReservationDTO(reservation);
 
@@ -257,9 +257,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.update(reservation.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -309,7 +309,7 @@ public class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReservationInDeleteReservation() {
+    void shouldGetNotFoundDueToMissingReservationInDeleteReservation() {
         Reservation reservation = utils.createReservation(null);
 
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -318,14 +318,14 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.delete(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInGetBranchReservations() {
+    void shouldGetNotFoundDueToMissingBranchInGetBranchReservations() {
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -342,14 +342,14 @@ public class ReservationServiceTest extends ServiceTest {
                     null);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branch.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToPageLessThanZeroInGetBranchReservations() {
+    void shouldGetNotFoundDueToPageLessThanZeroInGetBranchReservations() {
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
@@ -373,7 +373,7 @@ public class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToSizeLessThanOneInGetBranchReservations() {
+    void shouldGetNotFoundDueToSizeLessThanOneInGetBranchReservations() {
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(branch));
@@ -457,16 +457,16 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Cancel
     @Test
-    void shouldGetNoContentDueToMissingReservationInCancelReservation() {
+    void shouldGetNotFoundDueToMissingReservationInCancelReservation() {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             reservationService.cancel(1L);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + 1L + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -537,7 +537,7 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Reject
     @Test
-    void shouldGetNoContentDueToMissingReservationInRejectReservation() {
+    void shouldGetNotFoundDueToMissingReservationInRejectReservation() {
         Reservation reservation = utils.createReservation(null);
 
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -546,9 +546,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.reject(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -604,7 +604,7 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Accept
     @Test
-    void shouldGetNoContentDueToMissingReservationInAcceptReservation() {
+    void shouldGetNotFoundDueToMissingReservationInAcceptReservation() {
         Reservation reservation = utils.createReservation(null);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -612,9 +612,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.accept(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -685,7 +685,7 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Start
     @Test
-    void shouldGetNoContentDueToMissingReservationInStartReservation() {
+    void shouldGetNotFoundDueToMissingReservationInStartReservation() {
         Reservation reservation = utils.createReservation(null);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -693,9 +693,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.start(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -751,7 +751,7 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Retire
     @Test
-    void shouldGetNoContentDueToMissingReservationInRetireReservation() {
+    void shouldGetNotFoundDueToMissingReservationInRetireReservation() {
         Reservation reservation = utils.createReservation(null);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -759,9 +759,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.retire(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -817,7 +817,7 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Close
     @Test
-    void shouldGetNoContentDueToMissingReservationInCloseReservation() {
+    void shouldGetNotFoundDueToMissingReservationInCloseReservation() {
         Reservation reservation = utils.createReservation(null);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
@@ -825,9 +825,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.close(reservation.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
@@ -883,7 +883,7 @@ public class ReservationServiceTest extends ServiceTest {
 
     // Pay
     @Test
-    void shouldGetNoContentDueToMissingReservationInPayReservation() {
+    void shouldGetNotFoundDueToMissingReservationInPayReservation() {
         Reservation reservation = utils.createReservation(null);
         Invoice invoice = utils.createInvoice();
         InvoiceDTO invoiceDTO = utils.createInvoiceDTO(invoice);
@@ -894,9 +894,9 @@ public class ReservationServiceTest extends ServiceTest {
             reservationService.pay(reservation.getId(), invoiceDTO);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Reservation with id " + reservation.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 

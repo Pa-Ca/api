@@ -7,7 +7,7 @@ import com.paca.paca.sale.service.SaleProductService;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.sale.utils.ValidateSaleProductOwnerInterceptor.ValidateSaleProductOwner;
@@ -50,7 +50,7 @@ public class SaleProductController {
     @PostMapping(SaleProductStatics.Endpoint.SAVE)
     @Operation(summary = "Create new sale product", description = "Create a new SaleProduct")
     public ResponseEntity<SaleProductDTO> save(@RequestBody SaleProductDTO dto)
-            throws NoContentException {
+            throws NotFoundException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
@@ -77,7 +77,7 @@ public class SaleProductController {
     public ResponseEntity<SaleProductDTO> update(
             @PathVariable("id") Long id,
             @RequestBody SaleProductDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(saleProductService.update(id, dto));
     }
 
@@ -85,7 +85,7 @@ public class SaleProductController {
     @ValidateRoles({ "business" })
     @DeleteMapping(SaleProductStatics.Endpoint.DELETE)
     @Operation(summary = "Deletes a sale product", description = "Delete the data of a SaleProduct given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         saleProductService.delete(id);
     }
 }

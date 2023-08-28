@@ -14,7 +14,7 @@ import com.paca.paca.branch.service.AmenityService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.branch.dto.PaymentOptionListDTO;
 import com.paca.paca.reservation.service.ReservationService;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -64,13 +64,13 @@ public class BranchController {
     @PostMapping(BranchStatics.Endpoint.SAVE)
     @Operation(summary = "Create new branch", description = "Create a new branch in the app")
     public ResponseEntity<BranchDTO> save(@RequestBody BranchDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(branchService.save(dto));
     }
 
     @GetMapping(BranchStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get branch by ID", description = "Gets the data of a branch given its ID")
-    public ResponseEntity<BranchDTO> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<BranchDTO> getById(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(branchService.getById(id));
     }
 
@@ -81,7 +81,7 @@ public class BranchController {
     public ResponseEntity<BranchDTO> update(
             @PathVariable("id") Long id,
             @RequestBody BranchDTO dto)
-            throws NoContentException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(branchService.update(id, dto));
     }
 
@@ -89,28 +89,28 @@ public class BranchController {
     @ValidateRoles({ "business" })
     @DeleteMapping(BranchStatics.Endpoint.DELETE)
     @Operation(summary = "Delete branch", description = "Delete the data of a branch given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         branchService.delete(id);
     }
 
     @GetMapping(BranchStatics.Endpoint.GET_ALL_PRODUCT_SUB_CATEGORIES)
     @Operation(summary = "Get all product sub-categories of a branch", description = "Gets a list with the data of all the product sub-categories of a branch")
     public ResponseEntity<ProductSubCategoryListDTO> getProductSubCategories(
-            @PathVariable("id") Long id) throws NoContentException {
+            @PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(branchService.getProductSubCategories(id));
     }
 
     @GetMapping(BranchStatics.Endpoint.GET_ALL_PRODUCTS)
     @Operation(summary = "Get all products of a branch", description = "Gets a list with the data of all the products of a branch given its id")
     public ResponseEntity<ProductListDTO> getProducts(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(branchService.getProducts(id));
     }
 
     @GetMapping(BranchStatics.Endpoint.GET_ALL_PROMOTIONS)
     @Operation(summary = "Get all promotions of a branch", description = "Gets a list with the data of all the promotions of a branch given its id")
     public ResponseEntity<PromotionListDTO> getPromotions(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(branchService.getPromotions(id));
     }
 
@@ -119,14 +119,14 @@ public class BranchController {
     @GetMapping(BranchStatics.Endpoint.GET_ALL_FAVORITE_CLIENTS)
     @Operation(summary = "Gets all clients that have bookmarked this branch", description = "Gets a list with the data of all the users who have marked the branch as favorites given its id")
     public ResponseEntity<ClientListDTO> getFavoriteClients(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(branchService.getFavoriteClients(id));
     }
 
     @GetMapping(BranchStatics.Endpoint.GET_ALL_AMENITIES)
     @Operation(summary = "Get all amenities of a branch", description = "Gets a list with the data of all the amenities of a branch given its id")
     public ResponseEntity<AmenityListDTO> getAllAmenititesByBranchId(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(amenityService.getAllByBranchId(id));
     }
 
@@ -135,7 +135,7 @@ public class BranchController {
     @PostMapping(BranchStatics.Endpoint.SAVE_AMENITIES)
     @Operation(summary = "Associate a list of amenities to the branch", description = "Associates a list of amenities to the branch given its id. Amenities already associated or that do not exist will be ignored")
     public ResponseEntity<AmenityListDTO> saveBranchAmenities(
-            @PathVariable("id") Long id, @RequestBody AmenityListDTO dto) throws NoContentException {
+            @PathVariable("id") Long id, @RequestBody AmenityListDTO dto) throws NotFoundException {
         return ResponseEntity.ok(amenityService.saveAllByBranchId(id, dto));
     }
 
@@ -145,7 +145,7 @@ public class BranchController {
     @Operation(summary = "Detach a list of amenities to the branch", description = "Detach a list of amenities from the branch given its id. Amenities that were not associated or do not exist will be ignored")
     public ResponseEntity<AmenityListDTO> deleteAllByBranchId(
             @PathVariable("id") Long id,
-            @RequestBody AmenityListDTO dto) throws NoContentException {
+            @RequestBody AmenityListDTO dto) throws NotFoundException {
         return ResponseEntity.ok(amenityService.deleteAllByBranchId(id, dto));
     }
 
@@ -154,7 +154,7 @@ public class BranchController {
     public ResponseEntity<ReviewListDTO> getReviewsPage(
             @PathVariable("id") Long id,
             @RequestParam("page") int page,
-            @RequestParam("size") int size) throws NoContentException, UnprocessableException {
+            @RequestParam("size") int size) throws NotFoundException, UnprocessableException {
         return ResponseEntity.ok(branchService.getReviewsPage(id, page, size));
     }
 
@@ -168,7 +168,7 @@ public class BranchController {
             @RequestParam(value = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endTime,
             @RequestParam(value = "fullname", required = false) String fullname,
             @RequestParam(value = "identityDocument", required = false) String identitiyDocument,
-            @PathVariable("id") Long branchId) throws NoContentException, UnprocessableException {
+            @PathVariable("id") Long branchId) throws NotFoundException, UnprocessableException {
         return ResponseEntity.ok(reservationService.getBranchReservations(
                 page,
                 size,
@@ -191,7 +191,7 @@ public class BranchController {
             @RequestParam(value = "fullname", required = false) String fullname,
             @RequestParam(value = "identityDocument", required = false) String identitiyDocument,
             @PathVariable(value = "id", required = false) Long branchId)
-            throws NoContentException, UnprocessableException {
+            throws NotFoundException, UnprocessableException {
         return ResponseEntity.ok(saleService.getBranchSales(
                 page,
                 size,
@@ -206,7 +206,7 @@ public class BranchController {
     @GetMapping(BranchStatics.Endpoint.GET_ALL_TABLES)
     @Operation(summary = "Gets all the tables of a branch", description = "Gets all the tables of a branch given its id")
     public ResponseEntity<TableListDTO> getTablesByBranchId(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(branchService.getTablesByBranchId(id));
     }
 
@@ -214,7 +214,7 @@ public class BranchController {
     @GetMapping(BranchStatics.Endpoint.GET_ALL_PAYMENT_OPTIONS)
     @Operation(summary = "Gets all the payment options of a branch", description = "Gets all the payment options of a branch given its id")
     public ResponseEntity<PaymentOptionListDTO> getPaymentOptionsByBranchId(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(branchService.getPaymentOptionsByBranchId(id));
     }
 

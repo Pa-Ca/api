@@ -13,7 +13,7 @@ import com.paca.paca.client.service.ClientService;
 import com.paca.paca.client.statics.ClientStatics;
 import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.client.utils.ValidateClientInterceptor.ValidateClient;
 
@@ -37,13 +37,13 @@ public class ClientController {
     @ValidateRoles({ "client" })
     @Operation(summary = "Create new client", description = "Register a new client in the app")
     public ResponseEntity<ClientInfoDTO> save(@RequestBody ClientDTO client)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(clientService.save(client));
     }
 
     @GetMapping(ClientStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get client by ID", description = "Gets the data of a client given its ID")
-    public ResponseEntity<ClientDTO> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientDTO> getById(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(clientService.getById(id));
     }
 
@@ -52,7 +52,7 @@ public class ClientController {
     @PutMapping(ClientStatics.Endpoint.UPDATE)
     @Operation(summary = "Update client", description = "Updates the data of a client given its ID")
     public ResponseEntity<ClientInfoDTO> update(@PathVariable("id") Long id, @RequestBody ClientDTO client)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(clientService.update(id, client));
     }
 
@@ -60,13 +60,13 @@ public class ClientController {
     @ValidateRoles({ "client" })
     @DeleteMapping(ClientStatics.Endpoint.DELETE)
     @Operation(summary = "Delete client", description = "Delete the data of a client given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         clientService.delete(id);
     }
 
     @GetMapping(ClientStatics.Endpoint.GET_BY_USER_ID)
     @Operation(summary = "Get client by user ID", description = "Gets the data of a client given its user ID")
-    public ResponseEntity<ClientInfoDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientInfoDTO> getByUserId(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(clientService.getByUserId(id));
     }
 
@@ -74,7 +74,7 @@ public class ClientController {
     @ValidateRoles({ "client" })
     @GetMapping(ClientStatics.Endpoint.FRIENDS_ACCEPTED)
     @Operation(summary = "Gets all the friends of the client", description = "Gets the data of the customers who have accepted or were accepted as friends of the current customer given their ID")
-    public ResponseEntity<ClientListDTO> getAcceptedFriends(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientListDTO> getAcceptedFriends(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(clientService.getAcceptedFriends(id));
     }
 
@@ -82,7 +82,7 @@ public class ClientController {
     @ValidateRoles({ "client" })
     @GetMapping(ClientStatics.Endpoint.FRIENDS_REJECTED)
     @Operation(summary = "Gets all rejected friend requests", description = "Gets the data of customers whose friend requests were rejected by the current customer given their ID")
-    public ResponseEntity<ClientListDTO> getRejectedFriends(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientListDTO> getRejectedFriends(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(clientService.getRejectedFriends(id));
     }
 
@@ -90,7 +90,7 @@ public class ClientController {
     @ValidateRoles({ "client" })
     @GetMapping(ClientStatics.Endpoint.FRIENDS_PENDING)
     @Operation(summary = "Gets all pending friend requests", description = "Gets the data of customers whose friend requests have not yet been answered by the current customer given their ID")
-    public ResponseEntity<ClientListDTO> getPendingFriends(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ClientListDTO> getPendingFriends(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(clientService.getPendingFriends(id));
     }
 
@@ -100,7 +100,7 @@ public class ClientController {
     @Operation(summary = "Send a new friend request", description = "Send a new friend request given the requester and addresser IDs")
     public ResponseEntity<FriendDTO> friendRequest(
             @PathVariable("id") Long id,
-            @PathVariable("requesterId") Long requesterId) throws NoContentException, ConflictException {
+            @PathVariable("requesterId") Long requesterId) throws NotFoundException, ConflictException {
         return ResponseEntity.ok(clientService.friendRequest(requesterId, id));
     }
 
@@ -109,7 +109,7 @@ public class ClientController {
     @DeleteMapping(ClientStatics.Endpoint.DELETE_FRIEND_REQUEST)
     @Operation(summary = "Delete friend request", description = "Delete friend request given its ID")
     public void deleteFriendRequest(@PathVariable("id") Long id, @PathVariable("requesterId") Long requesterId)
-            throws NoContentException {
+            throws NotFoundException {
         clientService.deleteFriendRequest(requesterId, id);
     }
 
@@ -119,7 +119,7 @@ public class ClientController {
     @Operation(summary = "Accept a friend request", description = "Accept friend request given its ID")
     public ResponseEntity<FriendDTO> acceptFriendRequest(@PathVariable("id") Long id,
             @PathVariable("requesterId") Long requesterId)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(clientService.acceptFriendRequest(requesterId, id));
     }
 
@@ -129,7 +129,7 @@ public class ClientController {
     @Operation(summary = "Reject a friend request", description = "Reject friend request given its ID")
     public ResponseEntity<FriendDTO> rejectFriendRequest(@PathVariable("id") Long id,
             @PathVariable("requesterId") Long requesterId)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(clientService.rejectFriendRequest(requesterId, id));
     }
 
@@ -138,7 +138,7 @@ public class ClientController {
     @GetMapping(ClientStatics.Endpoint.RESERVATIONS)
     @Operation(summary = "Gets all client reservations", description = "Obtains the data of all the reservations of the client given his ID")
     public ResponseEntity<ReservationInfoListDTO> getReservations(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(clientService.getReservations(id));
     }
 
@@ -147,7 +147,7 @@ public class ClientController {
     @GetMapping(ClientStatics.Endpoint.FAVORITE_BRANCHES)
     @Operation(summary = "Gets the client's favorite branches", description = "Gets the data of the branches marked as favorites by the client given its ID")
     public ResponseEntity<BranchListDTO> getFavoriteBranches(@PathVariable("id") Long id)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(clientService.getFavoriteBranches(id));
     }
 
@@ -158,7 +158,7 @@ public class ClientController {
     public ResponseEntity<BranchDTO> addFavoriteBranches(
             @PathVariable("id") Long id,
             @PathVariable("branchId") Long branchId)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(clientService.addFavoriteBranch(id, branchId));
     }
 
@@ -169,7 +169,7 @@ public class ClientController {
     public void deleteFavoriteBranch(
             @PathVariable("id") Long id,
             @PathVariable("branchId") Long branchId)
-            throws NoContentException {
+            throws NotFoundException {
         clientService.deleteFavoriteBranch(id, branchId);
     }
 }

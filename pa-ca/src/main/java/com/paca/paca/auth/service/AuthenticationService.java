@@ -52,7 +52,7 @@ public class AuthenticationService {
         AuthUtils.validateRole(request.getRole());
         Optional<Role> role = roleRepository.findByName(UserRole.valueOf(request.getRole()));
         if (role.isEmpty()) {
-            throw new NoContentException("Role " + request.getRole() + " does not exists");
+            throw new NotFoundException("Role " + request.getRole() + " does not exists");
         }
 
         // Create and save new User
@@ -154,7 +154,7 @@ public class AuthenticationService {
     }
 
     public ResetPasswordResponseDTO resetPasswordRequest(ResetPasswordRequestDTO request)
-            throws BadRequestException, NoContentException, IOException, MessagingException {
+            throws BadRequestException, NotFoundException, IOException, MessagingException {
         String email = request.getEmail();
 
         if (email == null) {
@@ -162,7 +162,7 @@ public class AuthenticationService {
         }
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new NoContentException(
+                () -> new NotFoundException(
                         "User with email " + email + " does not exists",
                         30));
 
@@ -173,7 +173,7 @@ public class AuthenticationService {
     }
 
     public void resetPassword(ResetPasswordDTO request, String resetPasswordToken)
-            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+            throws ForbiddenException, BadRequestException, UnprocessableException, NotFoundException {
         String email;
 
         if (resetPasswordToken == null && request.getEmail() == null) {
@@ -209,7 +209,7 @@ public class AuthenticationService {
         AuthUtils.validatePassword(password);
 
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new NoContentException(
+                () -> new NotFoundException(
                         "User with email " + email + " does not exists",
                         30));
         user.setPassword(passwordEncoder.encode(password));
@@ -217,7 +217,7 @@ public class AuthenticationService {
     }
 
     public VerifyEmailResponseDTO verifyEmailRequest(VerifyEmailRequestDTO request)
-            throws BadRequestException, NoContentException, IOException, MessagingException {
+            throws BadRequestException, NotFoundException, IOException, MessagingException {
         String email = request.getEmail();
 
         if (email == null) {
@@ -225,7 +225,7 @@ public class AuthenticationService {
         }
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new NoContentException(
+                () -> new NotFoundException(
                         "User with email " + email + " does not exists",
                         30));
 
@@ -236,7 +236,7 @@ public class AuthenticationService {
     }
 
     public void verifyEmail(String verifyEmailToken)
-            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+            throws ForbiddenException, BadRequestException, UnprocessableException, NotFoundException {
         String email;
 
         try {
@@ -250,7 +250,7 @@ public class AuthenticationService {
         }
 
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new NoContentException(
+                () -> new NotFoundException(
                         "User with email " + email + " does not exists",
                         30));
 

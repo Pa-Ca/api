@@ -17,7 +17,7 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.TierRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.business.repository.BusinessRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
@@ -58,9 +58,9 @@ public class BusinessService {
         }
     }
 
-    public BusinessDTO getById(Long id) throws NoContentException {
+    public BusinessDTO getById(Long id) throws NotFoundException {
         Business business = businessRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Business with id " + id + " does not exists",
                         28));
 
@@ -69,12 +69,12 @@ public class BusinessService {
         return dto;
     }
 
-    public BusinessDTO save(BusinessDTO dto) throws NoContentException, ConflictException {
+    public BusinessDTO save(BusinessDTO dto) throws NotFoundException, ConflictException {
         String email = dto.getEmail();
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
         if (user.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "User with email " + dto.getEmail() + " does not exists",
                     30);
         }
@@ -92,7 +92,7 @@ public class BusinessService {
 
         Optional<Tier> tier = tierRepository.findByName(BusinessTier.valueOf(dto.getTier()));
         if (tier.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Tier " + tier.get() + " does not exists",
                     38);
         }
@@ -103,10 +103,10 @@ public class BusinessService {
         return dtoResponse;
     }
 
-    public BusinessDTO update(Long id, BusinessDTO dto) throws NoContentException {
+    public BusinessDTO update(Long id, BusinessDTO dto) throws NotFoundException {
         Optional<Business> current = businessRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Business with id " + id + " does not exists",
                     28);
         }
@@ -115,7 +115,7 @@ public class BusinessService {
         if (dto.getTier() != null) {
             validateTier(dto.getTier());
             tier = tierRepository.findByName(BusinessTier.valueOf(dto.getTier())).orElseThrow(
-                    () -> new NoContentException(
+                    () -> new NotFoundException(
                             "Tier " + dto.getTier() + " does not exists",
                             38));
         } else {
@@ -129,10 +129,10 @@ public class BusinessService {
         return dtoResponse;
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Business> current = businessRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Business with id " + id + " does not exists",
                     28);
         }
@@ -140,9 +140,9 @@ public class BusinessService {
 
     }
 
-    public BusinessDTO getByUserId(Long id) throws NoContentException {
+    public BusinessDTO getByUserId(Long id) throws NotFoundException {
         Business business = businessRepository.findByUserId(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "User with id " + id + " does not exists",
                         12));
 

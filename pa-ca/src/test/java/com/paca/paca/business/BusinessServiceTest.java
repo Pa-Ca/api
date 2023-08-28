@@ -11,7 +11,7 @@ import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
 import com.paca.paca.business.service.BusinessService;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import junit.framework.TestCase;
 
@@ -34,16 +34,16 @@ class BusinessServiceTest extends ServiceTest {
     private BusinessService businessService;
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInGetBusinessById() {
+    void shouldGetNotFoundDueToMissingBusinessInGetBusinessById() {
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             businessService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -61,7 +61,7 @@ class BusinessServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingUserInSave() {
+    void shouldGetNotFoundDueToMissingUserInSave() {
         BusinessDTO dto = utils.createBusinessDTO(null);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
@@ -70,9 +70,9 @@ class BusinessServiceTest extends ServiceTest {
             businessService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "User with email " + dto.getEmail() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 30);
         }
     }
 
@@ -114,7 +114,7 @@ class BusinessServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInUpdate() {
+    void shouldGetNotFoundDueToMissingBusinessInUpdate() {
         Business business = utils.createBusiness(null);
         BusinessDTO dto = utils.createBusinessDTO(business);
 
@@ -124,9 +124,9 @@ class BusinessServiceTest extends ServiceTest {
             businessService.update(business.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id " + business.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -149,7 +149,7 @@ class BusinessServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInDelete() {
+    void shouldGetNotFoundDueToMissingBusinessInDelete() {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -158,14 +158,14 @@ class BusinessServiceTest extends ServiceTest {
             businessService.delete(business.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id " + business.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInGetBusinessByUserId() {
+    void shouldGetNotFoundDueToMissingBusinessInGetBusinessByUserId() {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findByUserId(any(Long.class))).thenReturn(Optional.empty());
@@ -174,9 +174,9 @@ class BusinessServiceTest extends ServiceTest {
             businessService.getByUserId(business.getUser().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "User with id " + business.getUser().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 12);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 12);
         }
     }
 

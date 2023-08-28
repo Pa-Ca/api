@@ -26,7 +26,7 @@ import com.paca.paca.client.model.FavoriteBranch;
 import com.paca.paca.branch.service.BranchService;
 import com.paca.paca.promotion.dto.PromotionListDTO;
 import com.paca.paca.branch.dto.PaymentOptionListDTO;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.exception.exceptions.UnprocessableException;
@@ -50,16 +50,16 @@ public class BranchServiceTest extends ServiceTest {
     private BranchService branchService;
 
     @Test 
-    void shouldGetNoContentDueToMissingBranchInGetBranchById() {
+    void shouldGetNotFoundDueToMissingBranchInGetBranchById() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -77,7 +77,7 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInSaveBranch() {
+    void shouldGetNotFoundDueToMissingBusinessInSaveBranch() {
         BranchDTO dto = utils.createBranchDTO(null);
 
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -86,9 +86,9 @@ public class BranchServiceTest extends ServiceTest {
             branchService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id " + dto.getBusinessId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 21);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 21);
         }
     }
 
@@ -126,7 +126,7 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInUpdateBranch() {
+    void shouldGetNotFoundDueToMissingBranchInUpdateBranch() {
         Branch branch = utils.createBranch(null);
         BranchDTO dto = utils.createBranchDTO(branch);
 
@@ -136,9 +136,9 @@ public class BranchServiceTest extends ServiceTest {
             branchService.update(branch.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branch.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -176,7 +176,7 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInDeleteBranch() {
+    void shouldGetNotFoundDueToMissingBranchInDeleteBranch() {
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -185,14 +185,14 @@ public class BranchServiceTest extends ServiceTest {
             branchService.delete(branch.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branch.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInProductSubCategories() {
+    void shouldGetNotFoundDueToMissingBranchInProductSubCategories() {
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -201,9 +201,9 @@ public class BranchServiceTest extends ServiceTest {
             branchService.getProductSubCategories(branch.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branch.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -223,16 +223,16 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingBranchInGetProducts() {
+    void shouldGetNotFoundDueToMissingBranchInGetProducts() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getProducts(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -252,16 +252,16 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingBranchInGetPromotions() {
+    void shouldGetNotFoundDueToMissingBranchInGetPromotions() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getPromotions(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -281,16 +281,16 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingBranchInGetFavoriteClients() {
+    void shouldGetNotFoundDueToMissingBranchInGetFavoriteClients() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getFavoriteClients(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -310,7 +310,7 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test    
-    void shouldGetNoContentDueToMissingBranchInGetReviewsPage() {
+    void shouldGetNotFoundDueToMissingBranchInGetReviewsPage() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         Long branchId = 1L;
@@ -318,9 +318,9 @@ public class BranchServiceTest extends ServiceTest {
             branchService.getReviewsPage(branchId, 0, 10);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -387,16 +387,16 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInGetDefaultTaxesByBranchId() {
+    void shouldGetNotFoundDueToMissingBranchInGetDefaultTaxesByBranchId() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getDefaultTaxesByBranchId(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -416,16 +416,16 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInGetTablesBrBranchId() {
+    void shouldGetNotFoundDueToMissingBranchInGetTablesBrBranchId() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getTablesByBranchId(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -445,16 +445,16 @@ public class BranchServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInGetPaymentOptionsByBranchId() {
+    void shouldGetNotFoundDueToMissingBranchInGetPaymentOptionsByBranchId() {
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             branchService.getPaymentOptionsByBranchId(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 

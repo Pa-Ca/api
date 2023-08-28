@@ -9,7 +9,7 @@ import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.product.repository.ProductRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
 
@@ -25,9 +25,9 @@ public class ProductService {
 
     private final ProductSubCategoryRepository productSubCategoryRepository;
 
-    public ProductDTO getById(Long id) throws NoContentException {
+    public ProductDTO getById(Long id) throws NotFoundException {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Product with id " + id + " does not exists",
                         25));
 
@@ -35,11 +35,11 @@ public class ProductService {
         return dto;
     }
 
-    public ProductDTO save(ProductDTO dto) throws NoContentException, ConflictException {
+    public ProductDTO save(ProductDTO dto) throws NotFoundException, ConflictException {
         Optional<ProductSubCategory> subCategory = productSubCategoryRepository
                 .findById(dto.getSubCategoryId());
         if (subCategory.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product sub-category with id " + dto.getSubCategoryId() + " does not exists",
                     23);
         }
@@ -57,10 +57,10 @@ public class ProductService {
         return dtoResponse;
     }
 
-    public ProductDTO update(Long id, ProductDTO dto) throws NoContentException, ConflictException {
+    public ProductDTO update(Long id, ProductDTO dto) throws NotFoundException, ConflictException {
         Optional<Product> current = productRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product with id: " + id + " does not exists",
                     25);
         }
@@ -78,10 +78,10 @@ public class ProductService {
         return dtoResponse;
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Product> current = productRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product with id: " + id + " does not exists",
                     25);
         }

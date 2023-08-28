@@ -10,7 +10,7 @@ import com.paca.paca.branch.model.Branch;
 import com.paca.paca.promotion.model.Promotion;
 import com.paca.paca.promotion.dto.PromotionDTO;
 import com.paca.paca.promotion.service.PromotionService;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import java.util.Optional;
 
@@ -24,16 +24,16 @@ public class PromotionServiceTest extends ServiceTest {
     private PromotionService promotionService;
 
     @Test 
-    void shouldGetNoContentDueToMissingPromotionInGetPromotionById() {
+    void shouldGetNotFoundDueToMissingPromotionInGetPromotionById() {
         when(promotionRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             promotionService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Promotion with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 26);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 26);
         }
     }
 
@@ -51,7 +51,7 @@ public class PromotionServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInSavePromotion() {
+    void shouldGetNotFoundDueToMissingBranchInSavePromotion() {
         PromotionDTO dto = utils.createPromotionDTO(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -60,9 +60,9 @@ public class PromotionServiceTest extends ServiceTest {
             promotionService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + dto.getBranchId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -82,7 +82,7 @@ public class PromotionServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingPromotionInUpdatePromotion() {
+    void shouldGetNotFoundDueToMissingPromotionInUpdatePromotion() {
         Promotion promotion = utils.createPromotion(null);
         PromotionDTO dto = utils.createPromotionDTO(promotion);
 
@@ -92,9 +92,9 @@ public class PromotionServiceTest extends ServiceTest {
             promotionService.update(promotion.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Promotion with id " + promotion.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 26);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 26);
         }
     }
 
@@ -114,7 +114,7 @@ public class PromotionServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingPromotionInDeletePromotion() {
+    void shouldGetNotFoundDueToMissingPromotionInDeletePromotion() {
         Promotion promotion = utils.createPromotion(null);
 
         when(promotionRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -123,9 +123,9 @@ public class PromotionServiceTest extends ServiceTest {
             promotionService.delete(promotion.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Promotion with id " + promotion.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 26);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 26);
         }
     }
 }

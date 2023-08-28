@@ -31,7 +31,7 @@ import com.paca.paca.reservation.dto.ReservationInfoListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.client.repository.FavoriteBranchRepository;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
@@ -74,9 +74,9 @@ public class ClientService {
 
     private final FavoriteBranchRepository favoriteBranchRepository;
 
-    public ClientDTO getById(Long id) throws NoContentException {
+    public ClientDTO getById(Long id) throws NotFoundException {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Client with id " + id + " does not exists",
                         28));
 
@@ -84,12 +84,12 @@ public class ClientService {
         return dto;
     }
 
-    public ClientInfoDTO save(ClientDTO dto) throws NoContentException, ConflictException {
+    public ClientInfoDTO save(ClientDTO dto) throws NotFoundException, ConflictException {
         String email = dto.getEmail();
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
         if (user.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "User with email " + dto.getEmail() + " does not exists",
                     30);
         }
@@ -115,10 +115,10 @@ public class ClientService {
         return new ClientInfoDTO(response, clientGuest.getId());
     }
 
-    public ClientInfoDTO update(Long id, ClientDTO dto) throws NoContentException {
+    public ClientInfoDTO update(Long id, ClientDTO dto) throws NotFoundException {
         Optional<Client> current = clientRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -131,10 +131,10 @@ public class ClientService {
         return new ClientInfoDTO(response, clientGuest.getId());
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Client> current = clientRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -142,9 +142,9 @@ public class ClientService {
 
     }
 
-    public ClientInfoDTO getByUserId(Long id) throws NoContentException {
+    public ClientInfoDTO getByUserId(Long id) throws NotFoundException {
         Client client = clientRepository.findByUserId(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "User with id " + id + " does not exists",
                         12));
 
@@ -154,10 +154,10 @@ public class ClientService {
         return new ClientInfoDTO(dto, clientGuest.getId());
     }
 
-    public ClientListDTO getPendingFriends(Long id) throws NoContentException {
+    public ClientListDTO getPendingFriends(Long id) throws NotFoundException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -172,10 +172,10 @@ public class ClientService {
         return ClientListDTO.builder().clients(response).build();
     }
 
-    public ClientListDTO getAcceptedFriends(Long id) throws NoContentException {
+    public ClientListDTO getAcceptedFriends(Long id) throws NotFoundException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -195,10 +195,10 @@ public class ClientService {
         return ClientListDTO.builder().clients(response).build();
     }
 
-    public ClientListDTO getRejectedFriends(Long id) throws NoContentException {
+    public ClientListDTO getRejectedFriends(Long id) throws NotFoundException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -214,21 +214,21 @@ public class ClientService {
     }
 
     public FriendDTO friendRequest(Long requesterId, Long addresserId)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         if (requesterId == addresserId) {
             throw new ConflictException("Requester and addresser can not be the same", 28);
         }
 
         Optional<Client> requester = clientRepository.findById(requesterId);
         if (requester.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Requester with id: " + requesterId + " does not exists",
                     13);
         }
 
         Optional<Client> addresser = clientRepository.findById(addresserId);
         if (addresser.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Addresser with id: " + addresserId + " does not exists",
                     14);
         }
@@ -252,10 +252,10 @@ public class ClientService {
     }
 
     public FriendDTO acceptFriendRequest(Long requesterId, Long addresserId)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         Optional<Friend> request = friendRepository.findByRequesterIdAndAddresserId(requesterId, addresserId);
         if (request.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Friend request does not exists",
                     16);
         }
@@ -278,10 +278,10 @@ public class ClientService {
     }
 
     public FriendDTO rejectFriendRequest(Long requesterId, Long addresserId)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         Optional<Friend> request = friendRepository.findByRequesterIdAndAddresserId(requesterId, addresserId);
         if (request.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Friend request does not exists",
                     16);
         }
@@ -304,20 +304,20 @@ public class ClientService {
     }
 
     public void deleteFriendRequest(Long requesterId, Long addresserId)
-            throws NoContentException {
+            throws NotFoundException {
         Optional<Friend> request = friendRepository.findByRequesterIdAndAddresserId(requesterId, addresserId);
         if (request.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Friend request does not exists",
                     16);
         }
         friendRepository.deleteById(request.get().getId());
     }
 
-    public ReservationInfoListDTO getReservations(Long id) throws NoContentException {
+    public ReservationInfoListDTO getReservations(Long id) throws NotFoundException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -339,10 +339,10 @@ public class ClientService {
         return ReservationInfoListDTO.builder().reservations(response).build();
     }
 
-    public BranchListDTO getFavoriteBranches(Long id) throws NoContentException {
+    public BranchListDTO getFavoriteBranches(Long id) throws NotFoundException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
@@ -357,17 +357,17 @@ public class ClientService {
         return BranchListDTO.builder().branches(response).build();
     }
 
-    public BranchDTO addFavoriteBranch(Long id, Long branchId) throws NoContentException, ConflictException {
+    public BranchDTO addFavoriteBranch(Long id, Long branchId) throws NotFoundException, ConflictException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -389,24 +389,24 @@ public class ClientService {
         return dto;
     }
 
-    public void deleteFavoriteBranch(Long id, Long branchId) throws NoContentException {
+    public void deleteFavoriteBranch(Long id, Long branchId) throws NotFoundException {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + id + " does not exists",
                     28);
         }
 
         Optional<Branch> branch = branchRepository.findById(id);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + id + " does not exists",
                     20);
         }
 
         Boolean favExists = favoriteBranchRepository.existsByClientIdAndBranchId(id, branchId);
         if (!favExists) {
-            throw new NoContentException("Favorite branch does not exists", 33);
+            throw new NotFoundException("Favorite branch does not exists", 33);
         }
 
         FavoriteBranch fav = favoriteBranchRepository.findByClientIdAndBranchId(id, branchId).get();

@@ -26,7 +26,7 @@ import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.client.repository.ClientGuestRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.repository.InvoiceRepository;
@@ -66,9 +66,9 @@ public class ReservationService {
 
     private final ClientGuestRepository clientGuestRepository;
 
-    public ReservationInfoDTO getById(Long id) throws NoContentException {
+    public ReservationInfoDTO getById(Long id) throws NotFoundException {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Reservation with id " + id + " does not exists",
                         27));
 
@@ -84,12 +84,12 @@ public class ReservationService {
                 reservationMapper);
     }
 
-    public ReservationInfoDTO save(ReservationInfoDTO dto) throws NoContentException, BadRequestException {
+    public ReservationInfoDTO save(ReservationInfoDTO dto) throws NotFoundException, BadRequestException {
         ReservationDTO reservationDTO = dto.getReservation();
         Long branchId = reservationDTO.getBranchId();
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -154,20 +154,20 @@ public class ReservationService {
         return dtoResponse;
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Reservation> current = reservationRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists",
                     27);
         }
         reservationRepository.deleteById(id);
     }
 
-    public ReservationInfoDTO update(Long id, ReservationDTO dto) throws NoContentException {
+    public ReservationInfoDTO update(Long id, ReservationDTO dto) throws NotFoundException {
         Optional<Reservation> current = reservationRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists",
                     27);
         }
@@ -197,10 +197,10 @@ public class ReservationService {
             Date endTime,
             String fullname,
             String identityDocument)
-            throws UnprocessableException, NoContentException {
+            throws UnprocessableException, NotFoundException {
         Optional<Branch> branch = branchRepository.findById(branchId);
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + branchId + " does not exists",
                     20);
         }
@@ -372,11 +372,11 @@ public class ReservationService {
                 .build();
     }
 
-    public void cancel(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void cancel(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists",
                     27);
         }
@@ -406,11 +406,11 @@ public class ReservationService {
         reservationRepository.save(updatedReservation);
     }
 
-    public void reject(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void reject(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
@@ -433,11 +433,11 @@ public class ReservationService {
         reservationRepository.save(updatedReservation);
     }
 
-    public void accept(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void accept(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists", 27);
         }
 
@@ -466,11 +466,11 @@ public class ReservationService {
         reservationRepository.save(updatedReservation);
     }
 
-    public void start(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void start(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
@@ -493,11 +493,11 @@ public class ReservationService {
         reservationRepository.save(updatedReservation);
     }
 
-    public void retire(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void retire(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
@@ -520,11 +520,11 @@ public class ReservationService {
         reservationRepository.save(updatedReservation);
     }
 
-    public void close(Long id) throws NoContentException, BadRequestException, ForbiddenException {
+    public void close(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {
@@ -548,12 +548,12 @@ public class ReservationService {
     }
 
     public InvoiceDTO pay(Long id, InvoiceDTO dto)
-            throws NoContentException, BadRequestException, ForbiddenException {
+            throws NotFoundException, BadRequestException, ForbiddenException {
         dto.setPayDate(new Date());
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Reservation with id " + id + " does not exists", 27);
 
         if (reservation.get().getStatus().equals(ReservationStatics.Status.RETURNED)) {

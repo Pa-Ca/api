@@ -9,7 +9,7 @@ import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.service.GuestService;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import junit.framework.TestCase;
 
@@ -29,16 +29,16 @@ public class GuestServiceTest extends ServiceTest {
     private GuestService guestService;
 
     @Test
-    void shouldGetNoContentDueToMissingGuestInGetGuestById() {
+    void shouldGetNotFoundDueToMissingGuestInGetGuestById() {
         when(guestRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             guestService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Guest with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 54);
         }
     }
 
@@ -59,16 +59,16 @@ public class GuestServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingGuestInGetGuestByIdentityDocument() {
+    void shouldGetNotFoundDueToMissingGuestInGetGuestByIdentityDocument() {
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.empty());
 
         try {
             guestService.getByIdentityDocument(1L, "iden_doc_test");
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Guest with identityDocument iden_doc_test does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 40);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 40);
         }
     }
 
@@ -78,6 +78,8 @@ public class GuestServiceTest extends ServiceTest {
         when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
         when(reservationRepository.existsByBranchBusinessIdAndGuestId(any(Long.class), any(Long.class)))
                 .thenReturn(false);
+        when(saleRepository.existsByBranchBusinessIdAndClientGuestGuestId(any(Long.class), any(Long.class)))
+                .thenReturn(false);
 
         try {
             guestService.getByIdentityDocument(1L, "iden_doc_test");
@@ -85,7 +87,7 @@ public class GuestServiceTest extends ServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ForbiddenException);
             Assert.assertEquals(e.getMessage(),
-                    "Guest with identityDocument iden_doc_test does not have a past reservation with this business");
+                    "Guest with identityDocument iden_doc_test does not have a past reservation or sale with this business");
             Assert.assertEquals(((ForbiddenException) e).getCode(), (Integer) 40);
         }
     }
@@ -132,24 +134,6 @@ public class GuestServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetConflictDueToIdentityDocumentAlreadyExists() {
-        Guest guest = utils.createGuest();
-        GuestDTO dto = utils.createGuestDTO(guest);
-
-        when(guestRepository.findByIdentityDocument(any(String.class))).thenReturn(Optional.ofNullable(guest));
-
-        try {
-            guestService.save(dto);
-            TestCase.fail();
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof ConflictException);
-            Assert.assertEquals(e.getMessage(), "Guest with identity document " + dto.getIdentityDocument() +
-                    " already exists");
-            Assert.assertEquals(((ConflictException) e).getCode(), (Integer) 60);
-        }
-    }
-
-    @Test
     void shouldGetConflictDueToEmailAlreadyExists() {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
@@ -187,7 +171,7 @@ public class GuestServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingGuestInUpdateGuest() {
+    void shouldGetNotFoundDueToMissingGuestInUpdateGuest() {
         Guest guest = utils.createGuest();
         GuestDTO dto = utils.createGuestDTO(guest);
 
@@ -197,9 +181,9 @@ public class GuestServiceTest extends ServiceTest {
             guestService.update(guest.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Guest with id " + guest.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 54);
         }
     }
 
@@ -222,7 +206,7 @@ public class GuestServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingGuestInDeleteGuest() {
+    void shouldGetNotFoundDueToMissingGuestInDeleteGuest() {
         Guest guest = utils.createGuest();
 
         when(guestRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -231,9 +215,9 @@ public class GuestServiceTest extends ServiceTest {
             guestService.delete(guest.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Guest with id " + guest.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 54);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 54);
         }
     }
 }

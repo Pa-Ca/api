@@ -12,7 +12,7 @@ import com.paca.paca.branch.model.Branch;
 import com.paca.paca.product.model.Product;
 import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
@@ -45,16 +45,16 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
     }
 
     @Test 
-    void shouldGetNoContentDueToMissingProductSubCategoryInGetProductSubCategoryById() {
+    void shouldGetNotFoundDueToMissingProductSubCategoryInGetProductSubCategoryById() {
         when(productSubCategoryRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             productSubCategoryService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Product sub-category with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 23);
         }
     }
 
@@ -73,7 +73,7 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInSaveProductSubCategory() {
+    void shouldGetNotFoundDueToMissingBranchInSaveProductSubCategory() {
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(null);
 
         when(branchRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -82,14 +82,14 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
             productSubCategoryService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + dto.getBranchId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductCategoryInSaveProductSubCategory() {
+    void shouldGetNotFoundDueToMissingProductCategoryInSaveProductSubCategory() {
         Branch branch = utils.createBranch(null);
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(null);
 
@@ -100,9 +100,9 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
             productSubCategoryService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Product category with id " + dto.getCategoryId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 24);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 24);
         }
     }
 
@@ -152,7 +152,7 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductSubCategoryInUpdateProductSubCategory() {
+    void shouldGetNotFoundDueToMissingProductSubCategoryInUpdateProductSubCategory() {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
         ProductSubCategoryDTO dto = utils.createProductSubCategoryDTO(productSubCategory);
 
@@ -162,10 +162,10 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
             productSubCategoryService.update(productSubCategory.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(),
                     "Product sub-category with id " + productSubCategory.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 23);
         }
     }
 
@@ -209,7 +209,7 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductSubCategoryInDeleteProductSubCategory() {
+    void shouldGetNotFoundDueToMissingProductSubCategoryInDeleteProductSubCategory() {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
 
         when(productSubCategoryRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -218,15 +218,15 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
             productSubCategoryService.delete(productSubCategory.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(),
                     "Product sub-category with id " + productSubCategory.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 23);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingProductSubCategoryInGetAllProductsByProductCategory() {
+    void shouldGetNotFoundDueToMissingProductSubCategoryInGetAllProductsByProductCategory() {
         ProductSubCategory productSubCategory = utils.createProductSubCategory(null, null);
 
         when(productSubCategoryRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -235,10 +235,10 @@ public class ProductSubCategoryServiceTest extends ServiceTest {
             productSubCategoryService.getAllProducts(productSubCategory.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(),
                     "Product sub-category with id " + productSubCategory.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 23);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 23);
         }
     }
 

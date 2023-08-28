@@ -7,7 +7,7 @@ import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.branch.utils.ValidateTableOwnerInterceptor.ValidateTableOwner;
 
@@ -45,7 +45,7 @@ public class TableController {
     @PostMapping(TableStatics.Endpoint.SAVE)
     @Operation(summary = "Create new table", description = "Create a new table")
     public ResponseEntity<TableDTO> save(@RequestBody TableDTO dto)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"))) {
             return ResponseEntity.ok(tableService.save(dto));
@@ -67,7 +67,7 @@ public class TableController {
     public ResponseEntity<TableDTO> update(
             @PathVariable("id") Long id,
             @RequestBody TableDTO dto)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(tableService.update(id, dto));
     }
 
@@ -75,7 +75,7 @@ public class TableController {
     @ValidateRoles({ "business" })
     @DeleteMapping(TableStatics.Endpoint.DELETE)
     @Operation(summary = "Delete table", description = "Delete the data of a table given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         tableService.delete(id);
     }
 }

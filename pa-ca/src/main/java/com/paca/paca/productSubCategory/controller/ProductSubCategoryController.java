@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paca.paca.product.dto.ProductListDTO;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
@@ -49,14 +49,14 @@ public class ProductSubCategoryController {
     @Operation(summary = "Create new product sub-category", description = "Create a new product sub-category in the app")
     public ResponseEntity<ProductSubCategoryDTO> save(
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
-            throws NoContentException, BadRequestException, ConflictException {
+            throws NotFoundException, BadRequestException, ConflictException {
         return ResponseEntity.ok(productSubCategoryService.save(productSubCategoryDTO));
     }
 
     @GetMapping(ProductSubCategoryStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get product sub-category by ID", description = "Gets the data of a product sub-category given its ID")
     public ResponseEntity<ProductSubCategoryDTO> getById(
-            @PathVariable("id") Long id) throws NoContentException {
+            @PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(productSubCategoryService.getById(id));
     }
 
@@ -67,7 +67,7 @@ public class ProductSubCategoryController {
     public ResponseEntity<ProductSubCategoryDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
-            throws NoContentException, BadRequestException, ConflictException {
+            throws NotFoundException, BadRequestException, ConflictException {
         return ResponseEntity.ok(productSubCategoryService.update(id, productSubCategoryDTO));
     }
 
@@ -75,13 +75,13 @@ public class ProductSubCategoryController {
     @ValidateProductSubCategoryOwner
     @DeleteMapping(ProductSubCategoryStatics.Endpoint.DELETE)
     @Operation(summary = "Delete product sub-category", description = "Delete the data of a product sub-category given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         productSubCategoryService.delete(id);
     }
 
     @GetMapping(ProductSubCategoryStatics.Endpoint.GET_ALL_PRODUCTS_BY_ID)
     @Operation(summary = "Get all products of a sub-category", description = "Gets a list with the data of all the products of a sub-category given its id")
-    public ResponseEntity<ProductListDTO> getAllProducts(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ProductListDTO> getAllProducts(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(productSubCategoryService.getAllProducts(id));
     }
 }

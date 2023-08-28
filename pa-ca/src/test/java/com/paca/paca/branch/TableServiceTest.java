@@ -19,7 +19,7 @@ import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.service.TableService;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 public class TableServiceTest extends ServiceTest {
 
@@ -42,7 +42,7 @@ public class TableServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToBranchNoExistingInSave() {
+    void shouldGetNotFoundExceptionDueToBranchNoExistingInSave() {
         TableDTO tableDTO = utils.createTableDTO(null);
         long branchId = tableDTO.getBranchId();
 
@@ -51,9 +51,9 @@ public class TableServiceTest extends ServiceTest {
         try {
             tableService.save(tableDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
@@ -90,7 +90,7 @@ public class TableServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToTableNotExisistingInUpdate() {
+    void shouldGetNotFoundExceptionDueToTableNotExisistingInUpdate() {
         TableDTO tableDTO = utils.createTableDTO(null);
         long tableId = tableDTO.getId();
 
@@ -99,14 +99,14 @@ public class TableServiceTest extends ServiceTest {
         try {
             tableService.update(tableId, tableDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Table with id " + tableId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 49);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 49);
         }
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToBranchNotExisistingInUpdate() {
+    void shouldGetNotFoundExceptionDueToBranchNotExisistingInUpdate() {
         TableDTO tableDTO = utils.createTableDTO(null);
         long tableId = tableDTO.getId();
 
@@ -115,9 +115,9 @@ public class TableServiceTest extends ServiceTest {
         try {
             tableService.update(tableId, tableDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Table with id " + tableId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 49);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 49);
         }
     }
 
@@ -152,15 +152,15 @@ public class TableServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToTableNotExisistingInDelete(){
+    void shouldGetNotFoundExceptionDueToTableNotExisistingInDelete(){
         when(tableRepository.findById(anyLong())).thenReturn(Optional.empty()); 
 
         try {
             tableService.delete(1L);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Table with id " + 1L + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 49);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 49);
         }
     }
 

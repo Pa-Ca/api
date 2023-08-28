@@ -7,7 +7,7 @@ import com.paca.paca.sale.dto.TaxDTO;
 import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.sale.dto.SaleTaxDTO;
 import com.paca.paca.sale.service.SaleTaxService;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 
 import org.junit.Assert;
@@ -45,7 +45,7 @@ public class SaleTaxServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToSaleNotExistingInSave() {
+    void shouldGetNotFoundExceptionDueToSaleNotExistingInSave() {
         SaleTaxDTO saleTaxDTO = utils.createSaleTaxDTO(null);
 
         when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -53,9 +53,9 @@ public class SaleTaxServiceTest extends ServiceTest {
         try {
             saleTaxService.save(saleTaxDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Sale with id " + saleTaxDTO.getSaleId() + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 42);
         }
 
     }
@@ -94,7 +94,7 @@ public class SaleTaxServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToSaleTaxNotExistingInUpdate() {
+    void shouldGetNotFoundExceptionDueToSaleTaxNotExistingInUpdate() {
         TaxDTO dto = utils.createTaxDTO(null);
 
         when(taxRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -102,9 +102,9 @@ public class SaleTaxServiceTest extends ServiceTest {
         try {
             saleTaxService.update(1L, dto);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Tax with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 52);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 52);
         }
     }
 
@@ -138,15 +138,15 @@ public class SaleTaxServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToSaleTaxNotExistingInDelete(){
+    void shouldGetNotFoundExceptionDueToSaleTaxNotExistingInDelete(){
         when(taxRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
             saleTaxService.delete(1L);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Tax with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 52);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 52);
         }
     }
 

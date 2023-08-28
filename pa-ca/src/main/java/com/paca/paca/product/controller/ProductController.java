@@ -15,7 +15,7 @@ import com.paca.paca.product.dto.ProductDTO;
 import com.paca.paca.product.service.ProductService;
 import com.paca.paca.product.statics.ProductStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.product.utils.ValidateProductOwnerInterceptor.ValidateProductOwner;
 
@@ -39,13 +39,13 @@ public class ProductController {
     @PostMapping(ProductStatics.Endpoint.SAVE)
     @Operation(summary = "Create new product", description = "Create a new product in the app")
     public ResponseEntity<ProductDTO> save(@RequestBody ProductDTO dto)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(productService.save(dto));
     }
 
     @GetMapping(ProductStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get product by ID", description = "Gets the data of a product given its ID")
-    public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(productService.getById(id));
     }
 
@@ -56,7 +56,7 @@ public class ProductController {
     public ResponseEntity<ProductDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductDTO dto)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(productService.update(id, dto));
     }
 
@@ -64,7 +64,7 @@ public class ProductController {
     @ValidateRoles({ "business" })
     @DeleteMapping(ProductStatics.Endpoint.DELETE)
     @Operation(summary = "Delete product", description = "Delete the data of a product given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         productService.delete(id);
     }
 }

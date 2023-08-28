@@ -9,19 +9,22 @@ import com.paca.paca.sale.dto.SaleDTO;
 import com.paca.paca.sale.model.SaleTax;
 import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.Client;
+import com.paca.paca.client.dto.ClientDTO;
 import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.sale.model.InsiteSale;
 import com.paca.paca.sale.model.OnlineSale;
 import com.paca.paca.sale.model.SaleProduct;
 import com.paca.paca.sale.dto.SaleProductDTO;
 import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.sale.service.SaleService;
 import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.sale.dto.BranchSalesInfoDTO;
 import com.paca.paca.reservation.model.Reservation;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
@@ -58,6 +61,15 @@ public class SaleServiceTest extends ServiceTest {
                 SaleProduct.class,
                 Mockito.mock(List.class));
         Reservation reservation = insite ? insiteSale.get().getReservation() : null;
+        GuestDTO guestDTO = sale.getClientGuest().getHaveGuest()
+                ? utils.createGuestDTO(sale.getClientGuest().getGuest())
+                : null;
+        ClientDTO clientDTO = !sale.getClientGuest().getHaveGuest()
+                ? utils.createClientDTO(sale.getClientGuest().getClient())
+                : null;
+        List<TableDTO> tables = insite
+                ? TestUtils.castList(TableDTO.class, Mockito.mock(List.class))
+                : new ArrayList<>();
 
         when(saleRepository.findById(any())).thenReturn(Optional.of(sale));
         when(saleMapper.toDTO(any())).thenReturn(saleDTO);
@@ -65,24 +77,29 @@ public class SaleServiceTest extends ServiceTest {
         when(saleTaxRepository.findAllBySaleId(anyLong())).thenReturn(taxes);
         when(saleProductRepository.findAllBySaleId(anyLong())).thenReturn(products);
 
+        if (sale.getClientGuest().getHaveGuest()) {
+            when(guestMapper.toDTO(any(Guest.class))).thenReturn(guestDTO);
+        } else {
+            when(clientMapper.toDTO(any(Client.class))).thenReturn(clientDTO);
+        }
+
         if (insite) {
-            List<InsiteSaleTable> tables = TestUtils.castList(
+            List<InsiteSaleTable> saleTables = TestUtils.castList(
                     InsiteSaleTable.class,
                     Mockito.mock(List.class));
 
-            when(insiteSaleTableRepository.findAllByInsiteSaleId(anyLong())).thenReturn(tables);
+            when(insiteSaleTableRepository.findAllByInsiteSaleId(anyLong())).thenReturn(saleTables);
         }
 
-        return SaleInfoDTO.builder()
-                .sale(saleDTO)
-                .insite(insite)
-                .reservationId(reservation != null ? reservation.getId() : null)
-                .taxes(TestUtils.castList(TaxDTO.class, Mockito.mock(List.class)))
-                .tables(insite
-                        ? TestUtils.castList(TableDTO.class, Mockito.mock(List.class))
-                        : new ArrayList<>())
-                .products(TestUtils.castList(SaleProductDTO.class, Mockito.mock(List.class)))
-                .build();
+        return new SaleInfoDTO(
+                saleDTO,
+                insite,
+                guestDTO,
+                clientDTO,
+                reservation != null ? reservation.getId() : null,
+                TestUtils.castList(TaxDTO.class, Mockito.mock(List.class)),
+                tables,
+                TestUtils.castList(SaleProductDTO.class, Mockito.mock(List.class)));
     }
 
     @Test
@@ -109,6 +126,8 @@ public class SaleServiceTest extends ServiceTest {
         SaleInfoDTO dto = new SaleInfoDTO(
                 saleDTO,
                 insite,
+                null,
+                null,
                 reservation.getId(),
                 null,
                 new ArrayList<>(),
@@ -142,6 +161,8 @@ public class SaleServiceTest extends ServiceTest {
                 insite,
                 null,
                 null,
+                null,
+                null,
                 new ArrayList<>(),
                 null);
         SaleInfoDTO response = saleService.save(dto);
@@ -150,7 +171,7 @@ public class SaleServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBranchInSave() {
+    void shouldGetNotFoundDueToMissingBranchInSave() {
         SaleDTO saleDTO = utils.createSaleDTO(null);
 
         when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -159,15 +180,15 @@ public class SaleServiceTest extends ServiceTest {
 
         try {
             saleService.save(dto);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Branch with id " + saleDTO.getBranchId() + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingClientGuestInSave() {
+    void shouldGetNotFoundDueToMissingClientGuestInSave() {
         Branch branch = utils.createBranch(null);
         SaleDTO saleDTO = utils.createSaleDTO(null);
 
@@ -178,16 +199,16 @@ public class SaleServiceTest extends ServiceTest {
 
         try {
             saleService.save(dto);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Client guest with id " + saleDTO.getClientGuestId() + " does not exists",
                     e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 59);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 59);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingReservationInSaveInsite() {
+    void shouldGetNotFoundDueToMissingReservationInSaveInsite() {
         Boolean insite = true;
         Branch branch = utils.createBranch(null);
         ClientGuest clientGuest = utils.createClientGuest((Guest) null);
@@ -206,6 +227,8 @@ public class SaleServiceTest extends ServiceTest {
         SaleInfoDTO dto = new SaleInfoDTO(
                 saleDTO,
                 insite,
+                null,
+                null,
                 1L,
                 null,
                 new ArrayList<>(),
@@ -213,15 +236,15 @@ public class SaleServiceTest extends ServiceTest {
 
         try {
             saleService.save(dto);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Reservation with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 27);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 27);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingTableInSaveInsite() {
+    void shouldGetNotFoundDueToMissingTableInSaveInsite() {
         Boolean insite = true;
         Branch branch = utils.createBranch(null);
         ClientGuest clientGuest = utils.createClientGuest((Guest) null);
@@ -243,6 +266,8 @@ public class SaleServiceTest extends ServiceTest {
         SaleInfoDTO dto = new SaleInfoDTO(
                 saleDTO,
                 insite,
+                null,
+                null,
                 1L,
                 null,
                 List.of(table),
@@ -250,10 +275,10 @@ public class SaleServiceTest extends ServiceTest {
 
         try {
             saleService.save(dto);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Table with id " + table.getId() + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 49);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 49);
         }
     }
 
@@ -272,17 +297,17 @@ public class SaleServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToSaleNotExistingInUpdate() {
+    void shouldGetNotFoundDueToSaleNotExistingInUpdate() {
         SaleDTO saleDTO = utils.createSaleDTO(null);
 
         when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
             saleService.update(1L, saleDTO);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Sale with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 42);
         }
     }
 
@@ -326,15 +351,15 @@ public class SaleServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingSaleInDelete(){
+    void shouldGetNotFoundDueToMissingSaleInDelete(){
         when(saleRepository.findById(1L)).thenReturn(Optional.empty());
 
         try {
             saleService.delete(1L);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Sale with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 42);
         }
     }
 
@@ -377,15 +402,15 @@ public class SaleServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToMissingSaleInClearSaleProducts(){
+    void shouldGetNotFoundDueToMissingSaleInClearSaleProducts(){
         when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
             saleService.clearSaleProducts(1L);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Sale with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 42);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 42);
         }
 
     }
@@ -444,15 +469,15 @@ public class SaleServiceTest extends ServiceTest {
     }
 
     @Test
-    void shouldGetNoContentDueToBranchNotExistingInGetBranchSales(){
+    void shouldGetNotFoundDueToBranchNotExistingInGetBranchSales(){
         when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         try {
             saleService.getBranchSales(1, 10, 1L, null, null, null, null);
-        } catch (NoContentException e) {
-            Assert.assertTrue(e instanceof NoContentException);
+        } catch (NotFoundException e) {
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals("Branch with id " + 1L + " does not exists", e.getMessage());
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 21);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 21);
         }
     }
 

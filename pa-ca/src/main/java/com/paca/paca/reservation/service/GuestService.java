@@ -7,11 +7,12 @@ import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.dto.GuestInfoDTO;
 import com.paca.paca.reservation.utils.GuestMapper;
+import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.reservation.repository.ReservationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,15 +24,17 @@ public class GuestService {
 
     private final GuestMapper guestMapper;
 
+    private final SaleRepository saleRepository;
+
     private final GuestRepository guestRepository;
 
     private final ClientGuestRepository clientGuestRepository;
 
     private final ReservationRepository reservationRepository;
 
-    public GuestInfoDTO getById(Long id) throws NoContentException {
+    public GuestInfoDTO getById(Long id) throws NotFoundException {
         Guest guest = guestRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Guest with id " + id + " does not exists",
                         54));
 
@@ -42,17 +45,18 @@ public class GuestService {
     }
 
     public GuestInfoDTO getByIdentityDocument(Long businessId, String identityDocument)
-            throws NoContentException, ForbiddenException {
+            throws NotFoundException, ForbiddenException {
 
         Guest guest = guestRepository.findByIdentityDocument(identityDocument)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Guest with identityDocument " + identityDocument + " does not exists",
                         40));
 
-        if (!reservationRepository.existsByBranchBusinessIdAndGuestId(businessId, guest.getId())) {
+        if (!reservationRepository.existsByBranchBusinessIdAndGuestId(businessId, guest.getId()) &&
+                !saleRepository.existsByBranchBusinessIdAndClientGuestGuestId(businessId, guest.getId())) {
             throw new ForbiddenException(
                     "Guest with identityDocument " + identityDocument +
-                            " does not have a past reservation with this business",
+                            " does not have a past reservation or sale with this business",
                     40);
         }
         GuestDTO dto = guestMapper.toDTO(guest);
@@ -64,9 +68,7 @@ public class GuestService {
     public GuestInfoDTO save(GuestDTO dto) throws ConflictException {
         Optional<Guest> current = guestRepository.findByIdentityDocument(dto.getIdentityDocument());
         if (current.isPresent()) {
-            throw new ConflictException(
-                    "Guest with identity document " + dto.getIdentityDocument() + " already exists",
-                    60);
+            return update(current.get().getId(), dto);
         }
 
         current = guestRepository.findByEmail(dto.getEmail());
@@ -98,10 +100,10 @@ public class GuestService {
         return new GuestInfoDTO(response, clientGuest.getId());
     }
 
-    public GuestInfoDTO update(Long id, GuestDTO dto) throws NoContentException {
+    public GuestInfoDTO update(Long id, GuestDTO dto) throws NotFoundException {
         Optional<Guest> current = guestRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Guest with id " + id + " does not exists",
                     54);
         }
@@ -114,10 +116,10 @@ public class GuestService {
         return new GuestInfoDTO(dtoResponse, clientGuest.getId());
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Guest> current = guestRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Guest with id " + id + " does not exists",
                     54);
         }
