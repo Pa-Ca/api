@@ -1,20 +1,17 @@
 package com.paca.paca.promotion.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class PromotionDTO {
 
     private Long id;
     private Long branchId;
-    private Boolean disabled;
     private String text;
+    private Boolean disabled;
 }

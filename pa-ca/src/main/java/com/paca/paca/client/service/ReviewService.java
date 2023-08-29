@@ -5,24 +5,19 @@ import com.paca.paca.client.model.Client;
 import com.paca.paca.client.model.Review;
 import com.paca.paca.client.dto.ReviewDTO;
 import com.paca.paca.client.model.ReviewLike;
-import com.paca.paca.client.dto.ReviewListDTO;
 import com.paca.paca.client.utils.ReviewMapper;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.client.repository.ReviewRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.client.repository.ReviewLikeRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
-
-
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -38,20 +33,9 @@ public class ReviewService {
 
     private final ReviewLikeRepository reviewLikeRepository;
 
-    public ReviewListDTO getAll() {
-        List<ReviewDTO> response = new ArrayList<>();
-        reviewRepository.findAll().forEach(review -> {
-            ReviewDTO dto = reviewMapper.toDTO(review);
-            dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
-            response.add(dto);
-        });
-
-        return ReviewListDTO.builder().reviews(response).build();
-    }
-
-    public ReviewDTO getById(Long id) throws NoContentException {
+    public ReviewDTO getById(Long id) throws NotFoundException {
         Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Review with id " + id + " does not exists",
                         35));
 
@@ -60,27 +44,16 @@ public class ReviewService {
         return dto;
     }
 
-    public ReviewDTO getByClientIdAndBranchId(Long clientId, Long branchId) throws NoContentException {
-        Review review = reviewRepository.findByClientIdAndBranchId(clientId, branchId)
-                .orElseThrow(() -> new NoContentException(
-                        "Review does not exists",
-                        35));
-
-        ReviewDTO dto = reviewMapper.toDTO(review);
-        dto.setLikes(reviewLikeRepository.findAllByReviewId(review.getId()).size());
-        return dto;
-    }
-
-    public ReviewDTO save(ReviewDTO dto) throws NoContentException, ConflictException {
+    public ReviewDTO save(ReviewDTO dto) throws NotFoundException, ConflictException {
         Optional<Client> client = clientRepository.findById(dto.getClientId());
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + dto.getClientId() + " does not exists",
                     28);
         }
         Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + dto.getBranchId() + " does not exists",
                     20);
         }
@@ -99,10 +72,10 @@ public class ReviewService {
         return dtoResponse;
     }
 
-    public ReviewDTO update(Long id, ReviewDTO dto) throws NoContentException {
+    public ReviewDTO update(Long id, ReviewDTO dto) throws NotFoundException {
         Optional<Review> current = reviewRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Review with id " + id + " does not exists",
                     35);
         }
@@ -114,26 +87,26 @@ public class ReviewService {
         return dtoResponse;
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<Review> current = reviewRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Review with id " + id + " does not exists",
                     35);
         }
         reviewRepository.deleteById(id);
     }
 
-    public ReviewDTO like(Long id, Long clientId) throws NoContentException, ConflictException {
+    public ReviewDTO like(Long id, Long clientId) throws NotFoundException, ConflictException {
         Optional<Review> review = reviewRepository.findById(id);
         if (review.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Review with id " + id + " does not exists",
                     35);
         }
         Optional<Client> client = clientRepository.findById(clientId);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + clientId + " does not exists",
                     28);
         }
@@ -155,22 +128,22 @@ public class ReviewService {
         return dto;
     }
 
-    public ReviewDTO dislike(Long id, Long clientId) throws NoContentException {
+    public ReviewDTO dislike(Long id, Long clientId) throws NotFoundException {
         Optional<Review> review = reviewRepository.findById(id);
         if (review.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Review with id " + id + " does not exists",
                     35);
         }
         Optional<Client> client = clientRepository.findById(clientId);
         if (client.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Client with id " + clientId + " does not exists",
                     28);
         }
         Optional<ReviewLike> like = reviewLikeRepository.findByClientIdAndReviewId(clientId, id);
         if (like.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Review like does not exists",
                     38);
         }
@@ -181,5 +154,5 @@ public class ReviewService {
         dto.setLikes(reviewLikeRepository.findAllByReviewId(review.get().getId()).size());
         return dto;
     }
-    
+
 }

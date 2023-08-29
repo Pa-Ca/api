@@ -1,18 +1,16 @@
 package com.paca.paca.auth.dto;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
-@AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoginResponseDTO {
 
-    private String token;
-    private String refresh;
     private Long id;
     private String role;
+    private String token;
+    private String refresh;
 }

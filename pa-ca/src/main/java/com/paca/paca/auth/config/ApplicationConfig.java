@@ -1,7 +1,7 @@
 package com.paca.paca.auth.config;
 
 import com.paca.paca.user.repository.UserRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +23,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoContentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Bean

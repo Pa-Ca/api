@@ -10,111 +10,96 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.Optional;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.paca.paca.branch.dto.PaymentOptionDTO;
+import com.paca.paca.ServiceTest;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.model.PaymentOption;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.PaymentOptionRepository;
+import com.paca.paca.branch.dto.PaymentOptionDTO;
 import com.paca.paca.branch.service.PaymentOptionService;
-import com.paca.paca.branch.utils.PaymentOptionMapper;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.utils.TestUtils;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
-@ExtendWith(MockitoExtension.class)
-public class PaymentOptionServiceTest {
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private PaymentOptionRepository paymentOptionRepository;
-
-    @Mock
-    private PaymentOptionMapper paymentOptionMapper;
+public class PaymentOptionServiceTest extends ServiceTest {
 
     @InjectMocks
     private PaymentOptionService paymentOptionService;
 
-    private TestUtils utils = TestUtils.builder().build();
-
     @Test
     void shouldSave() {
-        PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
+        PaymentOptionDTO dto = utils.createPaymentOptionDTO(null);
         PaymentOption paymentOption = utils.createPaymentOption(null);
         Branch branch = utils.createBranch(null);
 
         when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(paymentOptionRepository.save(any())).thenReturn(paymentOption);
-        when(paymentOptionMapper.toDTO(any())).thenReturn(paymentOptionDTO);
+        when(paymentOptionMapper.toDTO(any())).thenReturn(dto);
 
-        PaymentOptionDTO response = paymentOptionService.save(paymentOptionDTO);
+        PaymentOptionDTO response = paymentOptionService.save(dto);
 
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToBranchNotExistingInSave() {
+    void shouldGetNotFoundExceptionDueToBranchNotExistingInSave() {
         PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
         Long branchId = paymentOptionDTO.getBranchId();
+
         when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.save(paymentOptionDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
     void shouldUpdate() {
-        PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
+        PaymentOptionDTO dto = utils.createPaymentOptionDTO(null);
         PaymentOption paymentOption = utils.createPaymentOption(null);
-        Branch branch = utils.createBranch(null);
 
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.of(branch));
         when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.of(paymentOption));
         when(paymentOptionRepository.save(any())).thenReturn(paymentOption);
-        when(paymentOptionMapper.toDTO(any())).thenReturn(paymentOptionDTO);
+        when(paymentOptionMapper.toDTO(any())).thenReturn(dto);
         when(paymentOptionMapper.updateModel(any(), any())).thenReturn(paymentOption);
 
-        PaymentOptionDTO response = paymentOptionService.update(1L, paymentOptionDTO);
+        PaymentOptionDTO response = paymentOptionService.update(1L, dto);
 
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(dto);
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToBranchNotExistingInUpdate() {
+    void shouldGetNotFoundExceptionDueToBranchNotExistingInUpdate() {
         PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
         Long branchId = paymentOptionDTO.getBranchId();
+
         when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.of(new PaymentOption()));
-        when(branchRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.update(1L, paymentOptionDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Branch with id " + branchId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 20);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 20);
         }
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToPaymentOptionNotExistingInUpdate() {
+    void shouldGetNotFoundExceptionDueToPaymentOptionNotExistingInUpdate() {
         PaymentOptionDTO paymentOptionDTO = utils.createPaymentOptionDTO(null);
-        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());
         long paymentOptionId = paymentOptionDTO.getId();
+
+        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.update(paymentOptionId, paymentOptionDTO);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Payment option with id " + paymentOptionId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 58);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 58);
         }
     }
 
@@ -130,15 +115,17 @@ public class PaymentOptionServiceTest {
     }
 
     @Test
-    void shouldGetNoContentExceptionDueToPaymentOptionNotExistingInDelete(){
-        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());  
+    void shouldGetNotFoundExceptionDueToPaymentOptionNotExistingInDelete() {
         long paymentOptionId = 12L;
+
+        when(paymentOptionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
         try {
             paymentOptionService.delete(paymentOptionId);
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Payment option with id " + paymentOptionId + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 58);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 58);
         }
     }
 

@@ -8,7 +8,7 @@ import com.paca.paca.exception.dto.ExceptionResponseDTO;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.exception.exceptions.ForbiddenException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 
 import java.time.ZonedDateTime;
@@ -26,9 +26,9 @@ public class ExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(value = { NoContentException.class })
-    public ResponseEntity<Object> handleNoContentException(NoContentException e) {
-        HttpStatus status = HttpStatus.NO_CONTENT;
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = { NotFoundException.class })
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException e) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ExceptionResponseDTO response = new ExceptionResponseDTO(
                 e.getMessage(),
                 status,

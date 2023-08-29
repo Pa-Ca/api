@@ -12,16 +12,15 @@ import com.paca.paca.product.dto.ProductListDTO;
 import com.paca.paca.product.utils.ProductMapper;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.product.repository.ProductRepository;
-import com.paca.paca.exception.exceptions.NoContentException;
-import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ConflictException;
+import com.paca.paca.exception.exceptions.NotFoundException;
+import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import com.paca.paca.productSubCategory.dto.ProductCategoryDTO;
 import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
 import com.paca.paca.productSubCategory.utils.ProductCategoryMapper;
-import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.productSubCategory.utils.ProductSubCategoryMapper;
 import com.paca.paca.productSubCategory.repository.ProductCategoryRepository;
 import com.paca.paca.productSubCategory.repository.ProductSubCategoryRepository;
@@ -32,29 +31,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductSubCategoryService {
 
-    private final ProductSubCategoryMapper productSubCategoryMapper;
+    private final ProductMapper productMapper;
 
     private final ProductCategoryMapper productCategoryMapper;
 
-    private final ProductMapper productMapper;
-
-    private final ProductSubCategoryRepository productSubCategoryRepository;
-
-    private final ProductCategoryRepository productCategoryRepository;
+    private final ProductSubCategoryMapper productSubCategoryMapper;
 
     private final BranchRepository branchRepository;
 
     private final ProductRepository productRepository;
 
-    public ProductSubCategoryListDTO getAll() {
-        List<ProductSubCategoryDTO> response = new ArrayList<>();
-        productSubCategoryRepository.findAll().forEach(category -> {
-            ProductSubCategoryDTO dto = productSubCategoryMapper.toDTO(category);
-            response.add(dto);
-        });
+    private final ProductCategoryRepository productCategoryRepository;
 
-        return ProductSubCategoryListDTO.builder().productSubCategories(response).build();
-    }
+    private final ProductSubCategoryRepository productSubCategoryRepository;
 
     public ProductCategoryListDTO getAllProductCategories() {
         List<ProductCategoryDTO> response = new ArrayList<>();
@@ -66,9 +55,9 @@ public class ProductSubCategoryService {
         return ProductCategoryListDTO.builder().productCategories(response).build();
     }
 
-    public ProductSubCategoryDTO getById(Long id) throws NoContentException {
+    public ProductSubCategoryDTO getById(Long id) throws NotFoundException {
         ProductSubCategory category = productSubCategoryRepository.findById(id)
-                .orElseThrow(() -> new NoContentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Product sub-category with id " + id + " does not exists",
                         23));
 
@@ -77,17 +66,17 @@ public class ProductSubCategoryService {
     }
 
     public ProductSubCategoryDTO save(ProductSubCategoryDTO dto)
-            throws NoContentException, BadRequestException, ConflictException {
+            throws NotFoundException, BadRequestException, ConflictException {
         Optional<Branch> branch = branchRepository.findById(dto.getBranchId());
         if (branch.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Branch with id " + dto.getBranchId() + " does not exists",
                     20);
         }
         Optional<ProductCategory> category = productCategoryRepository
                 .findById(dto.getCategoryId());
         if (category.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product category with id " + dto.getCategoryId() + " does not exists",
                     24);
         }
@@ -112,10 +101,10 @@ public class ProductSubCategoryService {
     }
 
     public ProductSubCategoryDTO update(Long id, ProductSubCategoryDTO dto)
-            throws NoContentException, BadRequestException, ConflictException {
+            throws NotFoundException, BadRequestException, ConflictException {
         Optional<ProductSubCategory> current = productSubCategoryRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product sub-category with id " + id + " does not exists",
                     23);
         }
@@ -138,20 +127,20 @@ public class ProductSubCategoryService {
         return dtoResponse;
     }
 
-    public void delete(Long id) throws NoContentException {
+    public void delete(Long id) throws NotFoundException {
         Optional<ProductSubCategory> current = productSubCategoryRepository.findById(id);
         if (current.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product sub-category with id " + id + " does not exists",
                     23);
         }
         productSubCategoryRepository.deleteById(id);
     }
 
-    public ProductListDTO getAllProducts(Long id) throws NoContentException {
+    public ProductListDTO getAllProducts(Long id) throws NotFoundException {
         Optional<ProductSubCategory> category = productSubCategoryRepository.findById(id);
         if (category.isEmpty()) {
-            throw new NoContentException(
+            throw new NotFoundException(
                     "Product sub-category with id " + id + " does not exists",
                     23);
         }

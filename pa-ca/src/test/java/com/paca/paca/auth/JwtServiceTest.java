@@ -1,17 +1,14 @@
 package com.paca.paca.auth;
 
-import org.mockito.Mock;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.user.model.Role;
 import com.paca.paca.user.model.User;
 import com.paca.paca.statics.UserRole;
 import com.paca.paca.auth.service.JwtService;
 import com.paca.paca.auth.model.JwtBlackList;
-import com.paca.paca.auth.repository.JwtBlackListRepository;
 
 import java.util.Date;
 import java.util.Optional;
@@ -23,11 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-public class JwtServiceTest {
-
-    @Mock
-    private JwtBlackListRepository jwtBlackListRepository;
+public class JwtServiceTest extends ServiceTest {
 
     @InjectMocks
     private JwtService jwtService;
@@ -65,7 +58,6 @@ public class JwtServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -92,7 +84,6 @@ public class JwtServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -119,7 +110,6 @@ public class JwtServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -146,7 +136,6 @@ public class JwtServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 
@@ -173,7 +162,6 @@ public class JwtServiceTest {
                 .email(email)
                 .password(password)
                 .verified(false)
-                .loggedIn(false)
                 .role(role)
                 .build();
 

@@ -12,8 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
 
-    Optional<ReviewLike> findById(Long id);
-
     Optional<ReviewLike> findByClientIdAndReviewId(Long clientId, Long reviewId);
 
     Boolean existsByClientIdAndReviewId(Long clientId, Long reviewId);

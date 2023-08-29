@@ -1,43 +1,51 @@
 package com.paca.paca.auth.service;
 
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
-import com.paca.paca.auth.dto.GoogleLoginRequestDTO;
-import com.paca.paca.auth.dto.LoginResponseDTO;
-import com.paca.paca.auth.utils.AuthUtils;
-import com.paca.paca.exception.exceptions.*;
-import com.paca.paca.statics.AuthProvider;
-import com.paca.paca.statics.UserRole;
-import com.paca.paca.user.model.Role;
-import com.paca.paca.user.model.User;
-import com.paca.paca.user.repository.RoleRepository;
-import com.paca.paca.user.repository.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
-import java.util.Collections;
-import java.util.Optional;
+import com.paca.paca.user.model.Role;
+import com.paca.paca.user.model.User;
+import com.paca.paca.statics.UserRole;
+import com.paca.paca.auth.utils.AuthUtils;
+import com.paca.paca.statics.AuthProvider;
+import com.paca.paca.exception.exceptions.*;
+import com.paca.paca.auth.dto.LoginResponseDTO;
+import com.paca.paca.auth.dto.GoogleLoginRequestDTO;
+import com.paca.paca.user.repository.RoleRepository;
+import com.paca.paca.user.repository.UserRepository;
 
-@Service
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+import java.util.Collections;
+
 @Getter
 @Setter
+@Service
 @RequiredArgsConstructor
 public class GoogleAuthenticationService {
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationService authenticationService;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+
     private final JwtService jwtService;
+
+    private final UserRepository userRepository;
+
+    private final RoleRepository roleRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final AuthenticationService authenticationService;
+
     @Value("${google.client.id}")
     private String CLIENT_ID;
 
@@ -79,7 +87,7 @@ public class GoogleAuthenticationService {
         AuthUtils.validateRole(request.getRole());
         Optional<Role> role = roleRepository.findByName(UserRole.valueOf(request.getRole()));
         if (role.isEmpty()) {
-            throw new NoContentException("Role " + request.getRole() + " does not exists");
+            throw new NotFoundException("Role " + request.getRole() + " does not exists");
         }
 
         // Create and save new User
@@ -88,9 +96,8 @@ public class GoogleAuthenticationService {
                 .password(AuthUtils.randomPasswordGenerator(64))
                 .role(role.get())
                 .verified(false)
-                .loggedIn(false)
                 .provider(AuthProvider.google.name())
-                .provider_id(payload.getSubject())
+                .providerId(payload.getSubject())
                 .build();
         user = userRepository.save(user);
 

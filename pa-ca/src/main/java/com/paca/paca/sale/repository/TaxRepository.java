@@ -2,21 +2,19 @@ package com.paca.paca.sale.repository;
 
 import com.paca.paca.sale.model.Tax;
 
-
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 
 @Repository
 public interface TaxRepository extends JpaRepository<Tax, Long> {
-    
-    List<Tax> findAllBySaleId(Long saleId);  
 
-    void deleteAllBySaleId(Long saleId); // Needs to be tested
-
-    Boolean existsByIdAndSale_Table_Branch_Business_Id(Long id, Long businessId); // Needs to be tested
-
+    @Query("SELECT t " +
+            "FROM Tax t, DefaultTax d " +
+            "WHERE (t.id = d.tax.id) AND (d.branch.id = :branchId)")
+    List<Tax> findAllByBranchId(@Param("branchId") Long branchId);
 }

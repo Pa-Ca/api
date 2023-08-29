@@ -28,14 +28,16 @@ public class BusinessMapperTest {
         Business business = utils.createBusiness(null);
 
         BusinessDTO response = businessMapper.toDTO(business);
+        BusinessDTO expected = new BusinessDTO(
+                business.getId(),
+                business.getUser().getId(),
+                business.getUser().getEmail(),
+                business.getTier().getName().name(),
+                business.getName(),
+                business.getVerified(),
+                business.getPhoneNumber());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(business.getId());
-        assertThat(response.getUserId()).isEqualTo(business.getUser().getId());
-        assertThat(response.getTier()).isEqualTo(business.getTier().getName().name());
-        assertThat(response.getName()).isEqualTo(business.getName());
-        assertThat(response.getVerified()).isEqualTo(business.getVerified());
-        assertThat(response.getPhoneNumber()).isEqualTo(business.getPhoneNumber());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
@@ -45,14 +47,15 @@ public class BusinessMapperTest {
         BusinessDTO dto = utils.createBusinessDTO(utils.createBusiness(user, tier));
 
         Business entity = businessMapper.toEntity(dto, tier, user);
+        Business expected = new Business(
+                dto.getId(),
+                user,
+                tier,
+                dto.getName(),
+                dto.getVerified(),
+                dto.getPhoneNumber());
 
-        assertThat(entity).isNotNull();
-        assertThat(entity.getId()).isEqualTo(dto.getId());
-        assertThat(entity.getUser().getId()).isEqualTo(user.getId());
-        assertThat(entity.getName()).isEqualTo(dto.getName());
-        assertThat(entity.getVerified()).isEqualTo(dto.getVerified());
-        assertThat(entity.getTier().getName().name()).isEqualTo(dto.getTier());
-        assertThat(entity.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
+        assertThat(entity).isEqualTo(expected);
     }
 
     @Test
@@ -60,54 +63,23 @@ public class BusinessMapperTest {
         Business business = utils.createBusiness(null);
         Tier tier = utils.createTier(BusinessTier.basic);
 
-        // Not changing ID
-        BusinessDTO dto = BusinessDTO.builder()
-                .id(business.getId() + 1)
-                .build();
-        Business updatedBusiness = businessMapper.updateModel(dto, business, tier);
-        assertThat(updatedBusiness).isNotNull();
-        assertThat(updatedBusiness.getId()).isEqualTo(business.getId());
+        BusinessDTO dto = new BusinessDTO(
+                business.getId() + 1,
+                business.getUser().getId() + 1,
+                business.getUser().getEmail() + ".",
+                BusinessTier.premium.name(),
+                business.getName() + ".",
+                !business.getVerified(),
+                business.getPhoneNumber() + ".");
+        Business response = businessMapper.updateModel(dto, business, tier);
+        Business expected = new Business(
+                business.getId(),
+                business.getUser(),
+                tier,
+                dto.getName(),
+                dto.getVerified(),
+                dto.getPhoneNumber());
 
-        // Not changing User ID
-        dto = BusinessDTO.builder()
-                .userId(business.getUser().getId() + 1)
-                .build();
-        updatedBusiness = businessMapper.updateModel(dto, business, tier);
-        assertThat(updatedBusiness).isNotNull();
-        assertThat(updatedBusiness.getUser().getId()).isEqualTo(business.getUser().getId());
-
-        // Changing name
-        dto = BusinessDTO.builder()
-                .name("m_test")
-                .build();
-        updatedBusiness = businessMapper.updateModel(dto, business, tier);
-        assertThat(updatedBusiness).isNotNull();
-        assertThat(updatedBusiness.getName()).isEqualTo(dto.getName());
-
-        // Changing verified
-        dto = BusinessDTO.builder()
-                .verified(true)
-                .build();
-        updatedBusiness = businessMapper.updateModel(dto, business, tier);
-        assertThat(updatedBusiness).isNotNull();
-        assertThat(updatedBusiness.getVerified()).isEqualTo(dto.getVerified());
-
-        // Changing tier
-        dto = BusinessDTO.builder()
-                .tier(BusinessTier.premium.name())
-                .build();
-        Tier newTier = utils.createTier(BusinessTier.premium);
-
-        updatedBusiness = businessMapper.updateModel(dto, business, newTier);
-        assertThat(updatedBusiness).isNotNull();
-        assertThat(updatedBusiness.getTier().getName().name()).isEqualTo(dto.getTier());
-
-        // Changing phone number
-        dto = BusinessDTO.builder()
-                .phoneNumber("new phone")
-                .build();
-        updatedBusiness = businessMapper.updateModel(dto, business, tier);
-        assertThat(updatedBusiness).isNotNull();
-        assertThat(updatedBusiness.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
+        assertThat(response).isEqualTo(expected);
     }
 }

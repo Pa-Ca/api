@@ -1,20 +1,17 @@
 package com.paca.paca.sale.dto;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.util.List;
-
-import lombok.AllArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 public class BranchSalesInfoDTO {
+
     List<SaleInfoDTO> ongoingSalesInfo;
-    List<SaleInfoDTO> historicSalesInfo; // Historic sales are sales that have already been closed or canceled
+    List<SaleInfoDTO> historicSalesInfo;
     int currentHistoricPage;
     int totalHistoricPages;
     int totalHistoricElements;

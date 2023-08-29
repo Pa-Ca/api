@@ -28,8 +28,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
@@ -40,21 +38,6 @@ public class AuthIntegrationTest extends PacaTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    static {
-        Dotenv dotenv = Dotenv.load();
-
-        System.setProperty("auth.secret.key", dotenv.get("AUTH_SECRET_KEY"));
-        System.setProperty("auth.expiration.token", dotenv.get("AUTH_TOKEN_EXPIRATION"));
-        System.setProperty("auth.expiration.refresh", dotenv.get("AUTH_REFRESH_EXPIRATION"));
-        System.setProperty("auth.expiration.verify.email", dotenv.get("AUTH_VERIFY_EMAIL_EXPIRATION"));
-        System.setProperty("auth.expiration.reset.password", dotenv.get("AUTH_RESET_PASSWORD_EXPIRATION"));
-
-        System.setProperty("spring.mail.username", dotenv.get("GOOGLE_EMAIL_FROM"));
-        System.setProperty("spring.mail.password", dotenv.get("GOOGLE_EMAIL_PASSWORD"));
-
-        System.setProperty("google.client.id", dotenv.get("GOOGLE_CLIENT_ID"));
-    }
 
     @Test
     public void shouldSignupLoginRefreshAndLogout() throws Exception {
@@ -459,7 +442,7 @@ public class AuthIntegrationTest extends PacaTest {
                 + AuthenticationStatics.Endpoint.RESET_PASSWORD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(resetPasswordRequest)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("User with email " + email + " does not exists")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)));
@@ -645,7 +628,7 @@ public class AuthIntegrationTest extends PacaTest {
                 + AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(verifyEmailRequest)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message",
                         CoreMatchers.is("User with email " + email + " does not exists")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", CoreMatchers.is(30)));

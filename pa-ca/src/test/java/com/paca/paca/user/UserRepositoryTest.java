@@ -41,7 +41,12 @@ public class UserRepositoryTest extends PacaTest {
         String email = "test@test.com";
         Role role = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
         User user = User.builder()
-                .id(1L).email(email).password("123456789aA#").verified(false).loggedIn(false).role(role).build();
+                .id(1L)
+                .email(email)
+                .password("123456789aA#")
+                .verified(false)
+                .role(role)
+                .build();
 
         roleRepository.save(role);
         userRepository.save(user);
@@ -64,7 +69,12 @@ public class UserRepositoryTest extends PacaTest {
         String email = "test@test.com";
         Role role = Role.builder().id((long) UserRole.admin.ordinal()).name(UserRole.admin).build();
         User user = User.builder()
-                .id(1L).email(email).password("123456789aA#").verified(false).loggedIn(false).role(role).build();
+                .id(1L)
+                .email(email)
+                .password("123456789aA#")
+                .verified(false)
+                .role(role)
+                .build();
 
         roleRepository.save(role);
         userRepository.save(user);

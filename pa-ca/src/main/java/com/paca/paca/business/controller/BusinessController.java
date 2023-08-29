@@ -2,11 +2,10 @@ package com.paca.paca.business.controller;
 
 import com.paca.paca.business.dto.BusinessDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
-import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.business.statics.BusinessStatics;
 import com.paca.paca.business.service.BusinessService;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.business.utils.ValidateBusinessInterceptor.ValidateBusiness;
 
@@ -29,13 +28,6 @@ public class BusinessController {
 
     private final BusinessService businessService;
 
-    @ValidateRoles({})
-    @GetMapping(BusinessStatics.Endpoint.GET_ALL)
-    @Operation(summary = "Get all business", description = "Returns a list with all business")
-    public ResponseEntity<BusinessListDTO> getAll() {
-        return ResponseEntity.ok(businessService.getAll());
-    }
-
     @GetMapping(BusinessStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get business by ID", description = "Gets the data of a business given its ID")
     public ResponseEntity<BusinessDTO> getById(@PathVariable("id") Long id) {
@@ -46,7 +38,7 @@ public class BusinessController {
     @PostMapping(BusinessStatics.Endpoint.SAVE)
     @Operation(summary = "Create new business", description = "Register a new business in the app")
     public ResponseEntity<BusinessDTO> save(@RequestBody BusinessDTO business)
-            throws NoContentException, ConflictException {
+            throws NotFoundException, ConflictException {
         return ResponseEntity.ok(businessService.save(business));
     }
 
@@ -55,7 +47,7 @@ public class BusinessController {
     @PutMapping(BusinessStatics.Endpoint.UPDATE)
     @Operation(summary = "Update business", description = "Updates the data of a business given its ID")
     public ResponseEntity<BusinessDTO> update(@PathVariable("id") Long id, @RequestBody BusinessDTO business)
-            throws NoContentException {
+            throws NotFoundException {
         return ResponseEntity.ok(businessService.update(id, business));
     }
 
@@ -63,13 +55,13 @@ public class BusinessController {
     @ValidateRoles({ "business" })
     @DeleteMapping(BusinessStatics.Endpoint.DELETE)
     @Operation(summary = "Delete business", description = "Delete the data of a business given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         businessService.delete(id);
     }
 
     @GetMapping(BusinessStatics.Endpoint.GET_BY_USER_ID)
     @Operation(summary = "Get business by user ID", description = "Gets the data of a business given its user ID")
-    public ResponseEntity<BusinessDTO> getByUserId(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<BusinessDTO> getByUserId(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(businessService.getByUserId(id));
     }
 
@@ -77,7 +69,7 @@ public class BusinessController {
     @ValidateRoles({ "business" })
     @GetMapping(BusinessStatics.Endpoint.GET_BRANCHES)
     @Operation(summary = "Get business branches", description = "Gets all the branches of a business given its ID")
-    public ResponseEntity<BranchInfoListDTO> getAllBranches(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<BranchInfoListDTO> getAllBranches(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(businessService.getAllBranchesById(id));
     }
 }

@@ -29,7 +29,7 @@ public class AuthenticationController {
     @Operation(summary = "User register", description = "Register a new user in the application")
     public ResponseEntity<LoginResponseDTO> signup(
             @RequestBody SignupRequestDTO request)
-            throws BadRequestException, NoContentException, UnprocessableException, ConflictException {
+            throws BadRequestException, NotFoundException, UnprocessableException, ConflictException {
         return ResponseEntity.ok(service.signup(request));
     }
 
@@ -56,35 +56,35 @@ public class AuthenticationController {
     @PostMapping(AuthenticationStatics.Endpoint.RESET_PASSWORD_REQUEST)
     @Operation(summary = "Reset password request", description = "Send an email to allow a user to change their password")
     public ResponseEntity<ResetPasswordResponseDTO> resetPasswordRequest(@RequestBody ResetPasswordRequestDTO request)
-            throws BadRequestException, NoContentException, IOException, MessagingException {
+            throws BadRequestException, NotFoundException, IOException, MessagingException {
         return ResponseEntity.ok(service.resetPasswordRequest(request));
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.RESET_PASSWORD)
     @Operation(summary = "Reset password using old password", description = "Change a user's password using their current password")
     public void resetPassword(@RequestBody ResetPasswordDTO request)
-            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+            throws ForbiddenException, BadRequestException, UnprocessableException, NotFoundException {
         service.resetPassword(request, null);
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.RESET_PASSWORD + "/{token}")
     @Operation(summary = "Reset password using auth token", description = "Change a user's password using an authorization token")
     public void resetPasswordWithToken(@RequestBody ResetPasswordDTO request, @PathVariable("token") String token)
-            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+            throws ForbiddenException, BadRequestException, UnprocessableException, NotFoundException {
         service.resetPassword(request, token);
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.VERIFY_EMAIL_REQUEST)
     @Operation(summary = "Send verify email request", description = "Send request to verify a user's email")
     public ResponseEntity<VerifyEmailResponseDTO> verifyEmailRequest(@RequestBody VerifyEmailRequestDTO request)
-            throws BadRequestException, NoContentException, IOException, MessagingException {
+            throws BadRequestException, NotFoundException, IOException, MessagingException {
         return ResponseEntity.ok(service.verifyEmailRequest(request));
     }
 
     @PostMapping(AuthenticationStatics.Endpoint.VERIFY_EMAIL + "/{token}")
     @Operation(summary = "Verify email", description = "Verify a user's mail using an authorization token")
     public void verifyEmail(@PathVariable("token") String token)
-            throws ForbiddenException, BadRequestException, UnprocessableException, NoContentException {
+            throws ForbiddenException, BadRequestException, UnprocessableException, NotFoundException {
         service.verifyEmail(token);
     }
 }

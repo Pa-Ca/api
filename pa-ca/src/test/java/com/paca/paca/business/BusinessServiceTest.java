@@ -1,5 +1,6 @@
 package com.paca.paca.business;
 
+import com.paca.paca.ServiceTest;
 import com.paca.paca.user.model.User;
 import com.paca.paca.utils.TestUtils;
 import com.paca.paca.branch.model.Branch;
@@ -7,28 +8,17 @@ import com.paca.paca.business.model.Tier;
 import com.paca.paca.statics.BusinessTier;
 import com.paca.paca.business.model.Business;
 import com.paca.paca.business.dto.BusinessDTO;
-import com.paca.paca.business.dto.BusinessListDTO;
 import com.paca.paca.branch.dto.BranchInfoListDTO;
-import com.paca.paca.business.utils.BusinessMapper;
-import com.paca.paca.branch.utils.DefaultTaxMapper;
-import com.paca.paca.user.repository.UserRepository;
 import com.paca.paca.business.service.BusinessService;
-import com.paca.paca.branch.repository.BranchRepository;
-import com.paca.paca.branch.repository.DefaultTaxRepository;
-import com.paca.paca.business.repository.TierRepository;
-import com.paca.paca.business.repository.BusinessRepository;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,55 +28,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-class BusinessServiceTest {
-    @Mock
-    private DefaultTaxRepository defaultTaxRepository;
-
-    @Mock
-    private BusinessRepository businessRepository;
-
-    @Mock
-    private BranchRepository branchRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private TierRepository tierRepository;
-
-    @Mock
-    private BusinessMapper businessMapper;
-
-    @Mock
-    private DefaultTaxMapper defaultTaxMapper;
+class BusinessServiceTest extends ServiceTest {
 
     @InjectMocks
     private BusinessService businessService;
 
-    private TestUtils utils = TestUtils.builder().build();
-
     @Test
-    void shouldGetAllBusiness() {
-        List<Business> business = TestUtils.castList(Business.class, Mockito.mock(List.class));
-
-        when(businessRepository.findAll()).thenReturn(business);
-        BusinessListDTO responseDTO = businessService.getAll();
-
-        assertThat(responseDTO).isNotNull();
-    }
-
-    @Test
-    void shouldGetNoContentDueToMissingBusinessInGetBusinessById() {
+    void shouldGetNotFoundDueToMissingBusinessInGetBusinessById() {
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
             businessService.getById(1L);
             TestCase.fail();
         } catch (Exception e){
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id 1 does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -100,13 +57,11 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.getById(business.getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
-    void shouldGetNoContentDueToMissingUserInSave() {
+    void shouldGetNotFoundDueToMissingUserInSave() {
         BusinessDTO dto = utils.createBusinessDTO(null);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
@@ -115,9 +70,9 @@ class BusinessServiceTest {
             businessService.save(dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "User with email " + dto.getEmail() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 30);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 30);
         }
     }
 
@@ -155,14 +110,11 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.save(dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
-        assertThat(dtoResponse.getTier()).isEqualTo(business.getTier().getName().name());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInUpdate() {
+    void shouldGetNotFoundDueToMissingBusinessInUpdate() {
         Business business = utils.createBusiness(null);
         BusinessDTO dto = utils.createBusinessDTO(business);
 
@@ -172,9 +124,9 @@ class BusinessServiceTest {
             businessService.update(business.getId(), dto);
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id " + business.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
@@ -193,14 +145,11 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.update(business.getId(), dto);
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
-        assertThat(dtoResponse.getTier()).isEqualTo(business.getTier().getName().name());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInDelete() {
+    void shouldGetNotFoundDueToMissingBusinessInDelete() {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findById(any(Long.class))).thenReturn(Optional.empty());
@@ -209,14 +158,14 @@ class BusinessServiceTest {
             businessService.delete(business.getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "Business with id " + business.getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 28);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 28);
         }
     }
 
     @Test
-    void shouldGetNoContentDueToMissingBusinessInGetBusinessByUserId() {
+    void shouldGetNotFoundDueToMissingBusinessInGetBusinessByUserId() {
         Business business = utils.createBusiness(null);
 
         when(businessRepository.findByUserId(any(Long.class))).thenReturn(Optional.empty());
@@ -225,9 +174,9 @@ class BusinessServiceTest {
             businessService.getByUserId(business.getUser().getId());
             TestCase.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NoContentException);
+            Assert.assertTrue(e instanceof NotFoundException);
             Assert.assertEquals(e.getMessage(), "User with id " + business.getUser().getId() + " does not exists");
-            Assert.assertEquals(((NoContentException) e).getCode(), (Integer) 12);
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 12);
         }
     }
 
@@ -241,9 +190,7 @@ class BusinessServiceTest {
 
         BusinessDTO dtoResponse = businessService.getByUserId(business.getUser().getId());
 
-        assertThat(dtoResponse).isNotNull();
-        assertThat(dtoResponse.getId()).isEqualTo(business.getId());
-        assertThat(dtoResponse.getUserId()).isEqualTo(business.getUser().getId());
+        assertThat(dtoResponse).isEqualTo(dto);
     }
 
     @Test

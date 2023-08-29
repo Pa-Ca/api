@@ -6,6 +6,7 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface AmenityMapper {
+
     AmenityDTO toDTO(Amenity amenity);
 
     Amenity toEntity(AmenityDTO dto);

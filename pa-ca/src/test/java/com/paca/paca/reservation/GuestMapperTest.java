@@ -14,8 +14,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
 public class GuestMapperTest {
+
     @InjectMocks
     private GuestMapperImpl guestMapper;
+
     private TestUtils utils = TestUtils.builder().build();
 
     @Test
@@ -23,70 +25,53 @@ public class GuestMapperTest {
         Guest guest = utils.createGuest();
 
         GuestDTO response = guestMapper.toDTO(guest);
+        GuestDTO expected = new GuestDTO(
+                guest.getId(),
+                guest.getName(),
+                guest.getSurname(),
+                guest.getEmail(),
+                guest.getPhoneNumber(),
+                guest.getIdentityDocument());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(guest.getId());
-        assertThat(response.getName()).isEqualTo(guest.getName());
-        assertThat(response.getSurname()).isEqualTo(guest.getSurname());
-        assertThat(response.getEmail()).isEqualTo(guest.getEmail());
-        assertThat(response.getPhoneNumber()).isEqualTo(guest.getPhoneNumber());
+        assertThat(response).isEqualTo(expected);
     }
 
     @Test
     void shouldMapGuestDTOtoGuestEntity() {
         GuestDTO dto = utils.createGuestDTO(utils.createGuest());
-        Guest entity = guestMapper.toEntity(dto);
 
-        assertThat(entity).isNotNull();
-        assertThat(entity.getId()).isEqualTo(dto.getId());
-        assertThat(entity.getName()).isEqualTo(dto.getName());
-        assertThat(entity.getSurname()).isEqualTo(dto.getSurname());
-        assertThat(entity.getEmail()).isEqualTo(dto.getEmail());
-        assertThat(entity.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
+        Guest entity = guestMapper.toEntity(dto);
+        Guest expected = new Guest(
+                dto.getId(),
+                dto.getName(),
+                dto.getSurname(),
+                dto.getEmail(),
+                dto.getPhoneNumber(),
+                dto.getIdentityDocument());
+
+        assertThat(entity).isEqualTo(expected);
     }
 
     @Test
     void shouldPartiallyMapGuestDTOtoGuestEntity() {
         Guest guest = utils.createGuest();
 
-        // Not changing ID
-        GuestDTO dto = GuestDTO.builder()
-                .id(guest.getId() + 1)
-                .build();
-        Guest updatedGuest = guestMapper.updateModel(dto, guest);
-        assertThat(updatedGuest).isNotNull();
-        assertThat(updatedGuest.getId()).isEqualTo(guest.getId());
+        GuestDTO dto = new GuestDTO(
+                guest.getId() + 1,
+                guest.getName() + ".",
+                guest.getSurname() + ".",
+                guest.getEmail() + ".",
+                guest.getPhoneNumber() + ".",
+                guest.getIdentityDocument() + ".");
+        Guest response = guestMapper.updateModel(dto, guest);
+        Guest expected = new Guest(
+                guest.getId(),
+                dto.getName(),
+                dto.getSurname(),
+                dto.getEmail(),
+                dto.getPhoneNumber(),
+                dto.getIdentityDocument());
 
-        // Changing name
-        dto = GuestDTO.builder()
-                .name(guest.getName() + "_test")
-                .build();
-        updatedGuest = guestMapper.updateModel(dto, guest);
-        assertThat(updatedGuest).isNotNull();
-        assertThat(updatedGuest.getName()).isEqualTo(dto.getName());
-
-        // Changing surname
-        dto = GuestDTO.builder()
-                .surname(guest.getSurname() + "_test")
-                .build();
-        updatedGuest = guestMapper.updateModel(dto, guest);
-        assertThat(updatedGuest).isNotNull();
-        assertThat(updatedGuest.getSurname()).isEqualTo(dto.getSurname());
-
-        // Changing email
-        dto = GuestDTO.builder()
-                .email(guest.getEmail() + "_test")
-                .build();
-        updatedGuest = guestMapper.updateModel(dto, guest);
-        assertThat(updatedGuest).isNotNull();
-        assertThat(updatedGuest.getEmail()).isEqualTo(dto.getEmail());
-
-        // Changing phone number
-        dto = GuestDTO.builder()
-                .phoneNumber(guest.getPhoneNumber() + "_test")
-                .build();
-        updatedGuest = guestMapper.updateModel(dto, guest);
-        assertThat(updatedGuest).isNotNull();
-        assertThat(updatedGuest.getPhoneNumber()).isEqualTo(dto.getPhoneNumber());
+        assertThat(response).isEqualTo(expected);
     }
 }

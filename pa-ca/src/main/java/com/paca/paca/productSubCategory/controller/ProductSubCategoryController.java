@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paca.paca.product.dto.ProductListDTO;
-import com.paca.paca.exception.exceptions.NoContentException;
+import com.paca.paca.exception.exceptions.NotFoundException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.exception.exceptions.ConflictException;
 import com.paca.paca.productSubCategory.dto.ProductSubCategoryDTO;
 import com.paca.paca.productSubCategory.dto.ProductCategoryListDTO;
-import com.paca.paca.productSubCategory.dto.ProductSubCategoryListDTO;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.productSubCategory.service.ProductSubCategoryService;
 import com.paca.paca.productSubCategory.statics.ProductSubCategoryStatics;
@@ -39,57 +38,50 @@ public class ProductSubCategoryController {
 
     private final ProductSubCategoryService productSubCategoryService;
 
-    @GetMapping
-    @ValidateRoles({})
-    @Operation(summary = "Get all product sub-categories", description = "Returns a list with all product sub-categories")
-    public ResponseEntity<ProductSubCategoryListDTO> getAll() {
-        return ResponseEntity.ok(productSubCategoryService.getAll());
-    }
-
-    @GetMapping("/categories")
+    @GetMapping(ProductSubCategoryStatics.Endpoint.GET_ALL_CATEGORIES)
     @Operation(summary = "Get all product categories", description = "Returns a list with all product categories")
     public ResponseEntity<ProductCategoryListDTO> getAllProductCategories() {
         return ResponseEntity.ok(productSubCategoryService.getAllProductCategories());
     }
 
-    @PostMapping
     @ValidateRoles({ "business" })
+    @PostMapping(ProductSubCategoryStatics.Endpoint.SAVE)
     @Operation(summary = "Create new product sub-category", description = "Create a new product sub-category in the app")
     public ResponseEntity<ProductSubCategoryDTO> save(
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
-            throws NoContentException, BadRequestException, ConflictException {
+            throws NotFoundException, BadRequestException, ConflictException {
         return ResponseEntity.ok(productSubCategoryService.save(productSubCategoryDTO));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(ProductSubCategoryStatics.Endpoint.GET_BY_ID)
     @Operation(summary = "Get product sub-category by ID", description = "Gets the data of a product sub-category given its ID")
     public ResponseEntity<ProductSubCategoryDTO> getById(
-            @PathVariable("id") Long id) throws NoContentException {
+            @PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(productSubCategoryService.getById(id));
     }
 
-    @PutMapping("/{id}")
     @ValidateRoles({ "business" })
     @ValidateProductSubCategoryOwner
+    @PutMapping(ProductSubCategoryStatics.Endpoint.UPDATE)
     @Operation(summary = "Update product sub-category", description = "Updates the data of a product sub-category given its ID")
     public ResponseEntity<ProductSubCategoryDTO> update(
             @PathVariable("id") Long id,
             @RequestBody ProductSubCategoryDTO productSubCategoryDTO)
-            throws NoContentException, BadRequestException, ConflictException {
+            throws NotFoundException, BadRequestException, ConflictException {
         return ResponseEntity.ok(productSubCategoryService.update(id, productSubCategoryDTO));
     }
 
-    @DeleteMapping("/{id}")
     @ValidateRoles({ "business" })
     @ValidateProductSubCategoryOwner
+    @DeleteMapping(ProductSubCategoryStatics.Endpoint.DELETE)
     @Operation(summary = "Delete product sub-category", description = "Delete the data of a product sub-category given its ID")
-    public void delete(@PathVariable("id") Long id) throws NoContentException {
+    public void delete(@PathVariable("id") Long id) throws NotFoundException {
         productSubCategoryService.delete(id);
     }
 
-    @GetMapping("/{id}/product")
+    @GetMapping(ProductSubCategoryStatics.Endpoint.GET_ALL_PRODUCTS_BY_ID)
     @Operation(summary = "Get all products of a sub-category", description = "Gets a list with the data of all the products of a sub-category given its id")
-    public ResponseEntity<ProductListDTO> getAllProducts(@PathVariable("id") Long id) throws NoContentException {
+    public ResponseEntity<ProductListDTO> getAllProducts(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok(productSubCategoryService.getAllProducts(id));
     }
 }
