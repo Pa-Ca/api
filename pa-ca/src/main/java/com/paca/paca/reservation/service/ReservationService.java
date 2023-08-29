@@ -7,30 +7,51 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.ArrayList;
 
+import com.paca.paca.sale.model.Tax;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.TaxDTO;
+import com.paca.paca.sale.model.SaleTax;
+import com.paca.paca.branch.model.Table;
 import com.paca.paca.branch.model.Branch;
+import com.paca.paca.client.model.Client;
+import com.paca.paca.branch.dto.TableDTO;
+import com.paca.paca.sale.utils.TaxMapper;
+import com.paca.paca.sale.dto.SaleInfoDTO;
+import com.paca.paca.sale.model.InsiteSale;
+import com.paca.paca.sale.utils.SaleMapper;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.branch.utils.TableMapper;
+import com.paca.paca.sale.statics.SaleStatics;
 import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.model.Invoice;
 import com.paca.paca.client.utils.ClientMapper;
+import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.reservation.dto.InvoiceDTO;
+import com.paca.paca.sale.repository.TaxRepository;
 import com.paca.paca.reservation.model.Reservation;
 import com.paca.paca.reservation.utils.GuestMapper;
 import com.paca.paca.reservation.dto.ReservationDTO;
+import com.paca.paca.sale.repository.SaleRepository;
 import com.paca.paca.reservation.utils.InvoiceMapper;
+import com.paca.paca.sale.repository.SaleTaxRepository;
+import com.paca.paca.branch.repository.TableRepository;
 import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.client.repository.ClientRepository;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.reservation.utils.ReservationMapper;
+import com.paca.paca.sale.repository.InsiteSaleRepository;
 import com.paca.paca.reservation.repository.GuestRepository;
 import com.paca.paca.reservation.statics.ReservationStatics;
 import com.paca.paca.exception.exceptions.ConflictException;
-import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.NotFoundException;
+import com.paca.paca.client.repository.ClientGuestRepository;
 import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.reservation.repository.InvoiceRepository;
 import com.paca.paca.reservation.dto.BranchReservationsInfoDTO;
+import com.paca.paca.sale.repository.InsiteSaleTableRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ClientGroupRepository;
 import com.paca.paca.reservation.repository.ReservationRepository;
@@ -44,6 +65,12 @@ import org.springframework.beans.support.PagedListHolder;
 @RequiredArgsConstructor
 public class ReservationService {
 
+    private final TaxMapper taxMapper;
+
+    private final SaleMapper saleMapper;
+
+    private final TableMapper tableMapper;
+
     private final GuestMapper guestMapper;
 
     private final ClientMapper clientMapper;
@@ -52,7 +79,13 @@ public class ReservationService {
 
     private final ReservationMapper reservationMapper;
 
+    private final TaxRepository taxRepository;
+
+    private final SaleRepository saleRepository;
+
     private final GuestRepository guestRepository;
+
+    private final TableRepository tableRepository;
 
     private final BranchRepository branchRepository;
 
@@ -60,11 +93,17 @@ public class ReservationService {
 
     private final InvoiceRepository invoiceRepository;
 
+    private final SaleTaxRepository saleTaxRepository;
+
+    private final InsiteSaleRepository insiteSaleRepository;
+
     private final ReservationRepository reservationRepository;
 
     private final ClientGroupRepository clientGroupRepository;
 
     private final ClientGuestRepository clientGuestRepository;
+
+    private final InsiteSaleTableRepository insiteSaleTableRepository;
 
     public ReservationInfoDTO getById(Long id) throws NotFoundException {
         Reservation reservation = reservationRepository.findById(id)
@@ -466,7 +505,8 @@ public class ReservationService {
         reservationRepository.save(updatedReservation);
     }
 
-    public void start(Long id) throws NotFoundException, BadRequestException, ForbiddenException {
+    public SaleInfoDTO start(Long id, TableListDTO tablesDTO)
+            throws NotFoundException, BadRequestException, ForbiddenException {
         Optional<Reservation> reservation = reservationRepository.findById(id);
 
         if (reservation.isEmpty())
@@ -490,7 +530,86 @@ public class ReservationService {
 
         ReservationDTO dto = ReservationDTO.builder().status(ReservationStatics.Status.STARTED).build();
         Reservation updatedReservation = reservationMapper.updateModel(dto, reservation.get());
-        reservationRepository.save(updatedReservation);
+        updatedReservation = reservationRepository.save(updatedReservation);
+
+        // Get associated client guest
+        ClientGuest clientGuest;
+        if (reservation.get().getByClient()) {
+            Client owner = clientGroupRepository.findAllByReservationId(id)
+                    .stream()
+                    .filter(g -> g.getIsOwner())
+                    .findFirst()
+                    .get()
+                    .getClient();
+            clientGuest = clientGuestRepository.findByClientId(owner.getId()).get();
+        } else {
+            clientGuest = clientGuestRepository.findByGuestId(reservation.get().getGuest().getId()).get();
+        }
+
+        // Create associated sale
+        Sale sale = new Sale(
+                -1L,
+                reservation.get().getBranch(),
+                clientGuest,
+                null,
+                reservation.get().getClientNumber(),
+                SaleStatics.Status.ONGOING,
+                new Date(),
+                null,
+                1F,
+                "");
+        final Sale newSale = saleRepository.save(sale);
+
+        // Create taxes
+        List<TaxDTO> taxes = new ArrayList<>();
+        taxRepository.findAllByBranchId(newSale.getBranch().getId()).forEach(tax -> {
+            Tax newTax = Tax.builder()
+                    .name(tax.getName())
+                    .type(tax.getType())
+                    .value(tax.getValue())
+                    .build();
+            newTax = taxRepository.save(newTax);
+            taxes.add(taxMapper.toDTO(newTax));
+
+            SaleTax saleTax = SaleTax.builder()
+                    .sale(newSale)
+                    .tax(newTax)
+                    .build();
+            saleTaxRepository.save(saleTax);
+        });
+
+        InsiteSale insiteSale = InsiteSale.builder()
+                .sale(newSale)
+                .reservation(reservation.get())
+                .build();
+        InsiteSale newInsiteSale = insiteSaleRepository.save(insiteSale);
+
+        // Create tables
+        List<TableDTO> tables = new ArrayList<>();
+        tablesDTO.tables.forEach(tableDTO -> {
+            Optional<Table> table = tableRepository.findById(tableDTO.getId());
+            if (table.isEmpty()) {
+                throw new NotFoundException(
+                        "Table with id " + tableDTO.getId() + " does not exists", 49);
+            }
+            tables.add(tableMapper.toDTO(table.get()));
+
+            InsiteSaleTable insiteSaleTable = InsiteSaleTable.builder()
+                    .insiteSale(newInsiteSale)
+                    .table(table.get())
+                    .build();
+            insiteSaleTableRepository.save(insiteSaleTable);
+        });
+
+        return new SaleInfoDTO(
+                saleMapper.toDTO(newSale),
+                true,
+                reservation.get().getByClient() ? null : guestMapper.toDTO(clientGuest.getGuest()),
+                !reservation.get().getByClient() ? null : clientMapper.toDTO(clientGuest.getClient()),
+                reservation.get().getId(),
+                taxes,
+                tables,
+                new ArrayList<>());
     }
 
     public void retire(Long id) throws NotFoundException, BadRequestException, ForbiddenException {

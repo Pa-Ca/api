@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class TableListDTO {
 
-    List<TableDTO> tables;
+    public List<TableDTO> tables;
 }

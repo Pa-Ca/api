@@ -52,6 +52,7 @@ import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.sale.repository.InsiteSaleTableRepository;
 import com.paca.paca.exception.exceptions.UnprocessableException;
 import com.paca.paca.reservation.repository.ReservationRepository;
+import com.paca.paca.reservation.statics.ReservationStatics;
 
 @Service
 @RequiredArgsConstructor
@@ -221,7 +222,7 @@ public class SaleService {
                     .type(tax.getType())
                     .value(tax.getValue())
                     .build();
-            taxRepository.save(newTax);
+            newTax = taxRepository.save(newTax);
 
             SaleTax saleTax = SaleTax.builder()
                     .sale(newSale)
@@ -287,8 +288,19 @@ public class SaleService {
         }
 
         // Update the sale
+        Short oldState = sale.get().getStatus();
         Sale updatedSale = saleMapper.updateModel(dto, sale.get());
         updatedSale = saleRepository.save(updatedSale);
+
+        // If the sale went from ONGOING to CLOSED, we check if it has an associated
+        // reservation, in that case we also close the reservation
+        Reservation reservation = getReservationBySaleId(updatedSale.getId());
+        if (oldState.equals(SaleStatics.Status.ONGOING)
+                && updatedSale.getStatus().equals(SaleStatics.Status.CLOSED)
+                && reservation != null) {
+            reservation.setStatus(ReservationStatics.Status.CLOSED);
+            reservationRepository.save(reservation);
+        }
 
         return completeData(updatedSale.getId());
     }

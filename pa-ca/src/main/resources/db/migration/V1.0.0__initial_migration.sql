@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2023-08-20 14:31:04.212
+-- Last modification date: 2023-08-28 17:22:04.603
 
 -- tables
 -- Table: amenity
@@ -309,7 +309,7 @@ CREATE TABLE public.reservation (
     by_client boolean  NOT NULL DEFAULT true,
     CONSTRAINT reservation_unique_invoice_id UNIQUE (invoice_id) NOT DEFERRABLE  INITIALLY IMMEDIATE,
     CONSTRAINT reservation_check_by_client_and_guest_id CHECK ((by_client = TRUE AND guest_id IS NULL) OR  (by_client = FALSE AND guest_id IS NOT NULL)) NOT DEFERRABLE INITIALLY IMMEDIATE,
-    CONSTRAINT reservation_check_date_in_less_than_dat_out CHECK ((reservation_date_out IS NULL) OR (reservation_date_in < reservation_date_out)) NOT DEFERRABLE INITIALLY IMMEDIATE,
+    CONSTRAINT reservation_check_date_in_less_than_date_out CHECK ((reservation_date_out IS NULL) OR (reservation_date_in < reservation_date_out)) NOT DEFERRABLE INITIALLY IMMEDIATE,
     CONSTRAINT reservation_pk PRIMARY KEY (id)
 );
 
@@ -569,7 +569,7 @@ ALTER TABLE insite_sale_table ADD CONSTRAINT insite_sale_table_table
 ALTER TABLE insite_sale ADD CONSTRAINT offline_sale_reservation
     FOREIGN KEY (reservation_id)
     REFERENCES public.reservation (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -728,7 +728,8 @@ ALTER TABLE sale ADD CONSTRAINT sale_client_guest
 -- Reference: sale_invoice (table: sale)
 ALTER TABLE sale ADD CONSTRAINT sale_invoice
     FOREIGN KEY (invoice_id)
-    REFERENCES public.invoice (id)  
+    REFERENCES public.invoice (id)
+    ON DELETE  RESTRICT  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -800,7 +801,7 @@ ALTER TABLE public.promotion ADD CONSTRAINT sede_promotion
 ALTER TABLE "table" ADD CONSTRAINT table_branch
     FOREIGN KEY (branch_id)
     REFERENCES public.branch (id)
-    ON DELETE  CASCADE  
+    ON DELETE  RESTRICT  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -809,7 +810,7 @@ ALTER TABLE "table" ADD CONSTRAINT table_branch
 ALTER TABLE sale_tax ADD CONSTRAINT tax_sale
     FOREIGN KEY (sale_id)
     REFERENCES sale (id)
-    ON DELETE  RESTRICT  
+    ON DELETE  CASCADE  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;

@@ -1,12 +1,21 @@
 package com.paca.paca.reservation;
 
 import com.paca.paca.ServiceTest;
+import com.paca.paca.sale.model.Sale;
+import com.paca.paca.sale.dto.SaleDTO;
+import com.paca.paca.branch.model.Table;
+import com.paca.paca.branch.dto.TableDTO;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.client.model.Client;
+import com.paca.paca.sale.dto.SaleInfoDTO;
 import com.paca.paca.client.dto.ClientDTO;
+import com.paca.paca.sale.model.InsiteSale;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.reservation.model.Guest;
+import com.paca.paca.client.model.ClientGuest;
 import com.paca.paca.reservation.dto.GuestDTO;
 import com.paca.paca.reservation.model.Invoice;
+import com.paca.paca.sale.model.InsiteSaleTable;
 import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.reservation.model.ClientGroup;
 import com.paca.paca.reservation.model.Reservation;
@@ -687,10 +696,12 @@ public class ReservationServiceTest extends ServiceTest {
     @Test
     void shouldGetNotFoundDueToMissingReservationInStartReservation() {
         Reservation reservation = utils.createReservation(null);
+        TableListDTO tables = new TableListDTO(new ArrayList<>());
+
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         try {
-            reservationService.start(reservation.getId());
+            reservationService.start(reservation.getId(), tables);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof NotFoundException);
@@ -702,13 +713,14 @@ public class ReservationServiceTest extends ServiceTest {
     @Test
     void shouldGetBadRequestWhenTryToStartReservationDueToReservationAlreadyInOtherStatus() {
         Reservation reservation = utils.createReservation(null);
+        TableListDTO tables = new TableListDTO(new ArrayList<>());
 
         // returned
         reservation.setStatus(ReservationStatics.Status.RETURNED);
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.start(reservation.getId());
+            reservationService.start(reservation.getId(), tables);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -723,7 +735,7 @@ public class ReservationServiceTest extends ServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.start(reservation.getId());
+            reservationService.start(reservation.getId(), tables);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -738,7 +750,7 @@ public class ReservationServiceTest extends ServiceTest {
         when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
 
         try {
-            reservationService.start(reservation.getId());
+            reservationService.start(reservation.getId(), tables);
             TestCase.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof BadRequestException);
@@ -747,6 +759,74 @@ public class ReservationServiceTest extends ServiceTest {
                             " can't start because it is already rejected");
             Assert.assertEquals(((BadRequestException) e).getCode(), (Integer) 71);
         }
+    }
+
+    @Test
+    void shouldGetNotFoundDueToMissingTableInStartReservation() {
+        Reservation reservation = utils.createReservation(null, null);
+        ClientGuest clientGuest = utils.createClientGuest(reservation.getGuest());
+        Sale sale = utils.createSale(reservation.getBranch(), clientGuest, null);
+        InsiteSale insiteSale = utils.createInsiteSale(sale, reservation);
+        Table table = utils.createTable(reservation.getBranch());
+        TableListDTO tables = new TableListDTO(List.of(utils.createTableDTO(table)));
+
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(reservationMapper.updateModel(any(ReservationDTO.class), any(Reservation.class))).thenReturn(reservation);
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(clientGuestRepository.findByGuestId(any(Long.class))).thenReturn(Optional.ofNullable(clientGuest));
+        when(saleRepository.save(any(Sale.class))).thenReturn(sale);
+        when(taxRepository.findAllByBranchId(any(Long.class))).thenReturn(new ArrayList<>());
+        when(insiteSaleRepository.save(any(InsiteSale.class))).thenReturn(insiteSale);
+        when(tableRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        try {
+            reservationService.start(reservation.getId(), tables);
+            TestCase.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NotFoundException);
+            Assert.assertEquals(e.getMessage(), "Table with id " + table.getId() + " does not exists");
+            Assert.assertEquals(((NotFoundException) e).getCode(), (Integer) 49);
+        }
+    }
+
+    @Test
+    void shouldStartReservation() {
+        Reservation reservation = utils.createReservation(null, null);
+        ClientGuest clientGuest = utils.createClientGuest(reservation.getGuest());
+        Sale sale = utils.createSale(reservation.getBranch(), clientGuest, null);
+        InsiteSale insiteSale = utils.createInsiteSale(sale, reservation);
+        Table table = utils.createTable(reservation.getBranch());
+        TableDTO tableDTO = utils.createTableDTO(table);
+        InsiteSaleTable insiteSaleTable = utils.createInsiteSaleTable(insiteSale, table);
+        SaleDTO saleDTO = utils.createSaleDTO(sale);
+        GuestDTO guestDTO = utils.createGuestDTO(reservation.getGuest());
+        TableListDTO tables = new TableListDTO(List.of(utils.createTableDTO(table)));
+
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(reservation));
+        when(reservationMapper.updateModel(any(ReservationDTO.class), any(Reservation.class))).thenReturn(reservation);
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(clientGuestRepository.findByGuestId(any(Long.class))).thenReturn(Optional.ofNullable(clientGuest));
+        when(saleRepository.save(any(Sale.class))).thenReturn(sale);
+        when(taxRepository.findAllByBranchId(any(Long.class))).thenReturn(new ArrayList<>());
+        when(insiteSaleRepository.save(any(InsiteSale.class))).thenReturn(insiteSale);
+        when(tableRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(table));
+        when(tableMapper.toDTO(any(Table.class))).thenReturn(tableDTO);
+        when(insiteSaleTableRepository.save(any(InsiteSaleTable.class))).thenReturn(insiteSaleTable);
+        when(saleMapper.toDTO(any(Sale.class))).thenReturn(saleDTO);
+        when(guestMapper.toDTO(any(Guest.class))).thenReturn(guestDTO);
+
+        SaleInfoDTO response = reservationService.start(reservation.getId(), tables);
+        SaleInfoDTO expected = new SaleInfoDTO(
+                saleDTO,
+                true,
+                guestDTO,
+                null,
+                reservation.getId(),
+                new ArrayList<>(),
+                List.of(tableDTO),
+                new ArrayList<>());
+
+        assertThat(response).isEqualTo(expected);
     }
 
     // Retire

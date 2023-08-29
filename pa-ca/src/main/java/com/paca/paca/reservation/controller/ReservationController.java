@@ -11,13 +11,15 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.paca.paca.sale.dto.SaleInfoDTO;
+import com.paca.paca.branch.dto.TableListDTO;
 import com.paca.paca.reservation.dto.InvoiceDTO;
 import com.paca.paca.reservation.dto.ReservationDTO;
 import com.paca.paca.reservation.dto.ReservationInfoDTO;
 import com.paca.paca.reservation.service.ReservationService;
 import com.paca.paca.reservation.statics.ReservationStatics;
-import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.NotFoundException;
+import com.paca.paca.exception.exceptions.ForbiddenException;
 import com.paca.paca.exception.exceptions.BadRequestException;
 import com.paca.paca.auth.utils.ValidateRolesInterceptor.ValidateRoles;
 import com.paca.paca.reservation.utils.ValidateReservationOwnerInterceptor.ValidateReservationOwner;
@@ -87,8 +89,9 @@ public class ReservationController {
     @ValidateReservationOwner(isClientOwner = false)
     @PostMapping(ReservationStatics.Endpoint.START)
     @Operation(summary = "Start a reservation", description = "Start a reservation given your id")
-    public void start(@PathVariable("id") Long id) throws ForbiddenException, NotFoundException, BadRequestException {
-        reservationService.start(id);
+    public SaleInfoDTO start(@PathVariable("id") Long id, @RequestBody TableListDTO dto)
+            throws ForbiddenException, NotFoundException, BadRequestException {
+        return reservationService.start(id, dto);
     }
 
     @ValidateRoles({ "business" })
