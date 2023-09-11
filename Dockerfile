@@ -4,6 +4,10 @@ COPY pa-ca/pom.xml /app/
 COPY pa-ca/src /app/src
 RUN mvn -f /app/pom.xml clean dependency:purge-local-repository package -Dmaven.test.skip -q
 
+# Enable curl
+USER root
+RUN apt-get update && apt-get install -y curl
+
 # Run stage
 FROM openjdk:17-jdk-alpine
 WORKDIR /app
