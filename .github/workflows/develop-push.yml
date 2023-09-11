@@ -34,25 +34,16 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/dev.paca-api:${{steps.build-number.outputs.BUILD_NUMBER}}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/dev.paca-api:latest
 
-  cd:
-    name: Deployment into server
+  deploy:
+    name: Deploy Application
     needs: build
     runs-on: [self-hosted, dev.paca]
+    env:
+        ENVIRONMENT: dev
+        APP: api
     steps:
-      - name: deploy new backend image
-        if: ${{ always() }}
-        run: |
-          docker rm -f dev.paca-api; 
-          docker run -e DB_HOSTNAME=${{secrets.DATABASE_HOSTNAME}} \
-          -e GOOGLE_EMAIL_FROM=${{secrets.GOOGLE_EMAIL_FROM}} \
-          -e GOOGLE_EMAIL_PASSWORD=${{secrets.GOOGLE_EMAIL_PASSWORD}} \
-          -e AUTH_REFRESH_EXPIRATION=${{secrets.AUTH_REFRESH_EXPIRATION}} \
-          -e AUTH_RESET_PASSWORD_EXPIRATION=${{secrets.AUTH_RESET_PASSWORD_EXPIRATION}} \
-          -e AUTH_SECRET_KEY=${{secrets.AUTH_SECRET_KEY}} \
-          -e AUTH_TOKEN_EXPIRATION=${{secrets.AUTH_TOKEN_EXPIRATION}} \
-          -e AUTH_VERIFY_EMAIL_EXPIRATION=${{secrets.AUTH_VERIFY_EMAIL_EXPIRATION}} \
-          -e GOOGLE_CLIENT_ID=${{secrets.GOOGLE_CLIENT_ID}} \
-          -e SPRING_DATASOURCE_URL=${{secrets.SPRING_DATASOURCE_URL}} \
-          -e SPRING_DATASOURCE_USERNAME=${{secrets.SPRING_DATASOURCE_USERNAME}} \
-          -e SPRING_DATASOURCE_PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}} \
-          -d --network host --name dev.paca-api ${{ secrets.DOCKERHUB_USERNAME }}/dev.paca-api:latest
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Manager Script
+        run: cd /root/deploy && ./manager.sh
