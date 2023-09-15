@@ -17,6 +17,7 @@ public interface AuthenticationStatics {
         "/swagger-ui/**",
         "/v3/api-docs/**",
         "/swagger-ui/index.html/**",
+        "/actuator/health",
         AuthenticationStatics.Endpoint.AUTH_PATH + "/**"
     };
   }
