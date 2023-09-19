@@ -1,5 +1,7 @@
 package com.paca.paca.auth.statics;
 
+import com.paca.paca.health.HealthStatics;
+
 import java.util.Map;
 import static java.util.Map.entry;
 
@@ -17,8 +19,8 @@ public interface AuthenticationStatics {
         "/swagger-ui/**",
         "/v3/api-docs/**",
         "/swagger-ui/index.html/**",
-        "/actuator/health",
-        AuthenticationStatics.Endpoint.AUTH_PATH + "/**"
+        AuthenticationStatics.Endpoint.AUTH_PATH + "/**",
+        HealthStatics.Endpoint.PATH + "/**"
     };
   }
 
