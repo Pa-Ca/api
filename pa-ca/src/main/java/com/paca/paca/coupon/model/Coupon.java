@@ -1,8 +1,6 @@
 package com.paca.paca.coupon.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -11,7 +9,10 @@ import java.sql.Timestamp;
 @Setter
 @Builder
 @Entity
-@Table(name = "coupon")
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "`coupon`")
 public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "coupon_seq")

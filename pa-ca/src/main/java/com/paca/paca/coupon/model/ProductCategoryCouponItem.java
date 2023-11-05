@@ -3,9 +3,7 @@ package com.paca.paca.coupon.model;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.productSubCategory.model.ProductCategory;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,7 +12,10 @@ import javax.persistence.Table;
 @Setter
 @Builder
 @Entity
-@Table (name = "product_category_coupon_item")
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Table (name = "`product_category_coupon_item`")
 public class ProductCategoryCouponItem {
 
     @Id
