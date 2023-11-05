@@ -4,9 +4,6 @@ import com.paca.paca.product.model.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 @Getter
 @Setter
 @Builder

@@ -2,7 +2,7 @@ package com.paca.paca.coupon.model;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 @Getter
