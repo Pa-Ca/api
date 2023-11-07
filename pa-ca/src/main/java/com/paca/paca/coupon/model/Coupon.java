@@ -4,6 +4,7 @@ import lombok.*;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -30,8 +31,8 @@ public class Coupon {
     private String description;
 
     @Column(name = "start_date", nullable = false)
-    private Timestamp startDate;
+    private Date startDate;
 
     @Column(name = "end_date", nullable = false)
-    private Timestamp endDate;
+    private Date endDate;
 }
