@@ -7,40 +7,36 @@ import com.paca.paca.coupon.model.ProductCategoryCouponItem;
 import com.paca.paca.coupon.model.ProductCouponItem;
 import com.paca.paca.coupon.model.ProductSubCategoryCouponItem;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(uses = CouponItemMapper.class)
+@Mapper(componentModel = "spring")
 public interface CouponMapper {
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "type", target = "type")
-    @Mapping(source = "value", target = "value")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "startDate", target = "startDate")
-    @Mapping(source = "endDate", target = "endDate")
-    @Mapping(target = "items", qualifiedByName = "toProductCouponItemDTOList")
+    @Mapping(source = "productCouponItems", target = "items", qualifiedByName = "toProductCouponItemDTOList")
     CouponDTO toDTOWithProductItems(Coupon coupon, List<ProductCouponItem> productCouponItems);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "type", target = "type")
-    @Mapping(source = "value", target = "value")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "startDate", target = "startDate")
-    @Mapping(source = "endDate", target = "endDate")
-    @Mapping(target = "items", qualifiedByName = "toProductCategoryCouponItemDTOList")
+    @Mapping(source = "productCategoryCouponItems", target = "items", qualifiedByName = "toProductCategoryCouponItemDTOList")
     CouponDTO toDTOWithProductCategoryItems(Coupon coupon, List<ProductCategoryCouponItem> productCategoryCouponItems);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "type", target = "type")
-    @Mapping(source = "value", target = "value")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "startDate", target = "startDate")
-    @Mapping(source = "endDate", target = "endDate")
-    @Mapping(target = "items", qualifiedByName = "toProductSubCategoryCouponItemDTOList")
+    @Mapping(source = "productSubCategoryCouponItems", target = "items", qualifiedByName = "toProductSubCategoryCouponItemDTOList")
     CouponDTO toDTOWithProductSubCategoryItems(Coupon coupon, List<ProductSubCategoryCouponItem> productSubCategoryCouponItems);
+
+    @Mapping(source = "product.id", target = "id")
+    @Mapping(source = "product.name", target = "name")
+    @Mapping(target = "type", constant = "Product")
+    CouponItemDTO toProductCouponItemDTO(ProductCouponItem productCouponItem);
+
+    @Mapping(source = "productCategory.id", target = "id")
+    @Mapping(source = "productCategory.name", target = "name")
+    @Mapping(target = "type", constant = "ProductCategory")
+    CouponItemDTO toProductCategoryCouponItemDTO(ProductCategoryCouponItem productCategoryCouponItem);
+
+    @Mapping(source = "productSubCategory.id", target = "id")
+    @Mapping(source = "productSubCategory.name", target = "name")
+    @Mapping(target = "type", constant = "ProductSubCategory")
+    CouponItemDTO toProductSubCategoryCouponItemDTO(ProductSubCategoryCouponItem productSubCategoryCouponItem);
 
     @Named("toProductCouponItemDTOList")
     default List<CouponItemDTO> toProductCouponItemDTOList(List<ProductCouponItem> productCouponItems) {
@@ -50,7 +46,7 @@ public interface CouponMapper {
 
         List<CouponItemDTO> list = new ArrayList<>(productCouponItems.size());
         for (ProductCouponItem productCouponItem : productCouponItems) {
-            list.add(Mappers.getMapper(CouponItemMapper.class).toProductCouponItemDTO(productCouponItem));
+            list.add(toProductCouponItemDTO(productCouponItem));
         }
 
         return list;
@@ -64,13 +60,13 @@ public interface CouponMapper {
 
         List<CouponItemDTO> list = new ArrayList<>(productCategoryCouponItems.size());
         for (ProductCategoryCouponItem productCategoryCouponItem : productCategoryCouponItems) {
-            list.add(Mappers.getMapper(CouponItemMapper.class).toProductCategoryCouponItemDTO(productCategoryCouponItem));
+            list.add(toProductCategoryCouponItemDTO(productCategoryCouponItem));
         }
 
         return list;
     }
 
-    @Named("toProductCategoryCouponItemDTOList")
+    @Named("toProductSubCategoryCouponItemDTOList")
     default List<CouponItemDTO> toProductSubCategoryCouponItemDTOList(List<ProductSubCategoryCouponItem> productSubCategoryCouponItems) {
         if (productSubCategoryCouponItems == null) {
             return null;
@@ -78,7 +74,7 @@ public interface CouponMapper {
 
         List<CouponItemDTO> list = new ArrayList<>(productSubCategoryCouponItems.size());
         for (ProductSubCategoryCouponItem productSubCategoryCouponItem : productSubCategoryCouponItems) {
-            list.add(Mappers.getMapper(CouponItemMapper.class).toProductSubCategoryCouponItemDTO(productSubCategoryCouponItem));
+            list.add(toProductSubCategoryCouponItemDTO(productSubCategoryCouponItem));
         }
 
         return list;
