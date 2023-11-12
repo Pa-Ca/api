@@ -1,11 +1,15 @@
 package com.paca.paca.coupon.utils;
 
+import com.paca.paca.branch.model.Branch;
 import com.paca.paca.coupon.dto.CouponDTO;
 import com.paca.paca.coupon.dto.CouponItemDTO;
 import com.paca.paca.coupon.model.Coupon;
 import com.paca.paca.coupon.model.ProductCategoryCouponItem;
 import com.paca.paca.coupon.model.ProductCouponItem;
 import com.paca.paca.coupon.model.ProductSubCategoryCouponItem;
+import com.paca.paca.product.model.Product;
+import com.paca.paca.productSubCategory.model.ProductCategory;
+import com.paca.paca.productSubCategory.model.ProductSubCategory;
 import org.mapstruct.*;
 
 import java.util.ArrayList;
@@ -79,5 +83,46 @@ public interface CouponMapper {
 
         return list;
     }
+
+    Coupon toEntity(CouponDTO dto);
+
+    @Mapping(target = "product", ignore = true)
+    @Mapping(target = "coupon", ignore = true)
+    ProductCouponItem toProductItemEntity(CouponItemDTO dto);
+    default ProductCouponItem toProductItemEntity(CouponItemDTO dto, Product product, Coupon coupon) {
+        ProductCouponItem item = toProductItemEntity(dto);
+        item.setProduct(product);
+        item.setCoupon(coupon);
+        return item;
+    };
+
+    @Mapping(target = "productCategory", ignore = true)
+    @Mapping(target = "coupon", ignore = true)
+    @Mapping(target = "branch", ignore = true)
+    ProductCategoryCouponItem toProductCategoryItemEntity(CouponItemDTO dto);
+    default ProductCategoryCouponItem toProductCategoryItemEntity(
+            CouponItemDTO dto, ProductCategory category, Coupon coupon, Branch branch) {
+        ProductCategoryCouponItem item = toProductCategoryItemEntity(dto);
+        item.setProductCategory(category);
+        item.setCoupon(coupon);
+        item.setBranch(branch);
+        return item;
+    };
+
+    @Mapping(target = "productSubCategory", ignore = true)
+    @Mapping(target = "coupon", ignore = true)
+    ProductSubCategoryCouponItem toProductSubCategoryItemEntity(CouponItemDTO dto);
+    default ProductSubCategoryCouponItem toProductSubCategoryItemEntity(
+            CouponItemDTO dto, ProductSubCategory subCategory, Coupon coupon) {
+        ProductSubCategoryCouponItem item = toProductSubCategoryItemEntity(dto);
+        item.setProductSubCategory(subCategory);
+        item.setCoupon(coupon);
+        return item;
+    };
+
+    @Mapping(target = "id", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Coupon update(CouponDTO dto, @MappingTarget Coupon coupon);
+
 }
 

@@ -18,5 +18,4 @@ public class PaCaApplication {
     public static void main(String[] args) {
         SpringApplication.run(PaCaApplication.class, args);
     }
-
 }

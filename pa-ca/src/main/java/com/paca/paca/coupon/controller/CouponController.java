@@ -50,4 +50,12 @@ public class CouponController {
     public void delete(@PathVariable Long id) {
         couponService.delete(id);
     }
+
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
+    @PostMapping(CouponStatics.Endpoint.SAVE)
+    @Operation(summary = "Create coupon", description = "Create a new coupon given a DTO object")
+    public ResponseEntity<CouponDTO> save(@PathVariable(required = false) Long branchId, @RequestBody CouponDTO dto) {
+        return ResponseEntity.ok(couponService.save(branchId, dto));
+    }
 }
