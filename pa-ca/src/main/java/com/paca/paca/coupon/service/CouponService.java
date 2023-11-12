@@ -3,7 +3,11 @@ package com.paca.paca.coupon.service;
 import com.paca.paca.branch.model.Branch;
 import com.paca.paca.branch.repository.BranchRepository;
 import com.paca.paca.coupon.dto.CouponDTO;
+import com.paca.paca.coupon.dto.CouponItemDTO;
 import com.paca.paca.coupon.model.Coupon;
+import com.paca.paca.coupon.model.ProductCategoryCouponItem;
+import com.paca.paca.coupon.model.ProductCouponItem;
+import com.paca.paca.coupon.model.ProductSubCategoryCouponItem;
 import com.paca.paca.coupon.repository.CouponRepository;
 import com.paca.paca.coupon.repository.ProductCategoryCouponItemRepository;
 import com.paca.paca.coupon.repository.ProductCouponItemRepository;
@@ -22,12 +26,14 @@ import com.paca.paca.sale.statics.TaxStatics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,28 +80,32 @@ public class CouponService {
                 "Coupon with id " + id + " does not exists", 300)));
     }
 
+    private void deleteListItems (Coupon coupon) {
+        switch (coupon.getType()) {
+            case CouponStatics.Type.PRODUCT:
+                productCouponItemRepository.deleteAllByCoupon_Id(coupon.getId());
+                break;
+            case CouponStatics.Type.CATEGORY:
+                productCategoryCouponItemRepository.deleteAllByCoupon_Id(coupon.getId());
+                break;
+            case CouponStatics.Type.SUB_CATEGORY:
+                productSubCategoryCouponItemRepository.deleteAllByCoupon_Id(coupon.getId());
+                break;
+            default:
+                throw new NotFoundException(
+                        "Coupon with id " + coupon.getId() + " does not have a valid type", 301);
+        }
+    }
+
     public void delete(Long id) {
         Coupon coupon = couponRepository.findById(id).orElseThrow(() -> new NotFoundException(
                 "Coupon with id " + id + " does not exists", 300));
 
-        switch (coupon.getType()) {
-            case CouponStatics.Type.PRODUCT:
-                productCouponItemRepository.deleteAllByCoupon_Id(id);
-                break;
-            case CouponStatics.Type.CATEGORY:
-                productCategoryCouponItemRepository.deleteAllByCoupon_Id(id);
-                break;
-            case CouponStatics.Type.SUB_CATEGORY:
-                productSubCategoryCouponItemRepository.deleteAllByCoupon_Id(id);
-                break;
-            default:
-                throw new NotFoundException(
-                        "Coupon with id " + id + " does not have a valid type. Found: " + coupon.getType(), 301);
-        }
+        deleteListItems(coupon);
         couponRepository.deleteById(id);
     }
 
-    public CouponDTO save(Long branchId, CouponDTO dto) {
+    private void validateDTO(CouponDTO dto) {
         Set<ConstraintViolation<CouponDTO>> violations = validator.validate(dto);
         if (!violations.isEmpty()) throw new BadRequestException(violations.toString(), 302);
 
@@ -108,15 +118,11 @@ public class CouponService {
         if (dto.getValue() < 0)
             throw new BadRequestException("The discount value must be positive", 302);
 
-        if (couponRepository.existsById(dto.getId())) throw new
-                BadRequestException("The given coupon already exists", 302);
-
         if (dto.getItems().isEmpty() || dto.getItems().size() > 5)
             throw new BadRequestException("The coupon must have at least one item and at most 5 items", 302);
+    }
 
-        Coupon coupon = couponMapper.toEntity(dto);
-        couponRepository.save(coupon);
-
+    private void saveListItems(Coupon coupon, CouponDTO dto, Long branchId) {
         switch (coupon.getType()) {
             case CouponStatics.Type.PRODUCT:
                 productCouponItemRepository.saveAll(dto.getItems().stream().map(item -> {
@@ -143,13 +149,93 @@ public class CouponService {
                     return couponMapper.toProductSubCategoryItemEntity(item, productSubCategory, coupon);
                 }).collect(Collectors.toList()));
                 break;
-            default: throw new NotFoundException("The discount type is not valid", 302);
+            default:
+                throw new NotFoundException("The discount type is not valid", 302);
         }
-
-        return CouponDTO.builder().build();
     }
 
-    public CouponDTO update(CouponDTO dto) {
+    public CouponDTO save(Long branchId, CouponDTO dto) {
+        validateDTO(dto);
+        if (couponRepository.existsById(dto.getId())) throw new
+                BadRequestException("The given coupon already exists", 302);
+
+        Coupon coupon = couponMapper.toEntity(dto);
+        couponRepository.save(coupon);
+
+        saveListItems(coupon, dto, branchId);
+        return CouponDTO.builder().build();
+    }
+    public CouponDTO update(CouponDTO dto, Long id, Long branchId) {
+        validateDTO(dto);
+        Coupon current = couponRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("The given coupon does not exists", 303));
+
+        Coupon coupon = couponMapper.update(dto, current);
+        couponRepository.save(coupon);
+
+        if (dto.getType().equals(current.getType())) {
+            switch (coupon.getType()) {
+                case CouponStatics.Type.PRODUCT:
+                    List<ProductCouponItem> productItem = productCouponItemRepository
+                            .findAllByCoupon_Id(coupon.getId());
+
+                    List<ProductCouponItem> updateProductCouponItemList =
+                            productItem.stream().filter(item -> dto.getItems().stream().noneMatch(dtoItem ->
+                                    Objects.equals(dtoItem.getId(), item.getId()))).collect(Collectors.toList());
+
+                    productCouponItemRepository.deleteAll(updateProductCouponItemList);
+
+                    updateProductCouponItemList.addAll(dto.getItems().stream().filter(dtoItem ->
+                                    productItem.stream().noneMatch(item ->
+                                            Objects.equals(item.getId(), dtoItem.getId())))
+                                                .map(couponMapper::toProductItemEntity)
+                            .collect(Collectors.toList()));
+
+                    productCouponItemRepository.saveAll(updateProductCouponItemList);
+                    break;
+                case CouponStatics.Type.CATEGORY:
+                    List<ProductCategoryCouponItem> productCategoryItem = productCategoryCouponItemRepository
+                            .findAllByCoupon_Id(coupon.getId());
+
+                    List<ProductCategoryCouponItem> updateCategoryProductCouponItemList =
+                            productCategoryItem.stream().filter(item -> dto.getItems().stream().noneMatch(dtoItem ->
+                                    Objects.equals(dtoItem.getId(), item.getId()))).collect(Collectors.toList());
+
+                    productCategoryCouponItemRepository.deleteAll(updateCategoryProductCouponItemList);
+
+                    updateCategoryProductCouponItemList.addAll(dto.getItems().stream().filter(dtoItem ->
+                                    productCategoryItem.stream().noneMatch(item ->
+                                            Objects.equals(item.getId(), dtoItem.getId())))
+                            .map(couponMapper::toProductCategoryItemEntity)
+                            .collect(Collectors.toList()));
+
+                    productCategoryCouponItemRepository.saveAll(updateCategoryProductCouponItemList);
+                    break;
+                case CouponStatics.Type.SUB_CATEGORY:
+                    List<ProductSubCategoryCouponItem> productSubCategoryItem = productSubCategoryCouponItemRepository
+                            .findAllByCoupon_Id(coupon.getId());
+
+                    List<ProductSubCategoryCouponItem> updateSubCategoryProductCouponItemList =
+                            productSubCategoryItem.stream().filter(item -> dto.getItems().stream().noneMatch(dtoItem ->
+                                    Objects.equals(dtoItem.getId(), item.getId()))).collect(Collectors.toList());
+
+                    productSubCategoryCouponItemRepository.deleteAll(updateSubCategoryProductCouponItemList);
+
+                    updateSubCategoryProductCouponItemList.addAll(dto.getItems().stream().filter(dtoItem ->
+                                    productSubCategoryItem.stream().noneMatch(item ->
+                                            Objects.equals(item.getId(), dtoItem.getId())))
+                                                .map(couponMapper::toProductSubCategoryItemEntity)
+                            .collect(Collectors.toList()));
+
+                    productSubCategoryCouponItemRepository.saveAll(updateSubCategoryProductCouponItemList);
+                    break;
+                default:
+                    throw new NotFoundException("The discount type is not valid", 303);
+            }
+        } else {
+            deleteListItems(current);
+            saveListItems(coupon, dto, branchId);
+        }
 
         return CouponDTO.builder().build();
     }

@@ -55,7 +55,15 @@ public class CouponController {
     @ValidateRoles({ "business" })
     @PostMapping(CouponStatics.Endpoint.SAVE)
     @Operation(summary = "Create coupon", description = "Create a new coupon given a DTO object")
-    public ResponseEntity<CouponDTO> save(@PathVariable(required = false) Long branchId, @RequestBody CouponDTO dto) {
+    public ResponseEntity<CouponDTO> save(@PathVariable Long branchId, @RequestBody CouponDTO dto) {
         return ResponseEntity.ok(couponService.save(branchId, dto));
+    }
+
+    @ValidateBranchOwner
+    @ValidateRoles({ "business" })
+    @PutMapping(CouponStatics.Endpoint.UPDATE)
+    @Operation(summary = "Update coupon", description = "Update a coupon given a DTO object")
+    public ResponseEntity<CouponDTO> update(@PathVariable Long branchId, @PathVariable Long id, @RequestBody CouponDTO dto) {
+        return ResponseEntity.ok(couponService.update(dto, id, branchId));
     }
 }

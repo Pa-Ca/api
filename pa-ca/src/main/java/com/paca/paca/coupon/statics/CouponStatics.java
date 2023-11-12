@@ -6,7 +6,7 @@ public interface CouponStatics {
         String PATH = "/api/v1/coupon";
 
         String SAVE = "/{branchId}";
-        String UPDATE = "/{id}";
+        String UPDATE = "/{branchId}/{id}";
         String DELETE = "/{id}";
         String GET_BY_ID = "/{id}";
         String GET_BY_PAGE = "/page";
