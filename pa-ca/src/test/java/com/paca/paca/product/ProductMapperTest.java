@@ -37,7 +37,8 @@ public class ProductMapperTest {
                 product.getName(),
                 product.getPrice(),
                 product.getDescription(),
-                product.getDisabled());
+                product.getDisabled(),
+                product.getImage());
 
         assertThat(response).isEqualTo(expected);
     }
@@ -55,7 +56,8 @@ public class ProductMapperTest {
                 dto.getName(),
                 dto.getPrice(),
                 dto.getDescription(),
-                dto.getDisabled());
+                dto.getDisabled(),
+                product.getImage());
 
         assertThat(response).isEqualTo(expected);
     }
@@ -71,7 +73,8 @@ public class ProductMapperTest {
                 product.getName() + ".",
                 product.getPrice().add(BigDecimal.valueOf(1)),
                 product.getDescription() + ".",
-                !product.getDisabled());
+                !product.getDisabled(),
+                product.getImage() + ".");
         Product response = productMapper.updateModel(dto, product);
         Product expected = new Product(
                 product.getId(),
@@ -79,7 +82,8 @@ public class ProductMapperTest {
                 dto.getName(),
                 dto.getPrice(),
                 dto.getDescription(),
-                dto.getDisabled());
+                dto.getDisabled(),
+                dto.getImage());
 
         assertThat(response).isEqualTo(expected);
     }

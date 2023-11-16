@@ -39,4 +39,7 @@ public class Product {
 
     @Column(name = "disabled", nullable = false)
     private Boolean disabled;
+
+    @Column(name = "image", nullable = false)
+    private String image;
 }

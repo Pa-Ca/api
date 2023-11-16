@@ -581,7 +581,8 @@ public class TestUtils {
                 "name_" + UUID.randomUUID().toString(),
                 BigDecimal.valueOf(ThreadLocalRandom.current().nextFloat() * 100),
                 "description_" + UUID.randomUUID().toString(),
-                false);
+                false,
+                "test_image");
 
         if (productRepository != null) {
             product = productRepository.save(product);
@@ -601,7 +602,8 @@ public class TestUtils {
                 product.getName(),
                 product.getPrice(),
                 product.getDescription(),
-                product.getDisabled());
+                product.getDisabled(),
+                product.getImage());
 
         return dto;
     }
