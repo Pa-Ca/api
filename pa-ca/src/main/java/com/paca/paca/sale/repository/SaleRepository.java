@@ -2,6 +2,7 @@ package com.paca.paca.sale.repository;
 
 import com.paca.paca.sale.model.Sale;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -12,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
-public interface SaleRepository extends JpaRepository<Sale, Long> {
+public interface SaleRepository extends JpaRepository<Sale, Long>, JpaSpecificationExecutor<Sale> {
 
     @Query("SELECT s "
             + "FROM Sale s "
