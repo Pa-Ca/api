@@ -33,3 +33,6 @@ pgdata/
 
 # Visual Studio Code
 .vscode/
+
+# Intellij
+.idea
