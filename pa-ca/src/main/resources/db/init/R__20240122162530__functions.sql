@@ -130,3 +130,63 @@ BEGIN
     );
 END;
 $function$;
+
+
+-- FUNCTION: paca_populate_branch
+-- DESCRIPTION: Adds random row to branch table
+-- RETURNS: branch table
+-- INVERSE: DROP FUNCTION public.paca_populate_branch(int4)
+CREATE OR REPLACE FUNCTION public.paca_populate_branch(num integer)
+    RETURNS TABLE(
+        id int4,
+        business_id int4,
+        "name" varchar(100),
+        score numeric(10, 4),
+        capacity int2,
+        reservation_price money,
+        maps_link varchar(1024),
+        "location" varchar(95),
+        overview text,
+        visibility bool,
+        reserve_off bool,
+        phone_number varchar(31),
+        "type" varchar(100),
+        hour_in time,
+        hour_out time,
+        average_reserve_time interval,
+        dollar_exchange numeric(16, 4),
+        deleted bool
+    )
+    LANGUAGE plpgsql
+AS $function$
+DECLARE
+    branches_count text;
+    current_business RECORD;
+    i Integer := 1;
+BEGIN
+    WHILE i <= num LOOP
+            branches_count := least((random() * 2 + 1)::INT, num - i + 1);
+            SELECT * INTO current_business FROM paca_populate_business(1) ppb;
+            FOR j IN 1..branches_count LOOP
+                    INSERT INTO branch (id, business_id, "name", score, capacity, reservation_price, maps_link, "location", overview, visibility, reserve_off, phone_number, "type", hour_in, hour_out, average_reserve_time, dollar_exchange, deleted)
+                    VALUES(
+                          (SELECT COALESCE(MAX(b.id), 1000) FROM public.branch b) + 1,
+                          current_business.id,
+                          current_business.name || ' ' || CAST(j AS VARCHAR(1)),
+                          (random() * 10)::INT,
+                          (random() * 100)::INT,
+                          (random() * 50)::NUMERIC(10,2),
+                          null, null, null,
+                          random() >= 0.8,
+                          random() >= 0.9,
+                          null, null, null, null, null, null,
+                          random() >= 0.9);
+                    i := i + 1;
+            END LOOP;
+    END LOOP;
+    RETURN QUERY (
+        SELECT * FROM public.branch res
+        WHERE res.id BETWEEN (SELECT MAX(b.id) FROM public.branch b) - num + 1 AND (SELECT MAX(b.id) FROM public.branch b)
+    );
+END;
+$function$;
