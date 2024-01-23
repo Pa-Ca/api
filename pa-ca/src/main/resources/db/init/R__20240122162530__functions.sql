@@ -61,7 +61,7 @@ $function$;
 -- DESCRIPTION: Adds random row to user table
 -- RETURNS: user table
 -- INVERSE: DROP FUNCTION public.paca_populate_user(int4)
-CREATE OR REPLACE FUNCTION public.paca_populate_user(num integer)
+CREATE OR REPLACE FUNCTION public.paca_populate_user(num INTEGER)
     RETURNS TABLE(
        id INTEGER,
        role_id INTEGER,
@@ -87,6 +87,46 @@ BEGIN
     RETURN QUERY (
         SELECT * FROM public.user res
         WHERE res.id BETWEEN (SELECT MAX(u.id) FROM public.user u) - num + 1 AND (SELECT MAX(u.id) FROM public.user u)
+    );
+END;
+$function$;
+
+
+-- FUNCTION: paca_populate_business
+-- DESCRIPTION: Adds random row to business table
+-- RETURNS: business table
+-- INVERSE: DROP FUNCTION public.paca_populate_business(int4)
+CREATE OR REPLACE FUNCTION public.paca_populate_business(num INTEGER)
+    RETURNS TABLE(
+                     id INTEGER,
+                     user_id INTEGER,
+                     tier_id INTEGER,
+                     "name" VARCHAR(100),
+                     verified BOOLEAN,
+                     phone_number VARCHAR(31)
+                 )
+    LANGUAGE plpgsql
+AS $function$
+BEGIN
+    FOR i IN 1..num loop
+            INSERT INTO business (id, user_id, tier_id, "name", verified)
+            VALUES(
+                  (SELECT COALESCE(MAX(b.id), 1000) FROM public.business b) + 1,
+                  (SELECT ppu.id FROM paca_populate_user(1) ppu),
+                  (random() * 2)::int,
+                  (SELECT array_to_string(array(
+                          SELECT word
+                          FROM regexp_split_to_table('Homely Café,The Eat Spot,The Hash House,The Pit Spot,The Snack Bar,The Pub,The Deli,The British Tea House,The Beerhouse,Cocktail,The Tied House,Brasserie,Café Spot,The Outlet Hub,The Former,The Juke,Entertainment Spot,The Food Resort,The Pub Hub,Sustainable,The Minor,Eatable,The Long Dinner,The Star Hub,The Deli Food,Flourish,Egg and Bowl,The Rice Bowl,The Dune,Casual Restaurant,The Shabby Space,The Incorporative,The Natural Resort,Eatery Spot,The Coffee Spot,The Ample Service,Busy Dine,The Tasty Spot,Fancy Co,The Meals,The Dawn,The Fresh Feed,Typical Dine In,Toned,The Classical Bar,Discriminated,The Bistro,The Wise Men,The Raw Eatery,Spice Market,Local Food Spot,The Differentials,Starry Night Eatery,More Food,Spice Drama,The Freshly Baked,Noshery,Steakhouse,The Gateway,Outlet,Confetti,My Night Spot,Boozer,Counter,Daily Food Club,Pastry Pub,Bruncheonette,Food Fusion,Dig In,Food Outlet,Display,The Mess Hall,Refectory,Eat O’café,The Decent Bar,Fresh Fodder,The Wise,Dining Compartment Trading Co,Cafe Place,Little Grocery Place,Empty Restaurant Trading Co,The Busy Deli,Deli Place,The Animal Meal,Down Cafe,Passport Restaurant,Meals Co,AuthenticDiner,Fancy Cafe Spot,Pub Collective,Star,The Better Groceries,Classic,The Dingy,Fresh Fed,Nutrition Group,Only,Casual Restaurant Pro,The Star,Casual', ',') AS word
+                          ORDER BY random()
+                          LIMIT 1
+                  ), '')),
+                  random() >= 0.5
+            );
+        END LOOP;
+
+    RETURN QUERY (
+        SELECT * FROM public.business res
+        WHERE res.id BETWEEN (SELECT MAX(b.id) FROM public.business b) - num + 1 AND (SELECT MAX(b.id) FROM public.business b)
     );
 END;
 $function$;
